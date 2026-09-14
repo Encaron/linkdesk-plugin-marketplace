@@ -1,31 +1,37 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-14T02:36:19.060Z",
+  "updatedAt": "2026-09-14T10:03:37.595Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.0.29",
+      "version": "1.0.30",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.29/resources/icon.svg",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.29/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.29/marketplace.linkdesk-plugin",
-      "size": 1185543,
-      "publishedAt": "2026-09-14T02:36:19.060Z",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.30/resources/icon.svg",
+      "iconSource": "url",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.30/resources/icon-brand.svg",
+      "marketIconSource": "url",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.30/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.30/marketplace.linkdesk-plugin",
+      "size": 1187349,
+      "publishedAt": "2026-09-14T10:03:37.595Z",
       "versions": [
+        {
+          "version": "1.0.30",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.30/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-14T10:03:37.595Z",
+          "changelog": "- 修好市场列表里「同一个插件两张脸」：列表行此前读的是目录条目里的 `icon`，而图标栏那几只插件（文件树 / 串口监视器 / 设置 / 插件市场）的 `icon` 按设计是单色线稿（白线剪影），于是市场里显线稿、装到本地显彩色身份图。现在列表行与详情页同序裁决——**已装读包内身份图，未装读目录条目身份图**（目录条目侧由发布链路自动带上 `marketIcon` 的绝对 URL）\n- 已装插件的图标改回**本地**读（快、断网可用），不再可能去拉远程图；未装插件走目录里的绝对 URL——两态各自归位\n- 禁用列表行的图标同样改为「插件自己的图优先」（此前只能退到目录条目取图）"
+        },
         {
           "version": "1.0.29",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.29/marketplace.linkdesk-plugin",
           "publishedAt": "2026-09-14T02:36:19.060Z",
           "changelog": "- 源码迁入独立仓（E6#99，L7 第 7.2 轮）——从壳仓 `Encaron/linkdesk` 抽出本插件子树，历史全保（hash 变）\n- 随包 `plugin.json` 显式声明 `pluginId`（E6#98g）：插件身份不再靠目录名兜底，独立仓构建出的包名与身份稳定\n- `$schema` 改指本仓 `node_modules/@linkdesk/plugin-sdk`（脱离壳仓后原相对路径指到仓外，编辑器补全/校验会失效）"
         }
-      ],
-      "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.29/resources/icon-brand.svg",
-      "marketIconSource": "url"
+      ]
     }
   ]
 }
