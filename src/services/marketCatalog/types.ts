@@ -14,6 +14,12 @@ export interface CatalogEntry {
   icon?: string;
   /** "lucide" | "codicon" | "url"——url 形态 = 作者自制彩色图以 img 元素直载（E6#29c/06-图标.md） */
   iconSource?: "lucide" | "codicon" | "url";
+  /** E6#106：插件身份彩色图（Type-2）——**图标栏插件的 `icon` 是 Type-1 剪影，市场展示位必须读这一张**。
+   *  现实形态一律 `iconSource:"url"` + 绝对 URL（publish 自动 URL 化：包内相对路径在未装态不可达，
+   *  见 @linkdesk/plugin-sdk 的 `withCatalogIdentity`）。缺省 → 落 `icon` → 再缺 → 统一默认彩色块。
+   *  ⚠️ 与「已装」不是一回事：已装插件读**包内** manifest（本地、断网可用）；本条只服务**未装态**。 */
+  marketIcon?: string;
+  marketIconSource?: "lucide" | "codicon" | "url";
   category?: string;
   categories?: string[];
   downloadUrl?: string;

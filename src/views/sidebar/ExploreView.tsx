@@ -55,7 +55,7 @@ export default function ExploreView() {
    *  #30.9b 离线态——离线 ≠ 失败：钮置灰 + title「联网后重试」，无 [重试]（G3） */
   useInstallJobsSubscription();
   const online = useOnlineStatus();
-  const { statusOf, localLoading } = useCatalogStatus();
+  const { statusOf, identityOf, localLoading } = useCatalogStatus();
   const { handleInstall } = useCatalogInstall(online);
 
   /* 行点击开详情（E6#30.5b——详情页三态 action bar 的未装验证入口）——与已装列表同款 plugin-detail 标签。
@@ -122,6 +122,7 @@ export default function ExploreView() {
             entry={e}
             status={statusOf(e)}
             online={online}
+            installedIdentity={identityOf(e.id)}
             onOpenDetail={handleOpenDetail}
             onInstall={handleInstall}
           />

@@ -37,6 +37,10 @@ function normalizeEntry(raw: unknown): CatalogEntry | null {
     author: r.author,
     icon: r.icon,
     iconSource: r.iconSource,
+    // E6#106：身份图（Type-2）——漏了这两行 = 目录带着身份图进来、被白名单静默丢掉，
+    // 市场行退回 icon（图标栏插件 = Type-1 剪影），「同一插件两张脸」原样复发
+    marketIcon: r.marketIcon,
+    marketIconSource: r.marketIconSource,
     category: r.category,
     categories: Array.isArray(r.categories) ? r.categories : undefined,
     downloadUrl: r.downloadUrl,

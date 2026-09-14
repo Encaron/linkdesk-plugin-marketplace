@@ -9,7 +9,7 @@ import { useState, useCallback, useEffect } from "react";
 // E5.7#98：_allPlugins 数据源是 pluginManager.list()（IPC 序列化子集）——消费 PluginListEntry，
 // 非 ViewPluginEntry（后者带 component 字段，IPC 不可达）
 // E5.8#20-c：契约化——插件列表类型走 @linkdesk/contracts（零 @src/core）
-import type { PluginListEntry } from "@linkdesk/contracts";
+import type { PluginListEntry, PluginInfoEntry } from "@linkdesk/contracts";
 import { getMarketplaceSearch, onMarketplaceSearchChange } from "./searchState";
 
 const lk = () => window.linkdesk;
@@ -20,14 +20,11 @@ const pm = () => window.linkdesk?.pluginManager;
 
 let _loadingPromise: Promise<void> | null = null;
 let _allPlugins: PluginListEntry[] = [];
-let _disabledPlugins: Array<{
-  pluginId: string;
-  name: string;
-  description?: string;
-  version?: string;
-  core?: boolean; // E6#30.5b：禁用态 core 透传（守 E6#18 详情页藏卸载钮——禁用分支卸载钮需要它）
-  updatable?: boolean; // E6#73j（G6）：住所透传——随包发货件（只读 app 根）不画「更新到 vX」死钮
-}> = [];
+/* E6#106：改用契约类型 `PluginInfoEntry`（此前是**本地手抄的一份形状**——`core`/`updatable`/图标四字段
+ * 每加一次就要在这里补一遍，漏补的表现就是「壳侧字段已经到了、市场侧 TS 报不存在」）。同一个形状抄两份
+ * = 必然漂移，故收成契约单一来源；契约的 `icon/iconSource/marketIcon/marketIconSource` 即禁用行的
+ * 展示图通道（照 E6#65a 给 list() 补图标通道的先例）。 */
+let _disabledPlugins: PluginInfoEntry[] = [];
 const _dataListeners = new Set<() => void>();
 
 function notifyDataListeners(): void {

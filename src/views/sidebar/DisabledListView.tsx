@@ -53,10 +53,13 @@ export default function DisabledListView() {
         return (
           <div key={p.pluginId} className="ms-extension-item disabled">
             <div className="ms-item-icon">
-              {/* E6#66：禁用子集无 icon 字段（PluginInfoEntry 形状）——行图取目录官方条目兜底
-               *  （catalogById 上文已查，顺带复用），目录也没有 → 默认彩色块顶替历史 📄（硬约束 11：
-               *  图标只由声明字段/目录条目裁决，不凭空猜）。E6#69c/#69f：共享 pickIdentityArt 同裁决。 */}
-              <PluginIcon pluginId={p.pluginId} manifest={pickIdentityArt(catalogById.get(p.pluginId))} />
+              {/* E6#66：禁用子集此前无 icon 字段（PluginInfoEntry 形状）——行图取目录官方条目兜底。
+               *  E6#106：**禁用子集已补图标四字段**（壳 getDisabledPluginInfo 投影随行，照 E6#65a 给
+               *  list() 补图标通道的同一先例），故裁决序与其它位统一为
+               *  「已装（禁用但仍在盘上）→ 目录条目 → 默认彩色块」。
+               *  🔴 这条是**防回归**：目录条目图标已 URL 化，若仍只读目录，禁用行会静默改去拉远程图
+               *  ——既破 06-图标.md「已装不读远程目录图标」，又断网即裂图。 */}
+              <PluginIcon pluginId={p.pluginId} manifest={pickIdentityArt(p, catalogById.get(p.pluginId))} />
             </div>
             <div
               className="ms-item-details"

@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@linkdesk/plugin-sdk/schemas/plugin.schema.json",
   "pluginId": "marketplace",
   "name": "插件市场",
-  "version": "1.0.29",
+  "version": "1.0.30",
   "icon": "resources/icon.svg",
   "marketIcon": "resources/icon-brand.svg",
   "description": "浏览、安装和管理插件",

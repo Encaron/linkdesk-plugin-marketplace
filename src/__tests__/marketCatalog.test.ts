@@ -117,6 +117,31 @@ describe("parseCatalog", () => {
     expect(r.ok).toBe(true);
     if (r.ok) expect(r.catalog.plugins[0].author).toBe("Solo Dev");
   });
+
+  /* E6#106：身份图（Type-2）必须**穿过**白名单——本函数的白名单是逐字段手抄的，
+   * 漏一行 = 目录带着身份图进来、被静默丢掉，图标栏插件的市场行退回 Type-1 剪影（本 bug 原样复发）。 */
+  it("marketIcon/marketIconSource 穿过白名单（漏抄即静默丢，市场行退回剪影）", () => {
+    const r = parseCatalog(
+      JSON.stringify({
+        plugins: [
+          {
+            id: "demo-epsilon",
+            name: "Demo Epsilon",
+            version: "2.0.0",
+            icon: "https://example.invalid/demo-epsilon/icon-bar.svg",
+            iconSource: "url",
+            marketIcon: "https://example.invalid/demo-epsilon/icon.svg",
+            marketIconSource: "url",
+          },
+        ],
+      }),
+    );
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.catalog.plugins[0].marketIcon).toBe("https://example.invalid/demo-epsilon/icon.svg");
+      expect(r.catalog.plugins[0].marketIconSource).toBe("url");
+    }
+  });
 });
 
 /* ── 版本比较（本地 semver，插件独立零 @src/core） ── */

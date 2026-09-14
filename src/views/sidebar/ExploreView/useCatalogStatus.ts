@@ -11,6 +11,9 @@
  *     撞装前冲突；启用/卸载归详情与已装列表）
  *
  * `localLoading` 与状态表同源透出——门面用它与目录 loading 做双门占位（防本地列表未到前整屏误显「安装」）。
+ *
+ * E6#106：同源再透出 `identityOf(id)`——身份图裁决链的「已装候选」（图标四字段）。
+ *   行状态与行图标**读的是同一份本地列表**，两处各订阅一次必然漂移，故都从这里出。
  */
 
 import { useCallback, useMemo } from "react";
@@ -18,6 +21,14 @@ import { updateTargetFor, type CatalogEntry } from "../../../services/marketCata
 import { useMarketplacePlugins } from "../../../services/marketplaceShared";
 
 export type RowStatus = "install" | "installed" | "update" | "disabled";
+
+/** 行/详情身份图裁决的「已装候选」形状——只取图标四字段（= `pickIdentityArt` 的入参形状） */
+export interface LocalIdentity {
+  icon?: string;
+  iconSource?: "codicon" | "svg" | "url" | "lucide";
+  marketIcon?: string;
+  marketIconSource?: "codicon" | "svg" | "url" | "lucide";
+}
 
 export function useCatalogStatus() {
   // 本地未过滤全量列表——#30b 交叉比对基准（勿用 filter 后的 installed/builtin）；
@@ -31,6 +42,34 @@ export function useCatalogStatus() {
     [all],
   );
   const disabledIds = useMemo(() => new Set(disabledRaw.map((p) => p.pluginId)), [disabledRaw]);
+
+  /* ── E6#106：已装候选的图标四字段——身份图裁决链的**第一候选**（与详情页同序：
+   *  已装 manifest → 目录条目 → 默认彩色块）。为什么必须有它（是防回归、不是美化）：
+   *  目录条目的图标已改成**绝对 URL**（包内路径未装时不可达），已装行若不接本地 manifest，
+   *  就会静默改去拉远程图——既破 06-图标.md「已装不读远程目录图标」，又**断网即裂图**。
+   *  启用行优先、禁用行其次（两源都可能装着；同 id 时先写的被覆盖）。 ── */
+  const identityById = useMemo(() => {
+    const m = new Map<string, LocalIdentity>();
+    for (const p of disabledRaw) {
+      m.set(p.pluginId, {
+        icon: p.icon,
+        iconSource: p.iconSource,
+        marketIcon: p.marketIcon,
+        marketIconSource: p.marketIconSource,
+      });
+    }
+    for (const p of all) {
+      m.set(p.pluginId, {
+        icon: p.manifest.icon,
+        iconSource: p.manifest.iconSource,
+        marketIcon: p.manifest.marketIcon,
+        marketIconSource: p.manifest.marketIconSource,
+      });
+    }
+    return m;
+  }, [all, disabledRaw]);
+
+  const identityOf = useCallback((pluginId: string): LocalIdentity | undefined => identityById.get(pluginId), [identityById]);
 
   const statusOf = useCallback(
     (entry: CatalogEntry): RowStatus => {
@@ -46,5 +85,5 @@ export function useCatalogStatus() {
     [localById, disabledIds],
   );
 
-  return { statusOf, localLoading };
+  return { statusOf, identityOf, localLoading };
 }
