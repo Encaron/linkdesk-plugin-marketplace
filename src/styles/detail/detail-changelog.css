@@ -81,7 +81,7 @@
   font-size: var(--font-size-sm);
 }
 
-.mpd-chg .mdv {
+.mpd-chg .ldk-mdv {
   margin-top: 2px;
 }
 
@@ -93,7 +93,7 @@
 }
 
 /* title-row 壳 Badge 内 codicon 对齐（30.8f「官方发布」徽标——Badge 只带 children，图标尺寸/基线归消费方） */
-.mpd-title-row .badge .codicon {
+.mpd-title-row .ldk-badge .codicon {
   font-size: var(--font-size-2xs); /* E5.8 Phase 12 #180：=11px，token 化 */
   vertical-align: -1px;
   margin-right: 2px;
