@@ -1,24 +1,30 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-14T18:09:31.417Z",
+  "updatedAt": "2026-09-15T06:16:39.318Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.0.31",
+      "version": "1.0.32",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.31/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.32/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.31/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.32/resources/icon-brand.svg",
       "marketIconSource": "url",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.31/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.31/marketplace.linkdesk-plugin",
-      "size": 1188443,
-      "publishedAt": "2026-09-14T18:09:31.417Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.32/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.32/marketplace.linkdesk-plugin",
+      "size": 1188965,
+      "publishedAt": "2026-09-15T06:16:39.318Z",
       "versions": [
+        {
+          "version": "1.0.32",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.32/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-15T06:16:39.318Z",
+          "changelog": "- **适配 `@linkdesk/ui` 0.2.0 的类名归一**：共享组件的裸类名（`badge` / `button` / `combobox` / `mdv` / `selectbox` / `sle` / `slider` / `toggle`）全部带上 `ldk-` 前缀——它们此前在「宿主 + 共享组件 + 所有已加载插件」同一张样式表里是**全局标识符**，通用英文词极易被插件自己的元素撞上。本插件对共享控件的两处 scoped 调优同步改名：`.mpd-chg .mdv` → `.mpd-chg .ldk-mdv`、`.mpd-title-row .badge .codicon` → `.mpd-title-row .ldk-badge .codicon`\n- 这两行不改就是**静默失配**——旧的裸选择器不再命中任何元素，更改日志正文的上边距与「官方发布」徽标里的图标尺寸/基线会悄悄跑掉，没有报错\n- `@linkdesk/ui` 升到 `^0.2.0`（`^0.1.4` → `^0.2.0`）。**必须手动放宽区间**：0.x 的 caret 只在上界之内挑版本，`^0.1.4` 永远够不到 0.2.0\n- 无功能变化"
+        },
         {
           "version": "1.0.31",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.31/marketplace.linkdesk-plugin",
