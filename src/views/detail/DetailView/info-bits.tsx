@@ -24,10 +24,10 @@ export function InfoItem({
   mono?: boolean;
   warn?: boolean;
 }) {
-  const cls = mono ? "mpd-info-value mono" : "mpd-info-value";
+  const cls = mono ? "marketplace-mpd-info-value mono" : "marketplace-mpd-info-value";
   return (
-    <div className="mpd-info-item">
-      <span className="mpd-info-label">{label}</span>
+    <div className="marketplace-mpd-info-item">
+      <span className="marketplace-mpd-info-label">{label}</span>
       {typeof value === "string" || typeof value === "number" ? (
         <span className={warn ? `${cls} warn` : cls}>{value}</span>
       ) : (
@@ -39,15 +39,15 @@ export function InfoItem({
 
 /** 元数据侧栏「—」空值占位（依赖/被依赖等无数据的诚实显示） */
 export function Dash() {
-  return <span className="mpd-info-value mpd-info-dash">—</span>;
+  return <span className="marketplace-mpd-info-value marketplace-mpd-info-dash">—</span>;
 }
 
 /** 元数据侧栏分组（#63c B3——mockup 04 定稿：无「信息」总词；节标题 + 组内字段/内容；空组不渲染不占位） */
 export function InfoGroup({ title, items }: { title?: string; items: ReactNode[] }) {
   if (items.length === 0) return null;
   return (
-    <div className="mpd-info-group">
-      {title && <h3 className="mpd-info-group-title">{title}</h3>}
+    <div className="marketplace-mpd-info-group">
+      {title && <h3 className="marketplace-mpd-info-group-title">{title}</h3>}
       {items}
     </div>
   );
@@ -67,9 +67,9 @@ export function DirLink({
   children: ReactNode;
 }) {
   return (
-    <button type="button" className="mpd-info-link mpd-info-link-btn" title={title} onClick={onClick}>
+    <button type="button" className="marketplace-mpd-info-link marketplace-mpd-info-link-btn" title={title} onClick={onClick}>
       {children}
-      {withIcon && <span className="codicon codicon-link-external mpd-info-link-icon" />}
+      {withIcon && <span className="codicon codicon-link-external marketplace-mpd-info-link-icon" />}
     </button>
   );
 }
@@ -77,8 +77,8 @@ export function DirLink({
 /** 外链值（「资源」组：仓库 / 问题）——新窗口打开，rel 防 window.opener */
 export function ExternalLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <a className="mpd-info-link" href={href} target="_blank" rel="noopener noreferrer">
-      {children} <span className="codicon codicon-link-external mpd-info-link-icon" />
+    <a className="marketplace-mpd-info-link" href={href} target="_blank" rel="noopener noreferrer">
+      {children} <span className="codicon codicon-link-external marketplace-mpd-info-link-icon" />
     </a>
   );
 }

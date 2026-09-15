@@ -18,11 +18,11 @@ import { cmdIdOf, type CmdItem, type ConfigItem, type KbItem } from "./contribs"
 function Section({ title, count, children }: { title: string; count: number; children: ReactNode }) {
   if (count === 0) return null;
   return (
-    <section className="mpd-fc-sec">
-      <h3 className="mpd-fc-sec-title">
-        {title} <span className="mpd-fc-count">{count}</span>
+    <section className="marketplace-mpd-fc-sec">
+      <h3 className="marketplace-mpd-fc-sec-title">
+        {title} <span className="marketplace-mpd-fc-count">{count}</span>
       </h3>
-      <div className="mpd-fc-rows">{children}</div>
+      <div className="marketplace-mpd-fc-rows">{children}</div>
     </section>
   );
 }
@@ -43,14 +43,14 @@ export function CommandGroup({
       {commands.map((c, i) => {
         const id = cmdIdOf(c);
         return (
-          <button key={id || i} className="mpd-fc-row" onClick={() => onCopy(id)} title={t("点击复制命令 ID")}>
-            <span className="codicon codicon-terminal mpd-fc-row-icon" />
-            <span className="mpd-fc-main">
-              <span className="mpd-fc-title">{c.title || id}</span>
-              {c.title && <span className="mpd-fc-id">{id}</span>}
+          <button key={id || i} className="marketplace-mpd-fc-row" onClick={() => onCopy(id)} title={t("点击复制命令 ID")}>
+            <span className="codicon codicon-terminal marketplace-mpd-fc-row-icon" />
+            <span className="marketplace-mpd-fc-main">
+              <span className="marketplace-mpd-fc-title">{c.title || id}</span>
+              {c.title && <span className="marketplace-mpd-fc-id">{id}</span>}
             </span>
             {copied === id ? (
-              <span className="mpd-fc-copied">
+              <span className="marketplace-mpd-fc-copied">
                 <span className="codicon codicon-check" /> {t("已复制")}
               </span>
             ) : null}
@@ -67,13 +67,13 @@ export function ConfigGroup({ configs, onJump }: { configs: ConfigItem[]; onJump
   return (
     <Section title={t("配置项")} count={configs.length}>
       {configs.map(([key, desc]) => (
-        <button key={key} className="mpd-fc-row" onClick={() => onJump(key)} title={t("在设置中打开")}>
-          <span className="codicon codicon-gear mpd-fc-row-icon" />
-          <span className="mpd-fc-main">
-            <span className="mpd-fc-title">{desc?.description || key}</span>
-            <span className="mpd-fc-id">{key}</span>
+        <button key={key} className="marketplace-mpd-fc-row" onClick={() => onJump(key)} title={t("在设置中打开")}>
+          <span className="codicon codicon-gear marketplace-mpd-fc-row-icon" />
+          <span className="marketplace-mpd-fc-main">
+            <span className="marketplace-mpd-fc-title">{desc?.description || key}</span>
+            <span className="marketplace-mpd-fc-id">{key}</span>
           </span>
-          <span className="codicon codicon-chevron-right mpd-fc-arrow" />
+          <span className="codicon codicon-chevron-right marketplace-mpd-fc-arrow" />
         </button>
       ))}
     </Section>
@@ -86,11 +86,11 @@ export function KeybindingGroup({ keybindings }: { keybindings: KbItem[] }) {
   return (
     <Section title={t("键绑定")} count={keybindings.length}>
       {keybindings.map((k, i) => (
-        <div key={i} className="mpd-fc-row mpd-fc-row-readonly">
-          <span className="codicon codicon-keyboard mpd-fc-row-icon" />
-          <span className="mpd-fc-main">
-            <span className="mpd-fc-title">{k.command}</span>
-            {k.key && <span className="mpd-fc-kbd">{k.key}</span>}
+        <div key={i} className="marketplace-mpd-fc-row marketplace-mpd-fc-row-readonly">
+          <span className="codicon codicon-keyboard marketplace-mpd-fc-row-icon" />
+          <span className="marketplace-mpd-fc-main">
+            <span className="marketplace-mpd-fc-title">{k.command}</span>
+            {k.key && <span className="marketplace-mpd-fc-kbd">{k.key}</span>}
           </span>
         </div>
       ))}
@@ -104,11 +104,11 @@ export function MenuGroup({ menuRows }: { menuRows: Array<{ menu: string; comman
   return (
     <Section title={t("菜单项")} count={menuRows.length}>
       {menuRows.map((m, i) => (
-        <div key={i} className="mpd-fc-row mpd-fc-row-readonly">
-          <span className="codicon codicon-menu mpd-fc-row-icon" />
-          <span className="mpd-fc-main">
-            <span className="mpd-fc-title">{m.command}</span>
-            <span className="mpd-fc-id">{m.menu}</span>
+        <div key={i} className="marketplace-mpd-fc-row marketplace-mpd-fc-row-readonly">
+          <span className="codicon codicon-menu marketplace-mpd-fc-row-icon" />
+          <span className="marketplace-mpd-fc-main">
+            <span className="marketplace-mpd-fc-title">{m.command}</span>
+            <span className="marketplace-mpd-fc-id">{m.menu}</span>
           </span>
         </div>
       ))}

@@ -29,13 +29,13 @@ export function DepValues({
 }) {
   if (deps.length === 0) return <Dash />;
   return (
-    <span className="mpd-info-deps">
+    <span className="marketplace-mpd-info-deps">
       {deps.map((dep) => {
         const miss = missing.includes(dep);
         return (
           <button
             key={dep}
-            className={miss ? "mpd-info-dep warn" : "mpd-info-dep"}
+            className={miss ? "marketplace-mpd-info-dep warn" : "marketplace-mpd-info-dep"}
             onClick={() => onJump(dep)}
             title={dep}
           >
@@ -58,11 +58,11 @@ export function DependentValues({
 }) {
   if (dependents.length === 0) return <Dash />;
   return (
-    <span className="mpd-info-deps">
+    <span className="marketplace-mpd-info-deps">
       {dependents.map((d) => (
         <button
           key={d.pluginId}
-          className="mpd-info-dep"
+          className="marketplace-mpd-info-dep"
           onClick={() => onJump(d.pluginId)}
           title={d.pluginId}
         >

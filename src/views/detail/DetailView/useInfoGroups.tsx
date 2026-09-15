@@ -87,9 +87,9 @@ export function useInfoGroups(o: InfoGroupsInput): Array<{ title?: string; items
   const cats: ReactNode[] =
     categoryList.length > 0
       ? [
-          <div key="cats" className="mpd-info-cats">
+          <div key="cats" className="marketplace-mpd-info-cats">
             {categoryList.map((slug) => (
-              <span key={slug} className="mpd-info-cat">
+              <span key={slug} className="marketplace-mpd-info-cat">
                 {localizeCategory(t, slug)}
               </span>
             ))}

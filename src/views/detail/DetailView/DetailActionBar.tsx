@@ -1,6 +1,6 @@
 /**
- * DetailActionBar——详情页头部右上动作列（`.mpd-acts`）：row1 主钮（三态分支）+ row2 版本偏好副控制。
- * E6#86a（第 3.6.3 轮）feature-folder 拆分：自 `DetailView.tsx` 的 `<div className="mpd-acts">` 段
+ * DetailActionBar——详情页头部右上动作列（`.marketplace-mpd-acts`）：row1 主钮（三态分支）+ row2 版本偏好副控制。
+ * E6#86a（第 3.6.3 轮）feature-folder 拆分：自 `DetailView.tsx` 的 `<div className="marketplace-mpd-acts">` 段
  * 原样搬出，零行为变更。
  *
  * 三分支判据由调用方算好传入（`disabledRow` / `pending` / `hasInfo`，顺序即优先级）；五个「小件」
@@ -69,8 +69,8 @@ export default function DetailActionBar({
   /* 生命周期动作（启/禁/卸）的冻结栅：替换期间不可再点（busy 与更新进行中同效） */
   const frozen = busy || updating;
   return (
-    <div className="mpd-acts">
-      <div className="mpd-acts-row">
+    <div className="marketplace-mpd-acts">
+      <div className="marketplace-mpd-acts-row">
         {disabledRow ? (
           <>
             {/* E6#33c/#33b 版本动作首槽：版本下拉（versions>1 有历史）+ 升/降钮（降走 requestDowngrade F2 确认 → allowOlder 放行）。
@@ -88,7 +88,7 @@ export default function DetailActionBar({
             )}
           </>
         ) : pending ? (
-          <span className="mpd-blocked-chip" title={pendingReason} role="status">
+          <span className="marketplace-mpd-blocked-chip" title={pendingReason} role="status">
             <span className="codicon codicon-circle-slash" />
             {t("安装不可用（缺依赖）")}
           </span>
@@ -136,10 +136,10 @@ export default function DetailActionBar({
       </div>
 
       {/* #33d 自动更新勾选（row2 副控制——mockup 01 .pdva-acts row2 L849-851；G2：已装且非挂起才渲染）
-       *  E6#83：同 row 尾随「已停在 vX」说明件——两条会打架的意愿并排（`.mpd-acts-row` 自带 wrap 兜底，
+       *  E6#83：同 row 尾随「已停在 vX」说明件——两条会打架的意愿并排（`.marketplace-mpd-acts-row` 自带 wrap 兜底，
        *  窄栏换行不掉版式）。两者皆空则整行不渲染，不留空行。 */}
       {autoUpdateToggle || pinnedNote ? (
-        <div className="mpd-acts-row">
+        <div className="marketplace-mpd-acts-row">
           {autoUpdateToggle}
           {pinnedNote}
         </div>

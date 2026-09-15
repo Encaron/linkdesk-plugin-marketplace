@@ -15,7 +15,7 @@
  * 零 @src/core——数据全走 window.linkdesk.* IPC + 本插件模块级 store。
  * 壳 PluginDetailPoolView 降级为保底宿主（无市场插件/无详情贡献时兜底，不崩）。
  *
- * E6#63 版式对账（3.5.1 B1-B5）：header = 图标 ｜ 名/副题/简述 ｜ 右上动作列 .mpd-acts（原 header 下方
+ * E6#63 版式对账（3.5.1 B1-B5）：header = 图标 ｜ 名/副题/简述 ｜ 右上动作列 .marketplace-mpd-acts（原 header 下方
  * action bar 整行迁入——01 竞标 A .pdva-head 三段一行 L829-853，动作在图标/名右方同头部）；
  * icon 52 位 + header 下 --separator 分隔线（B2）；info 侧栏 = mockup 04 分组（顶部 标识符/作者/版本/大小
  * + 组 市场/类别/资源/依赖·环境、label 左 | value 右 横排 + 项间细分隔、分类每枚 chip 并排）——作者行补齐
@@ -111,11 +111,11 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
   // ── 数据未齐（本地列表未到 → 误判「未安装」前等一拍；目录只等未装分支，已装不阻塞） ──
   if (!info) {
     if (pluginsLoading || catalog.loading) {
-      return <div className="mpd-empty">{t("加载中...")}</div>;
+      return <div className="marketplace-mpd-empty">{t("加载中...")}</div>;
     }
     if (!entry) {
       return (
-        <div className="mpd-empty">
+        <div className="marketplace-mpd-empty">
           {pluginId ? (
             <p>{t("插件") + ` "${pluginId}" ` + t("未安装")}</p>
           ) : (
@@ -156,8 +156,8 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
   };
 
   return (
-    <div className="mpd-detail">
-      {/* ═══ Header（#63a B1：三段一行——icon ｜ id/副题/简述列 ｜ 右上动作列 .mpd-acts） ═══ */}
+    <div className="marketplace-mpd-detail">
+      {/* ═══ Header（#63a B1：三段一行——icon ｜ id/副题/简述列 ｜ 右上动作列 .marketplace-mpd-acts） ═══ */}
       <DetailHeader
         pluginId={pluginId}
         iconManifest={iconManifest}
@@ -198,24 +198,24 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
       />
 
       {/* ═══ NavBar——详情/功能/更改日志（30.6 三 tab，本地 state，host 换插件实例重置） ═══ */}
-      <nav className="mpd-navbar">
-        <button className={tab === "overview" ? "mpd-navtab active" : "mpd-navtab"} onClick={() => setTab("overview")}>
+      <nav className="marketplace-mpd-navbar">
+        <button className={tab === "overview" ? "marketplace-mpd-navtab active" : "marketplace-mpd-navtab"} onClick={() => setTab("overview")}>
           {t("详情")}
         </button>
-        <button className={tab === "features" ? "mpd-navtab active" : "mpd-navtab"} onClick={() => setTab("features")}>
+        <button className={tab === "features" ? "marketplace-mpd-navtab active" : "marketplace-mpd-navtab"} onClick={() => setTab("features")}>
           {t("功能")}
         </button>
-        <button className={tab === "changelog" ? "mpd-navtab active" : "mpd-navtab"} onClick={() => setTab("changelog")}>
+        <button className={tab === "changelog" ? "marketplace-mpd-navtab active" : "marketplace-mpd-navtab"} onClick={() => setTab("changelog")}>
           {t("更改日志")}
           {/* E6#33b：可更新 → 更改日志 tab 亮 dot（04 §二·五——新内容在 changelog） */}
-          {ver.hasUpdate && <span className="mpd-nav-dot" aria-label={t("有新版本可用")} />}
+          {ver.hasUpdate && <span className="marketplace-mpd-nav-dot" aria-label={t("有新版本可用")} />}
         </button>
       </nav>
 
       {/* ═══ Body = tab 内容(main) + 元数据侧栏(aside，常驻三 tab) ═══ */}
-      <div className="mpd-body">
-        <div className="mpd-details-layout">
-          <div className="mpd-details-main">
+      <div className="marketplace-mpd-body">
+        <div className="marketplace-mpd-details-layout">
+          <div className="marketplace-mpd-details-main">
             {tab === "overview" && (
               <DetailOverviewTab
                 hasUpdate={ver.hasUpdate}

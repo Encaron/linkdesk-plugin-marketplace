@@ -4,19 +4,19 @@
 
 /* ═══ 功能 tab（30.6d——mockup 帧 9；组壳 = 底部分隔线卡片，行 hover = --tab-hover-bg 壳惯例） ═══ */
 
-.mpd-fc {
+.marketplace-mpd-fc {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.mpd-fc-sec {
+.marketplace-mpd-fc-sec {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.mpd-fc-sec-title {
+.marketplace-mpd-fc-sec-title {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -26,7 +26,7 @@
   color: var(--text-secondary);
 }
 
-.mpd-fc-count {
+.marketplace-mpd-fc-count {
   font-size: var(--font-size-xs);
   line-height: 1.5;
   color: var(--text-muted);
@@ -35,7 +35,7 @@
   padding: 0 6px;
 }
 
-.mpd-fc-rows {
+.marketplace-mpd-fc-rows {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--separator);
@@ -43,7 +43,7 @@
   overflow: hidden;
 }
 
-.mpd-fc-row {
+.marketplace-mpd-fc-row {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -60,29 +60,29 @@
   transition: background 120ms;
 }
 
-.mpd-fc-row:last-child {
+.marketplace-mpd-fc-row:last-child {
   border-bottom: none;
 }
 
-.mpd-fc-row:hover {
+.marketplace-mpd-fc-row:hover {
   background: var(--tab-hover-bg);
 }
 
-.mpd-fc-row-readonly {
+.marketplace-mpd-fc-row-readonly {
   cursor: default;
 }
 
-.mpd-fc-row-readonly:hover {
+.marketplace-mpd-fc-row-readonly:hover {
   background: none;
 }
 
-.mpd-fc-row-icon {
+.marketplace-mpd-fc-row-icon {
   color: var(--text-muted);
   font-size: var(--font-size-md);
   flex-shrink: 0;
 }
 
-.mpd-fc-main {
+.marketplace-mpd-fc-main {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -90,14 +90,14 @@
   gap: 1px;
 }
 
-.mpd-fc-title {
+.marketplace-mpd-fc-title {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--font-size-sm);
 }
 
-.mpd-fc-id {
+.marketplace-mpd-fc-id {
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   color: var(--text-muted);
@@ -106,7 +106,7 @@
   white-space: nowrap;
 }
 
-.mpd-fc-kbd {
+.marketplace-mpd-fc-kbd {
   display: inline-block;
   align-self: flex-start;
   font-family: var(--font-mono);
@@ -119,7 +119,7 @@
   color: var(--text-secondary);
 }
 
-.mpd-fc-copied {
+.marketplace-mpd-fc-copied {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -128,19 +128,19 @@
   font-size: var(--font-size-xs);
 }
 
-.mpd-fc-arrow {
+.marketplace-mpd-fc-arrow {
   color: var(--text-muted);
   font-size: var(--font-size-xs);
   flex-shrink: 0;
 }
 
-.mpd-fc-empty {
+.marketplace-mpd-fc-empty {
   padding: 16px 4px;
   color: var(--text-secondary);
   font-size: var(--font-size-md);
   line-height: 1.5;
 }
 
-.mpd-fc-empty p {
+.marketplace-mpd-fc-empty p {
   margin: 0;
 }

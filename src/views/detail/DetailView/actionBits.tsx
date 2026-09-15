@@ -33,7 +33,7 @@ export function versionPickerOf(o: {
       onChange={(v) => o.onPick(v)}
       disabled={o.disabled}
       title={o.t("选择版本")}
-      className="mpd-version-select"
+      className="marketplace-mpd-version-select"
     />
   );
 }
@@ -55,7 +55,7 @@ export function installPickerOf(o: {
       onChange={(v) => o.onPick(v)}
       disabled={o.disabled}
       title={o.t("选择版本")}
-      className="mpd-version-select"
+      className="marketplace-mpd-version-select"
     />
   );
 }
@@ -105,7 +105,7 @@ export function autoToggleOf(o: {
   if (!o.show) return null;
   return (
     <label
-      className={"mpd-auto-upd" + (o.disabled ? " disabled" : "")}
+      className={"marketplace-mpd-auto-upd" + (o.disabled ? " disabled" : "")}
       title={o.t("勾选后自动更新——有新版本就自动装上，装完发通知告诉你")}
     >
       <input
@@ -123,12 +123,12 @@ export function autoToggleOf(o: {
  *  同 row2 与自动更新勾并排：那两条正是会打架的两条意愿，摆在一起用户一眼能看出彼此关系；勾上开关即清钉、
  *  这枚件随之消失（可见的因果反馈）。
  *  设计（硬约束 16 已走 design skill）：**非按钮状态件**——纯说明、不可点，解钉的两条正路是勾开关或在下拉里
- *  选最新版，不给一个按不动的按钮（同 `.mpd-blocked-chip` 判据）。视觉复用 `.mpd-auto-upd` 同族 token。 */
+ *  选最新版，不给一个按不动的按钮（同 `.marketplace-mpd-blocked-chip` 判据）。视觉复用 `.marketplace-mpd-auto-upd` 同族 token。 */
 export function pinnedNoteOf(o: { show: boolean; version?: string; t: T }): ReactNode {
   if (!o.show || o.version === undefined) return null;
   return (
     <span
-      className="mpd-pinned-note"
+      className="marketplace-mpd-pinned-note"
       title={o.t("你从版本下拉里挑了 {{version}}，自动更新会跳过它——勾上「自动更新」或在下拉里选最新版即可解除", {
         version: `v${o.version}`,
       })}

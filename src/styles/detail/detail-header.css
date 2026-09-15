@@ -5,7 +5,7 @@
 
 /* ═══ Header ═══ */
 
-.mpd-header {
+.marketplace-mpd-header {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -14,7 +14,7 @@
   border-bottom: 1px solid var(--separator); /* #63b B2：header 面板下分隔线（气泡皮肤可弃、分隔线不可省） */
 }
 
-.mpd-icon {
+.marketplace-mpd-icon {
   position: relative;
   /* E6#66/67（2026-09-09 拍板）：展示位 52 → 96 方框；E6#69c 再放大档 96 → 128——Type-2 身份图框
    *（marketIcon/icon/默认彩色块同在此框显形，内图按型接管，见下；#69c 档位已点头） */
@@ -29,8 +29,8 @@
 /* 展示 descriptor → PluginIcon 渲染的尺寸接管。img 型 = Type-2 身份图（128 框内显 ~120 画幅，48 留白比例
  * 使色块 ≈100）；codicon/lucide/emoji 型 = 界面图形（放大到 56 即止，不把细线 glyph 撑成巨型——图形型本不是
  * 身份资产） */
-.mpd-icon .plugin-icon--codicon,
-.mpd-icon .plugin-icon--emoji {
+.marketplace-mpd-icon .plugin-icon--codicon,
+.marketplace-mpd-icon .plugin-icon--emoji {
   font-size: 56px !important;
   line-height: 1;
   width: auto;
@@ -38,19 +38,19 @@
   color: var(--text-secondary);
 }
 
-.mpd-icon .plugin-icon--lucide {
+.marketplace-mpd-icon .plugin-icon--lucide {
   width: 56px;
   height: 56px;
 }
 
-.mpd-icon .plugin-icon--img {
+.marketplace-mpd-icon .plugin-icon--img {
   width: 120px;
   height: 120px;
   object-fit: contain;
 }
 
 /* core:true 星标（#18a UI 旗标——藏卸载钮同旗；52 盒右下角收敛 ~20） */
-.mpd-icon-badge {
+.marketplace-mpd-icon-badge {
   position: absolute;
   right: -3px;
   bottom: -3px;
@@ -66,7 +66,7 @@
   justify-content: center;
 }
 
-.mpd-header-details {
+.marketplace-mpd-header-details {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -75,14 +75,14 @@
   justify-content: center;
 }
 
-.mpd-title-row {
+.marketplace-mpd-title-row {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.mpd-name {
+.marketplace-mpd-name {
   font-size: var(--font-size-3xl);
   line-height: 1.2;
   font-weight: 600;
@@ -90,7 +90,7 @@
   white-space: nowrap;
 }
 
-.mpd-version {
+.marketplace-mpd-version {
   font-size: var(--font-size-lg);
   color: var(--text-muted);
   white-space: nowrap;
@@ -98,13 +98,13 @@
 
 /* 内置 chip = 壳 Badge 基础件（E6#30.14b）——色/形状全走壳 token，本文件零样式 */
 
-.mpd-subtitle {
+.marketplace-mpd-subtitle {
   font-size: var(--font-size-md);
   color: var(--text-secondary);
   margin: 0;
 }
 
-.mpd-short-desc {
+.marketplace-mpd-short-desc {
   font-size: var(--font-size-md);
   color: var(--text-secondary);
   margin: 4px 0 0;
@@ -114,7 +114,7 @@
 /* ═══ 挂起·缺依赖 三通道（E6#30.5e——取代 E5.8#15.5 旧顶部横幅；mockup 帧 7：头部零横幅 + action chip） ═══ */
 
 /* 🚫 安装不可用（缺依赖）chip——非按钮状态件（禁交互，不抢主操作区） */
-.mpd-blocked-chip {
+.marketplace-mpd-blocked-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -127,39 +127,39 @@
   user-select: none;
 }
 
-.mpd-blocked-chip .codicon {
+.marketplace-mpd-blocked-chip .codicon {
   font-size: var(--font-size-md);
   flex-shrink: 0;
 }
 
 /* 主区「依赖未满足」说明块——标题 + 引导行 + 缺失依赖列表（行缺失标黄 ✕ 可点跳详情） */
-.mpd-deps-block {
+.marketplace-mpd-deps-block {
   display: flex;
   flex-direction: column;
   gap: 4px;
   margin-bottom: 16px;
 }
 
-.mpd-deps-title {
+.marketplace-mpd-deps-title {
   font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.mpd-deps-lead {
+.marketplace-mpd-deps-lead {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
   line-height: 1.5;
   margin: 4px 0 8px;
 }
 
-.mpd-deps-list {
+.marketplace-mpd-deps-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.mpd-dep-item {
+.marketplace-mpd-dep-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -176,23 +176,23 @@
   transition: border-color 120ms;
 }
 
-.mpd-dep-item:hover {
+.marketplace-mpd-dep-item:hover {
   border-color: var(--warning-text);
 }
 
-.mpd-dep-x {
+.marketplace-mpd-dep-x {
   color: var(--warning-text);
   font-size: var(--font-size-sm);
   flex-shrink: 0;
 }
 
-.mpd-dep-name {
+.marketplace-mpd-dep-name {
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   word-break: break-all;
 }
 
-.mpd-dep-state {
+.marketplace-mpd-dep-state {
   margin-left: auto;
   color: var(--text-muted);
   font-size: var(--font-size-xs);
@@ -202,7 +202,7 @@
 /* ═══ E6#33b 第四维「有新版本可用」块（mockup 帧 6：主区顶部 accent 信息带——只报状态引导 changelog，
  *  更新动作在 action bar 首槽 ⬆；accent = 更新语义族，与 install 绿/卸载红正交） ═══ */
 
-.mpd-update-block {
+.marketplace-mpd-update-block {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -213,34 +213,34 @@
   background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
-.mpd-update-block-icon {
+.marketplace-mpd-update-block-icon {
   color: var(--accent);
   font-size: var(--font-size-lg);
   flex-shrink: 0;
   margin-top: 1px;
 }
 
-.mpd-update-block-body {
+.marketplace-mpd-update-block-body {
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
 }
 
-.mpd-update-block-title {
+.marketplace-mpd-update-block-title {
   font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.mpd-update-block-lead {
+.marketplace-mpd-update-block-lead {
   margin: 0;
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
   line-height: 1.5;
 }
 
-.mpd-update-block-hint {
+.marketplace-mpd-update-block-hint {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -255,10 +255,10 @@
   cursor: pointer;
 }
 
-.mpd-update-block-hint:hover {
+.marketplace-mpd-update-block-hint:hover {
   text-decoration: underline;
 }
 
-.mpd-update-block-hint .codicon {
+.marketplace-mpd-update-block-hint .codicon {
   font-size: var(--font-size-xs);
 }

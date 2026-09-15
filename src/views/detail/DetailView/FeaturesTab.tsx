@@ -60,7 +60,7 @@ export default function FeaturesTab({ pluginId, contributes, hasContribSource, i
   /* ── 空态：无任何可展示组 ── */
   if (commands.length === 0 && configs.length === 0 && keybindings.length === 0 && menuRows.length === 0) {
     return (
-      <div className="mpd-fc-empty">
+      <div className="marketplace-mpd-fc-empty">
         <p>
           {hasContribSource
             ? t("该插件未声明功能贡献")
@@ -73,7 +73,7 @@ export default function FeaturesTab({ pluginId, contributes, hasContribSource, i
   }
 
   return (
-    <div className="mpd-fc">
+    <div className="marketplace-mpd-fc">
       <CommandGroup commands={commands} copied={copied} onCopy={handleCopy} />
       <ConfigGroup configs={configs} onJump={handleJumpConfig} />
       <KeybindingGroup keybindings={keybindings} />

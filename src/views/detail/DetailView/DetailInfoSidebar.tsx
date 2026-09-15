@@ -12,7 +12,7 @@ import { useInfoGroups, type InfoGroupsInput } from "./useInfoGroups";
 export default function DetailInfoSidebar(props: InfoGroupsInput) {
   const groups = useInfoGroups(props);
   return (
-    <aside className="mpd-info-sidebar">
+    <aside className="marketplace-mpd-info-sidebar">
       {groups.map((g) => (
         <InfoGroup key={g.title ?? "__top"} title={g.title} items={g.items} />
       ))}

@@ -50,16 +50,16 @@ export default function ChangelogTab({
 
   /* 版本块（渲染纯函数——t 来自本组件 hook，非子组件无 hook 规则问题） */
   const versionBlock = (version: string, opts: { date?: string; isLatest?: boolean; body?: string }) => (
-    <div className="mpd-chg-ver" key={version + (opts.date ?? "")}>
-      <div className="mpd-chg-ver-head">
-        <span className="mpd-chg-ver-tag">v{version}</span>
-        {opts.isLatest && <span className="mpd-chg-tag mpd-chg-tag-latest">{t("最新")}</span>}
-        {opts.date && <span className="mpd-chg-date">{fmtDate(opts.date)}</span>}
+    <div className="marketplace-mpd-chg-ver" key={version + (opts.date ?? "")}>
+      <div className="marketplace-mpd-chg-ver-head">
+        <span className="marketplace-mpd-chg-ver-tag">v{version}</span>
+        {opts.isLatest && <span className="marketplace-mpd-chg-tag marketplace-mpd-chg-tag-latest">{t("最新")}</span>}
+        {opts.date && <span className="marketplace-mpd-chg-date">{fmtDate(opts.date)}</span>}
       </div>
       {opts.body && opts.body.trim() ? (
         <MarkdownView markdown={opts.body} />
       ) : (
-        <p className="mpd-chg-none">{t("此版本未提供变更说明")}</p>
+        <p className="marketplace-mpd-chg-none">{t("此版本未提供变更说明")}</p>
       )}
     </div>
   );
@@ -68,32 +68,32 @@ export default function ChangelogTab({
    *  remote 块内容 = 目录 versions[].changelog（远端新包未下载无法读包内文件——诚实以目录注记为准，缺即显示未提供）。 */
   if (installed) {
     if (localChangelog === undefined) {
-      return <p className="mpd-chg-empty">{t("加载中...")}</p>;
+      return <p className="marketplace-mpd-chg-empty">{t("加载中...")}</p>;
     }
     const hasLocal = !!localChangelog && !!localChangelog.trim();
     if (!remote && !hasLocal) {
-      return <p className="mpd-chg-empty">{t("该插件未附带更改日志")}</p>;
+      return <p className="marketplace-mpd-chg-empty">{t("该插件未附带更改日志")}</p>;
     }
     return (
-      <div className="mpd-chg">
+      <div className="marketplace-mpd-chg">
         {remote && versionBlock(remote.version, { date: remote.date, isLatest: true, body: remote.body })}
         {hasLocal ? (
-          <div className="mpd-chg-ver">
+          <div className="marketplace-mpd-chg-ver">
             {/* E6#92f：块头诚实化——已装分支铺的是包内 CHANGELOG.md **全文**（全部历史），
                 原标题「v{已装版本} + 已安装」自称单版、底下却是全部 ⇒ **标题在骗人**。
                 改为「全部更新记录」+「已安装 v{版本}」：**切法一行未动**，版本号从
                 「这一块的版本」降为「你装的是哪版」放进徽标（用户 2026-09-11 拍板，
                 00 §五①——版式不对称是已知设计，不归一本轮）。 */}
-            <div className="mpd-chg-ver-head">
-              <span className="mpd-chg-ver-scope">{t("全部更新记录")}</span>
-              <span className="mpd-chg-tag mpd-chg-tag-installed">
+            <div className="marketplace-mpd-chg-ver-head">
+              <span className="marketplace-mpd-chg-ver-scope">{t("全部更新记录")}</span>
+              <span className="marketplace-mpd-chg-tag marketplace-mpd-chg-tag-installed">
                 {t("已安装")}{localVersion ? ` v${localVersion}` : ""}
               </span>
             </div>
             <MarkdownView markdown={localChangelog} />
           </div>
         ) : (
-          <p className="mpd-chg-empty">{t("该插件未附带更改日志")}</p>
+          <p className="marketplace-mpd-chg-empty">{t("该插件未附带更改日志")}</p>
         )}
       </div>
     );
@@ -107,7 +107,7 @@ export default function ChangelogTab({
         ? [{ version: latestVersion, date: undefined, isLatest: true, body: undefined }]
         : [];
   if (rows.length === 0) {
-    return <p className="mpd-chg-empty">{t("该插件未附带更改日志")}</p>;
+    return <p className="marketplace-mpd-chg-empty">{t("该插件未附带更改日志")}</p>;
   }
-  return <div className="mpd-chg">{rows.map((r) => versionBlock(r.version, r))}</div>;
+  return <div className="marketplace-mpd-chg">{rows.map((r) => versionBlock(r.version, r))}</div>;
 }

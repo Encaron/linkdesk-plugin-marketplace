@@ -5,30 +5,30 @@
 
 /* ═══ Body：details layout = main + info sidebar ═══ */
 
-.mpd-body {
+.marketplace-mpd-body {
   flex: 1;
   overflow-y: auto;
   padding: 16px 20px;
 }
 
-.mpd-details-layout {
+.marketplace-mpd-details-layout {
   display: flex;
   gap: 32px;
 }
 
-.mpd-details-main {
+.marketplace-mpd-details-main {
   flex: 1;
   min-width: 0;
 }
 
-.mpd-description {
+.marketplace-mpd-description {
   font-size: var(--font-size-md);
   color: var(--text-secondary);
   line-height: 1.6;
   margin: 0;
 }
 
-.mpd-info-sidebar {
+.marketplace-mpd-info-sidebar {
   width: 220px;
   flex: none; /* #63d B4：右栏定宽——README 全宽吃满可用宽时不被挤走 */
   display: flex;
@@ -36,42 +36,42 @@
   padding-bottom: 8px; /* 末项下分隔线留呼吸（行横排 = 下方 #63c 侧栏覆写） */
 }
 
-.mpd-info-item {
+.marketplace-mpd-info-item {
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: 4px 0;
 }
 
-.mpd-info-label {
+.marketplace-mpd-info-label {
   font-size: var(--font-size-xs);
   color: var(--text-muted);
 }
 
-.mpd-info-value {
+.marketplace-mpd-info-value {
   font-size: var(--font-size-sm);
   color: var(--text-primary);
   word-break: break-all;
 }
 
-.mpd-info-value.mono {
+.marketplace-mpd-info-value.mono {
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
 }
 
-/* ═══ #63c B3：侧栏分组 + 行横排（作用域限定 .mpd-info-sidebar——base .mpd-info-item 竖叠为默认布局；
+/* ═══ #63c B3：侧栏分组 + 行横排（作用域限定 .marketplace-mpd-info-sidebar——base .marketplace-mpd-info-item 竖叠为默认布局；
  *  mockup 04 定稿：节标题带组上分隔线、label 左 | value 右、项间细分隔） ═══ */
 
-.mpd-info-group {
+.marketplace-mpd-info-group {
   margin-top: 12px;
 }
 
-.mpd-info-sidebar > .mpd-info-group:first-child {
+.marketplace-mpd-info-sidebar > .marketplace-mpd-info-group:first-child {
   margin-top: 0;
 }
 
 /* 分组节标题（无「信息」总词——组内字段自带归属；2xs + secondary + 0.06em 字距 = muted 小号大标题感） */
-.mpd-info-group-title {
+.marketplace-mpd-info-group-title {
   margin: 0 0 2px;
   padding-top: 8px;
   border-top: 1px solid var(--separator);
@@ -81,8 +81,8 @@
   color: var(--text-secondary);
 }
 
-/* 行 = label 左 ｜ value 右 横排（base .mpd-info-item 竖叠为默认；侧栏内覆写为横排 + 项间细分隔） */
-.mpd-info-sidebar .mpd-info-item {
+/* 行 = label 左 ｜ value 右 横排（base .marketplace-mpd-info-item 竖叠为默认；侧栏内覆写为横排 + 项间细分隔） */
+.marketplace-mpd-info-sidebar .marketplace-mpd-info-item {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -92,12 +92,12 @@
   border-bottom: 1px solid var(--separator); /* 项间细分隔 */
 }
 
-.mpd-info-sidebar .mpd-info-label {
+.marketplace-mpd-info-sidebar .marketplace-mpd-info-label {
   flex: none;
   white-space: nowrap;
 }
 
-.mpd-info-sidebar .mpd-info-value {
+.marketplace-mpd-info-sidebar .marketplace-mpd-info-value {
   flex: 1;
   min-width: 0;
   text-align: right;
@@ -105,14 +105,14 @@
 }
 
 /* 类别组 = 每分类一枚 chip 并排（VS Code renderCategories 实证；非交互状态件） */
-.mpd-info-cats {
+.marketplace-mpd-info-cats {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
   padding: 3px 0 4px;
 }
 
-.mpd-info-cat {
+.marketplace-mpd-info-cat {
   font-size: var(--font-size-2xs);
   line-height: 1.6; /* 2xs(11px)×1.6≈18px 芯片高——unitless 免白名单 */
   color: var(--text-secondary);
@@ -125,7 +125,7 @@
 
 /* ═══ 截图画廊（30.6c1——mockup 帧 1/8：横向滚动截图条；作者自制图以 img 元素直载，同 downloadUrl 信任级） ═══ */
 
-.mpd-gallery {
+.marketplace-mpd-gallery {
   display: flex;
   gap: 12px;
   overflow-x: auto;
@@ -133,7 +133,7 @@
   margin-bottom: 8px;
 }
 
-.mpd-gallery-shot {
+.marketplace-mpd-gallery-shot {
   flex: 0 0 auto;
   max-width: 320px;
   max-height: 200px;
@@ -144,24 +144,24 @@
   object-fit: contain;
 }
 
-.mpd-readme-note {
+.marketplace-mpd-readme-note {
   margin: 4px 0;
   color: var(--text-muted);
   font-size: var(--font-size-sm);
 }
 
-.mpd-readme {
+.marketplace-mpd-readme {
   margin-top: 4px;
   overflow-wrap: break-word; /* #63d B4：README 超长 URL 断行不横向溢出（B4 全宽后正文列变宽） */
 }
 
 /* ═══ 元数据侧栏：空值 dash / 仓库·问题外链锚 / 依赖·被依赖 chip 组（30.6c2/c3） ═══ */
 
-.mpd-info-dash {
+.marketplace-mpd-info-dash {
   color: var(--text-muted);
 }
 
-.mpd-info-link {
+.marketplace-mpd-info-link {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -171,20 +171,20 @@
   cursor: pointer;
 }
 
-.mpd-info-link:hover {
+.marketplace-mpd-info-link:hover {
   text-decoration: underline;
 }
 
-.mpd-info-link-icon {
+.marketplace-mpd-info-link-icon {
   font-size: var(--font-size-xs);
 }
 
-/* E6#78：动作型链接 = <button> 扮 <a>。`.mpd-info-link` 原为 <a href> 而设，「打开所在位置 / 打开数据位置」
+/* E6#78：动作型链接 = <button> 扮 <a>。`.marketplace-mpd-info-link` 原为 <a href> 而设，「打开所在位置 / 打开数据位置」
  *  是**动作**不是导航——用 button 才有正确的键盘（Enter/Space）与读屏语义，故补按钮 reset。
  *  纵向 padding 2px 是**加点击靶不加宽**：文字基线不动、右对齐列宽不变（零布局跳动）；
  *  刻意不见方加高——「大小」与「数据位置」两行相邻，靶再高两行热区会并成一片（误点邻行）。
  *  焦点环走全局 `*:focus-visible`（src/index.css:268），此处不覆写。 */
-.mpd-info-link-btn {
+.marketplace-mpd-info-link-btn {
   background: none;
   border: 0;
   padding: 2px 0;
@@ -193,13 +193,13 @@
   line-height: inherit;
 }
 
-.mpd-info-deps {
+.marketplace-mpd-info-deps {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.mpd-info-dep {
+.marketplace-mpd-info-dep {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -216,22 +216,22 @@
   transition: border-color 120ms, color 120ms;
 }
 
-.mpd-info-dep:hover {
+.marketplace-mpd-info-dep:hover {
   border-color: var(--accent);
   color: var(--text-primary);
 }
 
 /* 缺失依赖 chip 标黄（与主区 deps 块同语义——--warning-text） */
-.mpd-info-dep.warn {
+.marketplace-mpd-info-dep.warn {
   color: var(--warning-text);
   border-color: var(--warning-text);
 }
 
-.mpd-info-dep.warn:hover {
+.marketplace-mpd-info-dep.warn:hover {
   background: var(--warning-bg);
 }
 
-.mpd-info-dep .codicon {
+.marketplace-mpd-info-dep .codicon {
   font-size: var(--font-size-xs);
   flex-shrink: 0;
 }
