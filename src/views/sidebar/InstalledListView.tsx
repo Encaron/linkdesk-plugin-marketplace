@@ -28,20 +28,20 @@ export default function InstalledListView() {
     tabs?.create("plugin-detail", { pluginId, pinned: true });
   };
 
-  if (loading) return <div className="ms-empty">{t("加载中...")}</div>;
+  if (loading) return <div className="marketplace-ms-empty">{t("加载中...")}</div>;
 
   const search = getMarketplaceSearch();
 
   if (installed.length === 0) {
     return (
-      <div className="ms-empty">
+      <div className="marketplace-ms-empty">
         {search ? t("未找到匹配的插件") : t("暂无已安装插件")}
       </div>
     );
   }
 
   return (
-    <div className="ms-section-items">
+    <div className="marketplace-ms-section-items">
       {installed.map((p) => (
         <ExtensionItem
           key={p.pluginId}

@@ -8,11 +8,11 @@
    mockup 01 对标 VS Code 扩展卡片；hover 高亮沿用列表可读性）。安装钮内 onClick stopPropagation 隔离。
    右缘状态区 = 已安装/可更新徽标（绿 / accent），无动作——升级入口归更新轮。 */
 
-.ms-extension-item.catalog {
+.marketplace-ms-extension-item.catalog {
   cursor: pointer;
 }
 
-.ms-catalog-status {
+.marketplace-ms-catalog-status {
   flex-shrink: 0;
   align-self: center;
   display: inline-flex;
@@ -24,34 +24,34 @@
   white-space: nowrap;
 }
 
-.ms-catalog-status.update {
+.marketplace-ms-catalog-status.update {
   color: var(--accent);
 }
 
-.ms-catalog-status .codicon {
+.marketplace-ms-catalog-status .codicon {
   font-size: var(--font-size-sm); /* E5.8 Phase 12 #175：内容图标 12→sm */
 }
 
 /* 目录行态变体（E6#30.9——基色 success 属「已安装」；进度 accent / 禁用 muted） */
-.ms-catalog-status.installing {
+.marketplace-ms-catalog-status.installing {
   color: var(--accent);
 }
 
-.ms-catalog-status.installing .codicon {
+.marketplace-ms-catalog-status.installing .codicon {
   /* 下载中图标微动画 = 内容图标转——示意活动，非装饰（reduced-motion 尊重） */
-  animation: ms-icon-spin 1.2s linear infinite;
+  animation: marketplace-ms-icon-spin 1.2s linear infinite;
 }
 
-.ms-catalog-status.disabled {
+.marketplace-ms-catalog-status.disabled {
   color: var(--text-muted);
 }
 
-.ms-catalog-status.disabled .codicon {
+.marketplace-ms-catalog-status.disabled .codicon {
   color: var(--text-secondary);
 }
 
 /* 安装失败行（30.9b M4 三）——归因文案截断 + [重试] 图标钮（✕ 归详情行）。整 chip 走语义 token */
-.ms-item-fail {
+.marketplace-ms-item-fail {
   flex-shrink: 0;
   align-self: center;
   display: inline-flex;
@@ -64,19 +64,19 @@
   white-space: nowrap;
 }
 
-.ms-item-fail > .codicon {
+.marketplace-ms-item-fail > .codicon {
   flex-shrink: 0;
   font-size: var(--font-size-sm);
 }
 
-.ms-item-fail-text {
+.marketplace-ms-item-fail-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
 }
 
-.ms-item-fail-act {
+.marketplace-ms-item-fail-act {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -91,16 +91,16 @@
   cursor: pointer;
 }
 
-.ms-item-fail-act:hover {
+.marketplace-ms-item-fail-act:hover {
   color: var(--text-primary);
   background: var(--tab-hover-bg);
 }
 
-.ms-item-fail-act .codicon {
+.marketplace-ms-item-fail-act .codicon {
   font-size: var(--font-size-sm);
 }
 
-@keyframes ms-icon-spin {
+@keyframes marketplace-ms-icon-spin {
   to {
     transform: rotate(360deg);
   }
@@ -108,17 +108,17 @@
 
 /* ── 目录空态 + 重试（#30f：offline / corrupt 各自文案 + [重试]） ── */
 
-.ms-empty-icon {
+.marketplace-ms-empty-icon {
   font-size: var(--font-size-xl); /* E5.8 Phase 12 #175：错误 icon 内容图标（基类 16px）→xl */
   color: var(--warning-text);
 }
 
-.ms-empty p {
+.marketplace-ms-empty p {
   margin: 6px 0 0;
   line-height: 1.5;
 }
 
-.ms-empty-action {
+.marketplace-ms-empty-action {
   margin-top: 10px;
   padding: 3px 12px;
   border: 1px solid var(--separator);
@@ -130,13 +130,13 @@
   font-family: inherit;
 }
 
-.ms-empty-action:hover {
+.marketplace-ms-empty-action:hover {
   background: var(--tab-hover-bg);
 }
 
 /* ── 列表顶注（#30c/#30f：单源失败 / 离线缓存兜底——不整体降级） ── */
 
-.ms-catalog-note {
+.marketplace-ms-catalog-note {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -147,20 +147,20 @@
   overflow: hidden;
 }
 
-.ms-catalog-note .codicon {
+.marketplace-ms-catalog-note .codicon {
   font-size: var(--font-size-xs); /* E5.8 Phase 12 #175：warning 内容图标（基类 16px）→xs */
   flex-shrink: 0;
 }
 
 /* ── ⚙ 齿轮按钮 —— Phase 5f 归一化：菜单走 <ContextMenu>，此文件只保留按钮样式 ── */
 
-.ms-item-gear-wrapper {
+.marketplace-ms-item-gear-wrapper {
   position: relative;
   flex-shrink: 0;
   align-self: center;
 }
 
-.ms-item-gear-btn {
+.marketplace-ms-item-gear-btn {
   background: none;
   border: none;
   color: var(--text-muted);
@@ -172,11 +172,11 @@
   transition: opacity 120ms;
 }
 
-.ms-extension-item:hover .ms-item-gear-btn {
+.marketplace-ms-extension-item:hover .marketplace-ms-item-gear-btn {
   opacity: 1;
 }
 
-.ms-item-gear-btn:hover {
+.marketplace-ms-item-gear-btn:hover {
   color: var(--text-primary);
   background: var(--tab-hover-bg);
 }

@@ -105,7 +105,7 @@ export default function ExploreView() {
   return (
     <>
       {(catalog.usedStale || failedSources.length > 0) && (
-        <div className="ms-catalog-note">
+        <div className="marketplace-ms-catalog-note">
           <span className="codicon codicon-warning" />
           {catalog.usedStale && <span>{t("目录为离线缓存，可能不是最新")}</span>}
           {failedSources.length > 0 && (
@@ -115,7 +115,7 @@ export default function ExploreView() {
           )}
         </div>
       )}
-      <div className="ms-section-items">
+      <div className="marketplace-ms-section-items">
         {filtered.map((e) => (
           <CatalogRow
             key={e.id}

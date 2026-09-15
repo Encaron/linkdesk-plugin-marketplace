@@ -47,12 +47,12 @@ export default function DisabledListView() {
   if (disabled.length === 0) return null;
 
   return (
-    <div className="ms-section-items">
+    <div className="marketplace-ms-section-items">
       {disabled.map((p) => {
         const updateTo = updateTargetFor(catalogById.get(p.pluginId), p.version, p.updatable);
         return (
-          <div key={p.pluginId} className="ms-extension-item disabled">
-            <div className="ms-item-icon">
+          <div key={p.pluginId} className="marketplace-ms-extension-item disabled">
+            <div className="marketplace-ms-item-icon">
               {/* E6#66：禁用子集此前无 icon 字段（PluginInfoEntry 形状）——行图取目录官方条目兜底。
                *  E6#106：**禁用子集已补图标四字段**（壳 getDisabledPluginInfo 投影随行，照 E6#65a 给
                *  list() 补图标通道的同一先例），故裁决序与其它位统一为
@@ -62,30 +62,30 @@ export default function DisabledListView() {
               <PluginIcon pluginId={p.pluginId} manifest={pickIdentityArt(p, catalogById.get(p.pluginId))} />
             </div>
             <div
-              className="ms-item-details"
+              className="marketplace-ms-item-details"
               onClick={makeClickHandler(p.pluginId)}
               style={{ cursor: "pointer" }}
             >
-              <div className="ms-item-header">
-                <span className="ms-item-name" style={{ opacity: 0.6 }}>
+              <div className="marketplace-ms-item-header">
+                <span className="marketplace-ms-item-name" style={{ opacity: 0.6 }}>
                   {t(p.name)}
                 </span>{/* E5.8#37.9.1：插件显示名 t() 解析 */}
                 {/* E6#33b：禁用插件也可更新（F1——更新后仍禁用）——徽标只示状态，升级入口归详情 */}
                 {updateTo && (
-                  <span className="ms-item-badge-update" title={t("可更新")}>
+                  <span className="marketplace-ms-item-badge-update" title={t("可更新")}>
                     <span className="codicon codicon-arrow-up" /> {t("可更新")} v{updateTo}
                   </span>
                 )}
-                {p.version && <span className="ms-item-version">v{p.version}</span>}
+                {p.version && <span className="marketplace-ms-item-version">v{p.version}</span>}
               </div>
               {p.description && (
-                <span className="ms-item-desc" style={{ opacity: 0.5 }}>
+                <span className="marketplace-ms-item-desc" style={{ opacity: 0.5 }}>
                   {p.description}
                 </span>
               )}
             </div>
             <button
-              className="ms-item-enable-btn"
+              className="marketplace-ms-item-enable-btn"
               onClick={(e) => handleEnable(p.pluginId, e)}
               title={t("启用插件")}
             >

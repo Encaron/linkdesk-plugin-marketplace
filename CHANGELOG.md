@@ -1,5 +1,14 @@
 # 更新日志
 
+## v1.0.33（2026-09-16）
+
+- **本插件自己的 CSS 类名与关键帧名全部带上 `marketplace-` 前缀**：139 个样式表里定义的裸名（`mpd-*` / `ms-*` → `marketplace-mpd-*` / `marketplace-ms-*`）＋ 关键帧 `ms-icon-spin` → `marketplace-ms-icon-spin`。这条与 v1.0.32 同源、但轴不同：v1.0.32 清的是**共享组件**的裸类名（带 `ldk-`），这次清的是**本插件自己**的——插件视图的一张样式表里同时装着宿主 CSS ＋ 共享组件 CSS ＋ **所有已加载插件的 CSS**，`mpd-` / `ms-` 这类短词在**插件与插件之间**没有任何唯一性保证。症状不报错、只是长得不对（同形态的实机现场：主题卡片右下角一块纯色）
+- 渲染点（TSX 的 `className`）与样式表**同笔**改；另补两处「JSX 里写着、样式表里根本没有对应规则」的类名（`mpd-version-select` / `ms-section-items`）——它们本来就不产生任何样式，加前缀只是让命名空间完整
+- 关键帧名同样是全局标识符：`@keyframes ms-icon-spin` 与它的 `animation:` 引用**两处一起改**（只改一边 = 「下载中」的图标不再转，且没有任何报错）
+- 机械证明：改动逐字节等于「改前文件 ＋ 只插入 `marketplace-`」——不改词干、不动任何视觉属性（颜色 / 间距 / 字号 / 圆角一律未碰）；改后旧名在源码面整词命中 **0**
+- 刻意**没动**的：共享组件类名的 scoped 调优选择器（如 `.marketplace-mpd-title-row .ldk-badge .codicon`）里的 `ldk-*` 是宿主 / 共享组件的名字，按设计保留
+- 无功能变化
+
 ## v1.0.32（2026-09-15）
 
 - **适配 `@linkdesk/ui` 0.2.0 的类名归一**：共享组件的裸类名（`badge` / `button` / `combobox` / `mdv` / `selectbox` / `sle` / `slider` / `toggle`）全部带上 `ldk-` 前缀——它们此前在「宿主 + 共享组件 + 所有已加载插件」同一张样式表里是**全局标识符**，通用英文词极易被插件自己的元素撞上。本插件对共享控件的两处 scoped 调优同步改名：`.mpd-chg .mdv` → `.mpd-chg .ldk-mdv`、`.mpd-title-row .badge .codicon` → `.mpd-title-row .ldk-badge .codicon`

@@ -1,11 +1,11 @@
-/* sidebar-list.css —— 侧栏列表件：Section header + 扩展项（.ms-extension-item 及 .ms-item-* 子件、
+/* sidebar-list.css —— 侧栏列表件：Section header + 扩展项（.marketplace-ms-extension-item 及 .ms-item-* 子件、
  * 图标 badge、#15.5 缺依赖挂起徽标、#33b 可更新徽标）+ 禁用项 + 安装钮（绿色 extensionButton）。
  * E6#86d（第 3.6.3 轮）：自 MarketplaceSidebar.css **只搬选择器块、零声明改动**切出（原 245–503 行）。
  * 全量出处与搬迁原则见 sidebar-shell.css 头注。 */
 
 /* ── Section header ── */
 
-.ms-section-header {
+.marketplace-ms-section-header {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -26,11 +26,11 @@
   z-index: 1;
 }
 
-.ms-section-header:hover {
+.marketplace-ms-section-header:hover {
   color: var(--text-primary);
 }
 
-.ms-section-header .codicon {
+.marketplace-ms-section-header .codicon {
   font-size: var(--font-size-sm); /* E5.8 Phase 12 #175：折叠 codicon 12→sm */
   line-height: 1;
   display: inline-flex;
@@ -40,14 +40,14 @@
   flex-shrink: 0;
 }
 
-.ms-section-title {
+.marketplace-ms-section-title {
   flex: 1;
   text-align: left;
 }
 
 /* ── Extension item — 对标 VS Code .extension-list-item ── */
 
-.ms-extension-item {
+.marketplace-ms-extension-item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -63,12 +63,12 @@
   position: relative;
 }
 
-.ms-extension-item:hover {
+.marketplace-ms-extension-item:hover {
   background: var(--tab-hover-bg);
 }
 
 /* VS Code: .icon-container with badge */
-.ms-item-icon {
+.marketplace-ms-item-icon {
   position: relative;
   flex-shrink: 0;
   width: calc(36px * var(--ui-scale)); /* E5.8 Phase 12 #175：--ms-item-icon 36px 乘 scale */
@@ -78,12 +78,12 @@
   justify-content: center;
 }
 
-.ms-item-icon .plugin-icon--codicon {
+.marketplace-ms-item-icon .plugin-icon--codicon {
   font-size: 28px; /* E5.8 Phase 12 #175：独立显示图标不缩放（§三.2，#180 白名单） */
   color: var(--text-secondary);
 }
 
-.ms-item-icon .plugin-icon--img {
+.marketplace-ms-item-icon .plugin-icon--img {
   /* E6#69c（2026-09-09 拍板「侧栏彩色小框放大一档」）：28 → 32——Type-2 身份图 48 画幅含 4px 透明
    * 留白，32 内显色块 ≈27；框 36 仍容（36 系 E5.8 Phase 12 #175 网格值不动）。opacity 0.65 → 0.9：
    * 行位 = 身份彩图本体（非远 640 场景封面），叠灰遮色与「列表=详情同一张彩图」意图冲突 */
@@ -92,11 +92,11 @@
   opacity: 0.9;
 }
 
-.ms-item-icon .plugin-icon--emoji {
+.marketplace-ms-item-icon .plugin-icon--emoji {
   font-size: 24px; /* E5.8 Phase 12 #175：独立显示图标不缩放（§三.2，#180 白名单） */
 }
 
-.ms-item-badge {
+.marketplace-ms-item-badge {
   position: absolute;
   bottom: 0;
   right: -2px;
@@ -105,7 +105,7 @@
 }
 
 /* VS Code: .details */
-.ms-item-details {
+.marketplace-ms-item-details {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -113,14 +113,14 @@
   gap: 2px;
 }
 
-.ms-item-header {
+.marketplace-ms-item-header {
   display: flex;
   align-items: center;
   gap: 6px;
   height: calc(20px * var(--ui-scale)); /* E5.8 Phase 12 #175：item-header 20px 乘 scale */
 }
 
-.ms-item-name {
+.marketplace-ms-item-name {
   font-size: var(--font-size-md); /* E5.8 Phase 12 #175：item-name 13→md */
   font-weight: 500;
   white-space: nowrap;
@@ -129,13 +129,13 @@
   min-width: 0;
 }
 
-.ms-item-version {
+.marketplace-ms-item-version {
   font-size: var(--font-size-xs); /* E5.8 Phase 12 #175：version 11→xs */
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.ms-item-desc {
+.marketplace-ms-item-desc {
   font-size: var(--font-size-xs); /* E5.8 Phase 12 #175：desc 11→xs */
   color: var(--text-secondary);
   white-space: nowrap;
@@ -143,19 +143,19 @@
   text-overflow: ellipsis;
 }
 
-.ms-item-footer {
+.marketplace-ms-item-footer {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-top: 2px;
 }
 
-.ms-item-author {
+.marketplace-ms-item-author {
   font-size: var(--font-size-2xs); /* E5.8 Phase 12 #175：author 10→2xs */
   color: var(--text-muted);
 }
 
-.ms-item-tag {
+.marketplace-ms-item-tag {
   font-size: var(--font-size-2xs); /* E5.8 Phase 12 #175：tag 9→2xs */
   color: var(--text-muted);
   background: var(--bg-window);
@@ -168,7 +168,7 @@
 }
 
 /* E5.8#15.5：缺依赖挂起（PENDING）徽标——琥珀信息态（等待非错误，ui-ux-pro-max dark/muted chip） */
-.ms-item-badge-pending {
+.marketplace-ms-item-badge-pending {
   font-size: var(--font-size-2xs); /* E5.8 Phase 12 #175：pending 9→2xs */
   color: var(--warning-text);
   background: var(--warning-bg);
@@ -181,7 +181,7 @@
 
 /* E6#33b：可更新徽标——accent 信息态（只示状态，动作归详情；accent = 更新语义族，正交 install 绿）
  *  vs pending 琥珀 vs tag 灰——三档信息强度区分（ui-ux-pro-max dark accent info chip） */
-.ms-item-badge-update {
+.marketplace-ms-item-badge-update {
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -196,21 +196,21 @@
   cursor: default;
 }
 
-.ms-item-badge-update .codicon {
+.marketplace-ms-item-badge-update .codicon {
   font-size: var(--font-size-2xs); /* ⬆ 行内图标随 chip 字号 */
 }
 
 /* ── Disabled extension item ── */
 
-.ms-extension-item.disabled {
+.marketplace-ms-extension-item.disabled {
   opacity: 0.7;
 }
 
-.ms-extension-item.disabled:hover {
+.marketplace-ms-extension-item.disabled:hover {
   opacity: 1;
 }
 
-.ms-item-enable-btn {
+.marketplace-ms-item-enable-btn {
   flex-shrink: 0;
   align-self: center;
   background: none;
@@ -223,7 +223,7 @@
   margin-left: 8px;
 }
 
-.ms-item-enable-btn:hover {
+.marketplace-ms-item-enable-btn:hover {
   background: color-mix(in srgb, var(--success) 10%, transparent); /* E6#30.12：语义绿 10% 合成 */
   border-color: color-mix(in srgb, var(--success) 40%, transparent);
 }
@@ -233,7 +233,7 @@
    消费壳语义 token --success（暗 #4CAF50 == mockup ok-green / 亮 #388A34，主题 colorway 可覆盖）+
    --badge-text（= --text-on-accent，两主题皆白字）。 */
 
-.ms-item-install-btn {
+.marketplace-ms-item-install-btn {
   flex-shrink: 0;
   align-self: center;
   background: var(--success);
@@ -248,16 +248,16 @@
   margin-left: 8px;
 }
 
-.ms-item-install-btn:hover:not(:disabled) {
+.marketplace-ms-item-install-btn:hover:not(:disabled) {
   opacity: 0.88;
 }
 
-.ms-item-install-btn:disabled {
+.marketplace-ms-item-install-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.ms-item-install-btn .codicon {
+.marketplace-ms-item-install-btn .codicon {
   font-size: var(--font-size-sm); /* E5.8 Phase 12 #175：下载 codicon 12→sm */
   vertical-align: middle;
 }

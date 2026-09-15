@@ -2,7 +2,7 @@
  * ConfirmInstall——E6#71c 安装确认卡视图（contributes.views.main["marketplace-install-confirm"] inert）。
  *
  * 角色：壳 DialogHost content 槽的内容（PluginComponent 挂载本视图渲染插件自绘确认卡）。
- * 原 DetailView 自画 mpd-confirm（OverlayPortal 绕开壳 Dialog）迁入——正文版式/按钮归本视图
+ * 原 DetailView 自画 marketplace-mpd-confirm（OverlayPortal 绕开壳 Dialog）迁入——正文版式/按钮归本视图
  * （§四·三「排版、按钮市场自由画」），弹窗机制（居中/遮罩/Esc/焦点锁/点遮罩取消）由壳 DialogHost 提供。
  *
  * 数据 = dialogHost.current()?.content?.payload（installConfirmPayload 产物——不透明载荷随打开参数
@@ -24,10 +24,10 @@ import "../../styles/MarketplaceConfirm.css";
 /** 行——label 上 / value 下竖叠（对齐原 InfoItem 在确认卡的版式） */
 function Row({ label, children }: { label: string; children?: ReactNode }) {
   return (
-    <div className="mpd-confirm-row">
-      <span className="mpd-confirm-row-label">{label}</span>
-      <span className="mpd-confirm-row-value">
-        {children ?? <span className="mpd-confirm-dash">—</span>}
+    <div className="marketplace-mpd-confirm-row">
+      <span className="marketplace-mpd-confirm-row-label">{label}</span>
+      <span className="marketplace-mpd-confirm-row-value">
+        {children ?? <span className="marketplace-mpd-confirm-dash">—</span>}
       </span>
     </div>
   );
@@ -68,17 +68,17 @@ export default function ConfirmInstall() {
     : t("确认前请查看来源与发布者。");
 
   return (
-    <div className="mpd-confirm" role="dialog" aria-modal="true" aria-label={actionLabel}>
-      <div className="mpd-confirm-head">
-        <span className="codicon codicon-shield mpd-confirm-shield" />
-        <span className="mpd-confirm-title">{actionLabel}</span>
+    <div className="marketplace-mpd-confirm" role="dialog" aria-modal="true" aria-label={actionLabel}>
+      <div className="marketplace-mpd-confirm-head">
+        <span className="codicon codicon-shield marketplace-mpd-confirm-shield" />
+        <span className="marketplace-mpd-confirm-title">{actionLabel}</span>
       </div>
-      <p className="mpd-confirm-plugin">{payload.name}</p>
-      <p className="mpd-confirm-note">{note}</p>
-      <div className="mpd-confirm-rows">
+      <p className="marketplace-mpd-confirm-plugin">{payload.name}</p>
+      <p className="marketplace-mpd-confirm-note">{note}</p>
+      <div className="marketplace-mpd-confirm-rows">
         <Row label={t("发布者")}>
-          <span className="mpd-confirm-publisher">
-            {payload.publisher ?? <span className="mpd-confirm-dash">—</span>}
+          <span className="marketplace-mpd-confirm-publisher">
+            {payload.publisher ?? <span className="marketplace-mpd-confirm-dash">—</span>}
             {payload.official && (
               <Badge title={t("官方发布")}>
                 <span className="codicon codicon-verified" /> {t("官方发布")}
@@ -92,17 +92,17 @@ export default function ConfirmInstall() {
         <Row label={t("来源")}>
           {payload.repoUrl ? (
             <a
-              className="mpd-confirm-link"
+              className="marketplace-mpd-confirm-link"
               href={payload.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()} /* 链接点击不冒泡给卡——无面板 Enter/click 联动，纯防御 */
             >
               {payload.sourceName ?? ""}
-              <span className="codicon codicon-link-external mpd-confirm-link-icon" />
+              <span className="codicon codicon-link-external marketplace-mpd-confirm-link-icon" />
             </a>
           ) : (
-            (payload.sourceName ?? <span className="mpd-confirm-dash">—</span>)
+            (payload.sourceName ?? <span className="marketplace-mpd-confirm-dash">—</span>)
           )}
         </Row>
         {payload.description && <Row label={t("描述")}>{payload.description}</Row>}
@@ -110,7 +110,7 @@ export default function ConfirmInstall() {
         {payload.size != null && <Row label={t("大小")}>{fmtSize(payload.size)}</Row>}
         {payload.license && <Row label={t("许可证")}>{payload.license}</Row>}
       </div>
-      <div className="mpd-confirm-actions">
+      <div className="marketplace-mpd-confirm-actions">
         <Button variant="ghost" onClick={() => cancelApi()}>
           {t("取消")}
         </Button>

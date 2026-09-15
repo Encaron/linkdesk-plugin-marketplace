@@ -1,6 +1,6 @@
 {
   "name": "linkdesk-plugin-marketplace",
-  "version": "1.0.32",
+  "version": "1.0.33",
   "private": true,
   "type": "module",
   "description": "插件市场（内置）——独立仓可自足构建：build 走 @linkdesk/plugin-sdk 的 npm 通道，依赖在 dependencies 里显式声明（不再靠壳仓 workspaces 提升），插件代码零 @src（消费 @linkdesk/ui 零件 + window.linkdesk.*）",

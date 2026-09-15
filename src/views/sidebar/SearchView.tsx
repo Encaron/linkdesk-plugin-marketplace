@@ -72,10 +72,10 @@ export default function SearchView() {
   }, [t]);
 
   return (
-    <div className="ms-header">
-      <div className="ms-header-actions">
+    <div className="marketplace-ms-header">
+      <div className="marketplace-ms-header-actions">
         <button
-          className="ms-install-btn"
+          className="marketplace-ms-install-btn"
           onClick={handleInstall}
           disabled={installing}
           title={t("从本地安装插件")}
@@ -89,7 +89,7 @@ export default function SearchView() {
         </button>
         <button
           ref={srcBtnRef}
-          className="ms-addsrc-trigger"
+          className="marketplace-ms-addsrc-trigger"
           title={t("添加一个作者仓库为市场源")}
           aria-haspopup="dialog"
           aria-expanded={srcOpen}
@@ -102,16 +102,16 @@ export default function SearchView() {
       {srcOpen && srcAnchor && (
         <AddSourcePopup anchor={srcAnchor} triggerRef={srcBtnRef} onClose={() => setSrcOpen(false)} />
       )}
-      <div className="ms-search-container">
+      <div className="marketplace-ms-search-container">
         <input
-          className="ms-search-box"
+          className="marketplace-ms-search-box"
           type="text"
           placeholder={t("搜索插件...")}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
         {value && (
-          <button className="ms-search-clear" onClick={onClear}>
+          <button className="marketplace-ms-search-clear" onClick={onClear}>
             <span className="codicon codicon-close" />
           </button>
         )}

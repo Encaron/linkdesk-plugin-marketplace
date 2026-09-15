@@ -66,10 +66,10 @@ export default function AddSourcePopup({
 
   return (
     <OverlayPortal onClose={onClose} triggerRef={triggerRef} trapFocus>
-      <div className="ms-addsrc-pop" style={anchor} role="dialog" aria-label={t("添加市场源")}>
-        <span className="ms-addsrc-pop-title">{t("添加市场源")}</span>
+      <div className="marketplace-ms-addsrc-pop" style={anchor} role="dialog" aria-label={t("添加市场源")}>
+        <span className="marketplace-ms-addsrc-pop-title">{t("添加市场源")}</span>
         <input
-          className={`ms-addsrc-pop-input${err ? " err" : ""}`}
+          className={`marketplace-ms-addsrc-pop-input${err ? " err" : ""}`}
           type="url"
           autoComplete="off"
           spellCheck={false}
@@ -83,16 +83,16 @@ export default function AddSourcePopup({
             if (e.key === "Enter" && !busy) void submit();
           }}
         />
-        <span className={err ? "ms-addsrc-pop-err" : "ms-addsrc-pop-hint"}>
+        <span className={err ? "marketplace-ms-addsrc-pop-err" : "marketplace-ms-addsrc-pop-hint"}>
           {err ??
             t("该仓库根目录需有 marketplace.json；添加后几秒内，该源的所有插件出现在商店。")}
         </span>
-        <div className="ms-addsrc-pop-actions">
-          <button className="ms-addsrc-pop-btn" onClick={onClose} disabled={busy}>
+        <div className="marketplace-ms-addsrc-pop-actions">
+          <button className="marketplace-ms-addsrc-pop-btn" onClick={onClose} disabled={busy}>
             {t("取消")}
           </button>
           <button
-            className="ms-addsrc-pop-btn ms-addsrc-pop-btn--primary"
+            className="marketplace-ms-addsrc-pop-btn marketplace-ms-addsrc-pop-btn--primary"
             onClick={() => void submit()}
             disabled={busy}
           >

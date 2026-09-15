@@ -48,11 +48,11 @@ export default function CatalogRow({
   const { t } = useTranslation();
   return (
     <div
-      className="ms-extension-item catalog"
+      className="marketplace-ms-extension-item catalog"
       onClick={() => onOpenDetail(entry.id, entry.name)}
       title={t("详情")}
     >
-      <div className="ms-item-icon">
+      <div className="marketplace-ms-item-icon">
         {/* E6#30e：目录 icon descriptor；E6#69c/#69f：行 = 详情同裁决；
          *  E6#106：候选按序「已装 manifest → 目录条目 → 默认彩色块」（与详情页同序，防已装行转远程图） */}
         <PluginIcon
@@ -61,20 +61,20 @@ export default function CatalogRow({
           alt={entry.name}
         />
       </div>
-      <div className="ms-item-details">
-        <div className="ms-item-header">
-          <span className="ms-item-name" title={entry.name}>{entry.name}</span>
-          <span className="ms-item-version">v{entry.version}</span>
+      <div className="marketplace-ms-item-details">
+        <div className="marketplace-ms-item-header">
+          <span className="marketplace-ms-item-name" title={entry.name}>{entry.name}</span>
+          <span className="marketplace-ms-item-version">v{entry.version}</span>
         </div>
-        {entry.description && <span className="ms-item-desc">{entry.description}</span>}
-        <div className="ms-item-footer">
+        {entry.description && <span className="marketplace-ms-item-desc">{entry.description}</span>}
+        <div className="marketplace-ms-item-footer">
           {authorLabel(entry.author) && (
-            <span className="ms-item-author">{authorLabel(entry.author)}</span>
+            <span className="marketplace-ms-item-author">{authorLabel(entry.author)}</span>
           )}
           {entry.sourceName && (
-            <span className="ms-item-tag" title={entry.sourceName}>{entry.sourceName}</span>
+            <span className="marketplace-ms-item-tag" title={entry.sourceName}>{entry.sourceName}</span>
           )}
-          {formatSize(entry.size) && <span className="ms-item-tag">{formatSize(entry.size)}</span>}
+          {formatSize(entry.size) && <span className="marketplace-ms-item-tag">{formatSize(entry.size)}</span>}
         </div>
       </div>
       <CatalogRowAction entry={entry} status={status} online={online} onInstall={onInstall} />
