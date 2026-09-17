@@ -1,5 +1,16 @@
 # 更新日志
 
+## v1.0.35（2026-09-17）
+
+- **上下文旗子带上归属**（E6#111n-4）：6 个旗子全部加 `marketplace.` 前缀——`pluginDisabled` · `extensionHasThemes` ·
+  `extensionHasLanguages` · `extensionHasIconThemes` · `extensionHasConfiguration` · `extensionHasKeybindings`。
+  旗子是**运行时状态**（按条目悬停/选中刷新，进内存 map，不落盘）⇒ **无迁移面**，老用户零影响
+- 🔴 **写点与读点同笔改**——这 6 个旗子**全部服务同一个齿轮菜单**：
+  - 写点 `src/components/ExtensionItem.tsx`（6 条 set ＋ 6 条复位）
+  - 读点 `src/services/marketplaceShared/commands.ts` 的 7 条菜单项 `when`（`theme.pick` 等宿主命令**一字未改**）
+  只改一侧 ⇒ 对应菜单项**永久消失或永久出现**，而它看起来只是「菜单少了一项」，没人会归因到命名
+- 无功能变化——7 个菜单条目的显隐条件与改前逐项一致
+
 ## v1.0.34（2026-09-16）
 
 - **适配宿主 E6#109l-b 的共享组件类名归一（`@linkdesk/ui` 0.3.0）**：共享组件余下的 52 个类名一律收进 `ldk-` 前缀——`colorpicker-*` / `ctx-*` / `form-row` / `inline-input*` / `number-input*` / `segmented-radio*` / `sidebar-section*` / `theme-picker*` / `theme-card` / `theme-preview` / `.tbadge` / `.tname` / `.pv-*`，外加关键帧 `selectbox-in → ldk-selectbox-in`。至此**宿主与共享组件自己定义的类名 100% 是 `ldk-` 开头**（258 ＋ 89 个独立定义，零例外），规则只剩一句、不再有任何登记表。

@@ -15,22 +15,22 @@ const pm = () => window.linkdesk?.pluginManager;
 /** 齿轮菜单打开时设置 context key（菜单项 when 条件消费） */
 function applyExtensionContextKeys(manifest: PluginListSubset, isDisabled: boolean): void {
   const c = manifest?.contributes ?? {};
-  window.linkdesk?.contextKey?.set("pluginDisabled", isDisabled);
-  window.linkdesk?.contextKey?.set("extensionHasThemes", !!c.themes);
-  window.linkdesk?.contextKey?.set("extensionHasLanguages", !!c.languages);
-  window.linkdesk?.contextKey?.set("extensionHasIconThemes", !!c.iconThemes);
-  window.linkdesk?.contextKey?.set("extensionHasConfiguration", !!c.configuration);
-  window.linkdesk?.contextKey?.set("extensionHasKeybindings", !!c.keybindings);
+  window.linkdesk?.contextKey?.set("marketplace.pluginDisabled", isDisabled);
+  window.linkdesk?.contextKey?.set("marketplace.extensionHasThemes", !!c.themes);
+  window.linkdesk?.contextKey?.set("marketplace.extensionHasLanguages", !!c.languages);
+  window.linkdesk?.contextKey?.set("marketplace.extensionHasIconThemes", !!c.iconThemes);
+  window.linkdesk?.contextKey?.set("marketplace.extensionHasConfiguration", !!c.configuration);
+  window.linkdesk?.contextKey?.set("marketplace.extensionHasKeybindings", !!c.keybindings);
 }
 
 /** 齿轮菜单关闭时清理 context key */
 function clearExtensionContextKeys(): void {
-  window.linkdesk?.contextKey?.set("pluginDisabled", false);
-  window.linkdesk?.contextKey?.set("extensionHasThemes", false);
-  window.linkdesk?.contextKey?.set("extensionHasLanguages", false);
-  window.linkdesk?.contextKey?.set("extensionHasIconThemes", false);
-  window.linkdesk?.contextKey?.set("extensionHasConfiguration", false);
-  window.linkdesk?.contextKey?.set("extensionHasKeybindings", false);
+  window.linkdesk?.contextKey?.set("marketplace.pluginDisabled", false);
+  window.linkdesk?.contextKey?.set("marketplace.extensionHasThemes", false);
+  window.linkdesk?.contextKey?.set("marketplace.extensionHasLanguages", false);
+  window.linkdesk?.contextKey?.set("marketplace.extensionHasIconThemes", false);
+  window.linkdesk?.contextKey?.set("marketplace.extensionHasConfiguration", false);
+  window.linkdesk?.contextKey?.set("marketplace.extensionHasKeybindings", false);
 }
 
 interface ExtensionItemProps {

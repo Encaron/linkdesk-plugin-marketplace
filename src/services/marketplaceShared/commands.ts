@@ -90,13 +90,13 @@ function ensureMarketplaceCommands(): void {
   );
 
   lk().menu?.registerItems?.("marketplaceItemGear", "marketplace", [
-    { command: "core.openSettings", group: "navigation", when: "extensionHasConfiguration" },
-    { command: "theme.pick", group: "navigation", when: "extensionHasThemes" }, // E5.8#50.24：theme.pick 归一化命令 id
-    { command: "workbench.action.selectLanguage", group: "navigation", when: "extensionHasLanguages" },
-    { command: "workbench.action.selectIconTheme", group: "navigation", when: "extensionHasIconThemes" },
-    { command: "workbench.action.openExtensionKeybindings", group: "navigation", when: "extensionHasKeybindings" },
-    { command: "marketplace.enable", group: "navigation", when: "pluginDisabled" },
-    { command: "marketplace.disable", group: "navigation", when: "!pluginDisabled" },
+    { command: "core.openSettings", group: "navigation", when: "marketplace.extensionHasConfiguration" },
+    { command: "theme.pick", group: "navigation", when: "marketplace.extensionHasThemes" }, // E5.8#50.24：theme.pick 归一化命令 id
+    { command: "workbench.action.selectLanguage", group: "navigation", when: "marketplace.extensionHasLanguages" },
+    { command: "workbench.action.selectIconTheme", group: "navigation", when: "marketplace.extensionHasIconThemes" },
+    { command: "workbench.action.openExtensionKeybindings", group: "navigation", when: "marketplace.extensionHasKeybindings" },
+    { command: "marketplace.enable", group: "navigation", when: "marketplace.pluginDisabled" },
+    { command: "marketplace.disable", group: "navigation", when: "!marketplace.pluginDisabled" },
     { command: "marketplace.uninstall", group: "delete" },
   ]);
 }
