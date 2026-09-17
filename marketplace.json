@@ -1,24 +1,30 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-16T03:01:45.681Z",
+  "updatedAt": "2026-09-17T13:39:29.641Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.0.34",
+      "version": "1.0.35",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.34/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.35/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.34/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.35/resources/icon-brand.svg",
       "marketIconSource": "url",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.34/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.34/marketplace.linkdesk-plugin",
-      "size": 1190548,
-      "publishedAt": "2026-09-16T03:01:45.681Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.35/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.35/marketplace.linkdesk-plugin",
+      "size": 1191074,
+      "publishedAt": "2026-09-17T13:39:29.641Z",
       "versions": [
+        {
+          "version": "1.0.35",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.35/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-17T13:39:29.641Z",
+          "changelog": "- **上下文旗子带上归属**（E6#111n-4）：6 个旗子全部加 `marketplace.` 前缀——`pluginDisabled` · `extensionHasThemes` ·\n  `extensionHasLanguages` · `extensionHasIconThemes` · `extensionHasConfiguration` · `extensionHasKeybindings`。\n  旗子是**运行时状态**（按条目悬停/选中刷新，进内存 map，不落盘）⇒ **无迁移面**，老用户零影响\n- 🔴 **写点与读点同笔改**——这 6 个旗子**全部服务同一个齿轮菜单**：\n  - 写点 `src/components/ExtensionItem.tsx`（6 条 set ＋ 6 条复位）\n  - 读点 `src/services/marketplaceShared/commands.ts` 的 7 条菜单项 `when`（`theme.pick` 等宿主命令**一字未改**）\n  只改一侧 ⇒ 对应菜单项**永久消失或永久出现**，而它看起来只是「菜单少了一项」，没人会归因到命名\n- 无功能变化——7 个菜单条目的显隐条件与改前逐项一致"
+        },
         {
           "version": "1.0.34",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.34/marketplace.linkdesk-plugin",
