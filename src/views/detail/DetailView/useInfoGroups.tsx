@@ -15,14 +15,18 @@ import type { PluginDiskLocation, PluginFolderKind } from "@linkdesk/contracts";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import { localizeCategory } from "../../../services/marketCategories";
 import { Dash, fmtCount, InfoItem } from "./info-bits";
+import { CompatStatus } from "./CompatStatus";
 import { DependentValues, DepValues, depEnvGroupOf, resourcesGroupOf } from "./info-groups";
 import { topGroupOf } from "./info-top";
+import type { CompatReading } from "./useCompatReading";
 
 /** 侧栏全量输入——即 `DetailInfoSidebar` 的 props（展示件与求解共用一份，免得两处各抄一份会漂移） */
 export type InfoGroupsInput = {
   pluginId?: string;
   installed: boolean;
   entry?: CatalogEntry;
+  /** E6#118：宿主兼容读数（useCompatReading 取；undefined = 面缺失/没调到 ⇒ 状态行显示「—」） */
+  compat?: CompatReading;
   authorText?: string;
   versionText?: string;
   diskLoc: PluginDiskLocation | null;
@@ -49,6 +53,7 @@ export function useInfoGroups(o: InfoGroupsInput): Array<{ title?: string; items
     pluginId,
     installed,
     entry,
+    compat,
     authorText,
     versionText,
     diskLoc,
@@ -82,6 +87,10 @@ export function useInfoGroups(o: InfoGroupsInput): Array<{ title?: string; items
   /* E6#30.8b 下载数（read-only GitHub 计数）——仅 ready 显，无数据不造空位 */
   if (dlCount !== undefined) market.push(<InfoItem key="dl" label={t("下载")} value={fmtCount(dlCount)} />);
   groups.push({ title: t("市场"), items: market });
+
+  /* 组：兼容性（E6#118——mockup 01 帧①：紧跟「市场」组，只一行状态；🔴 全页唯一的状态标在此。
+   *  读数 = 宿主 plugins.getCompatibility，插件零复算；读不到 ⇒ CompatStatus 内部落「—」裸文本） */
+  groups.push({ title: t("兼容性"), items: [<CompatStatus key="compat" reading={compat} />] });
 
   /* 组：类别——每分类一枚 chip 并排（VS Code renderCategories 实证；空 → 整组不渲染） */
   const cats: ReactNode[] =

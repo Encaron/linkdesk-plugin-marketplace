@@ -58,6 +58,7 @@ import { useActionBits } from "./DetailView/useActionBits";
 import DetailHeader from "./DetailView/DetailHeader";
 import DetailActionBar from "./DetailView/DetailActionBar";
 import DetailInfoSidebar from "./DetailView/DetailInfoSidebar";
+import { useCompatReading } from "./DetailView/useCompatReading";
 import DetailOverviewTab from "./DetailView/DetailOverviewTab";
 import FeaturesTab from "./DetailView/FeaturesTab";
 import ChangelogTab from "./DetailView/ChangelogTab";
@@ -99,6 +100,8 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
     appVersion: ver.appVersion,
   });
   const { info, entry, disabled, pending, installed, enabledEntry, pluginsLoading, catalog } = id;
+  /* E6#118：宿主兼容读数（只消费不复算——面缺失/失败 ⇒ undefined ⇒ 状态行「—」） */
+  const compat = useCompatReading({ pluginId, entry, installed });
   /* 右上动作列五枚小件（版本/安装下拉 · 版本动作钮 · 自动更新勾 · 已停在 vX）——判据全在 useActionBits，
    *  本处只把结果转交 DetailActionBar（null = 该槽不出画） */
   const bits = useActionBits({ ver, act, inst, vAct, online, pending, installed, hasEntry: !!entry, t });
@@ -258,6 +261,7 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
             pluginId={pluginId}
             installed={installed}
             entry={entry}
+            compat={compat}
             authorText={authorText}
             versionText={versionText}
             diskLoc={id.diskLoc}
