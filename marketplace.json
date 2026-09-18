@@ -1,24 +1,30 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-17T13:39:29.641Z",
+  "updatedAt": "2026-09-18T18:08:05.856Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.0.35",
+      "version": "1.0.37",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.35/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.37/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.35/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.37/resources/icon-brand.svg",
       "marketIconSource": "url",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.35/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.35/marketplace.linkdesk-plugin",
-      "size": 1191074,
-      "publishedAt": "2026-09-17T13:39:29.641Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.37/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.37/marketplace.linkdesk-plugin",
+      "size": 1196836,
+      "publishedAt": "2026-09-18T18:08:05.856Z",
       "versions": [
+        {
+          "version": "1.0.37",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.37/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-18T18:08:05.856Z",
+          "changelog": "- **悬停帮助卡收编为壳的共享件**（E6#120）：卡体改用 `@linkdesk/ui` 0.3.1 的 `HintCard`\n  （壳只有一份实现；触发行为与卡文案逐字保留——400ms 悬停意图、移开消失、键盘与触屏可达、\n  卡体不可交互、状态标不挂 `title`，与 v1.0.36 用户点头的口径一字不差）。**用户可见界面零变化**。\n- 依赖：`@linkdesk/ui` `^0.3.0` → `^0.3.1`。⚠️ 本版**须等 `@linkdesk/ui` 0.3.1 发布后**再构建发版\n  （组件源码编译进 bundle——不升依赖重新构建就拿不到共享件，用户那边什么都不变）。"
+        },
         {
           "version": "1.0.35",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.35/marketplace.linkdesk-plugin",
