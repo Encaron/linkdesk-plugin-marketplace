@@ -263,36 +263,5 @@
   color: var(--error);
   border: 1px solid var(--error);
 }
-/* 悬停帮助卡：fixed 定位（JS 量标下缘 +6px、右缘夹紧）；300px = mockup .hovercard；
-   无遮罩不抢焦点；卡体 pointer-events:none（移开标即消失，卡不截 hover）。 */
-.marketplace-mpd-compat-card {
-  position: fixed;
-  z-index: var(--z-dropdown);
-  width: 300px;
-  box-sizing: border-box;
-  padding: 12px;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-  background: var(--bg-panel);
-  box-shadow: var(--shadow-pop);
-  pointer-events: none;
-}
-.marketplace-mpd-compat-card-title {
-  margin-bottom: 4px;
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--fg-primary);
-}
-.marketplace-mpd-compat-card p {
-  margin: 0 0 4px;
-  font-size: var(--font-size-sm);
-  color: var(--fg-secondary);
-  line-height: 1.7;
-}
-.marketplace-mpd-compat-card-src {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
-  font-size: var(--font-size-xs);
-  color: var(--fg-muted);
-}
+/* 悬停帮助卡（E6#120）：卡体收编为壳共享件 HintCard（@linkdesk/ui 0.3.1 起）——
+   样式/定位/触发随共享件走，本文件只留状态标（badge）自己的三档变体。 */
