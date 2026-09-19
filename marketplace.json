@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-19T12:49:27.445Z",
+  "updatedAt": "2026-09-19T13:46:55.372Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.0.41",
+      "version": "1.0.42",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.41/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.42/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.41/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.42/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.13",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.41/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.41/marketplace.linkdesk-plugin",
-      "size": 114852,
-      "publishedAt": "2026-09-19T12:49:27.445Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.42/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.42/marketplace.linkdesk-plugin",
+      "size": 115031,
+      "publishedAt": "2026-09-19T13:46:55.372Z",
       "versions": [
+        {
+          "version": "1.0.42",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.42/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-19T13:46:55.372Z",
+          "changelog": "- **安装请求随行条目来源 URL**（catalogUrl）：壳在同一个安装任务内自动装 requires 里缺失的依赖（依赖链自动装配套；请求不带来源时行为不变）。"
+        },
         {
           "version": "1.0.41",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.41/marketplace.linkdesk-plugin",
