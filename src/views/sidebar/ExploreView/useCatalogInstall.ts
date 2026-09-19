@@ -43,7 +43,8 @@ export function useCatalogInstall(online: boolean) {
       if (!confirmed) return;
       // 进度/失败/重试全走 startMarketInstall（进等待队列 → settle 归因 + toast[重试]，幂等单发）
       // E6#73c 第 1 步：带显示名——壳侧 job 行需要它（目录未加载时进程内也能兜底解析，不传则退化为 id）
-      await startMarketInstall(entry.id, entry.downloadUrl, entry.name);
+      // E6#73o：带条目来源 URL——壳在同一安装 job 内自动装 requires 缺失依赖（解析半径 = 来源目录）
+      await startMarketInstall(entry.id, entry.downloadUrl, entry.name, entry.sourceUrl);
     },
     [online, t],
   );

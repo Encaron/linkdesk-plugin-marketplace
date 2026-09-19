@@ -45,13 +45,14 @@ const pm = () => window.linkdesk?.pluginManager;
  * `installWithProgress` 不 throw（失败 resolve `{success:false, error}`，lifecycle-ops 实证）——
  * 仍留 catch：极端下壳面 reject 也要有终局，不能让调用方的按钮永远转圈。
  */
-async function runMarketInstall(pluginId: string, name: string, downloadUrl: string): Promise<boolean> {
+async function runMarketInstall(pluginId: string, name: string, downloadUrl: string, catalogUrl?: string): Promise<boolean> {
   const inst = lk()?.pluginManager?.installWithProgress;
   if (!inst) return false;
   try {
     // E6#73c 第 1 步：请求侧身份随行——壳侧 job 表按 pluginId 去重、job 行取显示名，而两者只有池侧知道
     // （第三个参数见 types.ts PluginInstallRequestOpts；jobId 不在此——它是壳侧 job 表的产物）。
-    const r = await inst(downloadUrl, { pluginId, displayName: name, origin: "user" });
+    // E6#73o：catalogUrl 随行——壳在同一安装 job 内自动装 requires 缺失依赖（解析半径 = 本条目来源目录）。
+    const r = await inst(downloadUrl, { pluginId, displayName: name, origin: "user", catalogUrl });
     // E6#73d：用户点「取消安装」——**不是失败**。壳侧已把那条 job 整条撤掉（不留红行），本模块也绝不走
     // settleInstallFailure（那会推一条带 [重试] 的错误 toast：用户刚亲口说不要，再问一遍要不要重试
     // = 拿他的决定去烦他）。
@@ -84,11 +85,12 @@ export function startMarketInstall(
   pluginId: string,
   downloadUrl: string,
   displayName?: string,
+  catalogUrl?: string,
 ): Promise<boolean> {
   if (!lk()?.pluginManager?.installWithProgress) return Promise.resolve(false);
   const open = _openInstalls.get(pluginId);
   if (open) return open;
-  const p = runMarketInstall(pluginId, displayName ?? pluginDisplayNameOf(pluginId), downloadUrl).finally(() => {
+  const p = runMarketInstall(pluginId, displayName ?? pluginDisplayNameOf(pluginId), downloadUrl, catalogUrl).finally(() => {
     _openInstalls.delete(pluginId);
   });
   _openInstalls.set(pluginId, p);

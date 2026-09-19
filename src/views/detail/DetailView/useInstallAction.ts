@@ -89,7 +89,8 @@ export function useInstallAction(
     }
     // 会话 store 负责归因 + 失败态；成功后 lifecycle 事件驱动列表翻态（30.5c），本视图随 info 收敛
     // E6#73c 第 1 步：带显示名——壳侧 job 行需要它（不传则退化为 id，标题会变成裸 id）
-    await startMarketInstall(pluginId, url, entry?.name);
+    // E6#73o：带条目来源 URL——壳在同一安装 job 内自动装 requires 缺失依赖（解析半径 = 来源目录）
+    await startMarketInstall(pluginId, url, entry?.name, entry?.sourceUrl);
   }, [pluginId, busy, installingHere, installGateError, entry, installUrl, installVer]);
 
   /* 安装钮点击 = E6#71k 确认门（**恒弹**）→ 富内容确认 → runInstall（安装执行单一入口仍留本视图）。
