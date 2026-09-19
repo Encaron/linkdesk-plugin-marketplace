@@ -1,5 +1,11 @@
 # 更新日志
 
+## v1.0.38（2026-09-19）
+
+- **换轨到「壳池集中供给」（E6#125 · L9 第 9.4 轮）**：`@linkdesk/ui` 不再编译进本插件 bundle——构建时 external，运行时由壳池供给同一份实例。源码 `import` 一行未改，只把依赖从 `^0.3.1` 换到重锚号 `^0.2.13`（`@linkdesk/ui` 自此与壳同号锁步）＋ `@linkdesk/plugin-sdk` `^0.1.19 → ^0.1.41`，重新构建发布。
+- **读数（产物前后对照）**：包 **1,196,836 → 113,811 字节（−90.5%）**；根 bundle JS **546,865 → 25,839 字节**。8 张视图 bundle 里的组件实现痕迹（`data-overlay-wrapper` / `overlay-root` / `ldk-button` / `ldk-form-row` / `ldk-toggle` / `ldk-hint-card`）grep **零命中**；只剩 `from "@linkdesk/ui"` 裸 specifier 交给壳解析。
+- **本仓自己借用的宿主类名照旧生效**：`CompatStatus` 的 `className="ldk-badge"` 与 `.marketplace-mpd-title-row .ldk-badge .codicon` 选择器没动——那些类名的**定义**现在由壳池全局供给（过去靠自带一份），写法不变、结果不变。
+
 ## v1.0.37（2026-09-19）
 
 - **悬停帮助卡收编为壳的共享件**（E6#120）：卡体改用 `@linkdesk/ui` 0.3.1 的 `HintCard`
