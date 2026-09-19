@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-19T10:12:24.090Z",
+  "updatedAt": "2026-09-19T12:49:27.445Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.0.40",
+      "version": "1.0.41",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.40/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.41/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.40/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.41/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.13",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.40/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.40/marketplace.linkdesk-plugin",
-      "size": 114757,
-      "publishedAt": "2026-09-19T10:12:24.090Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.41/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.41/marketplace.linkdesk-plugin",
+      "size": 114852,
+      "publishedAt": "2026-09-19T12:49:27.445Z",
       "versions": [
+        {
+          "version": "1.0.41",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.41/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-19T12:49:27.445Z",
+          "changelog": "- **重打可复现**：@linkdesk/plugin-sdk 0.1.42 起 zip 目录条目时间戳钉死，同一份源码重打逐字节一致。插件内容零变化（仅 plugin.json 版本号随包更新）。"
+        },
         {
           "version": "1.0.40",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.40/marketplace.linkdesk-plugin",
