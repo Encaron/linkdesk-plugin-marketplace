@@ -1,5 +1,9 @@
 # 更新日志
 
+## v1.0.41（2026-09-19）
+
+- **重打可复现**：@linkdesk/plugin-sdk 0.1.42 起 zip 目录条目时间戳钉死，同一份源码重打逐字节一致。插件内容零变化（仅 plugin.json 版本号随包更新）。
+
 ## v1.0.40（2026-09-19）
 
 - **删 4 处「有规则、无渲染方」的 CSS 死类**（E6#113）：`.marketplace-sidebar`／`.marketplace-ms-extensions`／`.marketplace-ms-section-header`（含 `:hover` 与 `.codicon` 后代共 3 条规则）／`.marketplace-ms-section-title`——旧自画侧栏与分节头的迁移遗留（侧栏外壳由壳的 `SidePanel`／`SidebarSection` 接管后，插件侧 JSX 不再画那些节点，CSS 未同笔删）。⚠️ `.marketplace-ms-section-items` 是**被用未定义**的合法标记类（detail-shell.css 有登记），不在删除范围。实机 CDP 普查 DOM 零存在 ⇒ 像素级零视觉变化。无功能变化。
