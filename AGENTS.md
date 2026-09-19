@@ -1,7 +1,7 @@
 # 插件市场（marketplace）——LinkDesk 插件仓
 
 > **本文件是给在这个仓里干活的 AI 看的**（Claude Code / Codex / Cursor / …）。人看 `README.md`。
-> 插件身份的唯一来源 = `plugin.json` 顶层的 `pluginId`（本仓：`marketplace`）。当前版本 `1.0.41`。
+> 插件身份的唯一来源 = `plugin.json` 顶层的 `pluginId`（本仓：`marketplace`）。当前版本 `1.0.42`。
 
 ## 1. 这是什么
 
