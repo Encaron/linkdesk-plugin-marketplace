@@ -1,5 +1,9 @@
 # 更新日志
 
+## v1.0.40（2026-09-19）
+
+- **删 4 处「有规则、无渲染方」的 CSS 死类**（E6#113）：`.marketplace-sidebar`／`.marketplace-ms-extensions`／`.marketplace-ms-section-header`（含 `:hover` 与 `.codicon` 后代共 3 条规则）／`.marketplace-ms-section-title`——旧自画侧栏与分节头的迁移遗留（侧栏外壳由壳的 `SidePanel`／`SidebarSection` 接管后，插件侧 JSX 不再画那些节点，CSS 未同笔删）。⚠️ `.marketplace-ms-section-items` 是**被用未定义**的合法标记类（detail-shell.css 有登记），不在删除范围。实机 CDP 普查 DOM 零存在 ⇒ 像素级零视觉变化。无功能变化。
+
 ## v1.0.39（2026-09-19）
 
 - **声明最低壳版本 `minAppVersion: "0.2.13"`**（E6#128 · L9 收尾补正）：本仓自上一版起改由**壳池集中供给** `@linkdesk/ui`（构建时 external、运行时向壳要同一份实例）⇒ 需要 **≥ 0.2.13** 的壳（该版本起池里才有 `@linkdesk/ui` 这件货）。此前本清单**没写这个字段** ⇒ 市场与加载期都拦不住「新插件 × 旧壳」的组合（旧壳上插件视图打不开，壳被 ErrorBoundary 兜住、不崩）。本版**只加这一行清单字段 + 版本 PATCH**，源码与产物行为零变化。

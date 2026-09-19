@@ -3,48 +3,6 @@
  * E6#86d（第 3.6.3 轮）：自 MarketplaceSidebar.css **只搬选择器块、零声明改动**切出（原 245–503 行）。
  * 全量出处与搬迁原则见 sidebar-shell.css 头注。 */
 
-/* ── Section header ── */
-
-.marketplace-ms-section-header {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  width: 100%;
-  min-height: 22px;
-  padding: 4px 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: var(--font-size-xs); /* E5.8 Phase 12 #175：section-header 11→xs */
-  font-weight: 600;
-  line-height: 1.3; /* E5.8 Phase 12 #175：14px 写死 → 单位 1.3（14/11 比例） */
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  color: var(--text-muted);
-  position: relative;
-  z-index: 1;
-}
-
-.marketplace-ms-section-header:hover {
-  color: var(--text-primary);
-}
-
-.marketplace-ms-section-header .codicon {
-  font-size: var(--font-size-sm); /* E5.8 Phase 12 #175：折叠 codicon 12→sm */
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
-.marketplace-ms-section-title {
-  flex: 1;
-  text-align: left;
-}
-
 /* ── Extension item — 对标 VS Code .extension-list-item ── */
 
 .marketplace-ms-extension-item {

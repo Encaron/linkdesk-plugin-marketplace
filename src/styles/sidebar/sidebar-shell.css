@@ -6,12 +6,6 @@
    document 级 :root 覆写会连带污染壳 PluginDetailPoolView .pd-btn-enable（现回归壳 teal 正解），
    且「连接」语义与安装绿混源；本插件启用/安装/已装徽标全消费 var(--success)。 */
 
-.marketplace-sidebar {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
 /* ── VS Code: .header 41px, search 28px ── */
 
 .marketplace-ms-header {
@@ -226,14 +220,6 @@
 
 .marketplace-ms-search-clear:hover {
   color: var(--text-primary);
-}
-
-/* ── VS Code: .extensions (height: calc(100% - 41px)) ── */
-
-.marketplace-ms-extensions {
-  flex: 1;
-  overflow-y: auto;
-  padding-top: 2px;
 }
 
 .marketplace-ms-empty {
