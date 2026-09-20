@@ -29,7 +29,7 @@ export default function BuiltinListView() {
   };
 
   return (
-    <div className="marketplace-ms-section-items">
+    <div>
       {builtin.map((p) => (
         <ExtensionItem
           key={p.pluginId}

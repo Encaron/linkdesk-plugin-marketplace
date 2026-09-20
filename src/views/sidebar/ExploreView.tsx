@@ -115,7 +115,7 @@ export default function ExploreView() {
           )}
         </div>
       )}
-      <div className="marketplace-ms-section-items">
+      <div>
         {filtered.map((e) => (
           <CatalogRow
             key={e.id}

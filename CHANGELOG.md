@@ -1,5 +1,11 @@
 # 更新日志
 
+## v1.0.43（2026-09-20）
+
+- **删三处死类名引用**（E6#136 普查裁决）：`marketplace-mpd-version-select`（版本下拉两处，SelectBox 的 className 入参）与 `marketplace-ms-section-items`（侧栏四个列表视图的容器标记类）在仓内 CSS 零定义、无任何 querySelector 式消费——SDK 新腿（0.1.44 自有类名引用悬空判据）指出它们是死引用；四处按命名一致性**一并删净**，并订正 `detail-shell.css` 头注里拿旧类名举例的那句。DOM 结构与渲染结果零变化，无功能变化。
+
+
+
 ## v1.0.42（2026-09-19）
 
 - **安装请求随行条目来源 URL**（catalogUrl）：壳在同一个安装任务内自动装 requires 里缺失的依赖（依赖链自动装配套；请求不带来源时行为不变）。

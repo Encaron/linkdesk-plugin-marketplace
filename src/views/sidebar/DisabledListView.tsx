@@ -47,7 +47,7 @@ export default function DisabledListView() {
   if (disabled.length === 0) return null;
 
   return (
-    <div className="marketplace-ms-section-items">
+    <div>
       {disabled.map((p) => {
         const updateTo = updateTargetFor(catalogById.get(p.pluginId), p.version, p.updatable);
         return (

@@ -41,7 +41,7 @@ export default function InstalledListView() {
   }
 
   return (
-    <div className="marketplace-ms-section-items">
+    <div>
       {installed.map((p) => (
         <ExtensionItem
           key={p.pluginId}

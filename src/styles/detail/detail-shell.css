@@ -44,7 +44,7 @@
  *
  * 🔴 **import 判据——为什么由门面一处全量 import，而非「谁用谁 import」**（档案 §四 的偏离，2026-09-11）：
  *   ① 每件样式文件是「一个 surface 的样式集」，不是「一个组件的样式」——按 module 图算需求要算**传递闭包**
- *      （例：`BuiltinListView` 自己的 JSX 只写 `.marketplace-ms-section-items`，真正吃样式的 `.marketplace-ms-item-*` 在它渲染的
+ *      （例：侧栏三个列表视图本身只贡献容器结构，真正吃样式的 `.marketplace-ms-item-*` 在它们渲染的
  *      `components/ExtensionItem` 里）⇒ 逐件 import 的收益 = 0，成本 = 每次改渲染树都要重算闭包。
  *   ② 已机械证明**跨文件零重复选择器**（上）⇒ 级联顺序与本拆分无关，单一 import 点即可完整覆盖。
  *   ③ bundler 按模块 id 去重，6 件 / 3 件与原来 1 件在产物 CSS 里等价；详情页只有 1 个 surface（`DetailView`），

@@ -33,7 +33,6 @@ export function versionPickerOf(o: {
       onChange={(v) => o.onPick(v)}
       disabled={o.disabled}
       title={o.t("选择版本")}
-      className="marketplace-mpd-version-select"
     />
   );
 }
@@ -55,7 +54,6 @@ export function installPickerOf(o: {
       onChange={(v) => o.onPick(v)}
       disabled={o.disabled}
       title={o.t("选择版本")}
-      className="marketplace-mpd-version-select"
     />
   );
 }
