@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-19T13:46:55.372Z",
+  "updatedAt": "2026-09-20T00:08:04.441Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.0.42",
+      "version": "1.0.43",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.42/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.43/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.42/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.43/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.13",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.42/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.42/marketplace.linkdesk-plugin",
-      "size": 115031,
-      "publishedAt": "2026-09-19T13:46:55.372Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.43/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.43/marketplace.linkdesk-plugin",
+      "size": 115255,
+      "publishedAt": "2026-09-20T00:08:04.441Z",
       "versions": [
+        {
+          "version": "1.0.43",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.43/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-20T00:08:04.441Z",
+          "changelog": "- **删三处死类名引用**（E6#136 普查裁决）：`marketplace-mpd-version-select`（版本下拉两处，SelectBox 的 className 入参）与 `marketplace-ms-section-items`（侧栏四个列表视图的容器标记类）在仓内 CSS 零定义、无任何 querySelector 式消费——SDK 新腿（0.1.44 自有类名引用悬空判据）指出它们是死引用；四处按命名一致性**一并删净**，并订正 `detail-shell.css` 头注里拿旧类名举例的那句。DOM 结构与渲染结果零变化，无功能变化。"
+        },
         {
           "version": "1.0.42",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.42/marketplace.linkdesk-plugin",
