@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-20T00:08:04.441Z",
+  "updatedAt": "2026-09-25T18:56:36.794Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.0.43",
+      "version": "1.0.44",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.43/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.44/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.43/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.44/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.13",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.43/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.43/marketplace.linkdesk-plugin",
-      "size": 115255,
-      "publishedAt": "2026-09-20T00:08:04.441Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.44/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.44/marketplace.linkdesk-plugin",
+      "size": 115922,
+      "publishedAt": "2026-09-25T18:56:36.794Z",
       "versions": [
+        {
+          "version": "1.0.44",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.44/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-25T18:56:36.794Z",
+          "changelog": "- **修详情页装载清单的坏项崩溃**（E6#151）：插件清单的 `contributes.commands`／`keybindings` 里出现空槽（`null`）等坏项时，取字函数直接读 `c.id` ⇒ 在渲染期抛错、被壳的 ErrorBoundary 兜住（表现为该插件详情页打不开）。现按**坏项丢弃、好项照常**处理：取字函数收空值返回空串，装载解析先按对象形状过滤，`menus` 形状不对时按空表处理——单个坏声明不再拖垮整页。壳侧同源缺陷（装载期 `contributes` 整块零形状校验，坏项之后的全部贡献静默不注册）同批修，见壳 v0.2.16。⚠️ 本轮只覆盖**空槽与错形状**；声明里缺必填字段（如命令没有 `id`）仍归各注册表自身的容错，不在此列。\n- **修生命周期订阅撤不掉**（E6#152）：`useMarketplacePlugins` 的三条 `plugin:*` 订阅注册在异步初始化函数内部，它返回的清理函数交给了自己的 promise、而不是 effect 的返回值 ⇒ 组件卸载时订阅仍在，跨挂载累积（壳侧每次 `plugin:installed` 触发多轮重拉、已卸载组件仍被唤醒）。现三条订阅与数据监听一起**同步注册在 effect 体内**，由 effect 的返回值统一撤销；卸载后再来的生命周期广播无人接（有测试钉住）。"
+        },
         {
           "version": "1.0.43",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.43/marketplace.linkdesk-plugin",
