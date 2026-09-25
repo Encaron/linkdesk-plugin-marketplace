@@ -3,11 +3,12 @@
  *
  * 纯函数零 IO：数据 = `list().manifest.contributes`（壳零新 API），解析口在详情页
  * `FeaturesTab.tsx`（parseContribs）与 `features-groups.tsx`（cmdIdOf）。
- * 契约 = **逐 key 收窄**：容忍缺省形状，坏项丢弃。
- * 🔴 口径限定：现实现对**缺字段**的坏项免疫（`{}` / `{title}` 等），但 `commands` / `keybindings`
- * 里如果是 **`null` 项**会抛（`cmdIdOf` 直读 `c.id`；`menus` 走 `it?.command` 免疫）——这与文件头
- * 「个别坏项不崩整组」的说法不符，是实测发现的一处不一致（已在覆盖层交接文档登记为观察）。
- * 本文件**不把该抛写进断言**：固化它 = 把一处待裁决的行为当正典。fixture 全虚构（硬约束 21）。
+ * 契约 = **逐 key 收窄**：容忍缺省形状，坏项丢弃、好项照常。
+ * 🔴 E6#151 修后本文件口径变了：修前 `commands` / `keybindings` 里的 **`null` 项会抛**
+ * （`cmdIdOf` 直读 `c.id`——文件头「个别坏项不崩整组」当时做不到），那时**故意不写断言**
+ * （固化待裁决的缺陷 = 把缺陷当正典）。修后该行为已定，遂把「空槽跳过 + 好项保留」写成断言钉住；
+ * 壳侧同族修复（坏项会吃掉后续全部贡献）的断言在壳仓
+ * `src/pluginLoader/contributions/contributions.badItems.test.ts`。fixture 全虚构（硬约束 21）。
  */
 
 import { describe, it, expect } from "vitest";
@@ -25,6 +26,11 @@ describe("cmdIdOf（命令标识取字——id 优先，command 兜底）", () =
   it("两者皆无 → 空串（调用方据此过滤该项）", () => {
     expect(cmdIdOf({})).toBe("");
     expect(cmdIdOf({ title: "Demo Title" } as CmdItem)).toBe("");
+  });
+
+  it("🔴 空槽入参不抛（E6#151 修后）：null / undefined → 空串，调用方照常过滤掉", () => {
+    expect(cmdIdOf(null)).toBe("");
+    expect(cmdIdOf(undefined)).toBe("");
   });
 
   it("前后空白被 trim", () => {
@@ -100,5 +106,37 @@ describe("parseContribs（四组解析——有声明才出现，坏项丢弃不
     expect(out.configs).toHaveLength(1);
     expect(out.keybindings).toHaveLength(1);
     expect(out.menuRows).toHaveLength(1);
+  });
+});
+
+describe("🔴 空槽与错形状（E6#151 修后：坏项丢弃，好项照常——详情页不崩）", () => {
+  it("commands 里夹 null / undefined 空槽 → 好项保留（修前第一项就抛，整块「功能」页签渲染崩）", () => {
+    const out = parseContribs({
+      commands: [null, { id: "demo.cmd.alpha" }, undefined, { command: "demo.cmd.beta" }] as never,
+    });
+    expect(out.commands.map(cmdIdOf)).toEqual(["demo.cmd.alpha", "demo.cmd.beta"]);
+  });
+
+  it("keybindings 里夹 null / 原始值 → 好项保留（同族另一处直读）", () => {
+    const out = parseContribs({ keybindings: [null, { key: "ctrl+demo" }, 7] as never });
+    expect(out.keybindings).toEqual([{ key: "ctrl+demo" }]);
+  });
+
+  it("menus 写成数组 → 按空处理（不产出 \"0\"/\"1\" 这种假菜单行）", () => {
+    const out = parseContribs({ menus: [{ command: "demo.cmd.alpha" }] as never });
+    expect(out.menuRows).toEqual([]);
+  });
+
+  it("坏项不吃掉同组其余项，也不吃掉其余三组（一并给出）", () => {
+    const out = parseContribs({
+      commands: [null, { id: "demo.cmd.alpha" }],
+      configuration: { properties: { "demo.setting.alpha": { description: "Demo Alpha" } } },
+      keybindings: [null, { key: "ctrl+demo" }],
+      menus: { "demo/menu-one": [null, { command: "demo.cmd.alpha" }] },
+    } as never);
+    expect(out.commands.map(cmdIdOf)).toEqual(["demo.cmd.alpha"]);
+    expect(out.configs).toEqual([["demo.setting.alpha", { description: "Demo Alpha" }]]);
+    expect(out.keybindings).toEqual([{ key: "ctrl+demo" }]);
+    expect(out.menuRows).toEqual([{ menu: "demo/menu-one", command: "demo.cmd.alpha" }]);
   });
 });

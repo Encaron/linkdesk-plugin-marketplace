@@ -88,6 +88,24 @@ export function useMarketplacePlugins() {
   useEffect(() => {
     let active = true;
 
+    /* 订阅插件生命周期变更——安装/卸载/启用/禁用后自动刷新（30.5c auto-flip 数据链）。
+     * plugin:installed/plugin:uninstalled = 装卸广播（池必达，带 pluginId）；plugin-lifecycle:changed =
+     * 池本地状态切换（启用/禁用）nudge。三通道同汇 scheduleDataRefresh（microtask 合并 burst）。
+     *
+     * 🔴 E6#152 修：这三条**必须同步注册在 effect 体里**。此前它们注册在下面那个 async `init()` 内部，
+     * 而 `init()` 里 `return` 的清理函数交给了**它自己的 promise**、不是 effect 的返回值（effect 只
+     * `return () => { active = false; }`）⇒ 组件卸载时这三条**撤不掉**、`_dataListeners.delete(rerender)`
+     * 也永不执行：反复开关市场面板后再装卸插件，壳侧一条广播触发 **N 次**重拉、已卸载组件的 `setTick`
+     * 仍被调用（同一 hook 里 `viewContainer:changed` 那条却「卸载即撤」，可见是漏而非设计）。
+     * 订阅与退订成对放在 effect 体内（铁律 19「卸载即撤」）；提前注册无副作用——
+     * `scheduleDataRefresh` 自身 microtask 合并且幂等，数据没到也只会多拉一趟。 */
+    const unsubs = [
+      lk()?.events?.on("plugin:installed", scheduleDataRefresh),
+      lk()?.events?.on("plugin:uninstalled", scheduleDataRefresh),
+      lk()?.events?.on("plugin-lifecycle:changed", scheduleDataRefresh),
+    ].filter(Boolean);
+    _dataListeners.add(rerender);
+
     const init = async () => {
       if (!_loadingPromise) {
         _loadingPromise = refreshData();
@@ -98,27 +116,14 @@ export function useMarketplacePlugins() {
 
       // 🔥 数据到了才更新 badge——不在 mount 时空跑
       updateAllBadges();
-
-      /* 订阅插件生命周期变更——安装/卸载/启用/禁用后自动刷新（30.5c auto-flip 数据链）。
-       * plugin:installed/plugin:uninstalled = 装卸广播（池必达，带 pluginId）；plugin-lifecycle:changed =
-       * 池本地状态切换（启用/禁用）nudge。三通道同汇 scheduleDataRefresh（microtask 合并 burst）。 */
-      const unsubs = [
-        lk()?.events?.on("plugin:installed", scheduleDataRefresh),
-        lk()?.events?.on("plugin:uninstalled", scheduleDataRefresh),
-        lk()?.events?.on("plugin-lifecycle:changed", scheduleDataRefresh),
-      ].filter(Boolean);
-      _dataListeners.add(rerender);
-
-      return () => {
-        _dataListeners.delete(rerender);
-        unsubs.forEach((u) => u && u());
-      };
     };
 
     init();
 
     return () => {
       active = false;
+      _dataListeners.delete(rerender);
+      unsubs.forEach((u) => u && u());
     };
   }, [rerender]);
 

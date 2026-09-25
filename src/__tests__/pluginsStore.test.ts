@@ -13,7 +13,9 @@
  *   ① `_loadingPromise` 盾——多个视图同时 mount 只发一趟 IPC（对标 loader 的 #59c Bug 1 教训）；
  *   ② 分组口径——installed = 非 core、builtin = core、disabled 来自 getDisabled（list 排除禁用）；
  *   ③ badge 广播——三个 viewId 各一条，`explore` **不发**（橱窗不是计数列表）；
- *   ④ 生命周期三通道订阅 ＋ 卸载全撤（铁律 19）＋ burst 合并（一次装卸连发多条只重拉一次）。
+ *   ④ 生命周期三通道订阅 ＋ 卸载全撤（铁律 19）＋ burst 合并（一次装卸连发多条只重拉一次）
+ *      ——🔴 E6#152 修：修前三条订阅注册在 async `init()` 内、「卸载全撤」只对 viewContainer 那条成立，
+ *      本文件当时**故意不写断言**（不把待裁决缺陷固化成正典）；修后四条全撤已成契约，断言就位。
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
@@ -204,23 +206,33 @@ describe("生命周期订阅（装卸/启停 ⇒ 自动重拉 ＋ badge 翻新�
     expect(listFn).toHaveBeenCalledTimes(2); // 不是 5
   });
 
-  it("🔴 卸载即撤订阅：viewContainer 兜底通道脱钩（铁律 19）", async () => {
+  it("🔴 卸载即撤订阅：四条通道全部脱钩（铁律 19）", async () => {
     const { store } = await boot();
     const { unmount } = renderHook(() => store.useMarketplacePlugins());
     await flush();
-    expect(handlers.has("viewContainer:changed")).toBe(true);
+    expect(handlers.size).toBe(4);
 
     unmount();
-    expect(handlers.has("viewContainer:changed")).toBe(false);
-    expect(unsubs.n).toBeGreaterThanOrEqual(1);
+    // E6#152 修后：三条生命周期订阅也撤了（修前它们注册在 async `init()` 内部、清理函数交给了 init 的
+    // promise ⇒ 卸载后仍在册，壳侧一条广播触发 N 次重拉、已卸载组件的 setTick 仍被调用；同一 hook 里
+    // viewContainer:changed 那条却「卸载即撤」——对照即证据）
+    expect([...handlers.keys()]).toEqual([]);
+    expect(unsubs.n).toBe(4);
   });
 
-  /* ⚠️ 实测观察（**只报不改**——登记进交接文档「会话四收口段」的观察清单，勿在此写断言固化）：
-   * `useMarketplacePlugins` 的三条生命周期订阅注册在**异步 `init()` 内部**，它 `return` 的清理函数交给了
-   * `init()` 的 promise、而不是 effect 的返回值（effect 只 `return () => { active = false; }`）
-   * ⇒ 组件卸载时这三条**撤不掉**，`_dataListeners.delete(rerender)` 也永不执行。
-   * 跨挂载/卸载累积的表现：壳侧每个 plugin:installed 触发 N 次重拉、已卸载组件的 setTick 仍被调用。
-   * 本文件**不写断言**钉住这个现状——把一处待裁决的缺陷固化成正典，是这一层明确禁止的做法。 */
+  it("🔴 卸载后再来生命周期广播 → 无人接（订阅真脱钩，不是「撤了还留着」）", async () => {
+    const { store } = await boot();
+    const { unmount } = renderHook(() => store.useMarketplacePlugins());
+    await flush();
+    expect(listFn).toHaveBeenCalledTimes(1);
+
+    unmount();
+    // 通道已从 handlers 移除 ⇒ 连触发都触发不到（修前这里仍取得到回调、并再拉一趟）
+    handlers.get("plugin:installed")?.({ pluginId: "demo-alpha" });
+    await flush();
+    expect(handlers.get("plugin:installed")).toBeUndefined();
+    expect(listFn).toHaveBeenCalledTimes(1);
+  });
 
   it("viewContainer:changed 只认本容器的 id（别家容器变动不白跑 badge）", async () => {
     const { store } = await boot();
