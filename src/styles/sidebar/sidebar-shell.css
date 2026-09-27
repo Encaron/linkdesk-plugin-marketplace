@@ -20,6 +20,9 @@
   justify-content: flex-end;
   gap: 6px; /* E6#30c ③：「安装」+「市场源」并排（mockup frame ③ .ms-header-top） */
   margin-bottom: 4px;
+  /* 05「插件市场·检查更新」：三钮 ＋ 就地注的总宽超过侧栏可用宽时换行（按 DOM 顺序贪心排布——注与
+     「检查更新」先留首行，放不下的钮顺次下行）。toolbar 变高由壳既有 ResizeObserver 自适应 ⇒ 壳零改动。 */
+  flex-wrap: wrap;
 }
 
 .marketplace-ms-install-btn {
@@ -76,6 +79,41 @@
 
 .marketplace-ms-addsrc-trigger .codicon {
   font-size: var(--font-size-sm); /* plus 内容图标（基类 16px）→sm（≈mockup svg 12） */
+}
+
+/* ── 「检查更新」钮槽 + 就地注（05「插件市场·检查更新」——mockup frame 1/4/5/6）──
+   钮本体是壳 `Button`（ghost/sm，22px，与详情页动作钮同族）；槽位 span 只为挂 `data-hint`——壳 Button
+   刻意不透传 data-*（Button.tsx:33-43），而挂 `title` 会把钮的无障碍名变成那句提示（同文件 :50-58）。
+   提示条走壳全局委托 + closest() ⇒ 挂槽位照样出条。
+   注 = 完成后的就地反馈（04「发行说明刷新按钮」落地件同款口径）：muted 小字，占钮左侧一拍。 */
+
+.marketplace-ms-check-slot {
+  display: inline-flex;
+  flex: none;
+}
+
+.marketplace-ms-check-slot .ldk-button {
+  gap: 4px; /* 图标与文字间距——壳 Button 自身不带 gap（与详情页图标钮同款做法） */
+}
+
+.marketplace-ms-check-slot .codicon {
+  font-size: var(--font-size-sm); /* sync 内容图标（基类 16px）→sm，与「市场源」钮的 plus 同档 */
+}
+
+.marketplace-ms-check-spin {
+  animation: marketplace-ms-icon-spin 1.2s linear infinite; /* 复用本仓既有旋转关键帧（sidebar-explore.css） */
+}
+
+.marketplace-ms-check-note {
+  flex: none;
+  width: max-content; /* 窄侧栏换行时注自身不压扁（宽窄都不去挤按钮） */
+  white-space: nowrap;
+  font-size: var(--font-size-2xs);
+  color: var(--text-muted);
+}
+
+.marketplace-ms-check-note.is-err {
+  color: var(--error); /* 失败注用语义红（同值 token：mockup frame 6） */
 }
 
 /* ── 添加市场源浮层（E6#30c ③——mockup frame ③ .addsrc-pop）──

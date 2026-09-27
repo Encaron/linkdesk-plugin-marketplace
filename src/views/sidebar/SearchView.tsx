@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { setMarketplaceSearch, notifyError } from "../../services/marketplaceShared";
 import { useDebouncedInput } from "@linkdesk/ui"; // E6#15h：共享件全走 @linkdesk/ui 零件
 import AddSourcePopup from "./SearchView/AddSourcePopup";
+import CheckUpdateButton from "./SearchView/CheckUpdateButton";
 /* E6#86d：侧栏样式已按实测分节拆为 3 件（原 MarketplaceSidebar.css 680 行）——**本处按原文档顺序
  *  全量 import**：5 个侧栏 surface 共用同一套样式，且各 surface 吃样式的类分散在自身 JSX 与其子件
  *  （如 ExtensionItem）里，逐件 import 要算传递闭包、收益为零。判据见 styles/detail/detail-shell.css 头注。 */
@@ -74,6 +75,10 @@ export default function SearchView() {
   return (
     <div className="marketplace-ms-header">
       <div className="marketplace-ms-header-actions">
+        {/* 05「插件市场·检查更新」：第三枚钮，放**最左**——「查」是无副作用的读操作且最常用，与两个「写」
+         *  操作（安装 / 加源）视觉上天然分隔；既有两钮的次序与写法零改动（老用户肌肉记忆不破）。
+         *  手动绕开 5min 目录缓存 + 重投影刷新「可更新」徽标，零壳改动。 */}
+        <CheckUpdateButton />
         <button
           className="marketplace-ms-install-btn"
           onClick={handleInstall}

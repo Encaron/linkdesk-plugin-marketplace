@@ -383,6 +383,16 @@ describe("runUpdateDiscovery（主编排 IO）", () => {
     expect(show).not.toHaveBeenCalled();
   });
 
+  it("🔴 读盘不可信（list 拒绝）→ null（**判不了**），不是「已是最新」的空计划；目录一趟不拉", async () => {
+    // 05「插件市场·检查更新」同笔修：available=false 此前会掉进「installed.length===0 ⇒ 空计划」，
+    // 把一次 IPC 故障说成「没有可更新」——手动按钮会据此显示「已是最新」（撒谎）。
+    const h = stubWindow({ enabled: [] });
+    h.list.mockRejectedValue(new Error("demo-ipc-down"));
+    okCatalogFetch([catEntry("demo-alpha", "1.2.0")]);
+    expect(await runUpdateDiscovery()).toBeNull();
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it("有已装有新版 → 铃铛推一条 + 记 lastNotifiedVersion；再跑幂等不重推", async () => {
     const meta = metaStore();
     __setMetaStore(meta);

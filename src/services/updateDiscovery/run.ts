@@ -68,6 +68,10 @@ async function doRunDiscovery(force: boolean): Promise<DiscoveryPlan | null> {
     );
   }
 
+  // 🔴 读盘不可信（IPC 不可用/失败）⇒ **判不了（null）**，不是「一台没装」的结论——拿一次瞬时故障当
+  //   「没有可更新」就是撒谎（用户点「检查更新」会得到「已是最新」）。`available` 此前只被用来把住销账
+  //   （见上一段），漏了这一步：本行补上，与文件头「null = 判不了」的口径对齐（05「插件市场·检查更新」同笔）。
+  if (!available) return null;
   // 「一台没装」是**结论**（读到了、就是空）；「读盘不可信」那条已在上面早退，走不到这里。
   if (installed.length === 0) return EMPTY_PLAN;
   const catalog = await loadCatalog(force);

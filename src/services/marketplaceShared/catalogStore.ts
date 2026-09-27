@@ -110,6 +110,25 @@ export function useMarketplaceCatalog() {
   };
 }
 
+/** 手动「检查更新」的后半程：把目录**非强拉**地重投影一遍并通知订阅方 ⇒ 行内「可更新」徽标当场翻新
+ *  （05「插件市场·检查更新」）。
+ *
+ *  🔴 为什么非有这一步不可：徽标读的是**本模块的 `_catalogResult`**（`useCatalogEntryById` → 列表行），
+ *    不是 `marketSources` 的 5min 缓存——发现腿（`runUpdateDiscovery`）只刷新了后者。不重投影，用户点了
+ *    「检查更新」也看不到徽标动，而「点一下就知道有没有新版本」正是这件功能的全部意义。
+ *  ⚠️ **非强拉是刻意的**：调用方（`services/updateCheck`）刚让发现腿强拉过目录，且成功结果会写进缓存
+ *    （`marketSources/fetch.ts:51`）⇒ 这里命中 fresh 缓存、**全程只有 1 次网络**。换成 `forceRefreshCatalog`
+ *    会二次全源拉取，还会先 `removeCache`——失败路径连 stale 兜底都没了。
+ *  ⚠️ 组件内的同名刷新是 `useMarketplaceCatalog().refresh`（force 版，hook 面）；本函数是它的**非 hook 孪生**，
+ *    供服务层调用。两份都只改这一份 `_catalogResult`（唯一属主见本文件头注）。 */
+export async function reprojectCatalog(): Promise<CatalogLoadResult> {
+  const r = await loadCatalog();
+  _catalogResult = r;
+  _catalogResolvedOnce = true;
+  notifyCatalogListeners();
+  return r;
+}
+
 /** E6#33b：目录条目 id 索引——已装/内置/禁用列表行「可更新」判定共用（updateToVersion 查目录），
  *  与详情页/发现同源同一把钥匙（目录条目 id = pluginId）。entries 引用变化即重建（目录重拉后徽标自动翻新）。 */
 export function useCatalogEntryById(): ReadonlyMap<string, CatalogEntry> {
