@@ -37,7 +37,7 @@ export function DepValues({
             key={dep}
             className={miss ? "marketplace-mpd-info-dep warn" : "marketplace-mpd-info-dep"}
             onClick={() => onJump(dep)}
-            title={dep}
+            data-hint={dep}
           >
             {miss && <span className="codicon codicon-close" />}
             {labelOf(dep)}
@@ -64,7 +64,7 @@ export function DependentValues({
           key={d.pluginId}
           className="marketplace-mpd-info-dep"
           onClick={() => onJump(d.pluginId)}
-          title={d.pluginId}
+          data-hint={d.pluginId}
         >
           {d.name}
         </button>

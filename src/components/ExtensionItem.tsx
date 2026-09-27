@@ -88,11 +88,11 @@ export function ExtensionItem({ plugin, onClick, onDoubleClick, updateTo }: Exte
           <span className="marketplace-ms-item-name">{t(m.name ?? "")}</span>{/* E5.8#37.9.1：插件显示名 t() 解析——lang-defaults 持壳插件名 key（name 可空 → t("") 原样空） */}
           {/* E5.8#15.5：缺依赖挂起（PENDING）徽标——tooltip 显完整原因（"等待依赖: xxx"） */}
           {plugin.pendingReason && (
-            <span className="marketplace-ms-item-badge-pending" title={plugin.pendingReason}>{t("等待依赖")}</span>
+            <span className="marketplace-ms-item-badge-pending" data-hint={plugin.pendingReason}>{t("等待依赖")}</span>
           )}
           {/* E6#33b：可更新徽标（accent 信息态——只示状态，点击行开详情即升级入口） */}
           {updateTo && (
-            <span className="marketplace-ms-item-badge-update" title={t("可更新")}>
+            <span className="marketplace-ms-item-badge-update" data-hint={t("可更新")}>
               <span className="codicon codicon-arrow-up" /> {t("可更新")} v{updateTo}
             </span>
           )}
@@ -110,7 +110,7 @@ export function ExtensionItem({ plugin, onClick, onDoubleClick, updateTo }: Exte
       {/* ⚙ 齿轮——core 插件无齿轮菜单 */}
       {!m.core && (
         <div className="marketplace-ms-item-gear-wrapper">
-          <button ref={gearBtnRef} className="marketplace-ms-item-gear-btn" onClick={handleGear} title={t("管理")}>
+          <button ref={gearBtnRef} className="marketplace-ms-item-gear-btn" onClick={handleGear} data-hint={t("管理")} aria-label={t("管理")}>
             <span className="codicon codicon-gear" />
           </button>
           {gearMenuAnchor && (

@@ -67,7 +67,7 @@ export function DirLink({
   children: ReactNode;
 }) {
   return (
-    <button type="button" className="marketplace-mpd-info-link marketplace-mpd-info-link-btn" title={title} onClick={onClick}>
+    <button type="button" className="marketplace-mpd-info-link marketplace-mpd-info-link-btn" data-hint={title} onClick={onClick}>
       {children}
       {withIcon && <span className="codicon codicon-link-external marketplace-mpd-info-link-icon" />}
     </button>

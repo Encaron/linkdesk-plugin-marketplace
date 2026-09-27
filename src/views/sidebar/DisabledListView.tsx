@@ -72,7 +72,7 @@ export default function DisabledListView() {
                 </span>{/* E5.8#37.9.1：插件显示名 t() 解析 */}
                 {/* E6#33b：禁用插件也可更新（F1——更新后仍禁用）——徽标只示状态，升级入口归详情 */}
                 {updateTo && (
-                  <span className="marketplace-ms-item-badge-update" title={t("可更新")}>
+                  <span className="marketplace-ms-item-badge-update" data-hint={t("可更新")}>
                     <span className="codicon codicon-arrow-up" /> {t("可更新")} v{updateTo}
                   </span>
                 )}
@@ -87,7 +87,7 @@ export default function DisabledListView() {
             <button
               className="marketplace-ms-item-enable-btn"
               onClick={(e) => handleEnable(p.pluginId, e)}
-              title={t("启用插件")}
+              data-hint={t("启用插件")} aria-label={t("启用插件")}
             >
               <span className="codicon codicon-play" />
             </button>

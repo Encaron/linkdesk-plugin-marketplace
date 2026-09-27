@@ -41,7 +41,7 @@ export default function CatalogRowAction({
     if (installingHere) {
       /* 30.9a M4 二：安装中——阶段/进度标签（校验中/下载中 x%/解压中/加载中，i18n 全量已有 key） */
       return (
-        <span className="marketplace-ms-catalog-status installing" title={t("安装插件")}>
+        <span className="marketplace-ms-catalog-status installing" data-hint={t("安装插件")}>
           <span className="codicon codicon-cloud-download" />
           {installJobLabel(t, jobHere)}
         </span>
@@ -51,7 +51,7 @@ export default function CatalogRowAction({
       /* E6#73c 第 1 步：等待安装中——回执（此前这里是一条静默 return false：点了等于没点）。
        *  复用 installing 徽标样式（零新 CSS）；文案与 §五 I.4 排队行同词。 */
       return (
-        <span className="marketplace-ms-catalog-status installing" title={t("等待安装中")}>
+        <span className="marketplace-ms-catalog-status installing" data-hint={t("等待安装中")}>
           <span className="codicon codicon-clock" />
           {t("等待安装中")}
         </span>
@@ -61,7 +61,7 @@ export default function CatalogRowAction({
       /* 30.9b M4 三：安装失败——归因文案截断 + [重试]（手动无自动风暴；✕ 关闭归详情行，目录行不重复，
        *  另起安装会覆盖失败会话自清） */
       return (
-        <span className="marketplace-ms-item-fail" title={errHere.error}>
+        <span className="marketplace-ms-item-fail" data-hint={errHere.error}>
           <span className="codicon codicon-error" />
           <span className="marketplace-ms-item-fail-text">
             {t(installFailLabelKey(classifyInstallError(errHere.error)))}
@@ -72,7 +72,7 @@ export default function CatalogRowAction({
               e.stopPropagation();
               void retryMarketInstall(entry.id, entry.downloadUrl ?? "", entry.name);
             }}
-            title={t("重试")}
+            data-hint={t("重试")} aria-label={t("重试")}
           >
             <span className="codicon codicon-refresh" />
           </button>
@@ -88,7 +88,7 @@ export default function CatalogRowAction({
           onInstall(entry);
         }}
         disabled={!online} // #30.9b 离线态（G3）：置灰不发请求，联网自动回可用
-        title={!online ? t("联网后重试") : t("安装插件")}
+        data-hint={!online ? t("联网后重试") : t("安装插件")}
       >
         <span className="codicon codicon-cloud-download" /> {t("安装")}
       </button>
@@ -98,7 +98,7 @@ export default function CatalogRowAction({
   if (status === "disabled") {
     /* 已装但禁用（list() 排除禁用插件）——静置徽标，无动作（#30.9d 冲突由此防） */
     return (
-      <span className="marketplace-ms-catalog-status disabled" title={t("已禁用")}>
+      <span className="marketplace-ms-catalog-status disabled" data-hint={t("已禁用")}>
         <span className="codicon codicon-circle-slash" />
         {t("已禁用")}
       </span>
@@ -107,7 +107,7 @@ export default function CatalogRowAction({
 
   const isUpdate = status === "update";
   return (
-    <span className={`marketplace-ms-catalog-status${isUpdate ? " update" : ""}`} title={t(isUpdate ? "可更新" : "已安装")}>
+    <span className={`marketplace-ms-catalog-status${isUpdate ? " update" : ""}`} data-hint={t(isUpdate ? "可更新" : "已安装")}>
       <span className={`codicon ${isUpdate ? "codicon-arrow-up" : "codicon-check"}`} />
       {t(isUpdate ? "可更新" : "已安装")}
     </span>

@@ -109,7 +109,7 @@ export default function ExploreView() {
           <span className="codicon codicon-warning" />
           {catalog.usedStale && <span>{t("目录为离线缓存，可能不是最新")}</span>}
           {failedSources.length > 0 && (
-            <span title={failedSources}>
+            <span data-hint={failedSources}>
               {t("部分来源加载失败，已显示可用目录")}
             </span>
           )}

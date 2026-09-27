@@ -78,7 +78,7 @@ export default function SearchView() {
           className="marketplace-ms-install-btn"
           onClick={handleInstall}
           disabled={installing}
-          title={t("从本地安装插件")}
+          data-hint={t("从本地安装插件")}
         >
           <span className="codicon codicon-add" />
           {/* E6#73c 第 2 步：这里**只说实话**——目录源安装在请求侧不带身份（选目录前不知道 pluginId），
@@ -90,7 +90,7 @@ export default function SearchView() {
         <button
           ref={srcBtnRef}
           className="marketplace-ms-addsrc-trigger"
-          title={t("添加一个作者仓库为市场源")}
+          data-hint={t("添加一个作者仓库为市场源")}
           aria-haspopup="dialog"
           aria-expanded={srcOpen}
           onClick={handleSrcToggle}

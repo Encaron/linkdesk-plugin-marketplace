@@ -73,7 +73,7 @@ export default function DetailOverviewTab({
                 key={dep}
                 className="marketplace-mpd-dep-item"
                 onClick={() => onJumpToDep(dep)}
-                title={t("查看依赖")}
+                data-hint={t("查看依赖")}
               >
                 <span className="codicon codicon-close marketplace-mpd-dep-x" />
                 <span className="marketplace-mpd-dep-name">{depLabel(dep)}</span>

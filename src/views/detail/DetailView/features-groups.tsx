@@ -43,7 +43,7 @@ export function CommandGroup({
       {commands.map((c, i) => {
         const id = cmdIdOf(c);
         return (
-          <button key={id || i} className="marketplace-mpd-fc-row" onClick={() => onCopy(id)} title={t("点击复制命令 ID")}>
+          <button key={id || i} className="marketplace-mpd-fc-row" onClick={() => onCopy(id)} data-hint={t("点击复制命令 ID")}>
             <span className="codicon codicon-terminal marketplace-mpd-fc-row-icon" />
             <span className="marketplace-mpd-fc-main">
               <span className="marketplace-mpd-fc-title">{c.title || id}</span>
@@ -67,7 +67,7 @@ export function ConfigGroup({ configs, onJump }: { configs: ConfigItem[]; onJump
   return (
     <Section title={t("配置项")} count={configs.length}>
       {configs.map(([key, desc]) => (
-        <button key={key} className="marketplace-mpd-fc-row" onClick={() => onJump(key)} title={t("在设置中打开")}>
+        <button key={key} className="marketplace-mpd-fc-row" onClick={() => onJump(key)} data-hint={t("在设置中打开")}>
           <span className="codicon codicon-gear marketplace-mpd-fc-row-icon" />
           <span className="marketplace-mpd-fc-main">
             <span className="marketplace-mpd-fc-title">{desc?.description || key}</span>

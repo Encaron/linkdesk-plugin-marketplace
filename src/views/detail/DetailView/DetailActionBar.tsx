@@ -88,7 +88,7 @@ export default function DetailActionBar({
             )}
           </>
         ) : pending ? (
-          <span className="marketplace-mpd-blocked-chip" title={pendingReason} role="status">
+          <span className="marketplace-mpd-blocked-chip" data-hint={pendingReason} role="status">
             <span className="codicon codicon-circle-slash" />
             {t("安装不可用（缺依赖）")}
           </span>

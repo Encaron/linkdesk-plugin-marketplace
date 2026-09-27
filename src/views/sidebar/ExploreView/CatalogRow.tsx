@@ -50,7 +50,7 @@ export default function CatalogRow({
     <div
       className="marketplace-ms-extension-item catalog"
       onClick={() => onOpenDetail(entry.id, entry.name)}
-      title={t("详情")}
+      data-hint={t("详情")}
     >
       <div className="marketplace-ms-item-icon">
         {/* E6#30e：目录 icon descriptor；E6#69c/#69f：行 = 详情同裁决；
@@ -63,7 +63,7 @@ export default function CatalogRow({
       </div>
       <div className="marketplace-ms-item-details">
         <div className="marketplace-ms-item-header">
-          <span className="marketplace-ms-item-name" title={entry.name}>{entry.name}</span>
+          <span className="marketplace-ms-item-name" data-hint={entry.name} data-hint-delay="0">{entry.name}</span>
           <span className="marketplace-ms-item-version">v{entry.version}</span>
         </div>
         {entry.description && <span className="marketplace-ms-item-desc">{entry.description}</span>}
@@ -72,7 +72,7 @@ export default function CatalogRow({
             <span className="marketplace-ms-item-author">{authorLabel(entry.author)}</span>
           )}
           {entry.sourceName && (
-            <span className="marketplace-ms-item-tag" title={entry.sourceName}>{entry.sourceName}</span>
+            <span className="marketplace-ms-item-tag" data-hint={entry.sourceName} data-hint-delay="0">{entry.sourceName}</span>
           )}
           {formatSize(entry.size) && <span className="marketplace-ms-item-tag">{formatSize(entry.size)}</span>}
         </div>

@@ -104,7 +104,7 @@ export function autoToggleOf(o: {
   return (
     <label
       className={"marketplace-mpd-auto-upd" + (o.disabled ? " disabled" : "")}
-      title={o.t("勾选后自动更新——有新版本就自动装上，装完发通知告诉你")}
+      data-hint={o.t("勾选后自动更新——有新版本就自动装上，装完发通知告诉你")}
     >
       <input
         type="checkbox"
@@ -127,7 +127,7 @@ export function pinnedNoteOf(o: { show: boolean; version?: string; t: T }): Reac
   return (
     <span
       className="marketplace-mpd-pinned-note"
-      title={o.t("你从版本下拉里挑了 {{version}}，自动更新会跳过它——勾上「自动更新」或在下拉里选最新版即可解除", {
+      data-hint={o.t("你从版本下拉里挑了 {{version}}，自动更新会跳过它——勾上「自动更新」或在下拉里选最新版即可解除", {
         version: `v${o.version}`,
       })}
     >
