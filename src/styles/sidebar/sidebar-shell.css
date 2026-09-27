@@ -104,6 +104,13 @@
   animation: marketplace-ms-icon-spin 1.2s linear infinite; /* 复用本仓既有旋转关键帧（sidebar-explore.css） */
 }
 
+/* 动画是「在动」的视觉腿，文字（检查中…）才是语义腿——减少动效偏好下砍掉前者，状态仍可读（05 §四·⑥ 双保险）。 */
+@media (prefers-reduced-motion: reduce) {
+  .marketplace-ms-check-spin {
+    animation: none;
+  }
+}
+
 .marketplace-ms-check-note {
   flex: none;
   width: max-content; /* 窄侧栏换行时注自身不压扁（宽窄都不去挤按钮） */
