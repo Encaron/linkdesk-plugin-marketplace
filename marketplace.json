@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-25T18:56:36.794Z",
+  "updatedAt": "2026-09-27T07:09:56.583Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.0.44",
+      "version": "1.0.45",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.44/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.45/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.44/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.45/resources/icon-brand.svg",
       "marketIconSource": "url",
-      "minAppVersion": "0.2.13",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.44/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.44/marketplace.linkdesk-plugin",
-      "size": 115922,
-      "publishedAt": "2026-09-25T18:56:36.794Z",
+      "minAppVersion": "0.2.20",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.45/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.45/marketplace.linkdesk-plugin",
+      "size": 116596,
+      "publishedAt": "2026-09-27T07:09:56.583Z",
       "versions": [
+        {
+          "version": "1.0.45",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.45/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-27T07:09:56.583Z",
+          "changelog": "- **悬停提示收编（04「悬停提示系统」件 4）**：本仓 **27 处**小写标签上的原生 `title=` 全部换成壳的 `data-hint` 属性式提示（25 处说明类 ＋ 2 处揭示类另加 `data-hint-delay=\"0\"`）；其中 **3 枚图标钮**（子代只有一枚 codicon 字形）同笔补 `aria-label`——它们原本唯一的名字来源就是那个 `title`，只换属性会让按钮变成「没名字的按钮」。\n- **为什么换**：原生 tooltip 是 Chromium 的系统 UI，壳的 CSS 碰不到——不跟主题、不跟字号；`data-hint` 走壳自绘的提示条，并自动带出该命令的快捷键（与右键菜单同一份映射）。DOM 结构、类名、可见文字零变化。\n- **`minAppVersion` 0.2.13 → 0.2.20**：提示条本体（`HintTipRenderer`）由壳提供，0.2.20 起才有——在旧壳上 `data-hint` 是惰性属性，那批按钮会**没有任何提示**（比原生 tooltip 更糟），故此版起要求应用 ≥0.2.20。\n- **`@linkdesk/plugin-sdk` ^0.1.46 → ^0.1.49**：新腿 `check-native-title` 判红原生 `title=`（本仓现为 **0 处**）——本仓的 `ci-verify` 严格档自动吃这条腿。"
+        },
         {
           "version": "1.0.44",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.44/marketplace.linkdesk-plugin",
