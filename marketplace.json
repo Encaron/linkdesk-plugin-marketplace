@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-27T07:09:56.583Z",
+  "updatedAt": "2026-09-27T18:09:45.250Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.0.45",
+      "version": "1.1.0",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.45/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.0/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.45/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.0/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.0.45/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.45/marketplace.linkdesk-plugin",
-      "size": 116596,
-      "publishedAt": "2026-09-27T07:09:56.583Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.0/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.0/marketplace.linkdesk-plugin",
+      "size": 119442,
+      "publishedAt": "2026-09-27T18:09:45.250Z",
       "versions": [
+        {
+          "version": "1.1.0",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.0/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-27T18:09:45.250Z",
+          "changelog": "- **侧栏动作行新增「检查更新」钮**（05「插件市场·检查更新」；设计件在壳仓 `docs/05-插件更新/插件市场/`）：点一下 = **强拉市场目录（绕开 5 分钟缓存）＋ 跑发现腿 ＋ 重投影目录**——行内「可更新」徽标**当场翻新**，不必退软件重进，也不必等下一次自动检查。钮放动作行**最左端**（既有「安装」「市场源」两钮的位置与写法零改动），**零壳改动**。\n- **为什么需要这件**：目录有 5 分钟 fresh 缓存、发现循环每进程只排一趟、徽标只随目录重投影翻新 ⇒ 作者刚发布的新版本，用户当天可能一直看不到。手动腿（`runUpdateDiscovery(force=true)`）引擎里早就有，缺的只是一个入口把它接上。\n- **一次网络（判据）**：发现腿强拉**成功即写缓存**（`marketSources/fetch.ts:51`），随后的重投影走非强拉、命中同一份 fresh 缓存 ⇒ **全程只 1 次网络**。顺序不可对调（先重投影再发现 = 两次全源拉取，且 `removeCache` 会让失败路径失去 stale 兜底）。`src/__tests__/updateCheck.test.ts` 用注入 fetcher **数调用次数**钉住这条，并覆盖「一台没装插件」的早退形态。\n- **失败就是失败，不装作用**：目录取不到 / 坏 parse ⇒ 就地注「**检查失败 · 显示的是旧目录**」（红字 muted 小字），详情落**唯一通知面**（铃铛宽面板，`notifyError`）——本页不自造错误条（与 04「发行说明刷新按钮」已落地件同口径）；页面**保留旧目录**不白屏，钮**回可用态**可立刻再点（⛔ 不会卡在「检查中」）。\n- **无障碍（一处取舍如实记录）**：钮用壳共享 `Button`（`ghost`/`sm`，与详情页动作钮同族），而壳 `Button` 刻意**不透传 `data-*`/`aria-*`**（`Button.tsx:33-43` 的设计）⇒ ①提示挂外层槽位 `data-hint`：给钮传 `title` 会让壳把 `aria-label` 设成那句提示、把钮的名字读歪（children 非纯字符串 ⇒ `hasVisibleText=false`，同文件 `:50-58`），而钮的可见文字「检查更新」才是它的无障碍名；②本钮**没有 `aria-busy`**——「进行中」由文字（检查中…）＋ 禁用态承担，「结果播报」由注的 `role=\"status\"` 承担。测试钉住这两条。\n- **修版本号漂移**：`package.json`（1.0.44）与 `plugin.json`（1.0.45）长期不同值，而本仓规矩是**同值**——本版两个字段**一并到 1.1.0**。类别按 **MINOR**（新增用户可见控件，向后兼容）；`minAppVersion` 不变（仍 0.2.20，未用到壳的新能力）。\n- **顺带修一处「撒谎」**（做本件时发现）：读盘失败（`pluginManager` 的 IPC 抛）时发现腿此前会掉进「一台没装 ⇒ 空计划」，把一次瞬时故障报成「没有可更新」——手动钮据此会显示「已是最新」。现按引擎文件头**本来的口径**补上 `available === false ⇒ null（判不了）`：目录一趟不拉，交启动调度器按既有梯子重试，本钮如实显示失败。`src/__tests__/updateDiscovery.test.ts` 加一条用例钉住（该文件原有 69 例全绿）。\n- **文件落点**（照本仓 feature-folder 规矩，无一大文件）：新增 `src/services/updateCheck.ts`（手动检查的唯一动作，~80 行）、`src/views/sidebar/SearchView/CheckUpdateButton.tsx`（私有件：三态 ＋ 就地注，~110 行）；改动 `marketplaceShared/catalogStore.ts`（＋`reprojectCatalog` 非 hook 版重投影）、`views/sidebar/SearchView.tsx`（首槽 ＋ 一行 import）、`styles/sidebar/sidebar-shell.css`（动作行 `flex-wrap` ＋ 钮槽/注样式，全 token）、`i18n/en.json`（8 个新键）。新增测试 2 件。"
+        },
         {
           "version": "1.0.45",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.45/marketplace.linkdesk-plugin",
