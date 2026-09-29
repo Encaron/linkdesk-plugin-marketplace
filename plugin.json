@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@linkdesk/plugin-sdk/schemas/plugin.schema.json",
   "pluginId": "marketplace",
   "name": "插件市场",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "minAppVersion": "0.2.20",
   "icon": "resources/icon.svg",
   "marketIcon": "resources/icon-brand.svg",
@@ -20,6 +20,22 @@
     "singleton": true
   },
   "contributes": {
+    "commands": [
+      {
+        "id": "marketplace.addSource",
+        "title": "添加市场源",
+        "category": "插件市场",
+        "description": "添加一个作者市场源（该仓库根目录需有 marketplace.json）：读现作者源 → 判重拦截（空 / 非 http(s) / 官方源 / 已在列表）→ 通过才落盘 marketplace.marketplaceSources；落盘后配置变更自动重拉目录。回执三态：加上了 {ok:true,added} ／ 没变化 {ok:true,noop:true,reason:official|duplicate} ／ 调用不成立 {ok:false,noop:true,reason:empty|bad-url}",
+        "params": [
+          {
+            "name": "url",
+            "type": "string",
+            "required": true,
+            "description": "作者仓库地址（仓库主页或 HEAD 直链均可，保持原样落盘——不归一；例：https://github.com/作者/仓库）"
+          }
+        ]
+      }
+    ],
     "i18n": {
       "en": "i18n/en.json",
       "zh": "i18n/zh.json"

@@ -8,6 +8,7 @@
  */
 
 import { retryMarketInstall, retryMarketUpdate } from "./installFlow";
+import { registerMarketSourceAddCommand } from "../marketSourceAddCommand";
 
 const lk = () => window.linkdesk;
 
@@ -88,6 +89,10 @@ function ensureMarketplaceCommands(): void {
     },
     { title: "重试更新" },
   );
+
+  // M2 生长格 `AI#56`：「添加市场源」命令化——原来唯一入口是搜索页弹窗（鼠标路径），
+  // 命令面板 / CLI / MCP 都够不着。handler 与三态回执见 `marketSourceAddCommand.ts` 头注。
+  registerMarketSourceAddCommand();
 
   lk().menu?.registerItems?.("marketplaceItemGear", "marketplace", [
     { command: "core.openSettings", group: "navigation", when: "marketplace.extensionHasConfiguration" },

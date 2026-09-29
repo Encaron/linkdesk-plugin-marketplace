@@ -1,5 +1,12 @@
 # 更新日志
 
+## v1.1.1（2026-09-29）
+
+- **「添加市场源」命令化（M2 生长格 `AI#56`）**：此前加源的**唯一入口是搜索页的「市场源」弹窗**——一条纯鼠标路径，命令面板 / CLI / MCP 都够不着（跨面一致性缺口）。本版补 `marketplace.addSource`：`url` 一条必填参数，**handler 转发服务层同一决策单点**（`decideAddSource`），**不复制判重逻辑**；写盘走 `window.linkdesk.configuration.set("marketplace.marketplaceSources", next)`——与弹窗同一条路径，配置变更后目录自动重拉，零壳改动。
+- **回执三态**（与壳 `AI#55`/`AI#60` 同口径，⛔ 不是「ok 就是干成了」）：加上了 `{ok:true, added}` ／ 调用成立但没变化 `{ok:true, noop:true, reason:"official"|"duplicate"}` ／ 调用本身不成立 `{ok:false, noop:true, reason:"empty"|"bad-url"}`。**只有第一种真落盘**——其余五种 `set` 一次都不被调用（测试钉住）。写盘失败 / 配置面缺失**大声抛错**，不吞成假 ok。
+- **声明在 `plugin.json` 的 `contributes.commands[]`**（本仓此前是零条声明）：命令由此进池内注册表——CLI `describe` 能看见、未挂载市场视图也能 `exec` 触发（按 `AI#54` 的可发现性面）。命令元数据（title/description/params）**只此一处**，运行时 `registerCommand` 只带 `{title}`。
+- 新增测试 1 件（`src/__tests__/marketSourceAddCommand.test.ts`）：两种调用形等价、追加不重排、四种拒因回执与零落盘、写盘抛错上抛、注册面 id/title/返回码。
+
 ## v1.1.0（2026-09-27）
 
 - **侧栏动作行新增「检查更新」钮**（05「插件市场·检查更新」；设计件在壳仓 `docs/05-插件更新/插件市场/`）：点一下 = **强拉市场目录（绕开 5 分钟缓存）＋ 跑发现腿 ＋ 重投影目录**——行内「可更新」徽标**当场翻新**，不必退软件重进，也不必等下一次自动检查。钮放动作行**最左端**（既有「安装」「市场源」两钮的位置与写法零改动），**零壳改动**。
