@@ -10,6 +10,16 @@ import { useEffect, useState } from "react";
 import { readInstalledPackageFile } from "../../../services/packageFiles";
 import type { DetailIdentity } from "./useDetailIdentity";
 
+/** 远端 README 的相对媒体基址——readmeUrl（https 裸文件 URL）剥去最后一段 = 同目录基址。
+ *  相对图解析成同目录 https 直链（MarkdownView 协议白名单只放 https/linkdesk，解析结果仍在闸内）。
+ *  非 https / 剥不出目录段（裸 origin）→ undefined（调用方不传基址，相对图诚实不显，纯 https 照显）。 */
+export function remoteReadmeAssetBase(readmeUrl: string | null | undefined): string | undefined {
+  if (!readmeUrl || !/^https:\/\//i.test(readmeUrl)) return undefined;
+  const i = readmeUrl.lastIndexOf("/");
+  // "https://" 之后还必须有目录段——裸 origin（如 https://example.com）不给基址
+  return i > "https://".length ? readmeUrl.slice(0, i + 1) : undefined;
+}
+
 export function useDetailPackage(id: DetailIdentity) {
   const { pluginId, installed, entry } = id;
 
@@ -62,9 +72,12 @@ export function useDetailPackage(id: DetailIdentity) {
   const shots = (entry?.screenshots ?? []).filter((s) => typeof s === "string" && s);
   /* E6#70a（15 档案）：已装读包 README 的相对媒体引用解析到「被查看插件包内」→ 注入
    *  linkdesk://{pluginId}/ 基址（linkdesk:// 与读包 resolvePath 同根，README 引用的随包资产即此可达）。
-   *  远端 readmeUrl 来源（未装态/包内无 README 兜底）无本地副本 → 不传 assetBase（相对图诚实不显，
+   *  远端 readmeUrl 来源（未装态/包内无 README 兜底）：readmeUrl 是裸文件 URL（raw.githubusercontent
+   *  形态），剥去最后一段 = 同目录基址 → 相对图解析成同目录 https 直链照显（MarkdownView 协议白名单
+   *  只放 https/linkdesk，解析结果仍在闸内）。非 https / 解析不出目录 → 不给基址（相对图诚实不显，
    *  纯 https 远程照显——档案 §五.2 定案）。 */
   const localAssetBase = pluginId ? `linkdesk://${pluginId}/` : undefined;
+  const remoteAssetBase = remoteReadmeAssetBase(remoteReadmeUrl);
   const readme: { mode: "loading" | "content" | "none"; content?: string; assetBase?: string } = (() => {
     if (installed) {
       if (pkgReadme === undefined) return { mode: "loading" };
@@ -72,13 +85,13 @@ export function useDetailPackage(id: DetailIdentity) {
       // 包内无 README → 远端 readmeUrl 兜底（未装态一样）
       if (remoteReadmeUrl) {
         if (remoteReadme === undefined) return { mode: "loading" };
-        if (remoteReadme) return { mode: "content", content: remoteReadme };
+        if (remoteReadme) return { mode: "content", content: remoteReadme, assetBase: remoteAssetBase };
       }
       return { mode: "none" };
     }
     if (remoteReadmeUrl) {
       if (remoteReadme === undefined) return { mode: "loading" };
-      if (remoteReadme) return { mode: "content", content: remoteReadme };
+      if (remoteReadme) return { mode: "content", content: remoteReadme, assetBase: remoteAssetBase };
     }
     return { mode: "none" };
   })();

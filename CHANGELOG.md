@@ -1,5 +1,11 @@
 # 更新日志
 
+## v1.1.2（2026-09-30）
+
+- **修复：市场预览态（未安装）详情页 README 相对路径图片不显示**——此前只有安装后（读包内副本）图才显；本版把远端 `readmeUrl` 剥去最后一段得到**同目录 https 基址**传给渲染器，README 里的相对图按该目录解析成同目录直链照显（壳侧 `MarkdownView` 协议白名单本来就放 https，解析结果仍在安全闸内；`readmeUrl` 非 https 或裸 origin 时维持不显）。零壳改动（壳侧组件无需变更）。
+- 新增 `remoteReadmeAssetBase` 纯函数 + 单测 5 例（`src/__tests__/useDetailPackage.test.ts`）：raw 直链剥段、深路径、http 拒、裸 origin 拒、空值拒。
+- 作者面文档同步：`12-README说明区媒体契约` 的「市场预览态」行从「相对媒体不显示」改写为「显示（按 readmeUrl 所在目录解析）」（壳仓中英两树同笔）。
+
 ## v1.1.1（2026-09-29）
 
 - **「添加市场源」命令化（M2 生长格 `AI#56`）**：此前加源的**唯一入口是搜索页的「市场源」弹窗**——一条纯鼠标路径，命令面板 / CLI / MCP 都够不着（跨面一致性缺口）。本版补 `marketplace.addSource`：`url` 一条必填参数，**handler 转发服务层同一决策单点**（`decideAddSource`），**不复制判重逻辑**；写盘走 `window.linkdesk.configuration.set("marketplace.marketplaceSources", next)`——与弹窗同一条路径，配置变更后目录自动重拉，零壳改动。
