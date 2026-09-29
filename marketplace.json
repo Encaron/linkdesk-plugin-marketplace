@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-29T19:05:32.421Z",
+  "updatedAt": "2026-09-29T19:42:02.882Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.1.3",
+      "version": "1.1.4",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.3/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.4/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.3/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.4/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.3/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.3/marketplace.linkdesk-plugin",
-      "size": 124334,
-      "publishedAt": "2026-09-29T19:05:32.421Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.4/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.4/marketplace.linkdesk-plugin",
+      "size": 125049,
+      "publishedAt": "2026-09-29T19:42:02.882Z",
       "versions": [
+        {
+          "version": "1.1.4",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.4/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-29T19:42:02.882Z",
+          "changelog": "- **修复：侧栏动作行版式跳动（用户拍板改版式）**——「检查更新」独占一行（完成注与钮同排，超宽自动截断），「安装」「市场源」固定在下一行：就地注出现/消失不再把两颗写操作钮挤得上下换行。\n- **修复：自绘钮不随「组件圆角」设置**——全插件 CSS 的 11 处硬编码 `border-radius`（4px/3px）换算成主题 token（`--radius-sm` / `--radius-xs`，默认值逐像素等价）：「安装」「市场源」钮与各徽标从此跟随组件圆角六档设置（50% 圆形不受影响）。\n- **加固：手动检查更新后的全店同步**——重投影目录之外，把已装列表 store 也强拉一趟（探索/详情行的「可更新」判定同时吃目录与已装两份数据，两份都新鲜才翻牌）；并补目录 store 的竞态守卫：首趟加载在途时若发生重投影/强刷，落地较晚的旧首趟结果不再回写覆盖新鲜数据。"
+        },
         {
           "version": "1.1.3",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.3/marketplace.linkdesk-plugin",
