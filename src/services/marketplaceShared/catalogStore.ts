@@ -33,6 +33,11 @@ let _catalogResult: CatalogLoadResult = {
 };
 const _catalogListeners = new Set<() => void>();
 
+/** 结果代数——每有一方**写回更新的结果**（重投影 / 强刷）就 +1；首趟加载的 promise 落地时对号，
+ *  代数不符 = 中途已有更新的写入 ⇒ 旧结果**作废不回写**（2026-09-30 竞态守卫：首趟加载在途时用户点了
+ *  「检查更新」，重投影已把新鲜结果放进 store，随后才落地的旧首趟不得把 store 拖回旧目录）。 */
+let _catalogGen = 0;
+
 function notifyCatalogListeners(): void {
   _catalogListeners.forEach((fn) => fn());
 }
@@ -55,6 +60,7 @@ function ensureCatalogConfigWatch(): void {
   const sub = cfg?.onChange?.("marketplace.marketplaceSources", () => {
     forceRefreshCatalog()
       .then((r) => {
+        _catalogGen++; // 新结果入库 = 代数推进，作废任何在途旧首趟的回写权
         _catalogResult = r;
         notifyCatalogListeners();
       })
@@ -77,9 +83,12 @@ export function useMarketplaceCatalog() {
 
     const init = async () => {
       if (!_catalogPromise) {
+        const gen = _catalogGen; // 创建时的代数——落地时对号（不符 = 中途有人重投影/强刷过 ⇒ 作废不回写）
         _catalogPromise = loadCatalog().then((r) => {
-          _catalogResult = r;
-          _catalogResolvedOnce = true;
+          if (gen === _catalogGen) {
+            _catalogResult = r;
+            _catalogResolvedOnce = true;
+          }
         });
       }
       await _catalogPromise;
@@ -101,6 +110,7 @@ export function useMarketplaceCatalog() {
     refresh: () =>
       forceRefreshCatalog()
         .then((r) => {
+          _catalogGen++; // 新结果入库 = 代数推进，作废任何在途旧首趟的回写权
           _catalogResult = r;
           notifyCatalogListeners();
         })
@@ -123,6 +133,7 @@ export function useMarketplaceCatalog() {
  *    供服务层调用。两份都只改这一份 `_catalogResult`（唯一属主见本文件头注）。 */
 export async function reprojectCatalog(): Promise<CatalogLoadResult> {
   const r = await loadCatalog();
+  _catalogGen++; // 新结果入库 = 代数推进，作废任何在途旧首趟的回写权
   _catalogResult = r;
   _catalogResolvedOnce = true;
   notifyCatalogListeners();

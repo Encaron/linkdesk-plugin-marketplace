@@ -75,10 +75,12 @@ export default function SearchView() {
   return (
     <div className="marketplace-ms-header">
       <div className="marketplace-ms-header-actions">
-        {/* 05「插件市场·检查更新」：第三枚钮，放**最左**——「查」是无副作用的读操作且最常用，与两个「写」
-         *  操作（安装 / 加源）视觉上天然分隔；既有两钮的次序与写法零改动（老用户肌肉记忆不破）。
+        {/* 05「插件市场·检查更新」：第三枚钮。2026-09-30 用户拍板改版式——「检查更新」**独占一行**（钮 +
+         *  就地注同排），「安装」「市场源」固定在下一行：注出现/消失不再把两颗写操作钮挤得上下跳。
          *  手动绕开 5min 目录缓存 + 重投影刷新「可更新」徽标，零壳改动。 */}
-        <CheckUpdateButton />
+        <div className="marketplace-ms-check-row">
+          <CheckUpdateButton />
+        </div>
         <button
           className="marketplace-ms-install-btn"
           onClick={handleInstall}

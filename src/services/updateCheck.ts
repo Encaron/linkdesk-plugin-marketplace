@@ -28,6 +28,7 @@
 import { runUpdateDiscovery } from "./updateDiscovery";
 import type { DiscoveryPlan } from "./updateDiscovery";
 import { reprojectCatalog } from "./marketplaceShared/catalogStore";
+import { scheduleDataRefresh } from "./marketplaceShared/pluginsStore";
 
 export interface UpdateCheckResult {
   /** `ok` = 比过了（含「没有可更新」这一结论）；`failed` = 判不了（目录取不到/坏 parse、读盘不可信） */
@@ -47,6 +48,10 @@ export async function checkForPluginUpdates(): Promise<UpdateCheckResult> {
     const plan: DiscoveryPlan | null = await runUpdateDiscovery(true);
     if (plan === null) return failed();
     await reprojectCatalog();
+    // 2026-09-30 用户报障兜底：探索/详情行的「可更新」判定除了目录条目还吃**已装列表 store**（本地版本 +
+    // 住所闸 updatable，`useCatalogStatus` 交叉比对）——目录新鲜而该 store 陈旧时行依旧不翻。手动检查是
+    // 用户「现在就要对上」的显式动作 ⇒ 重投影之外把已装列表也强拉一趟（microtask 合并，幂等、零额外成本）。
+    scheduleDataRefresh();
     return { state: "ok", updatableCount: plan.candidates.length, checkedAt: Date.now() };
   } catch {
     // 读盘/目录/配置任一处抛（如预览环境无 configuration 面）——一律「判不了」，不把异常漏给调用方

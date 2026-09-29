@@ -20,9 +20,18 @@
   justify-content: flex-end;
   gap: 6px; /* E6#30c ③：「安装」+「市场源」并排（mockup frame ③ .ms-header-top） */
   margin-bottom: 4px;
-  /* 05「插件市场·检查更新」：三钮 ＋ 就地注的总宽超过侧栏可用宽时换行（按 DOM 顺序贪心排布——注与
-     「检查更新」先留首行，放不下的钮顺次下行）。toolbar 变高由壳既有 ResizeObserver 自适应 ⇒ 壳零改动。 */
+  /* 2026-09-30 用户拍板：「检查更新」独占一行（.marketplace-ms-check-row flex-basis 100% 强制换行），
+     「安装」「市场源」固定在下一行——就地注出现/消失不再把两颗写操作钮挤得上下跳。 */
   flex-wrap: wrap;
+}
+
+/* 「检查更新」行——钮 ＋ 就地注同排；flex-basis 100% = 强制独占首行，行内再挤也不波及下一行的写操作钮 */
+.marketplace-ms-check-row {
+  flex-basis: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 }
 
 .marketplace-ms-install-btn {
@@ -31,7 +40,7 @@
   gap: 4px;
   padding: 3px 10px;
   border: 1px solid var(--separator);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: var(--text-primary);
   cursor: pointer;
@@ -112,8 +121,11 @@
 }
 
 .marketplace-ms-check-note {
-  flex: none;
-  width: max-content; /* 窄侧栏换行时注自身不压扁（宽窄都不去挤按钮） */
+  /* 2026-09-30 版式：注与钮同排独占一行——超宽时注自己截断（ellipsis），不挤同一行的钮 */
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--font-size-2xs);
   color: var(--text-muted);
@@ -234,7 +246,7 @@
   box-sizing: border-box;
   padding: 4px 28px 4px 8px;
   border: 1px solid var(--separator);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: var(--bg-card);
   color: var(--text-primary);
   font-size: var(--font-size-sm); /* E5.8 Phase 12 #175：search 12→sm */

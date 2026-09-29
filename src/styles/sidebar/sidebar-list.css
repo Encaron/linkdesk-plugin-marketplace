@@ -118,7 +118,7 @@
   color: var(--text-muted);
   background: var(--bg-window);
   padding: 1px 4px;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   max-width: 140px; /* E6#30d：来源仓库名（owner/repo）超长截断——完整值走 title */
   white-space: nowrap;
   overflow: hidden;
@@ -131,7 +131,7 @@
   color: var(--warning-text);
   background: var(--warning-bg);
   padding: 1px 4px;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   white-space: nowrap;
   flex-shrink: 0;
   cursor: default;
@@ -148,7 +148,7 @@
   background: color-mix(in srgb, var(--accent) 8%, transparent);
   border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   padding: 0 4px;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
   white-space: nowrap;
   flex-shrink: 0;
   cursor: default;
@@ -173,7 +173,7 @@
   align-self: center;
   background: none;
   border: 1px solid var(--separator);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   color: var(--success); /* E6#30.12：启用钮语义 success（theme 域可覆盖） */
   cursor: pointer;
   padding: 3px 8px;
@@ -196,7 +196,7 @@
   align-self: center;
   background: var(--success);
   border: 1px solid var(--success);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   color: var(--badge-text);
   cursor: pointer;
   padding: 3px 10px;
