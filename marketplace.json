@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-29T05:40:40.403Z",
+  "updatedAt": "2026-09-29T18:41:43.042Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.1/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.2/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.1/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.2/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.1/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.1/marketplace.linkdesk-plugin",
-      "size": 123535,
-      "publishedAt": "2026-09-29T05:40:40.403Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.2/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.2/marketplace.linkdesk-plugin",
+      "size": 124035,
+      "publishedAt": "2026-09-29T18:41:43.042Z",
       "versions": [
+        {
+          "version": "1.1.2",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.2/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-29T18:41:43.042Z",
+          "changelog": "- **修复：市场预览态（未安装）详情页 README 相对路径图片不显示**——此前只有安装后（读包内副本）图才显；本版把远端 `readmeUrl` 剥去最后一段得到**同目录 https 基址**传给渲染器，README 里的相对图按该目录解析成同目录直链照显（壳侧 `MarkdownView` 协议白名单本来就放 https，解析结果仍在安全闸内；`readmeUrl` 非 https 或裸 origin 时维持不显）。零壳改动（壳侧组件无需变更）。\n- 新增 `remoteReadmeAssetBase` 纯函数 + 单测 5 例（`src/__tests__/useDetailPackage.test.ts`）：raw 直链剥段、深路径、http 拒、裸 origin 拒、空值拒。\n- 作者面文档同步：`12-README说明区媒体契约` 的「市场预览态」行从「相对媒体不显示」改写为「显示（按 readmeUrl 所在目录解析）」（壳仓中英两树同笔）。"
+        },
         {
           "version": "1.1.1",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.1/marketplace.linkdesk-plugin",
