@@ -331,4 +331,13 @@ describe("按钮五态（壳侧 job 只读镜像 → 原位画什么）", () => 
     const { result } = renderHook(() => useInstallAction(identity(), opts()));
     expect(result.current.installLabel()).toBe("job:running");
   });
+
+  it("整句进度 message 透传出 hook（按钮 title 用）——无 job ⇒ null", () => {
+    const empty = renderHook(() => useInstallAction(identity(), opts()));
+    expect(empty.result.current.installMessage).toBeNull();
+    empty.unmount();
+    h.S.job = { pluginId: "demo-alpha", state: "running", message: "开始下载 https://example.com/demo.linkdesk-plugin" };
+    const { result } = renderHook(() => useInstallAction(identity(), opts()));
+    expect(result.current.installMessage).toBe("开始下载 https://example.com/demo.linkdesk-plugin");
+  });
 });

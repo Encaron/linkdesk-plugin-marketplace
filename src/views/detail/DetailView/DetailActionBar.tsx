@@ -26,6 +26,7 @@ export default function DetailActionBar({
   uninstallingHere,
   installFailed,
   installLabel,
+  installMessage,
   versionPicker,
   installPicker,
   actButton,
@@ -54,6 +55,8 @@ export default function DetailActionBar({
   /** 本插件有失败 job——安装钮原位变红「重试安装」 */
   installFailed: boolean;
   installLabel: string;
+  /** 安装中整句进度（含下载地址）——只进按钮 title，不进按钮文字（2026-09-30 报障：长句撑爆按钮） */
+  installMessage?: string | null;
   versionPicker: ReactNode;
   installPicker: ReactNode;
   actButton: ReactNode;
@@ -125,7 +128,15 @@ export default function DetailActionBar({
                 variant="success"
                 onClick={onInstallClick}
                 disabled={busy || installingHere || queuedHere || !online}
-                title={!online ? t("联网后重试") : queuedHere ? t("等待安装中") : undefined}
+                title={
+                  !online
+                    ? t("联网后重试")
+                    : queuedHere
+                      ? t("等待安装中")
+                      : installingHere && installMessage
+                        ? installMessage
+                        : undefined
+                }
               >
                 <span className="codicon codicon-cloud-download" />
                 {installingHere ? installLabel : queuedHere ? t("等待安装中") : t("安装")}

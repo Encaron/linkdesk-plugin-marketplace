@@ -46,6 +46,8 @@ export function useInstallAction(
   const uninstallingHere = installJob?.kind === "uninstall" && installJob.state === "running";
 
   const installLabel = (): string => installJobLabel(t, installJob);
+  /** 安装中的整句进度（壳/主进程解析，含下载地址）——只进按钮 title，不进按钮文字（长句撑爆版式） */
+  const installMessage: string | null = installJob?.message ?? null;
 
   /* E6#30.8a/30.8c 安装门禁（确认弹窗前后双拦幂等）。#64 A2 归因区分：
    *  - 已装冲突 / 离线 = 状态类（UI 本已翻转/按钮已置灰 + title）→ 静默拦，无 toast 无红字；
@@ -119,6 +121,7 @@ export function useInstallAction(
     queuedHere,
     uninstallingHere,
     installLabel,
+    installMessage,
     installGateError,
     runInstall,
     handleInstallClick,

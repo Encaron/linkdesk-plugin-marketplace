@@ -39,7 +39,8 @@ export default function CatalogRowAction({
 
   if (status === "install") {
     if (installingHere) {
-      /* 30.9a M4 二：安装中——阶段/进度标签（校验中/下载中 x%/解压中/加载中，i18n 全量已有 key） */
+      /* 30.9a M4 二：安装中——阶段/进度标签（校验中/下载中 x%/解压中/加载中，i18n 全量已有 key）。
+       *  整句 message（含下载地址）不上徽标文字——长句会把行撑爆（2026-09-30 报障）；要看全句去详情页按钮 title。 */
       return (
         <span className="marketplace-ms-catalog-status installing" data-hint={t("安装插件")}>
           <span className="codicon codicon-cloud-download" />

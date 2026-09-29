@@ -186,6 +186,7 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
             uninstallingHere={inst.uninstallingHere}
             installFailed={!!inst.installErrHere}
             installLabel={inst.installLabel()}
+            installMessage={inst.installMessage}
             versionPicker={bits.versionPicker}
             installPicker={bits.installPicker}
             actButton={bits.actButton}

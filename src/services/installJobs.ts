@@ -144,10 +144,12 @@ export function useInstallJobsSubscription(): void {
 }
 
 /**
- * job 行状态短语——`message`（壳/主进程解析过的整句）优先，否则由 `stage` + `percent` 派生。
- * 显示文本铁律：文字要么由壳侧 `t()` 解析过、要么是本视图自己 `t()` 派生，池哑渲染零自产。
+ * job 行状态短语——由 `stage` + `percent` 派生（短、定长、i18n），按钮/徽标专用。
+ * 🔴 **不再优先 `message`**（2026-09-30 用户报障）：message 是壳/主进程解析的**整句**（如
+ * 「开始下载 https://github.com/…/x.linkdesk-plugin」，含完整 URL）——塞进安装钮把按钮拉长、
+ * 旁侧文字挤成每行几字。整句降级为悬停 title（消费方自取 `job.message`）。
+ * 显示文本铁律：文字由本视图 `t()` 派生，池哑渲染零自产。
  */
 export function installJobLabel(t: (key: string, opts?: Record<string, unknown>) => string, job: InstallJob | null): string {
-  if (job?.message) return job.message;
   return marketInstallStageLabel(t, job?.stage, job?.percent);
 }

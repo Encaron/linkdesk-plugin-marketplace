@@ -130,19 +130,26 @@ describe("池侧 job 镜像——订阅与选取（E6#73c 第 2 步）", () => {
     expect(unsubCalls).toBe(1);
   });
 
-  it("行内文案——message（已解析整句）优先，否则由 stage + percent 派生", async () => {
+  it("行内文案——由 stage + percent 派生；message（整句，含下载地址）不进按钮文字（2026-09-30 报障）", async () => {
     const { installJobLabel } = await boot();
     const t = (k: string, o?: Record<string, unknown>) => (o ? `${k}:${JSON.stringify(o)}` : k);
     expect(
       installJobLabel(t, job({ jobId: "j", pluginId: "p", state: "running", stage: "downloading", percent: 62 })),
     ).toBe('下载中 {{percent}}%:{"percent":62}');
     expect(installJobLabel(t, job({ jobId: "j", pluginId: "p", state: "running", stage: "extracting" }))).toBe("解压中...");
+    // 整句 message 即使存在也不上按钮（含 URL 会把按钮拉长挤爆旁侧）——title 由消费方自取 job.message
     expect(
       installJobLabel(
         t,
-        job({ jobId: "j", pluginId: "p", state: "running", stage: "downloading", message: "下载失败，正在重试（1/2）" }),
+        job({
+          jobId: "j",
+          pluginId: "p",
+          state: "running",
+          stage: "downloading",
+          message: "开始下载 https://github.com/demo/demo/releases/download/v1/x.linkdesk-plugin",
+        }),
       ),
-    ).toBe("下载失败，正在重试（1/2）");
+    ).toBe("下载中...");
     expect(installJobLabel(t, null)).toBe("安装中...");
   });
 });
