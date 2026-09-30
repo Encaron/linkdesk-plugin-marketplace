@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-30T03:47:48.946Z",
+  "updatedAt": "2026-09-30T21:47:18.515Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.1.8",
+      "version": "1.1.9",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.8/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.9/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.8/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.9/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.8/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.8/marketplace.linkdesk-plugin",
-      "size": 78734,
-      "publishedAt": "2026-09-30T03:47:48.946Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.9/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.9/marketplace.linkdesk-plugin",
+      "size": 61986,
+      "publishedAt": "2026-09-30T21:47:18.515Z",
       "versions": [
+        {
+          "version": "1.1.9",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.9/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-30T21:47:18.515Z",
+          "changelog": "- **「已安装」那块标题改口径**：原「全部更新记录」→「**更新记录（最近 5 版）**」——包里只剩最近 5 版，标题与内容对上（更早的记录仍在插件仓库里）。\n- **安装包瘦身**：包内更新日志只带最近 5 版——由 SDK 自动施加，用户无需任何操作。"
+        },
         {
           "version": "1.1.8",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.8/marketplace.linkdesk-plugin",
@@ -47,128 +53,107 @@
         {
           "version": "1.1.4",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.4/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-29T19:42:02.882Z",
-          "changelog": "- **修复：侧栏动作行版式跳动（用户拍板改版式）**——「检查更新」独占一行（完成注与钮同排，超宽自动截断），「安装」「市场源」固定在下一行：就地注出现/消失不再把两颗写操作钮挤得上下换行。\n- **修复：自绘钮不随「组件圆角」设置**——全插件 CSS 的 11 处硬编码 `border-radius`（4px/3px）换算成主题 token（`--radius-sm` / `--radius-xs`，默认值逐像素等价）：「安装」「市场源」钮与各徽标从此跟随组件圆角六档设置（50% 圆形不受影响）。\n- **加固：手动检查更新后的全店同步**——重投影目录之外，把已装列表 store 也强拉一趟（探索/详情行的「可更新」判定同时吃目录与已装两份数据，两份都新鲜才翻牌）；并补目录 store 的竞态守卫：首趟加载在途时若发生重投影/强刷，落地较晚的旧首趟结果不再回写覆盖新鲜数据。"
+          "publishedAt": "2026-09-29T19:42:02.882Z"
         },
         {
           "version": "1.1.3",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.3/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-29T19:05:32.421Z",
-          "changelog": "- **修复：安装中绿色按钮被整句进度撑爆**——`installJobLabel` 此前让 `job.message`（壳/主进程解析的整句，含完整下载 URL）优先于阶段短语，塞进详情页安装钮后按钮拉长、旁侧文字被挤成每行几字。现改为**一律由 `stage` + `percent` 派生短标签**（下载中 x% / 校验中 / 解压中…），整句降级为详情页安装钮的悬停 `title`；探索列表行徽标同步受益（纯阶段短语）。测试钉点同笔改写并加「整句不上按钮」反例（429 例全绿）。"
+          "publishedAt": "2026-09-29T19:05:32.421Z"
         },
         {
           "version": "1.1.2",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.2/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-29T18:41:43.042Z",
-          "changelog": "- **修复：市场预览态（未安装）详情页 README 相对路径图片不显示**——此前只有安装后（读包内副本）图才显；本版把远端 `readmeUrl` 剥去最后一段得到**同目录 https 基址**传给渲染器，README 里的相对图按该目录解析成同目录直链照显（壳侧 `MarkdownView` 协议白名单本来就放 https，解析结果仍在安全闸内；`readmeUrl` 非 https 或裸 origin 时维持不显）。零壳改动（壳侧组件无需变更）。\n- 新增 `remoteReadmeAssetBase` 纯函数 + 单测 5 例（`src/__tests__/useDetailPackage.test.ts`）：raw 直链剥段、深路径、http 拒、裸 origin 拒、空值拒。\n- 作者面文档同步：`12-README说明区媒体契约` 的「市场预览态」行从「相对媒体不显示」改写为「显示（按 readmeUrl 所在目录解析）」（壳仓中英两树同笔）。"
+          "publishedAt": "2026-09-29T18:41:43.042Z"
         },
         {
           "version": "1.1.1",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.1/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-29T05:40:40.403Z",
-          "changelog": "- **「添加市场源」命令化（M2 生长格 `AI#56`）**：此前加源的**唯一入口是搜索页的「市场源」弹窗**——一条纯鼠标路径，命令面板 / CLI / MCP 都够不着（跨面一致性缺口）。本版补 `marketplace.addSource`：`url` 一条必填参数，**handler 转发服务层同一决策单点**（`decideAddSource`），**不复制判重逻辑**；写盘走 `window.linkdesk.configuration.set(\"marketplace.marketplaceSources\", next)`——与弹窗同一条路径，配置变更后目录自动重拉，零壳改动。\n- **回执三态**（与壳 `AI#55`/`AI#60` 同口径，⛔ 不是「ok 就是干成了」）：加上了 `{ok:true, added}` ／ 调用成立但没变化 `{ok:true, noop:true, reason:\"official\"|\"duplicate\"}` ／ 调用本身不成立 `{ok:false, noop:true, reason:\"empty\"|\"bad-url\"}`。**只有第一种真落盘**——其余五种 `set` 一次都不被调用（测试钉住）。写盘失败 / 配置面缺失**大声抛错**，不吞成假 ok。\n- **声明在 `plugin.json` 的 `contributes.commands[]`**（本仓此前是零条声明）：命令由此进池内注册表——CLI `describe` 能看见、未挂载市场视图也能 `exec` 触发（按 `AI#54` 的可发现性面）。命令元数据（title/description/params）**只此一处**，运行时 `registerCommand` 只带 `{title}`。\n- 新增测试 1 件（`src/__tests__/marketSourceAddCommand.test.ts`）：两种调用形等价、追加不重排、四种拒因回执与零落盘、写盘抛错上抛、注册面 id/title/返回码。"
+          "publishedAt": "2026-09-29T05:40:40.403Z"
         },
         {
           "version": "1.1.0",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.0/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-27T18:09:45.250Z",
-          "changelog": "- **侧栏动作行新增「检查更新」钮**（05「插件市场·检查更新」；设计件在壳仓 `docs/05-插件更新/插件市场/`）：点一下 = **强拉市场目录（绕开 5 分钟缓存）＋ 跑发现腿 ＋ 重投影目录**——行内「可更新」徽标**当场翻新**，不必退软件重进，也不必等下一次自动检查。钮放动作行**最左端**（既有「安装」「市场源」两钮的位置与写法零改动），**零壳改动**。\n- **为什么需要这件**：目录有 5 分钟 fresh 缓存、发现循环每进程只排一趟、徽标只随目录重投影翻新 ⇒ 作者刚发布的新版本，用户当天可能一直看不到。手动腿（`runUpdateDiscovery(force=true)`）引擎里早就有，缺的只是一个入口把它接上。\n- **一次网络（判据）**：发现腿强拉**成功即写缓存**（`marketSources/fetch.ts:51`），随后的重投影走非强拉、命中同一份 fresh 缓存 ⇒ **全程只 1 次网络**。顺序不可对调（先重投影再发现 = 两次全源拉取，且 `removeCache` 会让失败路径失去 stale 兜底）。`src/__tests__/updateCheck.test.ts` 用注入 fetcher **数调用次数**钉住这条，并覆盖「一台没装插件」的早退形态。\n- **失败就是失败，不装作用**：目录取不到 / 坏 parse ⇒ 就地注「**检查失败 · 显示的是旧目录**」（红字 muted 小字），详情落**唯一通知面**（铃铛宽面板，`notifyError`）——本页不自造错误条（与 04「发行说明刷新按钮」已落地件同口径）；页面**保留旧目录**不白屏，钮**回可用态**可立刻再点（⛔ 不会卡在「检查中」）。\n- **无障碍（一处取舍如实记录）**：钮用壳共享 `Button`（`ghost`/`sm`，与详情页动作钮同族），而壳 `Button` 刻意**不透传 `data-*`/`aria-*`**（`Button.tsx:33-43` 的设计）⇒ ①提示挂外层槽位 `data-hint`：给钮传 `title` 会让壳把 `aria-label` 设成那句提示、把钮的名字读歪（children 非纯字符串 ⇒ `hasVisibleText=false`，同文件 `:50-58`），而钮的可见文字「检查更新」才是它的无障碍名；②本钮**没有 `aria-busy`**——「进行中」由文字（检查中…）＋ 禁用态承担，「结果播报」由注的 `role=\"status\"` 承担。测试钉住这两条。\n- **修版本号漂移**：`package.json`（1.0.44）与 `plugin.json`（1.0.45）长期不同值，而本仓规矩是**同值**——本版两个字段**一并到 1.1.0**。类别按 **MINOR**（新增用户可见控件，向后兼容）；`minAppVersion` 不变（仍 0.2.20，未用到壳的新能力）。\n- **顺带修一处「撒谎」**（做本件时发现）：读盘失败（`pluginManager` 的 IPC 抛）时发现腿此前会掉进「一台没装 ⇒ 空计划」，把一次瞬时故障报成「没有可更新」——手动钮据此会显示「已是最新」。现按引擎文件头**本来的口径**补上 `available === false ⇒ null（判不了）`：目录一趟不拉，交启动调度器按既有梯子重试，本钮如实显示失败。`src/__tests__/updateDiscovery.test.ts` 加一条用例钉住（该文件原有 69 例全绿）。\n- **文件落点**（照本仓 feature-folder 规矩，无一大文件）：新增 `src/services/updateCheck.ts`（手动检查的唯一动作，~80 行）、`src/views/sidebar/SearchView/CheckUpdateButton.tsx`（私有件：三态 ＋ 就地注，~110 行）；改动 `marketplaceShared/catalogStore.ts`（＋`reprojectCatalog` 非 hook 版重投影）、`views/sidebar/SearchView.tsx`（首槽 ＋ 一行 import）、`styles/sidebar/sidebar-shell.css`（动作行 `flex-wrap` ＋ 钮槽/注样式，全 token）、`i18n/en.json`（8 个新键）。新增测试 2 件。"
+          "publishedAt": "2026-09-27T18:09:45.250Z"
         },
         {
           "version": "1.0.45",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.45/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-27T07:09:56.583Z",
-          "changelog": "- **悬停提示收编（04「悬停提示系统」件 4）**：本仓 **27 处**小写标签上的原生 `title=` 全部换成壳的 `data-hint` 属性式提示（25 处说明类 ＋ 2 处揭示类另加 `data-hint-delay=\"0\"`）；其中 **3 枚图标钮**（子代只有一枚 codicon 字形）同笔补 `aria-label`——它们原本唯一的名字来源就是那个 `title`，只换属性会让按钮变成「没名字的按钮」。\n- **为什么换**：原生 tooltip 是 Chromium 的系统 UI，壳的 CSS 碰不到——不跟主题、不跟字号；`data-hint` 走壳自绘的提示条，并自动带出该命令的快捷键（与右键菜单同一份映射）。DOM 结构、类名、可见文字零变化。\n- **`minAppVersion` 0.2.13 → 0.2.20**：提示条本体（`HintTipRenderer`）由壳提供，0.2.20 起才有——在旧壳上 `data-hint` 是惰性属性，那批按钮会**没有任何提示**（比原生 tooltip 更糟），故此版起要求应用 ≥0.2.20。\n- **`@linkdesk/plugin-sdk` ^0.1.46 → ^0.1.49**：新腿 `check-native-title` 判红原生 `title=`（本仓现为 **0 处**）——本仓的 `ci-verify` 严格档自动吃这条腿。"
+          "publishedAt": "2026-09-27T07:09:56.583Z"
         },
         {
           "version": "1.0.44",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.44/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-25T18:56:36.794Z",
-          "changelog": "- **修详情页装载清单的坏项崩溃**（E6#151）：插件清单的 `contributes.commands`／`keybindings` 里出现空槽（`null`）等坏项时，取字函数直接读 `c.id` ⇒ 在渲染期抛错、被壳的 ErrorBoundary 兜住（表现为该插件详情页打不开）。现按**坏项丢弃、好项照常**处理：取字函数收空值返回空串，装载解析先按对象形状过滤，`menus` 形状不对时按空表处理——单个坏声明不再拖垮整页。壳侧同源缺陷（装载期 `contributes` 整块零形状校验，坏项之后的全部贡献静默不注册）同批修，见壳 v0.2.16。⚠️ 本轮只覆盖**空槽与错形状**；声明里缺必填字段（如命令没有 `id`）仍归各注册表自身的容错，不在此列。\n- **修生命周期订阅撤不掉**（E6#152）：`useMarketplacePlugins` 的三条 `plugin:*` 订阅注册在异步初始化函数内部，它返回的清理函数交给了自己的 promise、而不是 effect 的返回值 ⇒ 组件卸载时订阅仍在，跨挂载累积（壳侧每次 `plugin:installed` 触发多轮重拉、已卸载组件仍被唤醒）。现三条订阅与数据监听一起**同步注册在 effect 体内**，由 effect 的返回值统一撤销；卸载后再来的生命周期广播无人接（有测试钉住）。"
+          "publishedAt": "2026-09-25T18:56:36.794Z"
         },
         {
           "version": "1.0.43",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.43/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-20T00:08:04.441Z",
-          "changelog": "- **删三处死类名引用**（E6#136 普查裁决）：`marketplace-mpd-version-select`（版本下拉两处，SelectBox 的 className 入参）与 `marketplace-ms-section-items`（侧栏四个列表视图的容器标记类）在仓内 CSS 零定义、无任何 querySelector 式消费——SDK 新腿（0.1.44 自有类名引用悬空判据）指出它们是死引用；四处按命名一致性**一并删净**，并订正 `detail-shell.css` 头注里拿旧类名举例的那句。DOM 结构与渲染结果零变化，无功能变化。"
+          "publishedAt": "2026-09-20T00:08:04.441Z"
         },
         {
           "version": "1.0.42",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.42/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-19T13:46:55.372Z",
-          "changelog": "- **安装请求随行条目来源 URL**（catalogUrl）：壳在同一个安装任务内自动装 requires 里缺失的依赖（依赖链自动装配套；请求不带来源时行为不变）。"
+          "publishedAt": "2026-09-19T13:46:55.372Z"
         },
         {
           "version": "1.0.41",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.41/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-19T12:49:27.445Z",
-          "changelog": "- **重打可复现**：@linkdesk/plugin-sdk 0.1.42 起 zip 目录条目时间戳钉死，同一份源码重打逐字节一致。插件内容零变化（仅 plugin.json 版本号随包更新）。"
+          "publishedAt": "2026-09-19T12:49:27.445Z"
         },
         {
           "version": "1.0.40",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.40/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-19T10:12:24.090Z",
-          "changelog": "- **删 4 处「有规则、无渲染方」的 CSS 死类**（E6#113）：`.marketplace-sidebar`／`.marketplace-ms-extensions`／`.marketplace-ms-section-header`（含 `:hover` 与 `.codicon` 后代共 3 条规则）／`.marketplace-ms-section-title`——旧自画侧栏与分节头的迁移遗留（侧栏外壳由壳的 `SidePanel`／`SidebarSection` 接管后，插件侧 JSX 不再画那些节点，CSS 未同笔删）。⚠️ `.marketplace-ms-section-items` 是**被用未定义**的合法标记类（detail-shell.css 有登记），不在删除范围。实机 CDP 普查 DOM 零存在 ⇒ 像素级零视觉变化。无功能变化。"
+          "publishedAt": "2026-09-19T10:12:24.090Z"
         },
         {
           "version": "1.0.39",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.39/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-19T06:01:44.842Z",
-          "changelog": "- **声明最低壳版本 `minAppVersion: \"0.2.13\"`**（E6#128 · L9 收尾补正）：本仓自上一版起改由**壳池集中供给** `@linkdesk/ui`（构建时 external、运行时向壳要同一份实例）⇒ 需要 **≥ 0.2.13** 的壳（该版本起池里才有 `@linkdesk/ui` 这件货）。此前本清单**没写这个字段** ⇒ 市场与加载期都拦不住「新插件 × 旧壳」的组合（旧壳上插件视图打不开，壳被 ErrorBoundary 兜住、不崩）。本版**只加这一行清单字段 + 版本 PATCH**，源码与产物行为零变化。"
+          "publishedAt": "2026-09-19T06:01:44.842Z"
         },
         {
           "version": "1.0.38",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.38/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-19T01:50:19.814Z",
-          "changelog": "- **换轨到「壳池集中供给」（E6#125 · L9 第 9.4 轮）**：`@linkdesk/ui` 不再编译进本插件 bundle——构建时 external，运行时由壳池供给同一份实例。源码 `import` 一行未改，只把依赖从 `^0.3.1` 换到重锚号 `^0.2.13`（`@linkdesk/ui` 自此与壳同号锁步）＋ `@linkdesk/plugin-sdk` `^0.1.19 → ^0.1.41`，重新构建发布。\n- **读数（产物前后对照）**：包 **1,196,836 → 113,811 字节（−90.5%）**；根 bundle JS **546,865 → 25,839 字节**。8 张视图 bundle 里的组件实现痕迹（`data-overlay-wrapper` / `overlay-root` / `ldk-button` / `ldk-form-row` / `ldk-toggle` / `ldk-hint-card`）grep **零命中**；只剩 `from \"@linkdesk/ui\"` 裸 specifier 交给壳解析。\n- **本仓自己借用的宿主类名照旧生效**：`CompatStatus` 的 `className=\"ldk-badge\"` 与 `.marketplace-mpd-title-row .ldk-badge .codicon` 选择器没动——那些类名的**定义**现在由壳池全局供给（过去靠自带一份），写法不变、结果不变。"
+          "publishedAt": "2026-09-19T01:50:19.814Z"
         },
         {
           "version": "1.0.37",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.37/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-18T18:08:05.856Z",
-          "changelog": "- **悬停帮助卡收编为壳的共享件**（E6#120）：卡体改用 `@linkdesk/ui` 0.3.1 的 `HintCard`\n  （壳只有一份实现；触发行为与卡文案逐字保留——400ms 悬停意图、移开消失、键盘与触屏可达、\n  卡体不可交互、状态标不挂 `title`，与 v1.0.36 用户点头的口径一字不差）。**用户可见界面零变化**。\n- 依赖：`@linkdesk/ui` `^0.3.0` → `^0.3.1`。⚠️ 本版**须等 `@linkdesk/ui` 0.3.1 发布后**再构建发版\n  （组件源码编译进 bundle——不升依赖重新构建就拿不到共享件，用户那边什么都不变）。"
+          "publishedAt": "2026-09-18T18:08:05.856Z"
         },
         {
           "version": "1.0.35",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.35/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-17T13:39:29.641Z",
-          "changelog": "- **上下文旗子带上归属**（E6#111n-4）：6 个旗子全部加 `marketplace.` 前缀——`pluginDisabled` · `extensionHasThemes` ·\n  `extensionHasLanguages` · `extensionHasIconThemes` · `extensionHasConfiguration` · `extensionHasKeybindings`。\n  旗子是**运行时状态**（按条目悬停/选中刷新，进内存 map，不落盘）⇒ **无迁移面**，老用户零影响\n- 🔴 **写点与读点同笔改**——这 6 个旗子**全部服务同一个齿轮菜单**：\n  - 写点 `src/components/ExtensionItem.tsx`（6 条 set ＋ 6 条复位）\n  - 读点 `src/services/marketplaceShared/commands.ts` 的 7 条菜单项 `when`（`theme.pick` 等宿主命令**一字未改**）\n  只改一侧 ⇒ 对应菜单项**永久消失或永久出现**，而它看起来只是「菜单少了一项」，没人会归因到命名\n- 无功能变化——7 个菜单条目的显隐条件与改前逐项一致"
+          "publishedAt": "2026-09-17T13:39:29.641Z"
         },
         {
           "version": "1.0.34",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.34/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-16T03:01:45.681Z",
-          "changelog": "- **适配宿主 E6#109l-b 的共享组件类名归一（`@linkdesk/ui` 0.3.0）**：共享组件余下的 52 个类名一律收进 `ldk-` 前缀——`colorpicker-*` / `ctx-*` / `form-row` / `inline-input*` / `number-input*` / `segmented-radio*` / `sidebar-section*` / `theme-picker*` / `theme-card` / `theme-preview` / `.tbadge` / `.tname` / `.pv-*`，外加关键帧 `selectbox-in → ldk-selectbox-in`。至此**宿主与共享组件自己定义的类名 100% 是 `ldk-` 开头**（258 ＋ 89 个独立定义，零例外），规则只剩一句、不再有任何登记表。\n- **本仓源码零改动**：本仓自己的 CSS 与 TSX 对这批共享组件类名的引用逐条核过 = **0 处**（本仓用组件本身，没有用后代选择器去微调它们）。\n- **依赖**：`@linkdesk/ui` `^0.2.0 → ^0.3.0`（**必须手动放宽区间**——0.x 的 caret 只在上界之内挑版本，`^0.2.0` 永远够不到 0.3.0）＋ 随包 `@linkdesk/plugin-sdk` `0.1.23 → 0.1.25`。\n- **解包复核（真产物）**：解开本版的 `marketplace.linkdesk-plugin` ⇒ 本仓自己的 CSS/JS **旧名 0 命中**；随包 `@linkdesk/ui` 的 CSS 里新名有命中。\n- 无功能变化、无视觉变化。"
+          "publishedAt": "2026-09-16T03:01:45.681Z"
         },
         {
           "version": "1.0.33",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.33/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-15T17:44:37.880Z",
-          "changelog": "- **本插件自己的 CSS 类名与关键帧名全部带上 `marketplace-` 前缀**：139 个样式表里定义的裸名（`mpd-*` / `ms-*` → `marketplace-mpd-*` / `marketplace-ms-*`）＋ 关键帧 `ms-icon-spin` → `marketplace-ms-icon-spin`。这条与 v1.0.32 同源、但轴不同：v1.0.32 清的是**共享组件**的裸类名（带 `ldk-`），这次清的是**本插件自己**的——插件视图的一张样式表里同时装着宿主 CSS ＋ 共享组件 CSS ＋ **所有已加载插件的 CSS**，`mpd-` / `ms-` 这类短词在**插件与插件之间**没有任何唯一性保证。症状不报错、只是长得不对（同形态的实机现场：主题卡片右下角一块纯色）\n- 渲染点（TSX 的 `className`）与样式表**同笔**改；另补两处「JSX 里写着、样式表里根本没有对应规则」的类名（`mpd-version-select` / `ms-section-items`）——它们本来就不产生任何样式，加前缀只是让命名空间完整\n- 关键帧名同样是全局标识符：`@keyframes ms-icon-spin` 与它的 `animation:` 引用**两处一起改**（只改一边 = 「下载中」的图标不再转，且没有任何报错）\n- 机械证明：改动逐字节等于「改前文件 ＋ 只插入 `marketplace-`」——不改词干、不动任何视觉属性（颜色 / 间距 / 字号 / 圆角一律未碰）；改后旧名在源码面整词命中 **0**\n- 刻意**没动**的：共享组件类名的 scoped 调优选择器（如 `.marketplace-mpd-title-row .ldk-badge .codicon`）里的 `ldk-*` 是宿主 / 共享组件的名字，按设计保留\n- 无功能变化"
+          "publishedAt": "2026-09-15T17:44:37.880Z"
         },
         {
           "version": "1.0.32",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.32/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-15T06:16:39.318Z",
-          "changelog": "- **适配 `@linkdesk/ui` 0.2.0 的类名归一**：共享组件的裸类名（`badge` / `button` / `combobox` / `mdv` / `selectbox` / `sle` / `slider` / `toggle`）全部带上 `ldk-` 前缀——它们此前在「宿主 + 共享组件 + 所有已加载插件」同一张样式表里是**全局标识符**，通用英文词极易被插件自己的元素撞上。本插件对共享控件的两处 scoped 调优同步改名：`.mpd-chg .mdv` → `.mpd-chg .ldk-mdv`、`.mpd-title-row .badge .codicon` → `.mpd-title-row .ldk-badge .codicon`\n- 这两行不改就是**静默失配**——旧的裸选择器不再命中任何元素，更改日志正文的上边距与「官方发布」徽标里的图标尺寸/基线会悄悄跑掉，没有报错\n- `@linkdesk/ui` 升到 `^0.2.0`（`^0.1.4` → `^0.2.0`）。**必须手动放宽区间**：0.x 的 caret 只在上界之内挑版本，`^0.1.4` 永远够不到 0.2.0\n- 无功能变化"
+          "publishedAt": "2026-09-15T06:16:39.318Z"
         },
         {
           "version": "1.0.31",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.31/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-14T18:09:31.417Z",
-          "changelog": "- **分发件补上 MIT LICENSE**：`LICENSE` 早就在本仓里（E6#108g 那批加的），但**已发布的那版产物比它早** ⇒ 用户手上那份 zip 里一直没有版权声明。MIT 要求「副本里带声明」，而 zip 才是用户真正拿到的那份\n- **不再夹带仓库面文件**：`@linkdesk/plugin-sdk` 升到 0.1.19（^0.1.16 → ^0.1.19）——旧 SDK 的打包通道会把 `marketplace.json` / `scripts/ci-verify.mjs` / `AGENTS.md` 这类**仓库面文件**一起装进 zip（那是给仓库看的，不是给用户看的），0.1.19 的排除表已覆盖\n- 无功能变化——本版只为让「用户拿到的产物」与仓库对齐"
+          "publishedAt": "2026-09-14T18:09:31.417Z"
         },
         {
           "version": "1.0.30",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.30/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-14T10:03:37.595Z",
-          "changelog": "- 修好市场列表里「同一个插件两张脸」：列表行此前读的是目录条目里的 `icon`，而图标栏那几只插件（文件树 / 串口监视器 / 设置 / 插件市场）的 `icon` 按设计是单色线稿（白线剪影），于是市场里显线稿、装到本地显彩色身份图。现在列表行与详情页同序裁决——**已装读包内身份图，未装读目录条目身份图**（目录条目侧由发布链路自动带上 `marketIcon` 的绝对 URL）\n- 已装插件的图标改回**本地**读（快、断网可用），不再可能去拉远程图；未装插件走目录里的绝对 URL——两态各自归位\n- 禁用列表行的图标同样改为「插件自己的图优先」（此前只能退到目录条目取图）"
+          "publishedAt": "2026-09-14T10:03:37.595Z"
         },
         {
           "version": "1.0.29",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.0.29/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-14T02:36:19.060Z",
-          "changelog": "- 源码迁入独立仓（E6#99，L7 第 7.2 轮）——从壳仓 `Encaron/linkdesk` 抽出本插件子树，历史全保（hash 变）\n- 随包 `plugin.json` 显式声明 `pluginId`（E6#98g）：插件身份不再靠目录名兜底，独立仓构建出的包名与身份稳定\n- `$schema` 改指本仓 `node_modules/@linkdesk/plugin-sdk`（脱离壳仓后原相对路径指到仓外，编辑器补全/校验会失效）"
+          "publishedAt": "2026-09-14T02:36:19.060Z"
         }
       ]
     }
