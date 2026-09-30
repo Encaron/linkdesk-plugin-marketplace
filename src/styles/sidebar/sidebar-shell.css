@@ -25,11 +25,14 @@
   flex-wrap: wrap;
 }
 
-/* 「检查更新」行——钮 ＋ 就地注同排；flex-basis 100% = 强制独占首行，行内再挤也不波及下一行的写操作钮 */
+/* 「检查更新」行——钮 ＋ 就地注同排；flex-basis 100% = 强制独占首行，行内再挤也不波及下一行的写操作钮。
+ *  2026-09-30 用户拍板：钮**恒在右**、注出现在其左（justify-end）——注出现/消失不再让钮左右瞬移，
+ *  与下一行「安装 / 市场源」的右对齐同一条视觉轴。 */
 .marketplace-ms-check-row {
   flex-basis: 100%;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 6px;
   min-width: 0;
 }
