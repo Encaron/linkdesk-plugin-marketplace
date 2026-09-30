@@ -87,7 +87,7 @@ function stubShell(o: { list?: () => Promise<PluginListEntry[]>; show?: boolean 
   });
 }
 
-/** 每例取全新模块实例（本仓模块单例：目录 store 的 `_catalogPromise`/`_catalogResult`、发现腿的 `_running`） */
+/** 每例取全新模块实例（目录 store / 发现腿的**共享槽**由 `vitest.setup.ts` 每例前清，2026-09-30 起） */
 async function boot(o: { installed?: PluginListEntry[]; text?: () => string; ok?: boolean } = {}) {
   vi.resetModules();
   fetchCalls = [];

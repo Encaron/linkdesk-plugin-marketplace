@@ -1,10 +1,11 @@
 /**
- * searchState 单测——模块级搜索状态（E6#149/#151 补；此前零测试）。
+ * searchState 单测——跨表面搜索状态（E6#149/#151 补；此前零测试）。
  *
- * 为什么走 `vi.resetModules()` ＋ 动态 `import()`：状态是**模块级**的（`let _search` ＋ 模块级
- * 监听者 `Set`）——静态 import 会让全部用例共享同一份状态，跨例串味。每个用例先 resetModules
- * 再拿一份干净实例。
- * ⚠️ 会话二的坑：`vi.resetModules()` 不可与 `renderHook` 同用——本文件不引 RTL，只为取干净模块实例。
+ * 状态自 2026-09-30 起住 `realmSlot` 全局槽（多表面塌缩修复；见 `services/realmSlot.ts`），
+ * **不随模块实例走**——每例前由 `vitest.setup.ts` 清槽（等价于「拿一份干净实例」）。
+ * `vi.resetModules()` ＋ 动态 `import()` 仍留着：本文件只测「一份实例内的行为」，不引 RTL。
+ * ⚠️ 「resetModules 不可与 renderHook 同用」的旧记（会话二）2026-09-30 复核已不成立：
+ *   `crossSurfaceSharedState.test.ts` 里两者同用、全绿（vitest 4.1.11）。
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";

@@ -28,6 +28,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { marketInstallStageLabel } from "./marketplaceShared";
+import { realmSlot } from "./realmSlot";
 
 const lk = () => window.linkdesk;
 
@@ -67,28 +68,39 @@ export type InstallJob = {
 
 type InstallJobsPayload = { jobs?: InstallJob[] };
 
-/** 最新一次全量快照（事件即快照——整表替换，不做增量合并） */
-let _jobs: readonly InstallJob[] = [];
-const _listeners = new Set<() => void>();
-let _sub: (() => void) | null = null;
-let _subUsers = 0;
+/** 最新一次全量快照（事件即快照——整表替换，不做增量合并）。
+ *  🔴 2026-09-30：住 `realmSlot` 全局槽——详情面与侧栏面是各自独立的 bundle（模块级变量在表面间各长一份），
+ *  槽里一份让两边读同一张镜像、也把多余的 IPC 订阅收成一条（引用计数跨表面计数）。见 `services/realmSlot.ts`。 */
+interface InstallJobsState {
+  jobs: readonly InstallJob[];
+  listeners: Set<() => void>;
+  sub: (() => void) | null;
+  subUsers: number;
+}
+
+const state = realmSlot<InstallJobsState>("installJobs/v1", () => ({
+  jobs: [],
+  listeners: new Set<() => void>(),
+  sub: null,
+  subUsers: 0,
+}));
 
 function ingest(payload: InstallJobsPayload): void {
-  _jobs = Array.isArray(payload?.jobs) ? payload.jobs : [];
-  _listeners.forEach((fn) => fn());
+  state.jobs = Array.isArray(payload?.jobs) ? payload.jobs : [];
+  state.listeners.forEach((fn) => fn());
 }
 
 function mountJobSub(): void {
-  _subUsers += 1;
-  if (_subUsers > 1 || _sub) return;
-  _sub = lk()?.events?.on<InstallJobsPayload>(INSTALL_JOBS_EVENT, ingest) ?? null;
+  state.subUsers += 1;
+  if (state.subUsers > 1 || state.sub) return;
+  state.sub = lk()?.events?.on<InstallJobsPayload>(INSTALL_JOBS_EVENT, ingest) ?? null;
 }
 
 function unmountJobSub(): void {
-  _subUsers -= 1;
-  if (_subUsers > 0) return;
-  _sub?.();
-  _sub = null;
+  state.subUsers -= 1;
+  if (state.subUsers > 0) return;
+  state.sub?.();
+  state.sub = null;
 }
 
 /** 订阅底座——`pick` 渲染期读当前值：notify → 重渲染 → 重读（两个 hook 共用一份通知集，不各造一套） */
@@ -97,12 +109,12 @@ function useInstallJobs<T>(pick: () => T): T {
   const rerender = useCallback(() => setTick((t) => t + 1), []);
   useEffect(() => {
     // E6#73i（F6）：**先挂监听、再订阅**——订阅那一刻的回放（池 preload 的会话级缓存）会同步触发
-    // ingest → notify；此时监听器还没进表的话，回放把 _jobs 更新了却没人重渲染，界面仍是旧快照。
-    _listeners.add(rerender);
+    // ingest → notify；此时监听器还没进表的话，回放把镜像更新了却没人重渲染，界面仍是旧快照。
+    state.listeners.add(rerender);
     mountJobSub();
     return () => {
       unmountJobSub();
-      _listeners.delete(rerender);
+      state.listeners.delete(rerender);
     };
   }, [rerender]);
   return pick();
@@ -113,14 +125,14 @@ function useInstallJobs<T>(pick: () => T): T {
  *
  * 为什么按优先级挑而不是按 jobId 找：同一个插件在壳侧可以有**多条** job（失败一条已 settle、
  * 重试又开一条 running）——去重只对「未结算」的 job 生效，已出结果的不参与。
- * `_jobs` 保持壳侧快照序（壳的 Map 插入序）⇒ 反向遍历取到的第一条 settled 就是最新那条。
+ * `state.jobs` 保持壳侧快照序（壳的 Map 插入序）⇒ 反向遍历取到的第一条 settled 就是最新那条。
  */
 export function pickInstallJob(pluginId: string | undefined): InstallJob | null {
   if (!pluginId) return null;
   let running: InstallJob | null = null;
   let queued: InstallJob | null = null;
   let settled: InstallJob | null = null;
-  for (const job of _jobs) {
+  for (const job of state.jobs) {
     if (job.pluginId !== pluginId) continue;
     if (job.state === "running") running = job;
     else if (job.state === "queued") queued = job;

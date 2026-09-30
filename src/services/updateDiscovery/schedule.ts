@@ -2,26 +2,31 @@
  * schedule — 启动发现调度（市场池首载触发，模块级每进程一次）+ 判不了时的重试梯子。
  * E6#86（第 3.6.3 轮）feature-folder 拆分：自 `updateDiscovery.ts` 原样搬出，零行为变更。
  *
- * 本文件是 `_scheduled` / `_retryTimer` 的唯一属主；在途运行态在 `run.ts`。
+ * 本文件是启动调度态（`scheduled` / `retryTimer`）的唯一属主；在途运行态在 `run.ts`。
+ * 🔴 2026-09-30：调度态住 `realmSlot` 全局槽——「每进程一次」在多表面打包下必须跨表面成立，否则每个
+ *   池面各排一趟 10s 发现（双倍网络 + 双份铃铛）。见 `services/realmSlot.ts` 头注。
  */
 
 import { __clearRunningDiscovery, runUpdateDiscovery } from "./run";
+import { realmSlot } from "../realmSlot";
 
 const DISCOVERY_DELAY_MS = 10_000;
 
 /** 判不了时的重试间隔（首趟之后；E6#82）——梯子走完为止，之后本会话不再试（下次开软件从头来）。 */
 const DISCOVERY_RETRY_DELAYS_MS = [30_000, 60_000, 120_000, 300_000];
 
-let _scheduled = false;
-let _retryTimer: ReturnType<typeof setTimeout> | null = null;
+const state = realmSlot<{ scheduled: boolean; retryTimer: ReturnType<typeof setTimeout> | null }>(
+  "updateDiscovery.schedule/v1",
+  () => ({ scheduled: false, retryTimer: null }),
+);
 
 /** 排一趟发现；跑完若是「判不了」（返回 null / 抛错）→ 改长一点再排，直到**拿出结论**或梯子走完。
  *  只有「判不了」才重试——「判了，没事做」与「已处理」（含 auto 更新，成败各有通知）都是结论，不打扰。 */
 function armDiscoveryAttempt(attempt: number, firstDelayMs: number): void {
   const delay = attempt === 0 ? firstDelayMs : DISCOVERY_RETRY_DELAYS_MS[attempt - 1];
   if (delay === undefined) return; // 梯子走完
-  _retryTimer = setTimeout(() => {
-    _retryTimer = null;
+  state.retryTimer = setTimeout(() => {
+    state.retryTimer = null;
     void runUpdateDiscovery()
       .then((plan) => {
         if (plan === null) armDiscoveryAttempt(attempt + 1, firstDelayMs);
@@ -43,19 +48,19 @@ function armDiscoveryAttempt(attempt: number, firstDelayMs: number): void {
  *    ⇒ 判不了就换时间再试（梯子见上），拿出结论就停。**自动更新是用户勾选那一刻给出的承诺，不该赌开机那十秒。**
  *  代价：每趟读盘 + 读目录（目录有 5min 缓存时零网络），梯子共 5 趟、最长约 8 分钟——可忽略。 */
 export function scheduleStartupDiscovery(delayMs: number = DISCOVERY_DELAY_MS): void {
-  if (_scheduled) return;
+  if (state.scheduled) return;
   if (!window.linkdesk?.notifications?.show) return; // 池门控（先判后占位——门控别消耗掉这一次调度）
-  _scheduled = true;
+  state.scheduled = true;
   armDiscoveryAttempt(0, delayMs);
 }
 
-/** 测试复位调度/并发态（vitest afterEach 用——模块单例跨用例残留；产线不调）。
+/** 测试复位调度/并发态（vitest afterEach 用——共享槽跨用例残留；产线不调）。
  *  调度态在本地，运行态在 `run.ts`——两处都要清。 */
 export function __resetUpdateDiscovery(): void {
-  _scheduled = false;
-  if (_retryTimer !== null) {
-    clearTimeout(_retryTimer);
-    _retryTimer = null;
+  state.scheduled = false;
+  if (state.retryTimer !== null) {
+    clearTimeout(state.retryTimer);
+    state.retryTimer = null;
   }
   __clearRunningDiscovery();
 }

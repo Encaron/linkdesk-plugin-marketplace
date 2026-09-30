@@ -9,6 +9,7 @@
 
 import { retryMarketInstall, retryMarketUpdate } from "./installFlow";
 import { registerMarketSourceAddCommand } from "../marketSourceAddCommand";
+import { realmSlot } from "../realmSlot";
 
 const lk = () => window.linkdesk;
 
@@ -21,12 +22,16 @@ const pm = () => window.linkdesk?.pluginManager;
  * 落地页未打开 = 未注册 = console.warn no-op → toast [重试] 点击无反应（71g 实机 bug 根因）。
  * 本模块被全部市场池面 import（侧栏已装/禁用/内置、探索、详情、落地页）——迁移后注册随任一视图
  * 激活即生效，池侧 handler 进 _poolCommands；壳进程经 glob loader 执行 marketplace entry（index →
- * marketplaceShared）启动即注册 → toast 落点自给自足，不再依赖落地页打开。 */
-let _marketplaceCommandsRegistered = false;
+ * marketplaceShared）启动即注册 → toast 落点自给自足，不再依赖落地页打开。
+ *
+ * 🔴 2026-09-30：幂等守卫住 `realmSlot` 全局槽——多表面打包下每个池面各有一份本模块副本，模块作用域的
+ *   布尔挡不住第二份 ⇒ 命令组与 gear 菜单被注册 N 遍（多表面塌缩的又一格，见 `services/realmSlot.ts`）。
+ *   槽按 realm 活：壳渲染进程与池**各注册自己那半程**（两半程本就该各注册一次），此语义不变。 */
+const state = realmSlot<{ registered: boolean }>("commands/v1", () => ({ registered: false }));
 
 function ensureMarketplaceCommands(): void {
-  if (_marketplaceCommandsRegistered) return;
-  _marketplaceCommandsRegistered = true;
+  if (state.registered) return;
+  state.registered = true;
 
   // E5.7#56：零 @src/core import——插件入口模块双进程执行（壳 glob loader + 池视图渲染）。
   // 注册走 window.linkdesk.commands：壳侧半程 → commands:registerShell → 壳注册表真实条目

@@ -26,8 +26,14 @@ import { notifyAutoResult, updateBellMessage } from "./messages";
 import { planDiscovery, selectAutoCandidates, selectMetaEvictions } from "./plan";
 import { readInstalledSnapshot } from "./snapshot";
 import type { DiscoveryPlan, UpdateCandidate } from "./types";
+import { realmSlot } from "../realmSlot";
 
-let _running: Promise<DiscoveryPlan | null> | null = null;
+/** 在途发现——住 `realmSlot` 全局槽（🔴 2026-09-30 多表面塌缩修复）：「并发一趟复用」这条判据在多表面下
+ *  必须跨表面成立——搜索面点「检查更新」与详情面勾自动更新撞在一起时，模块作用域的变量各看各的，
+ *  会双跑全源拉取 + 双份铃铛。见 `services/realmSlot.ts` 头注。 */
+const state = realmSlot<{ running: Promise<DiscoveryPlan | null> | null }>("updateDiscovery.running/v1", () => ({
+  running: null,
+}));
 
 /** 空计划——「读完了，没有可更新」的**结论**（区别于 `null` 的「判不了」）。 */
 const EMPTY_PLAN: DiscoveryPlan = { candidates: [], toNotify: [], toClearNotified: [] };
@@ -40,16 +46,16 @@ const EMPTY_PLAN: DiscoveryPlan = { candidates: [], toNotify: [], toClearNotifie
  *    调度器据这一位决定要不要换时间再试（见 `armDiscoveryAttempt`）。两者曾经混用：开机那十秒若赶上网络
  *    没热，发现静默跳过且整次开机不再重试 ⇒ 用户勾的自动更新一整天不响（E6#82 实机报障）。 */
 export async function runUpdateDiscovery(force = false): Promise<DiscoveryPlan | null> {
-  if (_running) return _running;
-  _running = doRunDiscovery(force).finally(() => {
-    _running = null;
+  if (state.running) return state.running;
+  state.running = doRunDiscovery(force).finally(() => {
+    state.running = null;
   });
-  return _running;
+  return state.running;
 }
 
 /** 测试复位在途发现态（vitest 用；产线不调） */
 export function __clearRunningDiscovery(): void {
-  _running = null;
+  state.running = null;
 }
 
 async function doRunDiscovery(force: boolean): Promise<DiscoveryPlan | null> {
@@ -145,7 +151,7 @@ async function doRunDiscovery(force: boolean): Promise<DiscoveryPlan | null> {
  *  返回是否成功自动更新。
  *  幂等守卫：发现编排在跑 → 先等收束（编排已含 auto 处理本趟候选，防双跑引擎 update）。 */
 export async function runAutoUpdateIfDue(pluginId: string): Promise<boolean> {
-  if (_running) await _running;
+  if (state.running) await state.running;
   const meta = await readUpdateMetaMap();
   const { snapshot, available } = await readInstalledSnapshot();
   if (!available) return false; // 读不到盘上现状（IPC 不可用/失败）→ 判不了，不动文件

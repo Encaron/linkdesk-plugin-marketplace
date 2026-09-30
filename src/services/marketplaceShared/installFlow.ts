@@ -11,6 +11,7 @@ import { confirmMarketInstallById } from "../installGate";
 import { pluginDisplayNameOf } from "./catalogStore";
 import { scheduleDataRefresh } from "./pluginsStore";
 import { settleInstallFailure } from "./notifications";
+import { realmSlot } from "../realmSlot";
 
 const lk = () => window.linkdesk;
 
@@ -72,8 +73,11 @@ async function runMarketInstall(pluginId: string, name: string, downloadUrl: str
  * 为什么壳侧已按 pluginId 去重了、这里还要一道：两份调用方各自 `await installWithProgress` 会拿到
  * **同一个结果对象**（壳侧去重命中的第二方 `waitInstallJob` 等第一方）⇒ 失败时**两条一模一样的
  * 失败 toast**。壳管的是「装几次」，这里管的是「报几次」。
+ *
+ * 🔴 2026-09-30：住 `realmSlot` 全局槽——「两份调用方」如今常常就是**两个表面**（侧栏行内钮 + 详情页钮，
+ * 各自独立的 bundle = 各自的模块副本），模块作用域的 Map 拦不住跨表面那一次 ⇒ 槽里一份才真拦得住。
  */
-const _openInstalls = new Map<string, Promise<boolean>>();
+const openInstalls = realmSlot<Map<string, Promise<boolean>>>("installFlow.openInstalls/v1", () => new Map());
 
 /**
  * 发起市场安装——直呼壳侧安装入口，返回**本单**结果。无队列、无 N=1 闸（E6#73c 第 2 步）。
@@ -88,12 +92,12 @@ export function startMarketInstall(
   catalogUrl?: string,
 ): Promise<boolean> {
   if (!lk()?.pluginManager?.installWithProgress) return Promise.resolve(false);
-  const open = _openInstalls.get(pluginId);
+  const open = openInstalls.get(pluginId);
   if (open) return open;
   const p = runMarketInstall(pluginId, displayName ?? pluginDisplayNameOf(pluginId), downloadUrl, catalogUrl).finally(() => {
-    _openInstalls.delete(pluginId);
+    openInstalls.delete(pluginId);
   });
-  _openInstalls.set(pluginId, p);
+  openInstalls.set(pluginId, p);
   return p;
 }
 

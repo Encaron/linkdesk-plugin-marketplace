@@ -4,10 +4,10 @@
  *
  * 本文件是纯再导出 + 模块级启动，**零实现**。原 779 行按职责拆进同名夹 `marketplaceShared/`：
  *   messages.ts      失败归因字典 + 阶段文案（码 → i18n key 的唯一映射处）
- *   searchState.ts   模块级搜索状态（跨视图同步过滤）
+ *   searchState.ts   搜索状态（跨表面同步过滤；住 realmSlot 槽——见 services/realmSlot.ts）
  *   onlineStatus.ts  离线态 hook
- *   catalogStore.ts  市场**目录** store（远端 catalog 的本地投影；`_catalogResult` 唯一属主）
- *   pluginsStore.ts  本地**已装/内置/禁用**列表 store + badge 广播
+ *   catalogStore.ts  市场**目录** store（远端 catalog 的本地投影；目录投影唯一属主，住 realmSlot 槽）
+ *   pluginsStore.ts  本地**已装/内置/禁用**列表 store + badge 广播（住 realmSlot 槽）
  *   notifications.ts 事件型失败通道（右下角 error toast，MARKET_SOURCE 归属）
  *   installFlow.ts   安装/更新/重试的发起与终局回执
  *   commands.ts      命令组 + gear 菜单注册（模块底自调用——**必须 import 到，否则静默不注册**）

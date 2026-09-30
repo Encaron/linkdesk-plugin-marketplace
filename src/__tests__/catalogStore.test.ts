@@ -5,13 +5,13 @@
  * （本仓惯例，不新造替身面）；壳面只桩 `configuration.{get,onChange}` 与 `events`。
  * 假目录文本用虚构条目（硬约束 21）。
  *
- * 🔴 本文件每个用例取全新模块实例（`vi.resetModules()` + 动态 import）——本 store 是模块单例：
- *   `_catalogPromise`（防并发）/ `_catalogResolvedOnce`（加载中 vs 真离线）/ `_catalogResult`
- *   / `_catalogListeners` / `_configWatchStarted`（模块级常驻订阅守卫）。不重置会跨例串味。
+ * 🔴 本文件每个用例取全新模块实例（`vi.resetModules()` + 动态 import）；store 的**共享状态**（首趟 promise
+ *   / resolvedOnce / 目录投影 / 监听集 / 配置订阅守卫）自 2026-09-30 起住 `realmSlot` 全局槽、**不随模块
+ *   实例重置**——每例前由 `vitest.setup.ts` 清槽（`__resetRealmSlots`），等价于原先的「实例全新＝状态全新」。
  *
  * 钉住的三件事：
  *   ① 加载态迁移与「resolved 后即便 offline 也是真实空态」（ExploreView 据此防闪一帧「无法加载」）；
- *   ② 源配置变更 → 模块级常驻订阅只注册一次、触发即强拉 + 通知全部订阅方；
+ *   ② 源配置变更 → 常驻订阅只注册一次、触发即强拉 + 通知全部订阅方；
  *   ③ 失败 toast 的显示名走 `pluginDisplayNameOf`——不在目录 = **裸 pluginId 诚实显示**。
  */
 

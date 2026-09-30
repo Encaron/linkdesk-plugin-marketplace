@@ -5,12 +5,13 @@
  * 假清单用**本仓契约形状**（`@linkdesk/contracts` 的 PluginListEntry / PluginInfoEntry），
  * 不用真插件名（硬约束 21）。
  *
- * 🔴 本文件每个用例取**全新模块实例**（`vi.resetModules()` + 动态 import）：本仓 store 是模块单例
- *   （`_loadingPromise` / `_allPlugins` / `_disabledPlugins` / `_dataListeners` / `_refreshQueued`），
- *   不重置会跨例串味。这是本层「模块级 store 要重置」纪律的落点。
+ * 🔴 本文件每个用例取**全新模块实例**（`vi.resetModules()` + 动态 import）；store 的**共享状态**（首趟
+ *   promise / 已装清单 / 禁用清单 / 监听集 / 刷新节流位）自 2026-09-30 起住 `realmSlot` 全局槽、
+ *   不随模块实例重置——每例前由 `vitest.setup.ts` 清槽（`__resetRealmSlots`）。这是本层
+ *   「跨表面共享状态要清零」纪律的落点（多表面塌缩修复，见 `services/realmSlot.ts`）。
  *
  * 钉住的四件事：
- *   ① `_loadingPromise` 盾——多个视图同时 mount 只发一趟 IPC（对标 loader 的 #59c Bug 1 教训）；
+ *   ① 首趟加载盾——多个视图同时 mount 只发一趟 IPC（对标 loader 的 #59c Bug 1 教训）；
  *   ② 分组口径——installed = 非 core、builtin = core、disabled 来自 getDisabled（list 排除禁用）；
  *   ③ badge 广播——三个 viewId 各一条，`explore` **不发**（橱窗不是计数列表）；
  *   ④ 生命周期三通道订阅 ＋ 卸载全撤（铁律 19）＋ burst 合并（一次装卸连发多条只重拉一次）
@@ -104,7 +105,7 @@ describe("装载与分组（installed / builtin / disabled 三组口径）", () 
     expect(disabledFn).toHaveBeenCalledTimes(1);
   });
 
-  it("🔴 `_loadingPromise` 盾：两个视图同时 mount → 只发一趟 IPC", async () => {
+  it("🔴 首趟加载盾：两个视图同时 mount → 只发一趟 IPC", async () => {
     const { store } = await boot({ plugins: [enabled("demo-alpha", false)] });
     const a = renderHook(() => store.useMarketplacePlugins());
     const b = renderHook(() => store.useMarketplacePlugins());

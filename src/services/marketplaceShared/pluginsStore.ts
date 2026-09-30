@@ -3,59 +3,75 @@
  * E6#86（第 3.6.3 轮）feature-folder 拆分：自 `marketplaceShared.ts` 原样搬出，零行为变更。
  *
  * 依赖方向：searchState → 本文件（列表按搜索词过滤）；本文件不 import 目录 store / 通知 / 安装流。
+ *
+ * 🔴 2026-09-30（多表面塌缩修复）：整份状态住 `realmSlot` 全局槽——已装列表在侧栏四个视图面与详情面里
+ *   各有一份模块副本，模块作用域的状态会让「详情页里装完/卸完、侧栏列表不翻」重演
+ *   （同 catalogStore 的双 store 事故，见 `services/realmSlot.ts` 头注）。槽里一份 ⇒ 谁拉的数据全体共用。
  */
 
 import { useState, useCallback, useEffect } from "react";
-// E5.7#98：_allPlugins 数据源是 pluginManager.list()（IPC 序列化子集）——消费 PluginListEntry，
+// E5.7#98：数据源是 pluginManager.list()（IPC 序列化子集）——消费 PluginListEntry，
 // 非 ViewPluginEntry（后者带 component 字段，IPC 不可达）
 // E5.8#20-c：契约化——插件列表类型走 @linkdesk/contracts（零 @src/core）
 import type { PluginListEntry, PluginInfoEntry } from "@linkdesk/contracts";
 import { getMarketplaceSearch, onMarketplaceSearchChange } from "./searchState";
+import { realmSlot } from "../realmSlot";
 
 const lk = () => window.linkdesk;
 
 const pm = () => window.linkdesk?.pluginManager;
 
-/* ═══ 本地插件共享数据 hook（已安装/内置/已禁用） ═══ */
+/* ═══ 本地插件共享数据（已安装/内置/已禁用） ═══ */
 
-let _loadingPromise: Promise<void> | null = null;
-let _allPlugins: PluginListEntry[] = [];
-/* E6#106：改用契约类型 `PluginInfoEntry`（此前是**本地手抄的一份形状**——`core`/`updatable`/图标四字段
- * 每加一次就要在这里补一遍，漏补的表现就是「壳侧字段已经到了、市场侧 TS 报不存在」）。同一个形状抄两份
- * = 必然漂移，故收成契约单一来源；契约的 `icon/iconSource/marketIcon/marketIconSource` 即禁用行的
- * 展示图通道（照 E6#65a 给 list() 补图标通道的先例）。 */
-let _disabledPlugins: PluginInfoEntry[] = [];
-const _dataListeners = new Set<() => void>();
+interface PluginsState {
+  /** 🛡️ 首趟拉取在途 promise——多个 view 同时 mount 只发一次 IPC（对标 initPluginLoader 的
+   *  _loadingPromise 模式，#59c Bug 1 教训）；也兼作「loading = 从未拉过」的判据 */
+  loadingPromise: Promise<void> | null;
+  allPlugins: PluginListEntry[];
+  /** E6#106：改用契约类型 `PluginInfoEntry`（此前是**本地手抄的一份形状**——`core`/`updatable`/图标四字段
+   * 每加一次就要在这里补一遍，漏补的表现就是「壳侧字段已经到了、市场侧 TS 报不存在」）。同一个形状抄两份
+   * = 必然漂移，故收成契约单一来源；契约的 `icon/iconSource/marketIcon/marketIconSource` 即禁用行的
+   * 展示图通道（照 E6#65a 给 list() 补图标通道的先例）。 */
+  disabledPlugins: PluginInfoEntry[];
+  listeners: Set<() => void>;
+  /** 生命周期刷新节流（30.5c 实机回归）——一次装卸可能连发多条广播（实机 4 条），microtask 合并为一次 IPC 重拉 */
+  refreshQueued: boolean;
+}
+
+const state = realmSlot<PluginsState>("pluginsStore/v1", () => ({
+  loadingPromise: null,
+  allPlugins: [],
+  disabledPlugins: [],
+  listeners: new Set<() => void>(),
+  refreshQueued: false,
+}));
 
 function notifyDataListeners(): void {
-  _dataListeners.forEach((fn) => fn());
+  state.listeners.forEach((fn) => fn());
 }
 
 async function refreshData(): Promise<void> {
   try {
     const [plugins, disabled] = await Promise.all([pm().list(), pm().getDisabled()]);
-    _allPlugins = plugins;
-    _disabledPlugins = disabled;
+    state.allPlugins = plugins;
+    state.disabledPlugins = disabled;
   } catch (e) {
     console.error("[marketplace] refreshData IPC 失败——插件列表数据可能为空:", e);
   }
 }
 
-/* ═══ 生命周期刷新节流（30.5c 实机回归） ═══
+/* ═══ 生命周期刷新通道 ═══
  * 两条通道：plugin:installed/plugin:uninstalled = 装卸跨窗广播（壳 loader events.emit → 主进程 → 池，
  * lifecycle.ts 消费端 6 注释「本通道供按插件消费方」）——实机实证 installWithProgress 装新插件只发此通道、
- * 不发 plugin-lifecycle:changed；后者 = 池本地状态切换（启用/禁用）nudge（data.ts 本地发非跨窗）。
- * 一次装卸可能连发多条 plugin:installed（实机 4 条）→ microtask 合并为一次 IPC 重拉。 */
-
-let _refreshQueued = false;
+ * 不发 plugin-lifecycle:changed；后者 = 池本地状态切换（启用/禁用）nudge（data.ts 本地发非跨窗）。 */
 
 /** 重拉已装列表（microtask 合并）——`useMarketplacePlugins.refresh` 是 React 绑定的同名动作，
  *  E6#73j 起也供**非组件上下文**调用（toast [重试] 命令的成功收敛），故导出。 */
 export function scheduleDataRefresh(): void {
-  if (_refreshQueued) return;
-  _refreshQueued = true;
+  if (state.refreshQueued) return;
+  state.refreshQueued = true;
   queueMicrotask(() => {
-    _refreshQueued = false;
+    state.refreshQueued = false;
     refreshData().then(() => {
       notifyDataListeners();
       updateAllBadges();
@@ -72,14 +88,12 @@ function updateAllBadges(): void {
   const emit = lk()?.events?.emit;
   if (!emit) return;
   const self = { pluginId: "marketplace", containerId: "marketplace" };
-  emit("marketplace:updateBadge", { ...self, viewId: "installed", count: _allPlugins.filter((p) => !p.manifest.core).length });
-  emit("marketplace:updateBadge", { ...self, viewId: "builtin", count: _allPlugins.filter((p) => p.manifest.core).length });
-  emit("marketplace:updateBadge", { ...self, viewId: "disabled", count: _disabledPlugins.length });
+  emit("marketplace:updateBadge", { ...self, viewId: "installed", count: state.allPlugins.filter((p) => !p.manifest.core).length });
+  emit("marketplace:updateBadge", { ...self, viewId: "builtin", count: state.allPlugins.filter((p) => p.manifest.core).length });
+  emit("marketplace:updateBadge", { ...self, viewId: "disabled", count: state.disabledPlugins.length });
   // E6#30d：viewId "explore"（探索插件）无 badge——目录浏览是橱窗不是计数列表，语义同 VS Code 无徽标
 }
 
-/** 🛡️ `_loadingPromise` 确保多个 view 同时 mount 时只发一次 IPC。
- *  对标 initPluginLoader 的 _loadingPromise 模式（#59c Bug 1 教训）。 */
 export function useMarketplacePlugins() {
   const [, setTick] = useState(0);
   const rerender = useCallback(() => setTick((t) => t + 1), []);
@@ -94,7 +108,7 @@ export function useMarketplacePlugins() {
      *
      * 🔴 E6#152 修：这三条**必须同步注册在 effect 体里**。此前它们注册在下面那个 async `init()` 内部，
      * 而 `init()` 里 `return` 的清理函数交给了**它自己的 promise**、不是 effect 的返回值（effect 只
-     * `return () => { active = false; }`）⇒ 组件卸载时这三条**撤不掉**、`_dataListeners.delete(rerender)`
+     * `return () => { active = false; }`）⇒ 组件卸载时这三条**撤不掉**、listeners.delete(rerender)
      * 也永不执行：反复开关市场面板后再装卸插件，壳侧一条广播触发 **N 次**重拉、已卸载组件的 `setTick`
      * 仍被调用（同一 hook 里 `viewContainer:changed` 那条却「卸载即撤」，可见是漏而非设计）。
      * 订阅与退订成对放在 effect 体内（铁律 19「卸载即撤」）；提前注册无副作用——
@@ -104,13 +118,13 @@ export function useMarketplacePlugins() {
       lk()?.events?.on("plugin:uninstalled", scheduleDataRefresh),
       lk()?.events?.on("plugin-lifecycle:changed", scheduleDataRefresh),
     ].filter(Boolean);
-    _dataListeners.add(rerender);
+    state.listeners.add(rerender);
 
     const init = async () => {
-      if (!_loadingPromise) {
-        _loadingPromise = refreshData();
+      if (!state.loadingPromise) {
+        state.loadingPromise = refreshData();
       }
-      await _loadingPromise;
+      await state.loadingPromise;
       if (!active) return; // 🔥 Bug 4 防线——组件已卸载时不更新
       rerender();
 
@@ -122,7 +136,7 @@ export function useMarketplacePlugins() {
 
     return () => {
       active = false;
-      _dataListeners.delete(rerender);
+      state.listeners.delete(rerender);
       unsubs.forEach((u) => u && u());
     };
   }, [rerender]);
@@ -152,24 +166,24 @@ export function useMarketplacePlugins() {
     );
   };
 
-  const installed = _allPlugins.filter(
+  const installed = state.allPlugins.filter(
     (p) => !p.manifest.core && matchSearch(p.manifest.name, p.pluginId, p.manifest.description),
   );
-  const builtin = _allPlugins.filter(
+  const builtin = state.allPlugins.filter(
     (p) => p.manifest.core && matchSearch(p.manifest.name, p.pluginId, p.manifest.description),
   );
-  const disabled = _disabledPlugins.filter((p) => matchSearch(p.name, p.pluginId, p.description));
+  const disabled = state.disabledPlugins.filter((p) => matchSearch(p.name, p.pluginId, p.description));
 
   return {
-    loading: _loadingPromise === null,
+    loading: state.loadingPromise === null,
     // 全量未过滤列表——探索视图交叉比对（#30b catalog↔list）须与搜索词无关，不能用下方 filter 后的数组
-    all: _allPlugins,
+    all: state.allPlugins,
     installed,
     builtin,
     // disabled = 搜索过滤后；disabledRaw = 未过滤原组（详情视图 E6#30.11c 需按 pluginId 精确判禁用——
     //   list() 排除禁用插件，禁用已装 = getDisabled 才可见，不能吃搜索词过滤串扰）
     disabled,
-    disabledRaw: _disabledPlugins,
+    disabledRaw: state.disabledPlugins,
     refresh: () => refreshData().then(() => notifyDataListeners()),
   };
 }
