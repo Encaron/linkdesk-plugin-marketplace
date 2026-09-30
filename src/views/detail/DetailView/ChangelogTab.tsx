@@ -79,13 +79,14 @@ export default function ChangelogTab({
         {remote && versionBlock(remote.version, { date: remote.date, isLatest: true, body: remote.body })}
         {hasLocal ? (
           <div className="marketplace-mpd-chg-ver">
-            {/* E6#92f：块头诚实化——已装分支铺的是包内 CHANGELOG.md **全文**（全部历史），
-                原标题「v{已装版本} + 已安装」自称单版、底下却是全部 ⇒ **标题在骗人**。
-                改为「全部更新记录」+「已安装 v{版本}」：**切法一行未动**，版本号从
-                「这一块的版本」降为「你装的是哪版」放进徽标（用户 2026-09-11 拍板，
-                00 §五①——版式不对称是已知设计，不归一本轮）。 */}
+            {/* E6#92f：块头诚实化——原标题「v{已装版本} + 已安装」自称单版、底下却是全部 ⇒ **标题在骗人**。
+                改为「全部更新记录」+「已安装 v{版本}」：**切法一行未动**，版本号从「这一块的版本」
+                降为「你装的是哪版」放进徽标（用户 2026-09-11 拍板，00 §五①——版式不对称是已知设计）。
+                🔴 E6#164 再订正：包内 CHANGELOG.md 自此**只带最近 5 版**（SDK 的分发面窗口在打包时裁），
+                「全部」不再属实 ⇒ 口径随内容改为「更新记录（最近 5 版）」。**数字与 SDK 的
+                `CHANGELOG_WINDOW`（=5）绑定——N 变则本串与其译名同改**（SDK 未导出该常量给运行时，故此处写字面量）。 */}
             <div className="marketplace-mpd-chg-ver-head">
-              <span className="marketplace-mpd-chg-ver-scope">{t("全部更新记录")}</span>
+              <span className="marketplace-mpd-chg-ver-scope">{t("更新记录（最近 5 版）")}</span>
               <span className="marketplace-mpd-chg-tag marketplace-mpd-chg-tag-installed">
                 {t("已安装")}{localVersion ? ` v${localVersion}` : ""}
               </span>

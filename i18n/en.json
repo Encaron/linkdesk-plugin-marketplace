@@ -68,7 +68,7 @@
   "确定卸载 {{name}} 吗？": "Uninstall {{name}}?",
   "功能": "Features",
   "更改日志": "Changelog",
-  "全部更新记录": "Full changelog",
+  "更新记录（最近 5 版）": "Changelog (last 5 versions)",
   "作者": "Author",
   "大小": "Size",
   "来源": "Source",
