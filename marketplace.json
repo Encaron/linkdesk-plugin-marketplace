@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-29T19:42:02.882Z",
+  "updatedAt": "2026-09-30T00:10:00.997Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.1.4",
+      "version": "1.1.5",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.4/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.5/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.4/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.5/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.4/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.4/marketplace.linkdesk-plugin",
-      "size": 125049,
-      "publishedAt": "2026-09-29T19:42:02.882Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.5/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.5/marketplace.linkdesk-plugin",
+      "size": 125133,
+      "publishedAt": "2026-09-30T00:10:00.997Z",
       "versions": [
+        {
+          "version": "1.1.5",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.5/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-30T00:10:00.997Z",
+          "changelog": "- **「检查更新」钮恒定右缘**（用户拍板）：钮固定在该行最右，完成注出现在钮的**左侧**——注出现/消失不再让钮从左瞬移到右。与下一行「安装 / 市场源」同一条右对齐视觉轴。"
+        },
         {
           "version": "1.1.4",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.4/marketplace.linkdesk-plugin",
