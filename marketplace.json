@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-30T00:36:08.628Z",
+  "updatedAt": "2026-09-30T01:26:14.432Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.1.6",
+      "version": "1.1.7",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.6/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.7/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.6/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.7/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.6/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.6/marketplace.linkdesk-plugin",
-      "size": 128455,
-      "publishedAt": "2026-09-30T00:36:08.628Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.7/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.7/marketplace.linkdesk-plugin",
+      "size": 77089,
+      "publishedAt": "2026-09-30T01:26:14.432Z",
       "versions": [
+        {
+          "version": "1.1.7",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.7/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-09-30T01:26:14.432Z",
+          "changelog": "- **平台层根治落到本仓产物（SDK 0.1.58 重建，插件源码零改动）**：壳仓 `E6#159` 把 SDK 多表面构建从「每表面一次独立 lib build ＋ 事后搬位」改成 **单次多入口 build**——共享模块只产**一份** chunk（`index-*.js`），各表面按 rollup 自算的相对 specifier 引用它。本版只做一件事：devDep 升到 `@linkdesk/plugin-sdk@0.1.58` 后重建。产物读数 = `realmSlot` 槽指纹 `__linkdesk_pluginSlots__marketplace` 从 **7 处**（1.1.6：主入口 ＋ 6 个表面各内联一份）降到 **1 处**（共享 chunk 内）⇒ 「模块级 = 跨视图唯一真相」**前提复位**——1.1.6 加的 `realmSlot` 槽保留不动，从此是**保险带**而非常规依赖（作者本不该被迫写它）。\n- **体积读数（对照 1.1.6，同一份源码）**：JS 总量 289.0 KB → **117.3 KB**（−59.5%）；`views/BuiltinListView.bundle.js` 34.9 KB → **0.86 KB**、`views/InstalledListView.bundle.js` 35.2 KB → **1.16 KB**、`views/DetailView.bundle.js` 86.9 KB → **51.9 KB**（新增共享 chunk `index-*.js` 33.8 KB，全局一份）；`index.bundle.css` 26.35 KB 仍为单份聚合。出厂 zip **128,455 → 77,089 字节**（−40.0%）。\n- **验收（机械 ＋ 真机）**：机械 = ① 槽指纹计数 1（旧 7）② SDK 产物判据 G1/G2 在**构建期强制**（G1 入口齐备 / G2 共享模块唯一，命中抛 `PACKAGER_RED` 硬失败），本仓 8 表面构建全过；真机 = 与 1.1.6 行为对照（「检查更新」后侧栏与详情页**同帧翻新** · 跨表面搜索过滤生效 · `events.on` 单次订阅）——⏳ 读数随本轮发版对照落。`test` 31 文件 437 例绿 · `verify` 六段绿 · `build` 8/8 表面 · **壳侧零改动**。\n- **为什么单独发一版**：老包（1.1.6 及以前）仍是「各表面自包含」，其跨表面共享状态**只靠 `realmSlot` 兜住**；重建即从根上消失。第三方作者仓同理——**用自己的 SDK 升到 0.1.58 后重发**即自动受益，源码一行不用改。"
+        },
         {
           "version": "1.1.6",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.6/marketplace.linkdesk-plugin",
