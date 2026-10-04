@@ -13,6 +13,7 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { cmdIdOf, type CmdItem, type ConfigItem, type KbItem } from "./contribs";
+import { configLabel } from "./configLabel";
 
 /** 组壳——四组同构（标题 + 计数 + 行容器）；0 项整组不渲染 */
 function Section({ title, count, children }: { title: string; count: number; children: ReactNode }) {
@@ -70,7 +71,8 @@ export function ConfigGroup({ configs, onJump }: { configs: ConfigItem[]; onJump
         <button key={key} className="marketplace-mpd-fc-row" onClick={() => onJump(key)} data-hint={t("在设置中打开")}>
           <span className="codicon codicon-gear marketplace-mpd-fc-row-icon" />
           <span className="marketplace-mpd-fc-main">
-            <span className="marketplace-mpd-fc-title">{desc?.description || key}</span>
+            {/* D3（配置项短名案 T3）：上行短名 → 说明 → 配置键级联，两种原文都过 t()（此前没过 ⇒ 英文界面中文裸奔） */}
+            <span className="marketplace-mpd-fc-title">{configLabel(desc, key, (s) => t(s))}</span>
             <span className="marketplace-mpd-fc-id">{key}</span>
           </span>
           <span className="codicon codicon-chevron-right marketplace-mpd-fc-arrow" />

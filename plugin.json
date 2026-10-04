@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@linkdesk/plugin-sdk/schemas/plugin.schema.json",
   "pluginId": "marketplace",
   "name": "插件市场",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "minAppVersion": "0.2.20",
   "icon": "resources/icon.svg",
   "marketIcon": "resources/icon-brand.svg",
@@ -45,6 +45,7 @@
       "properties": {
         "marketplace.marketplaceSources": {
           "type": "array",
+          "title": "市场源",
           "default": [
             "https://raw.githubusercontent.com/encaron/linkdesk-marketplace/main/marketplace.json"
           ],

@@ -18,7 +18,7 @@
 export type CmdItem = { id?: string; title?: string; command?: string };
 export type KbItem = { key?: string; command?: string };
 export type MenuItem = { command?: string };
-export type ConfigItem = [string, { description?: string } | undefined];
+export type ConfigItem = [string, { description?: string; title?: string } | undefined];
 
 function asList(v: unknown): unknown[] {
   return Array.isArray(v) ? v : [];
@@ -46,7 +46,9 @@ export function parseContribs(contributes?: Record<string, unknown>): {
     .filter(isItem)
     .map((c) => c as CmdItem)
     .filter((c) => cmdIdOf(c));
-  const configObj = (contributes?.configuration ?? {}) as { properties?: Record<string, { description?: string }> };
+  const configObj = (contributes?.configuration ?? {}) as {
+    properties?: Record<string, { description?: string; title?: string }>;
+  };
   const configs: ConfigItem[] = configObj.properties ? Object.entries(configObj.properties) : [];
   const keybindings: KbItem[] = asList(contributes?.keybindings)
     .filter(isItem)
