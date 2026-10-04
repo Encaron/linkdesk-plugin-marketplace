@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-09-30T21:47:18.515Z",
+  "updatedAt": "2026-10-04T15:10:19.877Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.1.9",
+      "version": "1.1.10",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.9/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.10/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.9/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.10/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.9/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.9/marketplace.linkdesk-plugin",
-      "size": 61986,
-      "publishedAt": "2026-09-30T21:47:18.515Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.10/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.10/marketplace.linkdesk-plugin",
+      "size": 62231,
+      "publishedAt": "2026-10-04T15:10:19.877Z",
       "versions": [
+        {
+          "version": "1.1.10",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.10/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-10-04T15:10:19.877Z",
+          "changelog": "- **详情页「功能」tab 的配置行改显短名**（随「配置项短名」）：上行取配置项声明里的短名（`title`），**没有短名的照旧显示说明**（第三方存量零影响），下行仍保留配置键——「短名 ＋ key」两行式。\n- **英文界面的中文裸奔就此断根**：这一行的文案（短名与说明两种形态）此前**没过翻译**，英文界面里原样显示中文；现在两种都过译名（缺译时回退显中文原文，同 i18next 既有口径）。\n- 本插件自己的「市场源」（`marketplace.marketplaceSources`）配置项补上短名。\n- 要求 LinkDesk **0.2.20 或更高**（未变）。"
+        },
         {
           "version": "1.1.9",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.9/marketplace.linkdesk-plugin",
@@ -47,8 +53,7 @@
         {
           "version": "1.1.5",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.5/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-30T00:10:00.997Z",
-          "changelog": "- **「检查更新」钮恒定右缘**（用户拍板）：钮固定在该行最右，完成注出现在钮的**左侧**——注出现/消失不再让钮从左瞬移到右。与下一行「安装 / 市场源」同一条右对齐视觉轴。"
+          "publishedAt": "2026-09-30T00:10:00.997Z"
         },
         {
           "version": "1.1.4",
