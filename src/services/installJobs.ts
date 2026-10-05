@@ -4,7 +4,7 @@
  * 病根（18 档 §五 I.9）：此前市场侧唯一的闸是模块级单例 `_installSession`，命中即静默丢弃请求
  * ⇒ 连点 7 个 = 装 1 丢 6。第 1 步把静默丢弃换成可见「等待安装中」回执，但**仍是 N=1 串行**。
  * 本步起**闸没有了**：并发上限、FIFO 顺序、同插件去重、槽级看门狗全部由壳侧
- * [`install-queue.ts`](../../../../src/pluginLoader/lifecycle/install-queue.ts) 持有，
+ * `install-queue.ts`（壳仓 `src/pluginLoader/lifecycle/install-queue.ts`）持有，
  * 市场只负责「把壳说的话画出来」。
  *
  * 为什么必须走广播（18 档 §五 I.6⑤）：插件禁止 import `@src/core`（插件通信铁律只认
