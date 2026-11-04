@@ -22,9 +22,10 @@ import {
   setPinnedVersion,
 } from "../installedUpdateMeta";
 import { applyEngineAutoUpdate } from "./apply";
-import { notifyAutoResult, updateBellMessage } from "./messages";
+import { blockedBellMessage, notifyAutoResult, notifyBlocked, updateBellMessage } from "./messages";
 import { planDiscovery, selectAutoCandidates, selectMetaEvictions } from "./plan";
 import { readInstalledSnapshot } from "./snapshot";
+import { readShellVersion } from "../minAppVersionGate";
 import type { DiscoveryPlan, UpdateCandidate } from "./types";
 import { realmSlot } from "../realmSlot";
 
@@ -85,7 +86,8 @@ async function doRunDiscovery(force: boolean): Promise<DiscoveryPlan | null> {
     // 源连上但目录真为空（合法空态）= 结论；拉不到 / 坏 parse = **判不了** → null 交调度器换时间重试。
     return catalog.state === "ok" ? EMPTY_PLAN : null;
   }
-  const plan = planDiscovery(catalog.entries, installed, meta);
+  // 2026-11-05 拍板③：带壳版本进纯计划——低于插件要求的候选标 blocked（停在旧版＋改口通知）
+  const plan = planDiscovery(catalog.entries, installed, meta, await readShellVersion());
 
   // 自愈清提醒（幂等——无变化不写盘，installedUpdateMeta 内部保证）
   await Promise.all(plan.toClearNotified.map((id) => clearNotifiedVersion(id)));
@@ -103,12 +105,21 @@ async function doRunDiscovery(force: boolean): Promise<DiscoveryPlan | null> {
   //  记账仍**逐条做**（幂等键是 per-plugin per-version，不是 per-批次）——整批一次推送成功即整批记账。
   const show = window.linkdesk?.notifications?.show;
   if (toNotify.length > 0) {
+    // 2026-11-05 拍板③：blocked（需更高壳版本）单独一条、文案说清「先更新软件」（warning）；普通批次照旧（info）。
+    const normal = toNotify.filter((c) => !c.blockedByMinApp);
+    const blocked = toNotify.filter((c) => c.blockedByMinApp);
     let pushed = false;
     if (show) {
       try {
         // E6#73g（S5）：版本提醒归市场来源桶（组标题解析成市场显示名，不显示内部 id）
-        await show(updateBellMessage(toNotify), { type: "info", source: "marketplace" });
-        pushed = true;
+        if (normal.length > 0) {
+          await show(updateBellMessage(normal), { type: "info", source: "marketplace" });
+          pushed = true;
+        }
+        if (blocked.length > 0) {
+          await show(blockedBellMessage(blocked), { type: "warning", source: "marketplace" });
+          pushed = true;
+        }
       } catch {
         pushed = false; // 推送失败 → 不记账（下次发现重推）
       }
@@ -160,8 +171,15 @@ export async function runAutoUpdateIfDue(pluginId: string): Promise<boolean> {
   const catalog = await loadCatalog(false);
   if (catalog.entries.length === 0) return false; // 无目录数据 → 判不出有没有新版，不猜
   // 复用发现编排的**同一份**判定（stable-only + semver.gt + updatable 闸 + 下架跳过）——单插件喂进去取首位。
-  const c = planDiscovery(catalog.entries, [inst], meta).candidates[0];
+  const c = planDiscovery(catalog.entries, [inst], meta, await readShellVersion()).candidates[0];
   if (!c) return false; // 没有比本地新的稳定版 → 无候选可跑
+  // 2026-11-05 拍板③：候选需要更高壳版本 ⇒ 停在旧版（不代劳），照铃铛口径告知一句——否则勾选那一下
+  //  静默无解释（E6#83 的承诺是「有新版本就自动装上，装完发通知」，装不了更得说为什么）。
+  if (c.blockedByMinApp) {
+    notifyBlocked([c]);
+    await noteNotifiedVersion(c.pluginId, c.remoteLatest);
+    return false;
+  }
   // 复用纯选择函数判定「这个插件本来该被自动更新吗」（autoUpdate on + 未钉版本）——不是 → 用户没表达过
   //  该意图，不该替他动文件。
   if (selectAutoCandidates([c], meta).length === 0) return false;

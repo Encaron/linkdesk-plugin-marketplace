@@ -62,3 +62,26 @@ export function notifyAutoResult(updated: UpdateCandidate[], failed: UpdateCandi
     void show(autoFailedMessage(failed), { type: "warning", source: "marketplace" });
   }
 }
+
+/** 「有新版本但需要更新软件」文案（2026-11-05 拍板③——自动更新停在旧版时让用户知道为什么停着）。
+ *  结构同 updateBellMessage；need = 该插件的 minAppVersion（blocked 批次恒有）。 */
+export function blockedBellMessage(cs: UpdateCandidate[]): string {
+  if (cs.length === 1) {
+    return i18n.t("「{{name}}」有新版本 {{version}}，但需要 LinkDesk {{need}}——请先更新软件", {
+      name: cs[0].name,
+      version: cs[0].remoteLatest,
+      need: cs[0].blockedByMinApp ?? "",
+    });
+  }
+  const heads = cs.slice(0, BELL_NAME_LIMIT).map((c) => c.name).join("、");
+  const names = cs.length > BELL_NAME_LIMIT ? i18n.t("{{names}} 等", { names: heads }) : heads;
+  return i18n.t("{{num}} 个插件的新版本需要更新 LinkDesk 后才能装：{{names}}", { num: cs.length, names });
+}
+
+/** blocked 单批推送（拍板③）——doRunDiscovery 直调 show 与记账联动，本件服务**勾选即跑**那条单插件路径；
+ *  无 notifications 能力 = no-op（同 notifyAutoResult）。 */
+export function notifyBlocked(cs: UpdateCandidate[]): void {
+  const show = window.linkdesk?.notifications?.show;
+  if (!show || cs.length === 0) return;
+  void show(blockedBellMessage(cs), { type: "warning", source: "marketplace" });
+}

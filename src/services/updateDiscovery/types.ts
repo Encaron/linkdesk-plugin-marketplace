@@ -28,6 +28,10 @@ export interface UpdateCandidate {
   name: string;
   /** 胜出目录条目（#33b 动作取 downloadUrl/versions[]；多源已取高者） */
   entry: CatalogEntry;
+  /** 2026-11-05 拍板③：壳版本低于该候选的 minAppVersion（值 = 所需最低壳版本）——**停在旧版**
+   *  （selectAutoCandidates 不选它），铃铛改走「需要更新软件」文案；candidates/toNotify 保留
+   *  （徽标与手动「更新」钮照常，点更新被同一道门拦下并说明原因）。壳版本缺（读失败）= 不标。 */
+  blockedByMinApp?: string;
 }
 
 export interface DiscoveryPlan {

@@ -8,7 +8,8 @@
 
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { compareVersions, pinnedAfterApply } from "../../../services/marketCatalog";
+import { pinnedAfterApply } from "../../../services/marketCatalog";
+import { minAppVerdict } from "../../../services/minAppVersionGate";
 import { notifyError, startMarketInstall, retryMarketInstall } from "../../../services/marketplaceShared";
 import { confirmMarketInstall } from "../../../services/installGate";
 import { installJobLabel, useInstallJob } from "../../../services/installJobs";
@@ -67,8 +68,10 @@ export function useInstallAction(
       notifyError(t("安装失败"));
       return true;
     }
-    if (entry?.minAppVersion && appVersion && compareVersions(appVersion, entry.minAppVersion) < 0) {
-      notifyError(t("需升级 LinkDesk 至 {{version}} 才能安装", { version: entry.minAppVersion }));
+    // 2026-11-05 拍板②：比对收**共享单点**（原就地 compareVersions——四入口唯一保留处改走同一道门）
+    const gate = minAppVerdict(entry?.minAppVersion, appVersion);
+    if (!gate.ok) {
+      notifyError(t("需升级 LinkDesk 至 {{version}} 才能安装", { version: gate.need }));
       return true;
     }
     return false;

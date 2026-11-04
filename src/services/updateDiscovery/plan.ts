@@ -17,6 +17,8 @@ export function planDiscovery(
   catalogEntries: CatalogEntry[],
   installed: InstalledSnapshot[],
   meta: InstalledUpdateMetaMap,
+  /** 2026-11-05 拍板③：当前壳版本（可选——读不到 = undefined ⇒ 不标 blocked，判不了 ≠ 判不满足，同 30.8c） */
+  shellVersion?: string,
 ): DiscoveryPlan {
   const byId = new Map(catalogEntries.map((e) => [e.id, e] as const));
   const candidates: UpdateCandidate[] = [];
@@ -43,6 +45,12 @@ export function planDiscovery(
       name: inst.name,
       entry,
     };
+    // 2026-11-05 拍板③：壳版本低于插件要求 ⇒ 标 blocked——**停在旧版**（selectAutoCandidates 不选它），
+    //   铃铛走「需要更新软件」文案（run 编排分批）。⛔ 不从 candidates 删：徽标与手动入口照旧可见，
+    //   点「更新」会被同一道门拦下并说明原因（不留「看得见装不上」之外的沉默）。
+    if (shellVersion && entry.minAppVersion && compareVersions(shellVersion, entry.minAppVersion) < 0) {
+      c.blockedByMinApp = entry.minAppVersion;
+    }
     candidates.push(c);
     // 同版已提醒过 → 不重推（幂等；semver 相等判——防 v 前缀/缺位补 0 的串漂移重铃）
     if (!notified || compareVersions(remote, notified) !== 0) toNotify.push(c);
@@ -58,6 +66,7 @@ export function selectAutoCandidates(
   meta: InstalledUpdateMetaMap,
 ): UpdateCandidate[] {
   return candidates.filter((c) => {
+    if (c.blockedByMinApp) return false; // 2026-11-05 拍板③：需更高壳版本 ⇒ 停在旧版（装上也加载不了）
     const m = meta[c.pluginId];
     return m?.autoUpdate === true && m?.pinnedVersion === undefined;
   });

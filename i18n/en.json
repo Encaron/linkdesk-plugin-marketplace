@@ -50,6 +50,8 @@
   "刚刚": "just now",
   "已是最新 · {{time}}": "Up to date · {{time}}",
   "发现 {{count}} 个可更新 · {{time}}": "{{count}} available · {{time}}",
+  "「{{name}}」有新版本 {{version}}，但需要 LinkDesk {{need}}——请先更新软件": "\"{{name}}\" has an update ({{version}}), but it needs LinkDesk {{need}} — update LinkDesk first",
+  "{{num}} 个插件的新版本需要更新 LinkDesk 后才能装：{{names}}": "{{num}} plugins have updates that need a newer LinkDesk: {{names}}",
   "检查失败 · 显示的是旧目录": "Check failed · showing the old catalog",
   "检查更新失败：取不到市场目录": "Update check failed: couldn't fetch the marketplace catalog",
   "立即向市场源查询插件新版本（忽略 5 分钟缓存）": "Check the marketplace sources for new plugin versions now (ignores the 5-minute cache)",

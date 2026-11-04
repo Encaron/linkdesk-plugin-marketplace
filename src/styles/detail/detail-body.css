@@ -34,6 +34,12 @@
   display: flex;
   flex-direction: column;
   padding-bottom: 8px; /* 末项下分隔线留呼吸（行横排 = 下方 #63c 侧栏覆写） */
+  /* 2026-11-05 拍板：滚动吸顶——元数据侧栏常驻可见（三 tab 结构性共用，一处生效全吃）。align-self 脱离
+   * flex 默认 stretch（侧栏被拉到与正文等高 = sticky 不动的经典坑）；top:0 相对唯一滚动区 .marketplace-mpd-body。
+   * 已知边界：侧栏自身高于视口时底部够不着——兜底（max-height＋自身滚动）待实机见到再补（05 夹 §三）。 */
+  align-self: flex-start;
+  position: sticky;
+  top: 0;
 }
 
 .marketplace-mpd-info-item {

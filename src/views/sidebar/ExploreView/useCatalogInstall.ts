@@ -17,6 +17,8 @@ import { useTranslation } from "react-i18next";
 import { notifyError, startMarketInstall } from "../../../services/marketplaceShared";
 // E6#71k「都问」：安装确认门——行内安装与详情页走同一门（双入口单门，零漂移）
 import { confirmMarketInstall } from "../../../services/installGate";
+// 2026-11-05 拍板②：行内安装与详情页过**同一道** minAppVersion 门（共享单点——此前此路无比对＝缝）
+import { minAppVerdict, readShellVersion } from "../../../services/minAppVersionGate";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 
 const lk = () => window.linkdesk;
@@ -35,6 +37,13 @@ export function useCatalogInstall(online: boolean) {
       // installWithProgress 契约上选填（老 preload 面无此法）——缺 = 安装链路不可用，别静默
       if (!lk()?.pluginManager?.installWithProgress) {
         notifyError(t("安装失败"));
+        return;
+      }
+      // 2026-11-05 拍板②：minAppVersion 门（此前行内安装无比对＝缝——行内装得上详情页装不上的包，
+      //   装上后只能靠壳加载门事后拦停）。口径与文案照 E6#30.8c（读不到壳版本 = 放行不拦）。
+      const gate = minAppVerdict(entry.minAppVersion, await readShellVersion());
+      if (!gate.ok) {
+        notifyError(t("需升级 LinkDesk 至 {{version}} 才能安装", { version: gate.need }));
         return;
       }
       // E6#71k「都问」：行内安装与详情页走同一个门（installGate）——**恒弹卡**，官方来源不豁免。

@@ -10,6 +10,7 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { compareVersions, pinnedAfterApply, versionDownloadUrl } from "../../../services/marketCatalog";
+import { minAppVerdict, readShellVersion } from "../../../services/minAppVersionGate";
 import { notifyError, settleUpdateFailure, updateFailText } from "../../../services/marketplaceShared";
 import { confirmMarketInstall } from "../../../services/installGate";
 import { setPinnedVersion } from "../../../services/installedUpdateMeta";
@@ -61,14 +62,24 @@ export function useDetailVersionAction(
        *  以「缺少下载地址」返回——不会静默跳过本门）。
        *  ⚠️ 这道门只管**手动路径**（用户在场点更新）；自动更新走另一条路、不过门——勾选本身即那次授权
        *  （E6#79 用户更正了 #71k 把两者混为一谈的推论，见 updateDiscovery 头注）。 */
+      // 引擎锚①（前移）：目标 < 当前（版本下拉选旧版降级）→ 显式 allowOlder:true 放行；升/同级不发（同版恒拒引擎兜底）
+      const isDowngrade = !!localVer && compareVersions(ver, localVer) < 0;
+      // 2026-11-05 拍板②：升级/同级过 minAppVersion 门（此前此路无比对＝缝——更到需要更高壳的版本，
+      //   装上后只能靠壳加载门事后拦停）。**降级不比**：entry.minAppVersion 是**最新版**的要求，拿它挡
+      //   「降到旧版」会误伤（旧版可能本就适配当前壳）；旧版自身的要求由壳加载门读包内 manifest 兜底。
+      if (!isDowngrade) {
+        const gate = minAppVerdict(entry?.minAppVersion, await readShellVersion());
+        if (!gate.ok) {
+          notifyError(t("需升级 LinkDesk 至 {{version}} 才能安装", { version: gate.need }));
+          return;
+        }
+      }
       if (entry) {
         const ok = await confirmMarketInstall(entry, "update", ver);
         if (!ok) return;
       }
       setUpdating(true);
       try {
-        // 引擎锚①：目标 < 当前（版本下拉选旧版降级）→ 显式 allowOlder:true 放行；升/同级不发（同版恒拒引擎兜底）
-        const isDowngrade = !!localVer && compareVersions(ver, localVer) < 0;
         const r = await upd(pluginId, { url, allowOlder: isDowngrade ? true : undefined });
         if (r && r.success) {
           const pin = pinnedAfterApply(entry, ver);
