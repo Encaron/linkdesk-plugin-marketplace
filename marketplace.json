@@ -1,25 +1,31 @@
 {
   "version": "1",
-  "updatedAt": "2026-10-04T15:10:19.877Z",
+  "updatedAt": "2026-11-04T23:48:47.471Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.1.10",
+      "version": "1.2.0",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.10/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.2.0/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.10/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.2.0/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.1.10/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.10/marketplace.linkdesk-plugin",
-      "size": 62231,
-      "publishedAt": "2026-10-04T15:10:19.877Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.2.0/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.2.0/marketplace.linkdesk-plugin",
+      "size": 62199,
+      "publishedAt": "2026-11-04T23:48:47.471Z",
       "versions": [
+        {
+          "version": "1.2.0",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.2.0/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-04T23:48:47.471Z",
+          "changelog": "- **详情页元数据侧栏滚动吸顶**：右侧「标识符／作者／版本／兼容性…」那栏滚动时**钉在原地**，不再跟着正文滚走；「详情／功能／更改日志」三个 tab 都生效（侧栏本就三 tab 常驻，一处生效全吃）。\n- **装前版本门补缝（minAppVersion）**：此前只有详情页「安装」会拦「需要更高版本 LinkDesk」的插件，**侧栏行内安装和手动更新都能装上、装完却用不了**（重启软件后报错跳过）。现在四个入口走**同一道门**——行内安装、手动更新同样先比对并说明原因；降级到旧版不受此门影响（旧版自身的要求由软件加载时核对包内声明）。\n- **自动更新遇「需要更高版本 LinkDesk」的候选 ⇒ 停在旧版**，并发一条通知说明原因（每个版本只提醒一次，不重复打扰），不再自动装上一个用不了的版本。\n- 要求 LinkDesk **0.2.20 或更高**（未变）。"
+        },
         {
           "version": "1.1.10",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.10/marketplace.linkdesk-plugin",
@@ -47,8 +53,7 @@
         {
           "version": "1.1.6",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.6/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-30T00:36:08.628Z",
-          "changelog": "- **修复「检查更新后主区详情页不翻新」（用户实机立案）**：侧栏行内「可更新」徽标当场翻新，但主区详情页版本下拉不动、更新钮不出现，要退软件重进。**根因不在业务逻辑**——SDK 多表面打包把每个 `contributes.views[].render` 编成一份独立自包含 bundle，ESM 模块身份 = URL ⇒ 同一份 `services/` 在侧栏、详情页各长出一个模块单例，「模块级可变状态 = 跨视图唯一真相」这个前提**在表面之间不成立**。本版新增 `src/services/realmSlot.ts` 地基（1 个新文件 + 8 处状态入槽）：**模块级可变状态不放模块作用域，放本 realm（同一 document）的全局槽注册表**（`globalThis` 上按插件命名空间）——N 份表面副本从槽里取到的是同一个对象。\n- **同族一并归位**（同类缺陷不止报障那一条，8 个文件里的模块级可变状态全部入槽）：搜索状态（🔴 此前侧栏搜索框的输入传不到已装/探索列表的过滤——跨表面静默失效）、目录 store（含配置变更的常驻订阅：每表面一次 → 每 realm 一次）、已装/内置/禁用列表 store、更新发现腿（并发去重从每表面一份收敛为一趟）、安装流程去重表、命令注册守卫、installJobs 订阅（跨表面重复订阅收敛）。\n- **回归钉**：新增 `src/__tests__/crossSurfaceSharedState.test.ts`（4 例——**跨模块实例**共享状态/单次网络/单次 IPC/单次订阅；修前全红、修后全绿）＋ `src/__tests__/realmSlot.test.ts`（4 例）；`vitest.setup.ts` 每例前清槽（`vi.resetModules()` 不换 `globalThis`，槽会跨例残留）。全仓 `test` 31 文件 / 437 例绿 · `verify` 六段绿 · `build` 8/8 表面。\n- **平台层正典另立案**（壳仓 `docs/02-Electron架构/插件生态与发布/01-插件独立构建/12-多表面共享状态塌缩-立案.md`）：SDK 层「跨表面共享模块提升为共享 chunk（或 SDK 提供同名原语 ＋ 作者面成规）」是长期解；届时本件的槽实现整体换成 SDK 版、调用点不动。**零壳改动**。"
+          "publishedAt": "2026-09-30T00:36:08.628Z"
         },
         {
           "version": "1.1.5",
