@@ -43,6 +43,10 @@ function normalizeEntry(raw: unknown): CatalogEntry | null {
     marketIconSource: r.marketIconSource,
     category: r.category,
     categories: Array.isArray(r.categories) ? r.categories : undefined,
+    // Marketplace-Store v2（R4-0.2/0.4）：作者聚合键＋定价声明进白名单——漏行 = 目录带着键进来被静默丢
+    // （E6#106/E6#77 乙同类坑）；三方对账腿②（catalogV2Reconcile.test.ts）钉住本白名单 ↔ SDK schema
+    authorId: r.authorId,
+    pricing: r.pricing,
     downloadUrl: r.downloadUrl,
     size: r.size,
     publishedAt: r.publishedAt,

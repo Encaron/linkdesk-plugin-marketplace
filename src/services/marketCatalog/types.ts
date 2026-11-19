@@ -22,6 +22,11 @@ export interface CatalogEntry {
   marketIconSource?: "lucide" | "codicon" | "url";
   category?: string;
   categories?: string[];
+  /** Marketplace-Store v2：作者身份聚合键——接 authors/<authorId>.json 作者块与 vendors.json 注册表
+   *  （判定链唯一：命中 ⇒「官方 ✓」，未命中 ⇒「社区」；09 §一·补2）。展示名不参与判定（重名合法）。 */
+  authorId?: string;
+  /** Marketplace-Store v2：定价声明——只展示不裁决（购买走外链、验签在壳；09 §三·补3） */
+  pricing?: PricingDecl;
   downloadUrl?: string;
   size?: number;
   publishedAt?: string;
@@ -29,7 +34,11 @@ export interface CatalogEntry {
   /** 版本历史（最新在前）——版本下拉数据源（E6#29c） */
   versions?: Array<{ version: string; downloadUrl?: string; publishedAt?: string; changelog?: string }>;
   readmeUrl?: string;
-  screenshots?: string[];
+  /** R4-0.2（06 §二·2 媒体契约向后兼容扩宽）：string = 图片 URL（旧数据原样可读）；
+   *  视频项 {type:"video",url,poster?} 至多 1 段且必须排第一（封面视频）——多段/越位的解析期丢弃并
+   *  在来源页记声明提示（⛔ 不静默降级成图）；播放语义照 README 视频（controls 强制/preload=metadata/
+   *  剥 autoplay/poster 优先；⛔ 不托管）。渲染器分支消费属棒 10（I12）。 */
+  screenshots?: CatalogScreenshot[];
   license?: string;
   /** 合并注入：条目来源仓库名（owner/repo）——用户知道装的是谁的（E6#30c 来源标注） */
   sourceName?: string;
@@ -43,11 +52,63 @@ export interface CatalogEntry {
   repository?: string;
 }
 
-/** marketplace.json 根结构 */
+/** 画廊媒体项：string = 图片 URL（旧形态）；视频对象至多 1 段且必须排第一（06 §二·2） */
+export type CatalogScreenshot = string | { type: "video"; url: string; poster?: string };
+
+/** 定价声明（Marketplace-Store v2 · 09 §三·补3）——市场只渲染；subscription/channel 为 B3 预留枚举位 */
+export interface PricingDecl {
+  model: "paid" | "subscription";
+  price?: number;
+  currency?: string;
+  period?: string;
+  /** 销售页——购买流 openExternal 目标；model:"paid" 时 schema 必填 */
+  licenseUrl?: string;
+  refundUrl?: string;
+  /** 试用天数 = 详情页静态说明（真试用门在作者代码，壳不管） */
+  trialDays?: number;
+  /** B3 双轨预留：self = 自销（离线签名 0 抽成）· managed = 托管（我们签发/收款/抽成） */
+  channel?: "self" | "managed";
+}
+
+/** 已审核第三方源清单条目（官方目录根级 sources[]；收录 = 背书，⛔ 不收条目副本） */
+export interface SourceLink {
+  url: string;
+  authorId: string;
+  addedAt: string;
+}
+
+/** 合集声明（06 §二·3；作者数据直显不走 t()） */
+export interface CollectionDecl {
+  id: string;
+  title: string;
+  subtitle?: string;
+  /** 板块副题说明字——不声明不渲染（09 §五） */
+  hint?: string;
+  cover?: string;
+  /** 卡片原型映射：banner→hero · strip→sm 横排 · duo→lg×2 · grid→md 网格（05 §四） */
+  layout?: "banner" | "strip" | "duo" | "grid";
+  /** 成员 pluginId 引用——缺失条目静默跳过（照目录 merge 防御语义） */
+  items: string[];
+  order?: number;
+}
+
+/** 分类 rail 展示顺序声明（06 §二·3）——未注册 slug 落「其他」桶，不报错 */
+export interface CategoryRailDecl {
+  order: string[];
+  icons?: Record<string, string>;
+}
+
+/** marketplace.json 根结构（v2 根级字段全部可选——旧目录天然合法，06 §二·3「可选字段纪律」） */
 export interface MarketplaceCatalog {
   version?: string;
   updatedAt?: string;
   plugins: CatalogEntry[];
+  /** v2：官方目录的已审核第三方源清单（只有官方运营者可写） */
+  sources?: SourceLink[];
+  /** v2：合集声明（作者仓 marketplace.json 亦可声明） */
+  collections?: CollectionDecl[];
+  /** v2：分类 rail 展示顺序 */
+  categoryRail?: CategoryRailDecl;
 }
 
 /** parse 结果——失败给原因（#30f 目录损坏空态判断依据，不抛） */
