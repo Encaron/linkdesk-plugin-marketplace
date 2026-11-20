@@ -80,14 +80,25 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
+/* 标题（R4-3.19 · I13 / 08 v3.56：标题上限 **2 行**）。
+ * 旧值 white-space:nowrap 让长名在窄窗被裁；改 clamp2 后允许两行，⛔ 一字一行（min-width:0 解 flex 子项最小宽）。
+ * max-width:100% 保证徽标行仍可换行，标题不把同排徽标顶出容器。 */
 .marketplace-mpd-name {
   font-size: var(--font-size-3xl);
   line-height: 1.2;
   font-weight: 600;
   margin: 0;
-  white-space: nowrap;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .marketplace-mpd-version {
@@ -98,17 +109,30 @@
 
 /* 内置 chip = 壳 Badge 基础件（E6#30.14b）——色/形状全走壳 token，本文件零样式 */
 
+/* 副标题（R4-3.19 · I13：用户实机报障——市场自身的「浏览、安装和管理插件」窄窗逐字换行）。
+ * 上限 **2 行**（08 v3.56 标题档）；min-width:0 由父级 `.marketplace-mpd-header-details` 已给。 */
 .marketplace-mpd-subtitle {
   font-size: var(--font-size-md);
   color: var(--text-secondary);
   margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
+/* 简介（08 v3.56 说明档：上限 **3 行**） */
 .marketplace-mpd-short-desc {
   font-size: var(--font-size-md);
   color: var(--text-secondary);
   margin: 4px 0 0;
   line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 /* ═══ 挂起·缺依赖 三通道（E6#30.5e——取代 E5.8#15.5 旧顶部横幅；mockup 帧 7：头部零横幅 + action chip） ═══ */

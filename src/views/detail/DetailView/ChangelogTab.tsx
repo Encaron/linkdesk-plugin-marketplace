@@ -87,8 +87,10 @@ export default function ChangelogTab({
                 `CHANGELOG_WINDOW`（=5）绑定——N 变则本串与其译名同改**（SDK 未导出该常量给运行时，故此处写字面量）。 */}
             <div className="marketplace-mpd-chg-ver-head">
               <span className="marketplace-mpd-chg-ver-scope">{t("更新记录（最近 5 版）")}</span>
+              {/* 05 §03：只标「你装的是这一版」——版本号转绿（.ver.cur 同义），⛔ 不标「可更新」 */}
               <span className="marketplace-mpd-chg-tag marketplace-mpd-chg-tag-installed">
-                {t("已安装")}{localVersion ? ` v${localVersion}` : ""}
+                {t("已安装")}
+                {localVersion ? <span className="marketplace-mpd-chg-cur-ver"> v{localVersion}</span> : ""}
               </span>
             </div>
             <MarkdownView markdown={localChangelog} />
@@ -100,7 +102,10 @@ export default function ChangelogTab({
     );
   }
 
-  /* 未装：目录版本史（最新在前）——versions 缺失用 entry.version 单卡兜底 */
+  /* 未装：目录版本史（最新在前）——versions 缺失用 entry.version 单卡兜底。
+   *  R4-3.17：05 §03「只带最近 5 版」，UI 口径「更新记录（最近 5 版）」——目录 versions[] 可能长于 5
+   *  （实测官方目录最长 47 版，SDK 只裁包内 CHANGELOG.md），故**展示口按 5 版裁**；裁剪的只是版本条数，
+   *  单版正文（MarkdownView）不截断。蓝图 03 renderDetail 同款 `.slice(0,5)`。 */
   const rows =
     versions && versions.length > 0
       ? versions.map((v, i) => ({ version: v.version, date: v.publishedAt, isLatest: i === 0, body: v.changelog }))
@@ -110,5 +115,12 @@ export default function ChangelogTab({
   if (rows.length === 0) {
     return <p className="marketplace-mpd-chg-empty">{t("该插件未附带更改日志")}</p>;
   }
-  return <div className="marketplace-mpd-chg">{rows.map((r) => versionBlock(r.version, r))}</div>;
+  return (
+    <div className="marketplace-mpd-chg">
+      <div className="marketplace-mpd-chg-ver-head">
+        <span className="marketplace-mpd-chg-ver-scope">{t("更新记录（最近 5 版）")}</span>
+      </div>
+      {rows.slice(0, 5).map((r) => versionBlock(r.version, r))}
+    </div>
+  );
 }

@@ -10,12 +10,13 @@
  */
 
 import type { ReactNode } from "react";
-import { Dash, ExternalLink, InfoItem } from "./info-bits";
+import { ExternalLink, InfoItem } from "./info-bits";
 
 /** i18n 取值签名（同 `installJobs.installJobLabel` 的写法——不引 i18next 类型，结构即契约） */
 type T = (key: string, opts?: Record<string, unknown>) => string;
 
-/** 依赖值——缺失依赖标黄 ✕ + 点击跳其详情页（30.5e/30.6c3） */
+/** 依赖值——缺失依赖标黄 ✕ + 点击跳其详情页（30.5e/30.6c3）。
+ *  R4-3.18：空数组 ⇒ null（「没有 → 不画行」；调用方据空值不渲染该行，⛔ 用「—」撑空行）。 */
 export function DepValues({
   deps,
   missing,
@@ -27,7 +28,7 @@ export function DepValues({
   labelOf: (dep: string) => string;
   onJump: (dep: string) => void;
 }) {
-  if (deps.length === 0) return <Dash />;
+  if (deps.length === 0) return null;
   return (
     <span className="marketplace-mpd-info-deps">
       {deps.map((dep) => {
@@ -48,7 +49,7 @@ export function DepValues({
   );
 }
 
-/** 被依赖值——谁 require 了本插件（点击跳其详情页） */
+/** 被依赖值——谁 require 了本插件（点击跳其详情页）；空数组 ⇒ null（同上：不画空行） */
 export function DependentValues({
   dependents,
   onJump,
@@ -56,7 +57,7 @@ export function DependentValues({
   dependents: Array<{ pluginId: string; name: string }>;
   onJump: (pluginId: string) => void;
 }) {
-  if (dependents.length === 0) return <Dash />;
+  if (dependents.length === 0) return null;
   return (
     <span className="marketplace-mpd-info-deps">
       {dependents.map((d) => (
@@ -116,30 +117,27 @@ export function resourcesGroupOf({
 }
 
 /** 组：依赖 · 环境（mockup 04 末组定名）——需 LinkDesk(minApp) / 依赖 / 被依赖。
- *  依赖行判据（30.6c3）：未装 → Dash 诚实空（#64e A4 缺依赖门禁前不猜目录 requires）。 */
+ *  R4-3.18（05 §02「没有 → 不画行」）：依赖/被依赖无值（未装、或确实没有）⇒ 该行不渲染；
+ *  值节点由调用方按「有货」决定传不传（空 ⇒ 不画）。「不够」仍在「需 LinkDesk」行标黄。 */
 export function depEnvGroupOf({
   t,
   minAppVersion,
   appBelowMin,
-  installed,
-  hasEntry,
   depsValue,
   dependentsValue,
 }: {
   t: T;
   minAppVersion?: string;
   appBelowMin: boolean;
-  installed: boolean;
-  hasEntry: boolean;
-  depsValue: ReactNode;
-  dependentsValue: ReactNode;
+  depsValue?: ReactNode;
+  dependentsValue?: ReactNode;
 }): ReactNode[] {
   const rows: ReactNode[] = [];
   if (minAppVersion)
     rows.push(
       <InfoItem key="minapp" label={t("需 LinkDesk")} mono warn={appBelowMin} value={`v${minAppVersion}`} />,
     );
-  if (installed || hasEntry) rows.push(<InfoItem key="deps" label={t("依赖")} value={depsValue} />);
-  if (installed) rows.push(<InfoItem key="dependents" label={t("被依赖")} value={dependentsValue} />);
+  if (depsValue) rows.push(<InfoItem key="deps" label={t("依赖")} value={depsValue} />);
+  if (dependentsValue) rows.push(<InfoItem key="dependents" label={t("被依赖")} value={dependentsValue} />);
   return rows;
 }

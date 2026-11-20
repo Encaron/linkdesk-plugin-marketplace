@@ -18,7 +18,16 @@ const CACHE_PREFIX = "ldk-market-catalog:v1:";
 /* ── fixture 生成（全虚构） ── */
 
 function entry(id: string, version: string): Record<string, string> {
-  return { id, name: `Demo ${id}`, version, downloadUrl: `https://example.invalid/releases/${id}-${version}.linkdesk-plugin` };
+  /* R4-3.18：网络源条目默认带齐抓取型字段（作者/发布时间/仓库）——缺了会多出 missing-entry-field 警告 */
+  return {
+    id,
+    name: `Demo ${id}`,
+    version,
+    author: "Demo Author",
+    publishedAt: "2026-09-01T00:00:00Z",
+    repository: "https://github.com/demo-owner/demo-repo",
+    downloadUrl: `https://example.invalid/releases/${id}-${version}.linkdesk-plugin`,
+  };
 }
 function catalogText(...plugins: Array<Record<string, string>>): string {
   return JSON.stringify({ version: "1", updatedAt: "2026-09-01T00:00:00Z", plugins });

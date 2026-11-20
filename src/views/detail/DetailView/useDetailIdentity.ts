@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import type { PluginDiskLocation, PluginFolderKind } from "@linkdesk/contracts";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import { notifyError, useMarketplaceCatalog, useMarketplacePlugins } from "../../../services/marketplaceShared";
+import { readLocalInstalls } from "../../../services/localInstalls";
 import type { DetailInfo } from "./types";
 
 const lk = () => window.linkdesk;
@@ -103,6 +104,26 @@ export function useDetailIdentity(pluginId?: string) {
       : null;
   const entry: CatalogEntry | undefined = catalog.entries.find((e) => e.id === pluginId);
 
+  /* R4-3.16（05 §01）：本地安装身份——只有「目录里没有条目」时用来出「本地」徽标。
+   *  本地安装记录只作溯源（06 §九，⛔ 不是已装真相源），判据 = 记录里有没有这个 pluginId。 */
+  const [localInstalled, setLocalInstalled] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    setLocalInstalled(false);
+    const id = pluginId ?? "";
+    if (!id || !installed) {
+      return () => {
+        alive = false;
+      };
+    }
+    void readLocalInstalls().then((records) => {
+      if (alive) setLocalInstalled(records.some((r) => r.pluginId === id));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [pluginId, installed]);
+
   /* 当前插件显示名——启/禁/卸三处失败 toast 共用（enabledEntry/disabledHit 是列表元素稳定引用，
    *  非每渲染新建对象，可入 deps）。E6#73h（D5）：三处原始报错一律加**结论句**前缀——
    *  此前 `notifyError(e.message)` 把桥/引擎原文直接当整句甩出去，用户看到的是
@@ -124,6 +145,7 @@ export function useDetailIdentity(pluginId?: string) {
     pending,
     info,
     entry,
+    localInstalled,
     displayName,
     diskLoc,
     openPluginDir,

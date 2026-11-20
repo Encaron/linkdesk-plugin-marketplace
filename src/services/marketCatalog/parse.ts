@@ -8,6 +8,7 @@
  */
 
 import { isKnownPrimaryCategory, validateEntryCategories } from "./categories";
+import { pluginRepoUrl } from "./sourceUrl";
 import type {
   CatalogEntry,
   CatalogScreenshot,
@@ -60,7 +61,7 @@ function normalizeEntry(raw: unknown, warnings: CatalogWarning[]): CatalogEntry 
   }
   // 封闭名单体检（04 §5.1）——名单外记警告、原值照留（归桶由 categories.primaryCategoryOf 兜）
   warnings.push(...validateEntryCategories(r));
-  return {
+  const normalized: CatalogEntry = {
     id: r.id,
     name: r.name,
     version: r.version,
@@ -92,6 +93,28 @@ function normalizeEntry(raw: unknown, warnings: CatalogWarning[]): CatalogEntry 
     sourceName: undefined, // 合并注入——parse 阶段不填
     official: undefined, // 同上：来源身份是合并时语义
   };
+  /* R4-3.18（05 §02 抓取/派生型「网络源必有」）——缺 = 目录缺字段，详情页不画行、来源页记声明提示 */
+  warnings.push(...missingFetchedFieldWarnings(normalized));
+  return normalized;
+}
+
+/** 抓取/派生型字段体检（05 §02）——只查目录里判得出的三类：
+ *  - `publishedAt`（首次发布/更新时间的数据源，versions[] 里任一有也算有）；
+ *  - `author`（作者行；两种形态 string / {name}）；
+ *  - `repo`（仓库/问题两行的 URL 是否推得出，判据复用 `pluginRepoUrl`）。
+ *  ⛔ 「下载」是运行时 GitHub 计数（downloadCounts），不在目录里，缺不算目录缺陷。 */
+function missingFetchedFieldWarnings(e: CatalogEntry): CatalogWarning[] {
+  const out: CatalogWarning[] = [];
+  const hasPublished =
+    (typeof e.publishedAt === "string" && e.publishedAt.trim().length > 0) ||
+    (e.versions?.some((v) => typeof v?.publishedAt === "string" && v.publishedAt.trim().length > 0) ?? false);
+  if (!hasPublished) out.push({ code: "missing-entry-field", entryId: e.id, detail: "publishedAt" });
+  const authorName = typeof e.author === "string" ? e.author : e.author?.name;
+  if (!authorName || !authorName.trim()) {
+    out.push({ code: "missing-entry-field", entryId: e.id, detail: "author" });
+  }
+  if (!pluginRepoUrl(e)) out.push({ code: "missing-entry-field", entryId: e.id, detail: "repo" });
+  return out;
 }
 
 /** 画廊媒体归一（06 §二·2 契约）：string = 图片；视频对象**至多 1 段且必须排第一**（封面视频）。

@@ -19,6 +19,8 @@ export default function DetailActionBar({
   hasInfo,
   isCore,
   online,
+  belowMinApp,
+  minAppVersion,
   busy,
   updating,
   installingHere,
@@ -47,6 +49,10 @@ export default function DetailActionBar({
   hasInfo: boolean;
   isCore: boolean;
   online: boolean;
+  /** R4-3.18「不够」：当前壳 < 条目要求的 minAppVersion——行保留标黄，安装/重试钮置灰并给出原因（05 §02/§07 D3） */
+  belowMinApp?: boolean;
+  /** 需 LinkDesk 的最低版本（与禁钮 title 同源；缺 = 不禁） */
+  minAppVersion?: string;
   busy: boolean;
   updating: boolean;
   installingHere: boolean;
@@ -71,6 +77,12 @@ export default function DetailActionBar({
   const { t } = useTranslation();
   /* 生命周期动作（启/禁/卸）的冻结栅：替换期间不可再点（busy 与更新进行中同效） */
   const frozen = busy || updating;
+  /* R4-3.18「不够」≠「没有」：字段有（条目声明了 minApp）但当前壳不满足 ⇒ 行保留标黄 ＋ 安装钮置灰写原因。
+   * 与 `installGateError` 的点击拦住同一条判据（minAppVerdict），两处都读 ver.appBelowMin，零第二套算法。 */
+  const minAppBlocked = !!belowMinApp && !!minAppVersion;
+  const minAppTitle = minAppBlocked
+    ? t("需升级 LinkDesk 至 {{version}} 才能安装", { version: minAppVersion })
+    : undefined;
   return (
     <div className="marketplace-mpd-acts">
       <div className="marketplace-mpd-acts-row">
@@ -118,8 +130,8 @@ export default function DetailActionBar({
               <Button
                 variant="danger"
                 onClick={onRetryInstall}
-                disabled={busy || !online}
-                title={!online ? t("联网后重试") : undefined}
+                disabled={busy || !online || minAppBlocked}
+                title={!online ? t("联网后重试") : minAppTitle}
               >
                 <span className="codicon codicon-refresh" /> {t("重试安装")}
               </Button>
@@ -127,15 +139,17 @@ export default function DetailActionBar({
               <Button
                 variant="success"
                 onClick={onInstallClick}
-                disabled={busy || installingHere || queuedHere || !online}
+                disabled={busy || installingHere || queuedHere || !online || minAppBlocked}
                 title={
                   !online
                     ? t("联网后重试")
-                    : queuedHere
-                      ? t("等待安装中")
-                      : installingHere && installMessage
-                        ? installMessage
-                        : undefined
+                    : minAppTitle
+                      ? minAppTitle
+                      : queuedHere
+                        ? t("等待安装中")
+                        : installingHere && installMessage
+                          ? installMessage
+                          : undefined
                 }
               >
                 <span className="codicon codicon-cloud-download" />

@@ -24,7 +24,16 @@ import {
 import type { CatalogEntry } from "../services/marketCatalog";
 
 function entry(patch: Partial<CatalogEntry> & { id: string }): CatalogEntry {
-  return { name: `Demo ${patch.id}`, version: "1.0.0", ...patch };
+  /* R4-3.18：目录条目默认带齐「抓取/派生型」三字段——网络源理论上必有（05 §02）。
+   * 缺它会被 missing-entry-field 记为目录缺陷，与本组各例要测的声明警告混在一起。 */
+  return {
+    name: `Demo ${patch.id}`,
+    version: "1.0.0",
+    author: { name: "Demo Author" },
+    publishedAt: "2026-11-20T00:00:00.000Z",
+    repository: "https://github.com/demo-owner/demo-repo",
+    ...patch,
+  };
 }
 
 /* ── 分类封闭名单（04 §5.1） ── */

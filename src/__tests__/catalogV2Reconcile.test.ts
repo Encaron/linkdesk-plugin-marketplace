@@ -117,6 +117,9 @@ const V2_CATALOG = {
       id: "demo-plugin",
       name: "Demo",
       version: "1.0.0",
+      author: { name: "Demo Author" },
+      // R4-3.18：抓取型字段（05 §02 网络源必有）——仓库/问题行与声明提示的判据源
+      repository: "https://github.com/demo-author/demo-repo",
       downloadUrl: "https://example.invalid/demo.linkdesk-plugin",
       authorId: "demo-author",
       pricing: { model: "paid", licenseUrl: "https://example.invalid/buy", trialDays: 14, channel: "self" },

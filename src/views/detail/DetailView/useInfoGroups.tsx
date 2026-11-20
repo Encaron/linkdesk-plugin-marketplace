@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import type { PluginDiskLocation, PluginFolderKind } from "@linkdesk/contracts";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import { localizeCategory } from "../../../services/marketCategories";
-import { Dash, fmtCount, InfoItem } from "./info-bits";
+import { fmtCount, InfoItem } from "./info-bits";
 import { CompatStatus } from "./CompatStatus";
 import { DependentValues, DepValues, depEnvGroupOf, resourcesGroupOf } from "./info-groups";
 import { topGroupOf } from "./info-top";
@@ -75,11 +75,20 @@ export function useInfoGroups(o: InfoGroupsInput): Array<{ title?: string; items
 
   const groups: Array<{ title?: string; items: ReactNode[] }> = [];
 
-  /* 顶部无节题小段（mockup 04 开首——不落「信息」总词；行装配在 `info-top.tsx`） */
-  groups.push({ items: topGroupOf({ t, pluginId, authorText, versionText, entry, diskLoc, onOpenDir }) });
+  /* R4-3.18（05 §02 四类字段）：
+   *   ① 本机事实（顶部无节题小段）＝标识符/版本/大小/安装位置/数据位置——本地插件也有，有值就画；
+   *   ② 抓取/派生型（「市场」组）＝作者/来源/首次发布/更新时间/下载——网络源理论上必有，
+   *      缺 = 目录缺字段（异常）⇒ **不画该行**（⛔ 不写「未提供」），来源页记「声明提示」；
+   *   ③ 作者声明型（「类别」「资源」组里的许可证）——有才显，整组空则整组消失；
+   *   ④ 宿主状态（「兼容性」组）——恒一行，读不到落「—」（全页唯一允许占位的一行）。
+   *  ⛔ 不用「—」撑空行：Dash 只留在兼容性与依赖值（宿主/依赖事实确实可空）两处。 */
+  groups.push({ items: topGroupOf({ t, pluginId, versionText, entry, diskLoc, onOpenDir }) });
 
-  /* 组：市场（mockup 04 归组——来源/首次发布/更新时间/下载；「来源」行即目录身份，无外链概念） */
+  /* 组：市场（抓取/派生——来源/作者/首次发布/更新时间/下载） */
   const market: ReactNode[] = [];
+  /* 作者行（#63c 补——与 header 副标题同源 authorText；manifest 缺失回退目录 entry.author）。
+   * R4-3.18：抓取型「没有 → 不画行」——本地插件/目录缺作者时不再用 Dash 撑一行。 */
+  if (authorText) market.push(<InfoItem key="author" label={t("作者")} value={authorText} />);
   if (sourceName) market.push(<InfoItem key="src" label={t("来源")} value={sourceName} mono />);
   if (firstRelease)
     market.push(<InfoItem key="first" label={t("首次发布")} value={firstRelease.slice(0, 10)} />);
@@ -115,14 +124,16 @@ export function useInfoGroups(o: InfoGroupsInput): Array<{ title?: string; items
       t,
       minAppVersion: entry?.minAppVersion,
       appBelowMin,
-      installed,
-      hasEntry: !!entry,
-      depsValue: installed ? (
-        <DepValues deps={requiresList} missing={missingDeps} labelOf={depLabel} onJump={onJumpToDep} />
-      ) : (
-        <Dash />
-      ),
-      dependentsValue: <DependentValues dependents={dependents} onJump={onJumpToDep} />,
+      /* R4-3.18（05 §02「没有 → 不画行」）：依赖/被依赖只在该行**有值**时出画——
+       *  未装时不猜目录 requires（原 Dash 空行退役）；已装但确实没有依赖也不画空行。 */
+      depsValue:
+        installed && requiresList.length > 0 ? (
+          <DepValues deps={requiresList} missing={missingDeps} labelOf={depLabel} onJump={onJumpToDep} />
+        ) : undefined,
+      dependentsValue:
+        installed && dependents.length > 0 ? (
+          <DependentValues dependents={dependents} onJump={onJumpToDep} />
+        ) : undefined,
     }),
   });
 

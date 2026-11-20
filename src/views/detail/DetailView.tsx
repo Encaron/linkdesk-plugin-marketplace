@@ -46,6 +46,8 @@ import { useTranslation } from "react-i18next";
 import { pickIdentityArt } from "@linkdesk/ui";
 import { useOnlineStatus } from "../../services/marketplaceShared";
 import { authorLabel } from "../../services/installConfirmPayload";
+import { openPluginDetailTab } from "../../services/openDetailTab";
+import { sourceBadge, type BadgeDesc } from "../../ui";
 import type { DetailContributedProps, TabId } from "./DetailView/types";
 import { useDetailIdentity } from "./DetailView/useDetailIdentity";
 import { useDetailVersions } from "./DetailView/useDetailVersions";
@@ -70,8 +72,6 @@ import "../../styles/detail/detail-actions.css";
 import "../../styles/detail/detail-body.css";
 import "../../styles/detail/detail-features.css";
 import "../../styles/detail/detail-changelog.css";
-
-const lk = () => window.linkdesk;
 
 export default function DetailView({ pluginId }: DetailContributedProps) {
   const { t } = useTranslation();
@@ -99,7 +99,7 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
     installVer: ver.installVer,
     appVersion: ver.appVersion,
   });
-  const { info, entry, disabled, pending, installed, enabledEntry, pluginsLoading, catalog } = id;
+  const { info, entry, disabled, pending, installed, enabledEntry, pluginsLoading, catalog, localInstalled } = id;
   /* E6#118：宿主兼容读数（只消费不复算——面缺失/失败 ⇒ undefined ⇒ 状态行「—」） */
   const compat = useCompatReading({ pluginId, entry, installed });
   /* 右上动作列五枚小件（版本/安装下拉 · 版本动作钮 · 自动更新勾 · 已停在 vX）——判据全在 useActionBits，
@@ -148,14 +148,25 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
    *  目录条目（未装/禁用态官方艺术兜底）；两环皆无配图 → 统一默认彩色块（市场门面）。 */
   const iconManifest = info ? pickIdentityArt(info.manifest, entry) : pickIdentityArt(entry);
 
+  /* R4-3.16（05 §01）：身份徽标**由来源派生，作者说了不算**——
+   *  目录条目走 `sourceBadge`（与商店卡同一条判定链：vendorId 命中 → 官方 ✓；官方源 → 官方；其余 → 社区）；
+   *  目录里没有条目、确是本地安装 ⇒ 本地（读 localInstalls 溯源）；两者皆无 ⇒ 不画徽标（⛔ 不伪造）。
+   *  `core → 内置` 是叠加徽标，不替代来源徽标。 */
+  const source: BadgeDesc | undefined = entry
+    ? sourceBadge(entry)
+    : localInstalled
+      ? { kind: "local", key: "本地" }
+      : undefined;
+
   /* 元数据侧栏数据（E6#30.8b 下载数仅 ready 显；被依赖列表带显示名） */
   const dlCount = ver.dl.status === "ready" ? ver.dl.count : undefined;
   const dependents = data.dependents.map((d) => ({ pluginId: d.pluginId, name: d.manifest.name ?? d.pluginId }));
 
   /* 依赖行点击 → 跳依赖插件详情页（30.5e/30.6c3「点击跳其详情页」）——E6#30.7b 带 label
-   *  （depLabel：已装名/目录名兜底，未装目标壳 viewRegistry 无 manifest 无法自行命名）。 */
+   *  （depLabel：已装名/目录名兜底，未装目标壳 viewRegistry 无 manifest 无法自行命名）。
+   *  R4-3.16：与商店卡片同一条 openPluginDetailTab（pinned:true＋label）——⛔ 视图里各写一份 tabs.create。 */
   const handleJumpToDep = (dep: string) => {
-    lk()?.tabs?.create("plugin-detail", { pluginId: dep, pinned: false, label: data.depLabel(dep) });
+    void openPluginDetailTab(dep, data.depLabel(dep));
   };
 
   return (
@@ -170,7 +181,7 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
         showDesc={showDesc}
         descText={descText}
         isCore={isCore}
-        official={entry?.official}
+        source={source}
         actions={
           <DetailActionBar
             disabledRow={disabled}
@@ -179,6 +190,8 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
             hasInfo={!!info}
             isCore={isCore}
             online={online}
+            belowMinApp={ver.appBelowMin}
+            minAppVersion={entry?.minAppVersion}
             busy={act.busy}
             updating={act.updating}
             installingHere={inst.installingHere}
@@ -201,10 +214,11 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
         }
       />
 
-      {/* ═══ NavBar——详情/功能/更改日志（30.6 三 tab，本地 state，host 换插件实例重置） ═══ */}
+      {/* ═══ NavBar——概览/功能/更改日志（30.6 三 tab，本地 state，host 换插件实例重置）。
+       *  R4-3.17：第一页签口径照 05 §03／07 §二「详情页三页签（概览/功能/更改日志）」——原「详情」改名「概览」。 ═══ */}
       <nav className="marketplace-mpd-navbar">
         <button className={tab === "overview" ? "marketplace-mpd-navtab active" : "marketplace-mpd-navtab"} onClick={() => setTab("overview")}>
-          {t("详情")}
+          {t("概览")}
         </button>
         <button className={tab === "features" ? "marketplace-mpd-navtab active" : "marketplace-mpd-navtab"} onClick={() => setTab("features")}>
           {t("功能")}

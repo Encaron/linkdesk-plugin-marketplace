@@ -32,6 +32,7 @@ import {
   setMarketplaceSearch,
 } from "./marketplaceShared/searchState";
 import { setViewPrefs } from "./marketplaceShared/uiPrefs";
+import { openPluginDetailTab } from "./openDetailTab";
 
 const lk = () => window.linkdesk;
 
@@ -118,12 +119,15 @@ async function openStoreTab(): Promise<OpenTabResult> {
   return { ok: true, tabId: await waiter.promise };
 }
 
-/** 开插件详情标签页（create——同 type 多个 pluginId 并存，⛔ 不能用 openOrFocus） */
+/** 开插件详情标签页（create——同 type 多个 pluginId 并存，⛔ 不能用 openOrFocus）。
+ *  R4-3.16：固定新开（pinned:true）走唯一入口 `services/openDetailTab`（与商店卡片/详情依赖跳转同一条）；
+ *  只有命令调用方**显式**要预览态（pinned:false）时才落本函数自己的 create。 */
 async function openDetailTab(pluginId: string, pinned: boolean, label: string): Promise<OpenTabResult> {
+  if (pinned) return { ok: await openPluginDetailTab(pluginId, label), tabId: "" };
   const tabs = lk()?.tabs;
   if (!tabs?.create) return { ok: false, tabId: "" };
   try {
-    await tabs.create(DETAIL_TAB_TYPE, { pluginId, pinned, label });
+    await tabs.create(DETAIL_TAB_TYPE, { pluginId, pinned: false, label });
     return { ok: true, tabId: "" };
   } catch {
     return { ok: false, tabId: "" };

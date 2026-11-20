@@ -23,6 +23,25 @@
   justify-content: flex-end;
   gap: 8px;
   flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* R4-3.19（08 v3.56 按钮档：**单行 nowrap** ＋ ellipsis ＋ flex:none ＋ max-width）——
+ * 窗口缩小只许换行/省略，⛔ 按钮变竖长条、⛔ 文案一字一行。
+ * `.ldk-button` 自带 nowrap，这里补齐可收缩容器下的 ellipsis 三件（flex:none 防被挤扁、max-width 防出屏）。 */
+.marketplace-mpd-acts-row > .ldk-button {
+  flex: none;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 版本下拉（壳 SelectBox）同受容器约束——触发器撑满剩余宽即收，标签自身 ellipsis 在共享件内。 */
+.marketplace-mpd-acts-row > .ldk-selectbox {
+  flex: none;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* 动作列内容图标（壳 Button 不归内容——图标尺寸/对齐归消费方本件） */

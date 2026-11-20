@@ -30,9 +30,9 @@ const OFFICIAL_CATALOG = { version: "1", plugins: [] };
 const DEMO_CATALOG = {
   version: "1",
   plugins: [
-    { id: "demo-one", name: "Demo One", version: "2.0.0", category: "hardware", authorId: "demo-author" },
-    { id: "demo-two", name: "Demo Two", version: "1.0.0", category: "hardware", authorId: "demo-author" },
-    { id: "demo-three", name: "Demo Three", version: "1.0.0", category: "hardware", authorId: "demo-author" },
+    { id: "demo-one", name: "Demo One", version: "2.0.0", category: "hardware", authorId: "demo-author", author: { name: "Demo Author" }, publishedAt: "2026-11-01T00:00:00Z", repository: "https://github.com/demo-author/demo-shop" },
+    { id: "demo-two", name: "Demo Two", version: "1.0.0", category: "hardware", authorId: "demo-author", author: { name: "Demo Author" }, publishedAt: "2026-11-01T00:00:00Z", repository: "https://github.com/demo-author/demo-shop" },
+    { id: "demo-three", name: "Demo Three", version: "1.0.0", category: "hardware", authorId: "demo-author", author: { name: "Demo Author" }, publishedAt: "2026-11-01T00:00:00Z", repository: "https://github.com/demo-author/demo-shop" },
   ],
 };
 const AUTHOR_BLOCK = {

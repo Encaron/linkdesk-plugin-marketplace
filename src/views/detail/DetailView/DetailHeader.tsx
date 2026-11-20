@@ -8,8 +8,8 @@
  */
 
 import type { ComponentProps, ReactNode } from "react";
-import { useTranslation } from "react-i18next";
-import { Badge, PluginIcon } from "@linkdesk/ui";
+import { PluginIcon } from "@linkdesk/ui";
+import { Badge, type BadgeDesc } from "../../../ui";
 
 export default function DetailHeader({
   pluginId,
@@ -20,7 +20,7 @@ export default function DetailHeader({
   showDesc,
   descText,
   isCore,
-  official,
+  source,
   actions,
 }: {
   pluginId?: string;
@@ -31,10 +31,10 @@ export default function DetailHeader({
   showDesc: boolean;
   descText: string;
   isCore: boolean;
-  official?: boolean;
+  /** R4-3.16：来源派生徽标（官方 ✓/官方/社区/本地）——判定链在 `ui/statusTag.sourceBadge`，本件只出画 */
+  source?: BadgeDesc;
   actions: ReactNode;
 }) {
-  const { t } = useTranslation();
   return (
     <header className="marketplace-mpd-header">
       <div className="marketplace-mpd-icon">
@@ -47,13 +47,10 @@ export default function DetailHeader({
         <div className="marketplace-mpd-title-row">
           <h1 className="marketplace-mpd-name">{nameText}</h1>
           {versionText && <span className="marketplace-mpd-version">v{versionText}</span>}
-          {isCore && <Badge>{t("内置")}</Badge>}
-          {/* E6#30.8f：官方发布徽标——胜出条目来自官方默认源（entry.official 合并注入），第三方源不伪造 */}
-          {official && (
-            <Badge title={t("官方发布")}>
-              <span className="codicon codicon-verified" /> {t("官方发布")}
-            </Badge>
-          )}
+          {/* R4-3.16：详情徽标收编 `ui/Badge`（棒 6 交办「棒 9 统一时再收」）——与商店卡同源 descriptor；
+           *  来源徽标派生（entry.official/vendorId ⇒ 官方/社区），⛔ 不读作者自声明、⛔ 按作者名猜。 */}
+          {isCore && <Badge desc={{ kind: "core", key: "内置" }} />}
+          {source && <Badge desc={source} />}
         </div>
         {authorText && <p className="marketplace-mpd-subtitle">{authorText}</p>}
         {showDesc && <p className="marketplace-mpd-short-desc">{descText}</p>}

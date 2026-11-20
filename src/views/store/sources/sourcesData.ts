@@ -9,7 +9,7 @@
 
 import { urlSourceKey } from "@linkdesk/ui";
 import type { AuthorDomain } from "../../../services/authors";
-import type { CatalogEntry } from "../../../services/marketCatalog";
+import type { CatalogEntry, CatalogWarning } from "../../../services/marketCatalog";
 import { normalizeSourceUrl, sourceNameOfUrl } from "../../../services/marketCatalog";
 import type { SourceRecord } from "../../../services/marketSources";
 import { hueOf } from "../../../ui";
@@ -31,18 +31,23 @@ export interface AuthorSourceGroup {
   repoCount: number;
   pluginCount: number;
   warnings: AuthorDomain["warnings"];
+  /** R4-3.18：本组各源条目带来的目录声明警告（含「目录缺抓取字段」）——与作者块警告同处展示 */
+  catalogWarnings: CatalogWarning[];
 }
 
 function keyOfUrl(url: string): string | null {
   return urlSourceKey(url);
 }
 
-/** 分组（remote only；本地条目由调用方单独成组） */
+/** 分组（remote only；本地条目由调用方单独成组）。
+ *  R4-3.18：`catalogWarnings` = 目录 parse 警告（含 missing-entry-field）——按警告的 `source` 落到
+ *  对应作者组，与作者块警告并排展示（详情页「不画行」的异常在这里留痕）。 */
 export function groupRemoteSources(
   records: readonly SourceRecord[],
   domains: readonly AuthorDomain[],
   sourceStatus: ReadonlyArray<{ url: string; ok: boolean; reason?: string }> | undefined,
   entries: readonly CatalogEntry[] = [],
+  catalogWarnings: readonly CatalogWarning[] = [],
 ): AuthorSourceGroup[] {
   // 聚合键以**条目声明的 authorId** 为准（09 §二身份正典；record.authorId 只是 GitHub owner 兜底）
   const declaredAuthorBySource = new Map<string, string>();
@@ -58,6 +63,8 @@ export function groupRemoteSources(
 
   const groups = new Map<string, AuthorSourceGroup>();
   const order: string[] = [];
+  /** 组 → 该组各源的 sourceName（目录警告按它归组） */
+  const sourceNamesByGroup = new Map<string, Set<string>>();
   for (const rec of records) {
     if (rec.kind !== "remote" || !rec.url) continue;
     const sourceName = sourceNameOfUrl(normalizeSourceUrl(rec.url) ?? rec.url);
@@ -75,10 +82,13 @@ export function groupRemoteSources(
         repoCount: 0,
         pluginCount: 0,
         warnings: domain?.warnings ?? [],
+        catalogWarnings: [],
       };
       groups.set(groupKey, group);
       order.push(groupKey);
+      sourceNamesByGroup.set(groupKey, new Set());
     }
+    sourceNamesByGroup.get(groupKey)!.add(sourceName);
     const key = keyOfUrl(rec.url);
     const status = key ? byStatus.get(key) : undefined;
     group.rows.push({
@@ -99,6 +109,18 @@ export function groupRemoteSources(
           )
           .reduce((n, repo) => n + repo.plugins.length, 0)
       : 0;
+    /* R4-3.18：目录警告按 source 归组（同一警告只留一条——多源同名的重复声明不刷屏） */
+    const names = sourceNamesByGroup.get(gid);
+    const seen = new Set<string>();
+    g.catalogWarnings = names
+      ? catalogWarnings.filter((w) => {
+          if (!w.source || !names.has(w.source)) return false;
+          const key = `${w.code}:${w.entryId ?? ""}:${w.detail ?? ""}:${w.source}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+      : [];
   }
   return order.map((id) => groups.get(id)!);
 }

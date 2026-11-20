@@ -124,7 +124,10 @@ export interface CatalogWarning {
     | "unknown-rail-category"
     | "screenshot-video-restricted"
     | "invalid-source-link"
-    | "invalid-collection";
+    | "invalid-collection"
+    /** R4-3.18（05 §02）：抓取/派生型字段缺失——网络源「理论上必有」，缺 = 目录缺字段（异常）。
+     *  详情页不画该行（⛔ 不写「未提供」），本警告供来源页「N 条声明提示」暴露。detail = 字段名。 */
+    | "missing-entry-field";
   /** 条目级警告的 pluginId；根级（rail/来源/合集）留空 */
   entryId?: string;
   /** 原值（作者自查要看得到自己写了什么） */

@@ -19,6 +19,7 @@ import { scheduleDataRefresh } from "../../services/marketplaceShared/pluginsSto
 import { notifyError } from "../../services/marketplaceShared/notifications";
 import { runMarketInstallAction } from "../../services/marketInstallAction";
 import { performMarketUpdate } from "../../services/marketUpdateAction";
+import { openPluginDetailTab } from "../../services/openDetailTab";
 import { openExternal, showToast } from "../../services/hostApi";
 import type { ActionId } from "../../ui";
 import type { StoreCardHandlers } from "./cards/cardParts";
@@ -33,8 +34,9 @@ export function useStoreActions(online: boolean): StoreCardHandlers {
   const pendingUninstall = useRef(new Map<string, number>());
 
   const onOpen = useCallback((entry: CatalogEntry) => {
-    // 08 v3.51：每插件一标签、pinned:true 固定新开；未装插件壳无 manifest，必须传 label
-    lk()?.tabs?.create("plugin-detail", { pluginId: entry.id, pinned: true, label: entry.name });
+    // 08 v3.51：每插件一标签、pinned:true 固定新开；未装插件壳无 manifest，必须传 label。
+    // 唯一入口 = services/openDetailTab（R4-3.16）——⛔ 视图里不再各自写 tabs.create。
+    void openPluginDetailTab(entry.id, entry.name);
   }, []);
 
   const onAct = useCallback(

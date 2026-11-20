@@ -30,6 +30,7 @@ import { openExternal, showToast } from "../../../services/hostApi";
 import { PLUGIN_TEMPLATE_URL } from "./AddSourceModal";
 import { useStore } from "../StoreContext";
 import { authorWarningLines } from "../authors/authorWarnings";
+import { catalogWarningLines } from "./catalogWarnings";
 import { agoText, groupRemoteSources, type AuthorSourceGroup, type SourceRowView } from "./sourcesData";
 
 type PendingRemove =
@@ -85,9 +86,21 @@ export function SourcesView() {
   const [pending, setPending] = useState<PendingRemove | null>(null);
   const [removeInstalled, setRemoveInstalled] = useState(false);
 
-  const groups = groupRemoteSources(records, domains, data.catalog.sourceStatus, data.catalog.entries);
+  const groups = groupRemoteSources(
+    records,
+    domains,
+    data.catalog.sourceStatus,
+    data.catalog.entries,
+    data.catalog.warnings,
+  );
   const enabledSources = records.filter((r) => r.kind === "remote" && r.enabled).length;
   const officialCount = data.catalog.entries.filter((e) => e.official).length;
+  /* R4-3.18：官方源也是网络源——目录条目缺抓取字段 / 分类声明越界同样要在来源页留痕。
+   * 官方源不走作者组（恒锁定行），故单独按 warning.source 过滤。 */
+  const officialWarningLines = catalogWarningLines(
+    t,
+    data.catalog.warnings.filter((w) => !!w.source && w.source === data.catalog.sourceNames[0]),
+  );
   const totalPlugins = domains.reduce((n, d) => n + d.repos.reduce((m, r) => m + r.plugins.length, 0), 0);
 
   const toggleCollapse = (id: string) => {
@@ -242,6 +255,11 @@ export function SourcesView() {
             <div className="marketplace-store-src-url">{data.catalog.sourceNames[0] ?? "raw.githubusercontent.com"}</div>
           </div>
           <span className="marketplace-store-src-meta">{t("{{count}} 个插件 · 恒内置", { count: officialCount })}</span>
+          {officialWarningLines.length > 0 && (
+            <span className="marketplace-store-src-warn" data-hint={officialWarningLines.join("\n")}>
+              {t("{{count}} 条声明提示", { count: officialWarningLines.length })}
+            </span>
+          )}
           <div className="marketplace-store-src-acts">
             <button type="button" className="marketplace-store-sbtn" disabled data-hint={t("官方源不可移除、不参与排序")}>
               {t("不可操作")}
@@ -251,7 +269,11 @@ export function SourcesView() {
 
         {groups.map((group) => {
           const isCollapsed = collapsed.has(group.authorId.toLowerCase());
-          const lines = authorWarningLines(t, group.warnings);
+          /* R4-3.18：作者块警告 ＋ 目录声明警告（含「目录缺抓取字段」）同处暴露 */
+          const lines = [
+            ...authorWarningLines(t, group.warnings),
+            ...catalogWarningLines(t, group.catalogWarnings),
+          ];
           return (
             <div
               key={group.authorId}

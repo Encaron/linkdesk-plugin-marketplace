@@ -4,31 +4,30 @@
  * 零行为变更。与 `info-groups.tsx` 的 `resourcesGroupOf` / `depEnvGroupOf` 同构——「一段行怎么长出来」
  * 归各段自己，`useInfoGroups` 只负责把段拼成组表。
  *
- * 逐行判据：标识符/作者常显（无值给 Dash 占位不缩结构）；版本/大小/数据位置「有才显」。
+ * R4-3.18（05 §02 四类字段）：本段 = **本机事实**（标识符 / 版本 / 大小 / 安装位置 / 数据位置）——
+ * 「本地插件也有，恒可显示」。作者行属**抓取/派生型**，随「市场」组走（`useInfoGroups`）。
+ * 逐行判据：标识符常显；版本/大小/位置「有值才画」——⛔ 不用「—」撑空行（全页唯一允许占位的是兼容性行）。
  */
 
 import type { ReactNode } from "react";
 import type { PluginDiskLocation, PluginFolderKind } from "@linkdesk/contracts";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import { fmtSize } from "../../../services/installConfirmPayload";
-import { Dash, DirLink, InfoItem } from "./info-bits";
+import { DirLink, InfoItem } from "./info-bits";
 
 type T = (key: string, opts?: Record<string, unknown>) => string;
 
 export function topGroupOf(o: {
   t: T;
   pluginId?: string;
-  authorText?: string;
   versionText?: string;
   entry?: CatalogEntry;
   diskLoc: PluginDiskLocation | null;
   onOpenDir: (kind: PluginFolderKind) => void;
 }): ReactNode[] {
-  const { t, pluginId, authorText, versionText, entry, diskLoc, onOpenDir } = o;
+  const { t, pluginId, versionText, entry, diskLoc, onOpenDir } = o;
   const top: ReactNode[] = [
     <InfoItem key="id" label={t("标识符")} value={pluginId ?? ""} mono />,
-    /* 作者行（#63c 补——与 header 副标题同源 authorText；manifest 缺失回退目录 entry.author；都没有 → Dash） */
-    <InfoItem key="author" label={t("作者")} value={authorText || <Dash />} />,
   ];
   if (versionText) top.push(<InfoItem key="ver" label={t("版本")} value={`v${versionText}`} />);
   /* 大小行（B3 拍板「下载体积常显」保持——装不装都显，值 = 实测下载包字节）。
@@ -52,6 +51,25 @@ export function topGroupOf(o: {
           ) : (
             sizeText
           )
+        }
+      />,
+    );
+  }
+  /* R4-3.18 安装位置（05 §02 本机事实）——已装才有；值 = 磁盘真路径（mono，可点开安装目录）。
+   *  与「大小」链接同一落点（E6#78 install），但这里回答的是「装在哪」而不是「多大」。 */
+  if (diskLoc?.installDir) {
+    top.push(
+      <InfoItem
+        key="loc"
+        label={t("安装位置")}
+        mono
+        value={
+          <DirLink
+            title={t("在资源管理器里打开 {{path}}", { path: diskLoc.installDir })}
+            onClick={() => onOpenDir("install")}
+          >
+            {diskLoc.installDir}
+          </DirLink>
         }
       />,
     );
