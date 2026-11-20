@@ -65,6 +65,12 @@ export default function ExploreView() {
     lk()?.tabs?.create("plugin-detail", { pluginId: id, pinned: false, label: name });
   }, []);
 
+  /* R4-2.6（I7）：双击 = 固定打开（与已装/已禁用/内置列表同款——12 号档 I7：
+   *  探索列表此前只有单击，另三组双击可钉住，行为不一致）。 */
+  const handleOpenDetailPinned = useCallback((id: string, name: string) => {
+    lk()?.tabs?.create("plugin-detail", { pluginId: id, pinned: true, label: name });
+  }, []);
+
   /* 数据未齐 → 加载占位（目录 + 本地列表双门——防本地列表未到前整屏误显「安装」） */
   if (catalog.loading || localLoading) {
     return <CatalogLoading />;
@@ -124,6 +130,7 @@ export default function ExploreView() {
             online={online}
             installedIdentity={identityOf(e.id)}
             onOpenDetail={handleOpenDetail}
+            onOpenDetailPinned={handleOpenDetailPinned}
             onInstall={handleInstall}
           />
         ))}

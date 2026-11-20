@@ -85,3 +85,4 @@ export {
 } from "./categories";
 export { parseVendors, vendorIdSetOf, withVendorIds } from "./vendors";
 export { synthesizeEntryFromManifest } from "./manifestEntry";
+export { catalogSignature } from "./signature";

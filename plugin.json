@@ -16,9 +16,6 @@
     "iconBar": "top",
     "sidePanel": true
   },
-  "tabBehavior": {
-    "singleton": true
-  },
   "contributes": {
     "commands": [
       {
@@ -32,6 +29,162 @@
             "type": "string",
             "required": true,
             "description": "作者仓库地址（仓库主页或 HEAD 直链均可，保持原样落盘——不归一；例：https://github.com/作者/仓库）"
+          }
+        ]
+      },
+      {
+        "id": "marketplace.openStore",
+        "title": "打开插件市场",
+        "category": "插件市场",
+        "description": "打开（或聚焦）插件市场主标签页，并把导航目标复位到首页。回执 {ok, tabId}——store 命令经 openOrFocus，tabId 为壳回执的真实标签 id（超时/无事件时为空串）",
+        "params": []
+      },
+      {
+        "id": "marketplace.openCategory",
+        "title": "打开分类",
+        "category": "插件市场",
+        "description": "打开插件市场并导航到某分类页（rail 分类 slug，如 development/hardware/theme）。回执 {ok, tabId}",
+        "params": [
+          {
+            "name": "category",
+            "type": "string",
+            "required": true,
+            "description": "主分类 slug（04 §5.1 封闭名单；other = 其他桶）"
+          }
+        ]
+      },
+      {
+        "id": "marketplace.openLibrary",
+        "title": "打开我的库",
+        "category": "插件市场",
+        "description": "打开插件市场并导航到「我的库」。回执 {ok, tabId}",
+        "params": []
+      },
+      {
+        "id": "marketplace.openAuthor",
+        "title": "打开作者主页",
+        "category": "插件市场",
+        "description": "打开插件市场并导航到作者主页；可选 repoId 直接定位该作者的某个仓库（同一作者多仓时用）。回执 {ok, tabId}",
+        "params": [
+          {
+            "name": "authorId",
+            "type": "string",
+            "required": true,
+            "description": "作者聚合键（目录条目 authorId / 来源仓库 owner）"
+          },
+          {
+            "name": "repoId",
+            "type": "string",
+            "description": "可选：作者名下仓库 id（不传 = 作者店总览）"
+          }
+        ]
+      },
+      {
+        "id": "marketplace.openPlugin",
+        "title": "打开插件详情",
+        "category": "插件市场",
+        "description": "在新标签页打开插件详情（默认 pinned:true，不参与预览替换；标签名取目录条目名，退化到已装 manifest 名 / pluginId）。回执 {ok, tabId}——create 是 fire 型通道，tabId 恒为空串",
+        "params": [
+          {
+            "name": "pluginId",
+            "type": "string",
+            "required": true,
+            "description": "插件 id（目录条目 id = pluginId）"
+          },
+          {
+            "name": "pinned",
+            "type": "boolean",
+            "description": "是否钉住详情标签（缺省 true）"
+          }
+        ]
+      },
+      {
+        "id": "marketplace.openSources",
+        "title": "打开来源管理",
+        "category": "插件市场",
+        "description": "打开插件市场并导航到「来源管理」页（作者源增删/停用/本地安装分组）。回执 {ok, tabId}",
+        "params": []
+      },
+      {
+        "id": "marketplace.search",
+        "title": "搜索插件市场",
+        "category": "插件市场",
+        "description": "把市场搜索词设为 query（侧栏各组与商店搜索同源同步），并打开商店搜索页。回执 {ok, tabId}",
+        "params": [
+          {
+            "name": "query",
+            "type": "string",
+            "required": true,
+            "description": "搜索词（空串 = 清空搜索）"
+          }
+        ]
+      },
+      {
+        "id": "marketplace.addLocalPlugin",
+        "title": "添加本地插件",
+        "category": "插件市场",
+        "description": "从本地文件夹或 .linkdesk-plugin 离线包安装插件（复用壳 pluginManager.installFromDirectory：校验/复制到 userData/plugins/注册与网络安装同一流水线），成功后记入 pluginState localInstalls 供来源页溯源。回执 {ok, reason?}（reason: empty|unavailable|bad-manifest|unsafe-id|core-forbidden|exists|io）",
+        "params": [
+          {
+            "name": "path",
+            "type": "string",
+            "required": true,
+            "description": "含 plugin.json 的单插件文件夹路径，或 .linkdesk-plugin 包路径"
+          }
+        ]
+      },
+      {
+        "id": "marketplace.removeSource",
+        "title": "移除市场源",
+        "category": "插件市场",
+        "description": "从 marketplace.marketplaceSources 移除一个作者源（按 url/path 身份或数组 index）。保留其余记录的原始形态（不归一化重写）；官方源恒不在册（传官方 = 调用不成立）。回执 {ok, reason?}（reason: bad-arg|not-found|official）",
+        "params": [
+          {
+            "name": "target",
+            "type": "object",
+            "description": "要移除的目标：{url:\"...\"} 或 {path:\"...\"}（身份匹配）或 {index:0}（数组下标）"
+          }
+        ]
+      },
+      {
+        "id": "marketplace.checkUpdates",
+        "title": "检查插件更新",
+        "category": "插件市场",
+        "description": "手动检查已装插件更新（唯一动作 = services/updateCheck：强拉目录 + 发现腿 + 目录重投影；只发现/记账/通知，不构成自动更新授权）。回执 {ok, count}（ok=false = 判不了：目录取不到/读盘不可信；count = 可更新插件数）",
+        "params": []
+      },
+      {
+        "id": "marketplace.refreshCatalog",
+        "title": "刷新目录内容",
+        "category": "插件市场",
+        "description": "强刷目录内容（清 5min 缓存、重拉全部源并重投影；与「检查更新」是两个事实——本命令不跑插件版本发现）。回执 {ok, changed}（changed = 目录内容签名变化，同内容重拉为 false）",
+        "params": []
+      },
+      {
+        "id": "marketplace.markAllRead",
+        "title": "全部标为已读",
+        "category": "插件市场",
+        "description": "清掉发现型新内容点（分类项/作者项；⛔ 不碰任务型更新数字）——把当前目录里未读的键并入 pluginState discoverReads 并推进时间锚。回执 {cleared, reason?}（cleared = 本次实际清掉的点数）",
+        "params": [
+          {
+            "name": "kind",
+            "type": "string",
+            "required": true,
+            "description": "清理范围：category（仅分类点）| author（仅作者点）| all（两类都清并推进 until）"
+          }
+        ]
+      },
+      {
+        "id": "marketplace.setViewPrefs",
+        "title": "设置视图偏好",
+        "category": "插件市场",
+        "description": "记住视图方式/排序（pluginState marketplace.ui.prefs，跨重启生效；幂等）。page=lib|author|cat；view=grid|list；sort 按页取值：lib=name|updated|size|source|author|repo，cat=dl|upd|az|author|repo，author=name|plugins|repos。⛔ 不进 contributes.configuration。回执 {ok, reason?}",
+        "params": [
+          {
+            "name": "prefs",
+            "type": "object",
+            "required": true,
+            "description": "{ page:\"lib\"|\"author\"|\"cat\", view?: \"grid\"|\"list\", sort?: string }"
           }
         ]
       }

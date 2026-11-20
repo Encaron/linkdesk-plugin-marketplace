@@ -35,6 +35,7 @@ export default function CatalogRow({
   online,
   installedIdentity,
   onOpenDetail,
+  onOpenDetailPinned,
   onInstall,
 }: {
   entry: CatalogEntry;
@@ -43,6 +44,8 @@ export default function CatalogRow({
   /** E6#106：已装候选（图标四字段，来自 `useCatalogStatus().identityOf`）——未装为 undefined */
   installedIdentity?: LocalIdentity;
   onOpenDetail: (id: string, name: string) => void;
+  /** R4-2.6（I7）：双击固定打开——与已装/已禁用/内置列表同款 */
+  onOpenDetailPinned: (id: string, name: string) => void;
   onInstall: (entry: CatalogEntry) => void;
 }) {
   const { t } = useTranslation();
@@ -50,6 +53,7 @@ export default function CatalogRow({
     <div
       className="marketplace-ms-extension-item catalog"
       onClick={() => onOpenDetail(entry.id, entry.name)}
+      onDoubleClick={() => onOpenDetailPinned(entry.id, entry.name)}
       data-hint={t("详情")}
     >
       <div className="marketplace-ms-item-icon">

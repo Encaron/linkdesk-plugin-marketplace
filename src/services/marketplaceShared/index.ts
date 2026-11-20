@@ -37,6 +37,20 @@ export { MARKET_SOURCE, notifyError, settleUpdateFailure } from "./notifications
 export { scheduleDataRefresh, useMarketplacePlugins } from "./pluginsStore";
 export { useMarketplaceCatalog, useCatalogEntryById } from "./catalogStore";
 
+/* ═══ UI 偏好（06 §八·R4-2.4）═══
+ * 视图/排序的唯一读写口——商店各面（棒 6–8）读它、`marketplace.setViewPrefs` 命令写它；
+ * ⛔ 不进 contributes.configuration、⛔ 各面自建 localStorage。 */
+export {
+  DEFAULT_UI_PREFS,
+  getCachedUIPrefs,
+  normalizeUIPrefs,
+  onUIPrefsChange,
+  readUIPrefs,
+  setViewPrefs,
+  writeUIPrefs,
+} from "./uiPrefs";
+export type { AuthorSort, CatSort, LibSort, PrefPage, UIPrefs, ViewMode } from "./uiPrefs";
+
 /* ═══ 失败归因字典 ═══ */
 export type { InstallFailReason } from "./messages";
 export {

@@ -9,6 +9,7 @@
 
 import { retryMarketInstall, retryMarketUpdate } from "./installFlow";
 import { registerMarketSourceAddCommand } from "../marketSourceAddCommand";
+import { registerMarketplaceStoreCommands } from "../marketplaceCommands";
 import { realmSlot } from "../realmSlot";
 
 const lk = () => window.linkdesk;
@@ -98,6 +99,10 @@ function ensureMarketplaceCommands(): void {
   // M2 生长格 `AI#56`：「添加市场源」命令化——原来唯一入口是搜索页弹窗（鼠标路径），
   // 命令面板 / CLI / MCP 都够不着。handler 与三态回执见 `marketSourceAddCommand.ts` 头注。
   registerMarketSourceAddCommand();
+
+  // R4-2.5（I15·09 §三·补）：商店动作命令面 13 条——打开/导航/搜索/本地安装/移源/
+  // 检查更新/刷新目录/全部已读/视图偏好。handler 与实现边界见 `marketplaceCommands.ts` 头注。
+  registerMarketplaceStoreCommands();
 
   lk().menu?.registerItems?.("marketplaceItemGear", "marketplace", [
     { command: "core.openSettings", group: "navigation", when: "marketplace.extensionHasConfiguration" },

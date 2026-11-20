@@ -16,6 +16,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { loadCatalog, forceRefreshCatalog } from "../marketSources";
 import type { CatalogLoadResult } from "../marketSources";
+import { catalogSignature } from "../marketCatalog";
 import type { CatalogEntry } from "../marketCatalog";
 import { realmSlot } from "../realmSlot";
 
@@ -163,6 +164,41 @@ export async function reprojectCatalog(): Promise<CatalogLoadResult> {
   state.resolvedOnce = true;
   notifyCatalogListeners();
   return r;
+}
+
+/** 当前目录投影的**只读快照**（非 hook 面）——服务层/命令要在 React 之外读目录时走这里，
+ *  ⛔ 别各自再存一份（目录投影唯一属主仍是本文件，见文件头）。 */
+export function getCatalogResult(): CatalogLoadResult {
+  return state.result;
+}
+
+/**
+ * 手动「刷新目录内容」的命令落点（R4-2.5 `marketplace.refreshCatalog`）。
+ *
+ * 与 hook 面 `useMarketplaceCatalog().refresh` 同一个唯一属主（都只改 `state.result`）：
+ * 强刷全部源 → 入库 → 通知 → 回执 `changed` = 内容签名是否变化（`catalogSignature`，
+ * 不是「有没有发过网络请求」——同内容重拉 = 没变）。
+ * 首趟未加载时先做一次非强拉取（缓存命中时零网络），否则 `before` 是空目录 ⇒ `changed` 恒 true。
+ */
+export async function refreshCatalogNow(): Promise<{ ok: boolean; changed: boolean }> {
+  try {
+    if (!state.resolvedOnce) {
+      const cached = await loadCatalog();
+      state.result = cached;
+      state.resolvedOnce = true;
+      notifyCatalogListeners();
+    }
+    const before = catalogSignature(state.result.entries, state.result.collections, state.result.railOrder);
+    const r = await forceRefreshCatalog();
+    state.gen++; // 新结果入库 = 代数推进，作废任何在途旧首趟的回写权
+    state.result = r;
+    state.resolvedOnce = true;
+    notifyCatalogListeners();
+    const after = catalogSignature(r.entries, r.collections, r.railOrder);
+    return { ok: true, changed: after !== before };
+  } catch {
+    return { ok: false, changed: false };
+  }
 }
 
 /** E6#33b：目录条目 id 索引——已装/内置/禁用列表行「可更新」判定共用（updateToVersion 查目录），

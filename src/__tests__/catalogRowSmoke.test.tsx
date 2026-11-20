@@ -31,9 +31,17 @@ afterEach(() => cleanup());
 describe("CatalogRow 冒烟（E6#157 视图样板）", () => {
   it("渲染不炸：行带名字/版本/来源标，未装态恰一个安装动作按钮", () => {
     const onOpenDetail = vi.fn();
+    const onOpenDetailPinned = vi.fn();
     const onInstall = vi.fn();
     render(
-      <CatalogRow entry={ENTRY} status="install" online onOpenDetail={onOpenDetail} onInstall={onInstall} />,
+      <CatalogRow
+        entry={ENTRY}
+        status="install"
+        online
+        onOpenDetail={onOpenDetail}
+        onOpenDetailPinned={onOpenDetailPinned}
+        onInstall={onInstall}
+      />,
     );
     expect(screen.getByText("Demo Alpha")).toBeTruthy();
     expect(screen.getByText("v1.0.0")).toBeTruthy();
@@ -41,14 +49,24 @@ describe("CatalogRow 冒烟（E6#157 视图样板）", () => {
     expect(screen.getByRole("button", { name: "安装" })).toBeTruthy();
   });
 
-  it("关键交互：点行 → onOpenDetail(id, name)；点安装按钮 → onInstall(entry)", () => {
+  it("关键交互：点行 → onOpenDetail(id, name)；双击行 → onOpenDetailPinned（R4-2.6）；点安装按钮 → onInstall(entry)", () => {
     const onOpenDetail = vi.fn();
+    const onOpenDetailPinned = vi.fn();
     const onInstall = vi.fn();
     render(
-      <CatalogRow entry={ENTRY} status="install" online onOpenDetail={onOpenDetail} onInstall={onInstall} />,
+      <CatalogRow
+        entry={ENTRY}
+        status="install"
+        online
+        onOpenDetail={onOpenDetail}
+        onOpenDetailPinned={onOpenDetailPinned}
+        onInstall={onInstall}
+      />,
     );
     fireEvent.click(screen.getByText("Demo Alpha")); // 行内点击冒泡到行容器
     expect(onOpenDetail).toHaveBeenCalledWith("demo-alpha", "Demo Alpha");
+    fireEvent.doubleClick(screen.getByText("Demo Alpha")); // R4-2.6：双击 = 固定打开
+    expect(onOpenDetailPinned).toHaveBeenCalledWith("demo-alpha", "Demo Alpha");
     fireEvent.click(screen.getByRole("button", { name: "安装" }));
     expect(onInstall).toHaveBeenCalledWith(ENTRY);
   });

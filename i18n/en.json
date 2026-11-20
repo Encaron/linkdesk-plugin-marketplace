@@ -199,5 +199,18 @@
   "插件详情": "Plugin Details",
   "卸载中...": "Uninstalling...",
   "请输入仓库 URL。": "Enter a repository URL.",
-  "添加": "Add"
+  "添加": "Add",
+  "打开插件市场": "Open Plugin Store",
+  "打开分类": "Open Category",
+  "打开我的库": "Open My Library",
+  "打开作者主页": "Open Author Page",
+  "打开插件详情": "Open Plugin Details",
+  "打开来源管理": "Open Source Management",
+  "搜索插件市场": "Search Plugin Store",
+  "添加本地插件": "Add Local Plugin",
+  "移除市场源": "Remove Marketplace Source",
+  "检查插件更新": "Check for Plugin Updates",
+  "刷新目录内容": "Refresh Catalog",
+  "全部标为已读": "Mark All as Read",
+  "设置视图偏好": "Set View Preferences"
 }
