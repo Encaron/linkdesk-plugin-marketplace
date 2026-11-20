@@ -15,25 +15,40 @@
  * 🔴 版本比较不 import src/core（插件独立铁律——零 @src/core）。本地实现与壳
  * semverUtils 同语义（忽略 v 前缀 / 缺位补 0 / 预发布逐位），双实现分处两进程域。
  *
- * 夹内布局（依赖单向：semver → select / merge；types 为纯声明叶）：
+ * 夹内布局（依赖单向：types 为纯声明叶；categories → parse；semver → select / merge）：
  *   types.ts      数据形状声明
- *   sourceUrl.ts  源 URL 归一 + 插件自己的主页推导
- *   parse.ts      marketplace.json 文本 → 内存对象
+ *   sourceUrl.ts  源 URL 归一 + 兄弟文件/仓库身份推导 + 插件自己的主页推导
+ *   categories.ts 分类封闭名单（04 §5.1）＋归桶/rail 顺序（06 §二·4）
+ *   parse.ts      marketplace.json 文本 → 内存对象（含 v2 根级字段＋声明警告）
+ *   vendors.ts    vendors.json 解析 + 官方 ✓ 注入（09 §一·补2）
+ *   manifestEntry.ts  K5 回落链末段：plugin.json → 合成 1 条目录
  *   semver.ts     版本比较原语（与壳 semverUtils 同语义）
  *   select.ts     目录选择器（稳定版/可更新/下拉两值/钉记账）
- *   merge.ts      多源合并去重
+ *   merge.ts      多源合并去重（＋冲突回执）
  *
  * 🔴 **门面保留原路径原文件名**：`views/*` / `marketSources` / `updateDiscovery` / `installGate` /
  * `installConfirmPayload` / `__tests__/*` 共十余处消费方的 import 路径一字不改。
  */
 
-export type { CatalogEntry, MarketplaceCatalog, ParseResult, CatalogVersionChoice } from "./types";
+export type {
+  CatalogEntry,
+  MarketplaceCatalog,
+  ParseResult,
+  CatalogVersionChoice,
+  CatalogWarning,
+  CategoryRailDecl,
+  CollectionDecl,
+  SourceLink,
+  VendorRecord,
+} from "./types";
 
 export {
   OFFICIAL_SOURCE_URL,
   repoUrlToRawUrl,
   isRawMarketplaceUrl,
   normalizeSourceUrl,
+  catalogSiblingUrl,
+  githubOwnerRepoOf,
   pluginRepoUrl,
   sourceNameOfUrl,
 } from "./sourceUrl";
@@ -53,4 +68,20 @@ export {
   pinnedAfterApply,
 } from "./select";
 
-export { mergeCatalogs } from "./merge";
+export { mergeCatalogs, mergeCatalogsWithReceipt } from "./merge";
+export type { MergeConflict } from "./merge";
+
+/* Marketplace-Store v2（R4-2.1/2.2）：分类封闭名单与归桶 · 厂商注册表 · K5 清单合成 */
+export {
+  OTHER_CATEGORY_SLUG,
+  PRIMARY_CATEGORY_SLUGS,
+  SUBCATEGORY_SLUGS,
+  isKnownPrimaryCategory,
+  isKnownSubcategory,
+  primaryCategoryOf,
+  validateEntryCategories,
+  buildCategoryRailOrder,
+  groupByPrimaryCategory,
+} from "./categories";
+export { parseVendors, vendorIdSetOf, withVendorIds } from "./vendors";
+export { synthesizeEntryFromManifest } from "./manifestEntry";

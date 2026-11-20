@@ -31,6 +31,24 @@ export function normalizeSourceUrl(input: string): string | null {
   return repoUrlToRawUrl(raw);
 }
 
+/** 源 URL → GitHub owner/repo 身份（仓库主页与 raw 直链两种形态）——#10 源记录（authorId/repoId）、
+ *  K5 合成条目（仓库主页 / Release 资产直链）共用。推不出返回 null（⛔ 不猜主机）。 */
+export function githubOwnerRepoOf(rawUrl: string): { owner: string; repo: string } | null {
+  const m =
+    /^https?:\/\/(?:www\.)?github\.com\/([^/?#]+)\/([^/?#]+)/i.exec(rawUrl.trim()) ??
+    /^https?:\/\/raw\.githubusercontent\.com\/([^/?#]+)\/([^/?#]+)/i.exec(rawUrl.trim());
+  if (!m) return null;
+  const repo = m[2].replace(/\.git$/i, "");
+  return repo ? { owner: m[1], repo } : null;
+}
+
+/** 目录仓**同目录兄弟文件** URL（vendors.json / plugin.json / authors/<id>.json）——只认 raw 直链形态
+ *  （`…/<owner>/<repo>/<ref>/marketplace.json` ⇒ 换最后一段文件名）。仓库主页形态推不出 = null。 */
+export function catalogSiblingUrl(rawUrl: string, fileName: string): string | null {
+  const m = /^(https:\/\/raw\.githubusercontent\.com\/[^/]+\/[^/]+\/[^/]+)\/[^/]+$/.exec(rawUrl.trim());
+  return m ? `${m[1]}/${fileName}` : null;
+}
+
 /** 从 URL 里认 github.com `owner/repo` 主页——只认两个已知形态：`github.com/…`（downloadUrl 的
  *  releases/download 段、作者填的主页）与 `raw.githubusercontent.com/…`（readmeUrl）。
  *  其余主机一律不猜（推不出 = 调用方不渲染，诚实不伪链——E6#77 甲）。 */

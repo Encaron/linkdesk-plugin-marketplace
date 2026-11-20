@@ -107,7 +107,8 @@ describe("R4-0.4 腿②——parse 白名单 ↔ SDK schema（按 node_modules �
 const V2_CATALOG = {
   version: "1",
   updatedAt: "2026-11-20T00:00:00.000Z",
-  // 根级 v2 三件——旧读者只认 version/updatedAt/plugins，这些键应被静默忽略（不炸）
+  // 根级 v2 三件——R4-2.1 起进解析面（老插件读它仍不炸：未知根键被 JSON.parse 保留、
+  // 1.2.0 读者只取 version/updatedAt/plugins ⇒ 忽略即兼容；本断言钉「新读者必须交付」）
   sources: [{ url: "https://github.com/demo-author/catalog", authorId: "demo-author", addedAt: "2026-11-20" }],
   collections: [{ id: "editor-picks", title: "编辑推荐", layout: "strip", items: ["demo-plugin"] }],
   categoryRail: { order: ["development", "hardware"] },
@@ -128,8 +129,8 @@ const V2_CATALOG = {
   ],
 };
 
-describe("R4-0.5 兼容矩阵——旧读者（当前 parse）双向", () => {
-  it("旧读者读 v2 目录：ok 不炸；根级新键静默忽略；条目 v2 字段流经白名单", () => {
+describe("R4-0.5 兼容矩阵——v2 目录双向（R4-2.1 起根级字段进解析面）", () => {
+  it("当前读者读 v2 目录：ok 不炸；根级 sources/collections/categoryRail 进解析面；条目 v2 字段流经白名单", () => {
     const r = parseCatalog(JSON.stringify(V2_CATALOG));
     expect(r.ok).toBe(true);
     if (!r.ok) return;
@@ -137,10 +138,13 @@ describe("R4-0.5 兼容矩阵——旧读者（当前 parse）双向", () => {
     expect(r.catalog.plugins[0]!.authorId).toBe("demo-author");
     expect(r.catalog.plugins[0]!.pricing).toEqual({ model: "paid", licenseUrl: "https://example.invalid/buy", trialDays: 14, channel: "self" });
     expect(r.catalog.plugins[0]!.screenshots).toEqual(V2_CATALOG.plugins[0]!.screenshots);
-    // 根级新键：当前读者不产出（静默忽略的实读）——「槽位不渲染」的数据前提
-    expect(r.catalog.sources).toBeUndefined();
-    expect(r.catalog.collections).toBeUndefined();
-    expect(r.catalog.categoryRail).toBeUndefined();
+    // 根级新键：R4-2.1 起为交付面（收录源/合集/rail 顺序）——不再是「静默忽略」
+    expect(r.catalog.sources).toEqual(V2_CATALOG.sources);
+    expect(r.catalog.collections).toEqual([
+      { id: "editor-picks", title: "编辑推荐", subtitle: undefined, hint: undefined, cover: undefined, layout: "strip", items: ["demo-plugin"], order: undefined },
+    ]);
+    expect(r.catalog.categoryRail).toEqual({ order: ["development", "hardware"], icons: undefined });
+    expect(r.warnings).toEqual([]); // 声明全在册，零警告
   });
 
   it("旧读者读 v1 目录：ok；v2 条目字段缺省 undefined（缺省规则）", () => {

@@ -20,15 +20,30 @@
  * 重拉 + 重写缓存）。网络失败/坏 parse 时有缓存原文 → 降级用 stale（usedStale=true，展示「可能过期」提示用）。
  *
  * 夹内布局（依赖单向）：types → io / sourceConfig / fetch → load。
+ * v2（R4-2.1/2.2）：sourceConfig 读三形态源记录（string/{url}/全记录）· load 三源合并序
+ * （官方→收录→用户）+ vendors.json 判定链 + K5 回落链（plugin.json 合成 1 条）。
  * 🔴 **门面保留原路径原文件名**：marketplaceShared / installGate / installConfirmPayload / `__tests__/*`
  * 等消费方的 import 路径一字不改。
  */
 
-export type { CatalogLoadState, CatalogLoadResult, FetchFn, StorageLike } from "./types";
+export type {
+  CatalogLoadState,
+  CatalogLoadResult,
+  FetchFn,
+  StorageLike,
+  SourceRecord,
+  SidecarResult,
+} from "./types";
 
 /** 测试注入点——jsdom 直测替掉 fetch + localStorage（模块级状态的唯一属主见 `marketSources/io.ts`） */
 export { __setCatalogIO } from "./io";
 
-export { getSourceUrls, readConfiguredAuthorSources } from "./sourceConfig";
+export {
+  getSourceUrls,
+  readConfiguredAuthorSources,
+  readSourceRecords,
+  normalizeSourceRecord,
+  LOCAL_AUTHOR_ID,
+} from "./sourceConfig";
 
 export { loadCatalog, forceRefreshCatalog } from "./load";

@@ -49,6 +49,10 @@ const EMPTY_RESULT: CatalogLoadResult = {
   sourceNames: [],
   usedStale: false,
   fetchedAt: 0,
+  railOrder: [],
+  collections: [],
+  warnings: [],
+  deduped: [],
 };
 
 const state = realmSlot<CatalogState>("catalogStore/v1", () => ({

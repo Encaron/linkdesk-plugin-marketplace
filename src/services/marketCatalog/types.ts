@@ -40,6 +40,9 @@ export interface CatalogEntry {
    *  剥 autoplay/poster 优先；⛔ 不托管）。渲染器分支消费属棒 10（I12）。 */
   screenshots?: CatalogScreenshot[];
   license?: string;
+  /** 合并注入：厂商注册表命中键（vendors.json 的 vendorId ↔ 条目 authorId）——命中即「官方 ✓」。
+   *  判定链唯一在合并期（09 §一·补2）：UI 读本字段即可，⛔ 不许拿作者名再判一次。 */
+  vendorId?: string;
   /** 合并注入：条目来源仓库名（owner/repo）——用户知道装的是谁的（E6#30c 来源标注） */
   sourceName?: string;
   /** 合并注入：该胜出条目来自官方默认源（E6#30.8f「官方发布」徽标——官方身份随条目携带，UI 零再判） */
@@ -98,6 +101,34 @@ export interface CategoryRailDecl {
   icons?: Record<string, string>;
 }
 
+/** 厂商注册表行（vendors.json，官方目录仓根；09 §一·补2）——只有官方运营者可写 */
+export interface VendorRecord {
+  vendorId: string;
+  name: string;
+  domains?: string[];
+  githubOrgs?: string[];
+  verifiedBy?: string;
+  verifiedAt?: string;
+}
+
+/** parse 期声明警告（06 §三/09 §二：非致命问题 ⛔ 不静默吞——来源页「N 条声明提示」数据源） */
+export interface CatalogWarning {
+  /** 警告类别（封闭集合；新增类别 = 改本联合 + 来源页文案） */
+  code:
+    | "unknown-category"
+    | "unknown-subcategory"
+    | "unknown-rail-category"
+    | "screenshot-video-restricted"
+    | "invalid-source-link"
+    | "invalid-collection";
+  /** 条目级警告的 pluginId；根级（rail/来源/合集）留空 */
+  entryId?: string;
+  /** 原值（作者自查要看得到自己写了什么） */
+  detail?: string;
+  /** 来源仓库名（合并期回填，作者自查定位） */
+  source?: string;
+}
+
 /** marketplace.json 根结构（v2 根级字段全部可选——旧目录天然合法，06 §二·3「可选字段纪律」） */
 export interface MarketplaceCatalog {
   version?: string;
@@ -111,9 +142,9 @@ export interface MarketplaceCatalog {
   categoryRail?: CategoryRailDecl;
 }
 
-/** parse 结果——失败给原因（#30f 目录损坏空态判断依据，不抛） */
+/** parse 结果——失败给原因（#30f 目录损坏空态判断依据，不抛）；成功附声明警告（06 §三） */
 export type ParseResult =
-  | { ok: true; catalog: MarketplaceCatalog }
+  | { ok: true; catalog: MarketplaceCatalog; warnings: CatalogWarning[] }
   | { ok: false; reason: string };
 
 /** 版本下拉可选单条（E6#33c——05 §四：下拉每条 {version, downloadUrl, publishedAt?, changelog?}，选中哪条拉哪条） */

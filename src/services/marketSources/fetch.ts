@@ -7,7 +7,7 @@
 
 import { OFFICIAL_SOURCE_URL, parseCatalog, sourceNameOfUrl } from "../marketCatalog";
 import { CACHE_TTL_MS, injectedFetch, readCache, writeCache } from "./io";
-import type { SourceResult } from "./types";
+import type { SidecarResult, SourceResult } from "./types";
 
 async function fetchText(url: string): Promise<string> {
   const injected = injectedFetch();
@@ -55,4 +55,23 @@ export async function fetchOne(url: string, force: boolean): Promise<SourceResul
   // parse 失败 → stale 缓存兜底；无缓存 = 该源目录损坏
   if (cached) return { sourceName, official, text: cached.text, fresh: false, staleFallback: true };
   return { sourceName, official, reason: "parse" };
+}
+
+/** 侧车文件拉取（vendors.json / plugin.json——R4-2.1/v2 与 K5 回落链用）。
+ *  与目录源分开：**不做目录 parse 校验**（plugin.json 本来就不是目录），缓存键仍按 URL 独立。
+ *  失败**不抛**——调用方按「没有就没有」处理（目录主状态不受侧车影响）。 */
+export async function fetchSidecar(url: string, force: boolean): Promise<SidecarResult> {
+  const cached = readCache(url);
+  const withinTtl = cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS;
+  if (cached && withinTtl && !force) return { ok: true, text: cached.text };
+
+  let text: string;
+  try {
+    text = await fetchText(url);
+  } catch (err) {
+    if (cached) return { ok: true, text: cached.text }; // 网络失败 → stale 兜底
+    return { ok: false, reason: /HTTP 404/.test(String(err)) ? "missing" : "network" };
+  }
+  writeCache(url, text);
+  return { ok: true, text };
 }

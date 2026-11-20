@@ -1,9 +1,22 @@
 /**
- * parse — marketplace.json 文本 → 内存对象（最小结构校验 + 逐条白名单归一）。
+ * parse — marketplace.json 文本 → 内存对象（最小结构校验 + 逐条白名单归一 + 声明警告）。
  * E6#86（第 3.6.3 轮）feature-folder 拆分：自 `marketCatalog.ts` 原样搬出，零行为变更。
+ *
+ * Marketplace-Store v2（R4-2.1）：根级 `sources[]` / `collections[]` / `categoryRail` 进解析面
+ * （06 §二·3——全部可选，旧目录天然合法）；条目白名单外的**声明问题**不再静默（06 §三：
+ * 未知分类 / 视频项越位各记一条警告，`ParseResult.warnings` 交来源页展示）。
  */
 
-import type { CatalogEntry, ParseResult } from "./types";
+import { isKnownPrimaryCategory, validateEntryCategories } from "./categories";
+import type {
+  CatalogEntry,
+  CatalogScreenshot,
+  CatalogWarning,
+  CategoryRailDecl,
+  CollectionDecl,
+  ParseResult,
+  SourceLink,
+} from "./types";
 
 /** parse marketplace.json 文本——最小结构校验（plugins 数组存在 + 元素有 id） */
 export function parseCatalog(text: string): ParseResult {
@@ -14,21 +27,39 @@ export function parseCatalog(text: string): ParseResult {
     return { ok: false, reason: "invalid-json" };
   }
   if (typeof json !== "object" || json === null) return { ok: false, reason: "not-object" };
-  const obj = json as { plugins?: unknown };
+  const obj = json as Record<string, unknown>;
   if (!Array.isArray(obj.plugins)) return { ok: false, reason: "no-plugins-array" };
+
+  const warnings: CatalogWarning[] = [];
   const plugins = obj.plugins
-    .map(normalizeEntry)
+    .map((raw) => normalizeEntry(raw, warnings))
     .filter((p): p is CatalogEntry => p !== null);
-  return { ok: true, catalog: { version: (obj as { version?: string }).version, updatedAt: (obj as { updatedAt?: string }).updatedAt, plugins } };
+  const categoryRail = parseCategoryRail(obj.categoryRail);
+  if (categoryRail) warnings.push(...railWarningsOf(categoryRail));
+
+  return {
+    ok: true,
+    catalog: {
+      version: typeof obj.version === "string" ? obj.version : undefined,
+      updatedAt: typeof obj.updatedAt === "string" ? obj.updatedAt : undefined,
+      plugins,
+      sources: parseSourceLinks(obj.sources, warnings),
+      collections: parseCollections(obj.collections, warnings),
+      categoryRail,
+    },
+    warnings,
+  };
 }
 
-/** 单条归一——补 author/iconSource 形态缺省；无 id/name/version/downloadUrl 者丢弃（不崩其余） */
-function normalizeEntry(raw: unknown): CatalogEntry | null {
+/** 单条归一——补 author/iconSource 形态缺省；无 id/name/version 者丢弃（不崩其余） */
+function normalizeEntry(raw: unknown, warnings: CatalogWarning[]): CatalogEntry | null {
   if (typeof raw !== "object" || raw === null) return null;
   const r = raw as CatalogEntry;
   if (typeof r.id !== "string" || !r.id || typeof r.name !== "string" || typeof r.version !== "string") {
     return null;
   }
+  // 封闭名单体检（04 §5.1）——名单外记警告、原值照留（归桶由 categories.primaryCategoryOf 兜）
+  warnings.push(...validateEntryCategories(r));
   return {
     id: r.id,
     name: r.name,
@@ -42,7 +73,9 @@ function normalizeEntry(raw: unknown): CatalogEntry | null {
     marketIcon: r.marketIcon,
     marketIconSource: r.marketIconSource,
     category: r.category,
-    categories: Array.isArray(r.categories) ? r.categories : undefined,
+    categories: Array.isArray(r.categories)
+      ? r.categories.filter((c): c is string => typeof c === "string")
+      : undefined,
     // Marketplace-Store v2（R4-0.2/0.4）：作者聚合键＋定价声明进白名单——漏行 = 目录带着键进来被静默丢
     // （E6#106/E6#77 乙同类坑）；三方对账腿②（catalogV2Reconcile.test.ts）钉住本白名单 ↔ SDK schema
     authorId: r.authorId,
@@ -53,10 +86,112 @@ function normalizeEntry(raw: unknown): CatalogEntry | null {
     minAppVersion: r.minAppVersion,
     versions: Array.isArray(r.versions) ? r.versions : undefined,
     readmeUrl: r.readmeUrl,
-    screenshots: Array.isArray(r.screenshots) ? r.screenshots : undefined,
+    screenshots: normalizeScreenshots(r.screenshots, r.id, warnings),
     license: r.license,
     repository: r.repository, // E6#77 乙：作者声明的插件主页（本 whitelist 漏字段 = 静默丢，务必同步）
     sourceName: undefined, // 合并注入——parse 阶段不填
     official: undefined, // 同上：来源身份是合并时语义
   };
+}
+
+/** 画廊媒体归一（06 §二·2 契约）：string = 图片；视频对象**至多 1 段且必须排第一**（封面视频）。
+ *  多段/越位的视频项**丢弃并记警告**（⛔ 不静默降级成图）；字符串原样留（旧数据可读）。 */
+function normalizeScreenshots(
+  raw: unknown,
+  entryId: string,
+  warnings: CatalogWarning[],
+): CatalogScreenshot[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const out: CatalogScreenshot[] = [];
+  for (let i = 0; i < raw.length; i++) {
+    const item = raw[i];
+    if (typeof item === "string") {
+      out.push(item);
+      continue;
+    }
+    const video = item as { type?: unknown; url?: unknown; poster?: unknown } | null;
+    const isVideo = !!video && video.type === "video" && typeof video.url === "string";
+    if (!isVideo) continue;
+    if (i !== 0) {
+      warnings.push({ code: "screenshot-video-restricted", entryId, detail: `video@${i}` });
+      continue;
+    }
+    out.push({
+      type: "video",
+      url: video.url as string,
+      poster: typeof video.poster === "string" ? video.poster : undefined,
+    });
+  }
+  return out;
+}
+
+/** 根级已审核源清单（schema 要求 url/authorId/addedAt；不合形的一行跳过并记警告） */
+function parseSourceLinks(raw: unknown, warnings: CatalogWarning[]): SourceLink[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const out: SourceLink[] = [];
+  for (const item of raw) {
+    const r = item as Partial<SourceLink> | null;
+    if (!r || typeof r.url !== "string" || typeof r.authorId !== "string" || typeof r.addedAt !== "string") {
+      warnings.push({ code: "invalid-source-link", detail: JSON.stringify(item)?.slice(0, 120) });
+      continue;
+    }
+    out.push({ url: r.url, authorId: r.authorId, addedAt: r.addedAt });
+  }
+  return out;
+}
+
+/** 根级合集声明（06 §二·3）——id/title/items 三者齐才收；`layout` 封闭枚举外丢弃字段 */
+function parseCollections(raw: unknown, warnings: CatalogWarning[]): CollectionDecl[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const layouts = new Set(["banner", "strip", "duo", "grid"]);
+  const out: CollectionDecl[] = [];
+  for (const item of raw) {
+    const r = item as Partial<CollectionDecl> | null;
+    if (!r || typeof r.id !== "string" || typeof r.title !== "string" || !Array.isArray(r.items)) {
+      warnings.push({ code: "invalid-collection", detail: typeof r?.id === "string" ? r.id : undefined });
+      continue;
+    }
+    out.push({
+      id: r.id,
+      title: r.title,
+      subtitle: typeof r.subtitle === "string" ? r.subtitle : undefined,
+      hint: typeof r.hint === "string" ? r.hint : undefined,
+      cover: typeof r.cover === "string" ? r.cover : undefined,
+      layout: typeof r.layout === "string" && layouts.has(r.layout) ? r.layout : undefined,
+      items: r.items.filter((id): id is string => typeof id === "string"),
+      order: typeof r.order === "number" ? r.order : undefined,
+    });
+  }
+  return out;
+}
+
+/** 根级 rail 顺序声明（06 §二·3）——形状守卫；名单校验在 railWarningsOf */
+function parseCategoryRail(raw: unknown): CategoryRailDecl | undefined {
+  if (typeof raw !== "object" || raw === null) return undefined;
+  const r = raw as { order?: unknown; icons?: unknown };
+  if (!Array.isArray(r.order)) return undefined;
+  const order: string[] = [];
+  for (const slug of r.order) {
+    if (typeof slug !== "string") continue;
+    const s = slug.trim();
+    if (s) order.push(s);
+  }
+  const icons: Record<string, string> = {};
+  if (typeof r.icons === "object" && r.icons !== null) {
+    for (const [k, v] of Object.entries(r.icons as Record<string, unknown>)) {
+      if (typeof v === "string") icons[k] = v;
+    }
+  }
+  return { order, icons: Object.keys(icons).length > 0 ? icons : undefined };
+}
+
+/** rail 声明里未注册 slug 的警告（04 §5.1：⛔ 静默吞；`other` 是兜底桶不是声明值，不警告） */
+function railWarningsOf(decl: CategoryRailDecl): CatalogWarning[] {
+  const out: CatalogWarning[] = [];
+  for (const slug of decl.order) {
+    if (slug !== "other" && !isKnownPrimaryCategory(slug)) {
+      out.push({ code: "unknown-rail-category", detail: slug });
+    }
+  }
+  return out;
 }
