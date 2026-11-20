@@ -10,7 +10,7 @@
  */
 
 import { useEffect, useState } from "react";
-import type { CatalogEntry } from "../../services/marketCatalog";
+import type { CatalogEntry } from "../../../services/marketCatalog";
 
 /** 兼容读数 wire 形状（与壳 `PluginCompatibilityReading` 同形——见文件头注） */
 export interface CompatReading {

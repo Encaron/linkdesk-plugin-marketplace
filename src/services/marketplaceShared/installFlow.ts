@@ -17,6 +17,11 @@ const lk = () => window.linkdesk;
 
 const pm = () => window.linkdesk?.pluginManager;
 
+/* E6#73o：catalogUrl 随行安装——本仓 @linkdesk/contracts（0.1.15）类型面尚未含该字段（棒 12 统一升），
+ * 照 hostApi / installFromDirectory 的既有处置**只收窄本仓要用到的面**：运行时壳已消费它
+ * （同一安装 job 内自动装 requires 缺失依赖）；⛔ 不改依赖、不改运行时形状。 */
+type InstallRequestOpts = { pluginId: string; displayName: string; origin: "user"; catalogUrl?: string };
+
 /* ═══ E6#73c 第 2 步（18 档 §五 I.7）：并发闸交给壳，本模块只剩「发起 + 终局回执」 ═══
  *
  * 🔴 **已拆的两样东西**（第 1 步的过渡态，本步整段退役）：
@@ -53,7 +58,10 @@ async function runMarketInstall(pluginId: string, name: string, downloadUrl: str
     // E6#73c 第 1 步：请求侧身份随行——壳侧 job 表按 pluginId 去重、job 行取显示名，而两者只有池侧知道
     // （第三个参数见 types.ts PluginInstallRequestOpts；jobId 不在此——它是壳侧 job 表的产物）。
     // E6#73o：catalogUrl 随行——壳在同一安装 job 内自动装 requires 缺失依赖（解析半径 = 本条目来源目录）。
-    const r = await inst(downloadUrl, { pluginId, displayName: name, origin: "user", catalogUrl });
+    const r = await (inst as (path: string, opts?: InstallRequestOpts) => Promise<{ cancelled?: boolean; success?: boolean; error?: string }>)(
+      downloadUrl,
+      { pluginId, displayName: name, origin: "user", catalogUrl },
+    );
     // E6#73d：用户点「取消安装」——**不是失败**。壳侧已把那条 job 整条撤掉（不留红行），本模块也绝不走
     // settleInstallFailure（那会推一条带 [重试] 的错误 toast：用户刚亲口说不要，再问一遍要不要重试
     // = 拿他的决定去烦他）。
