@@ -302,3 +302,24 @@
 }
 .marketplace-store-m-link:hover { color: var(--text-primary); }
 .marketplace-store-m-link.is-inline { margin: 0 0 0 6px; font-size: 11px; }
+
+/* ── 许可弹窗（R4-3.21；壳复用上方 .marketplace-store-modal*——只有结论行/输入框描边是自己的） ── */
+.marketplace-ui-license-field.is-ok { border-color: var(--accent-hover); }
+.marketplace-ui-license-field.is-bad { border-color: var(--danger); }
+.marketplace-ui-license-input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+.marketplace-ui-license-note.is-ok { color: var(--accent-hover); }
+.marketplace-ui-license-acts {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}

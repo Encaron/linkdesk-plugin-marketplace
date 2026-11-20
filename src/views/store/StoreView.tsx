@@ -39,8 +39,10 @@ import { RankView } from "./browse/RankView";
 import { LibraryView } from "./library/LibraryView";
 import { SourcesView } from "./sources/SourcesView";
 import { AddSourceModal, type AddSourceMode } from "./sources/AddSourceModal";
+import { LicenseModal } from "./LicenseModal";
 import { AuthorsView } from "./authors/AuthorsView";
 import { AuthorStoreView } from "./authors/AuthorStoreView";
+import type { CatalogEntry } from "../../services/marketCatalog";
 import type { ViewMode } from "../../ui";
 
 import "../../styles/ui/primitives.css";
@@ -58,7 +60,8 @@ const FOCUS_CHECK_MS = 15 * 60_000;
 export default function StoreView({ isActive = true }: { isActive?: boolean }) {
   const { t } = useTranslation();
   const data = useStoreData();
-  const actions = useStoreActions(data.online);
+  const [licenseEntry, setLicenseEntry] = useState<CatalogEntry | null>(null);
+  const actions = useStoreActions(data.online, setLicenseEntry);
 
   const [route, setRoute] = useState<StoreRoute>(HOME_ROUTE);
   const [searchInput, setSearchInputState] = useState("");
@@ -381,6 +384,14 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
           </div>
         </div>
         <AddSourceModal open={addSourceMode !== null} initialMode={addSourceMode ?? "remote"} onClose={closeAddSource} />
+        {/* R4-3.21：许可弹窗（卡片「我有密钥/输入新密钥」的落点；公钥取条目 authorId 的作者块） */}
+        <LicenseModal
+          open={licenseEntry !== null}
+          pluginName={licenseEntry?.name ?? ""}
+          authorId={licenseEntry?.authorId}
+          onClose={() => setLicenseEntry(null)}
+          onVerified={data.refreshLicenses}
+        />
       </div>
     </StoreProvider>
   );

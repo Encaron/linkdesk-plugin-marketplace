@@ -33,6 +33,8 @@ export interface StoreData {
   counts: ReadonlyMap<string, number>;
   /** rail 逐分类计数（空桶 0；rail 灰显与「其他」桶同源） */
   railOrderCounts: ReadonlyMap<string, number>;
+  /** R4-3.21：权益投影收敛（验签入库后调）——卡/库/详情同源刷新 */
+  refreshLicenses: () => void;
   /** 逐卡上下文（状态/核心/权益/job/下载数/身份图一次算好） */
   ctxOf: (entry: CatalogEntry) => StoreCardContext;
 }
@@ -44,7 +46,7 @@ export function useStoreData(): StoreData {
   const online = useOnlineStatus();
   const { statusOf, identityOf, coreOf, localLoading } = useCatalogStatus();
   const { all } = useMarketplacePlugins();
-  const { map: licenses } = useLicenseEntitlements();
+  const { map: licenses, refresh: refreshLicenses } = useLicenseEntitlements();
   const urls = catalog.entries.map((e) => e.downloadUrl).filter((u): u is string => !!u);
   const counts = useDownloadCounts(urls);
   const railOrderCounts = countByBucket(catalog.entries, catalog.railOrder);
@@ -88,6 +90,7 @@ export function useStoreData(): StoreData {
     authorSourceCount,
     counts,
     railOrderCounts,
+    refreshLicenses,
     ctxOf,
   };
 }

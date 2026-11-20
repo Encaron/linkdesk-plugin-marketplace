@@ -9,6 +9,7 @@
 
 import { useTranslation } from "react-i18next";
 import { MarkdownView } from "@linkdesk/ui";
+import type { CatalogScreenshot } from "../../../services/marketCatalog";
 
 export default function DetailOverviewTab({
   hasUpdate,
@@ -29,7 +30,7 @@ export default function DetailOverviewTab({
   localVer?: string;
   missingDeps: string[];
   depLabel: (dep: string) => string;
-  shots: string[];
+  shots: CatalogScreenshot[];
   readme: { mode: "loading" | "content" | "none"; content?: string; assetBase?: string };
   showDesc: boolean;
   descText: string;
@@ -84,23 +85,40 @@ export default function DetailOverviewTab({
         </div>
       )}
 
-      {/* 30.6c1：截图画廊（screenshots[] 横向滚动）——作者自制图以 img 元素直载（同 downloadUrl 信任级） */}
+      {/* 30.6c1：截图画廊（screenshots[] 横向滚动）——作者自制媒体以 img/video 直载（同 downloadUrl 信任级）。
+       *  R4-3.22（I12）：视频项 = 封面视频（至多 1 段且必须第一项，parse 期已裁）——
+       *  播放语义照主仓 MarkdownView video override（E6#70d）：controls 强制、preload=metadata、
+       *  ⛔ autoplay（作者写也不透传）、poster 优先；⛔ 不托管——只播作者给的直链。 */}
       {shots.length > 0 && (
         <div className="marketplace-mpd-gallery" role="region" aria-label={t("截图")}>
-          {shots.map((s, i) => (
-            <img
-              key={i}
-              className="marketplace-mpd-gallery-shot"
-              src={s}
-              alt={nameText}
-              loading="lazy"
-              referrerPolicy="no-referrer"
-              onError={(e) => {
-                // 远端截图加载失败 → 藏起坏图占位（诚实不显示 broken glyph）
-                e.currentTarget.style.display = "none";
-              }}
-            />
-          ))}
+          {shots.map((s, i) =>
+            typeof s === "string" ? (
+              <img
+                key={i}
+                className="marketplace-mpd-gallery-shot"
+                src={s}
+                alt={nameText}
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  // 远端截图加载失败 → 藏起坏图占位（诚实不显示 broken glyph）
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            ) : (
+              <video
+                key={i}
+                className="marketplace-mpd-gallery-shot marketplace-mpd-gallery-video"
+                src={s.url}
+                poster={s.poster}
+                controls
+                preload="metadata"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            ),
+          )}
         </div>
       )}
 

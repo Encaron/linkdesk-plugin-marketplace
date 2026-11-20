@@ -82,9 +82,34 @@ const DEP_ENTRY = {
   versions: undefined,
 };
 
+/* R4-3.20/21/22：付费三态样例＋画廊封面视频（parse 契约：视频至多 1 段且必须第一项） */
+const PAID_ENTRY = {
+  ...NET_ENTRY,
+  id: "demo-paid",
+  name: "Demo Paid",
+  pricing: { model: "paid", licenseUrl: "https://example.invalid/buy", price: 68 },
+  screenshots: [
+    { type: "video", url: "https://example.invalid/clip.mp4", poster: "https://example.invalid/poster.jpg" },
+    "https://example.invalid/shot.png",
+  ],
+};
+const SUB_ENTRY = {
+  ...NET_ENTRY,
+  id: "demo-sub",
+  name: "Demo Sub",
+  pricing: { model: "subscription", price: 8, period: "月" },
+};
+
+const AUTHOR_BLOCK = {
+  authorId: "demo-author",
+  name: "Demo Author",
+  publicKey: "DEMO_AUTHOR_PUBKEY",
+  repos: [{ id: "demo-owner/demo-net", name: "Demo Net" }],
+};
+
 const CATALOG = {
   version: "1",
-  plugins: [NET_ENTRY, BARE_ENTRY, MINAPP_ENTRY, DEP_ENTRY],
+  plugins: [NET_ENTRY, BARE_ENTRY, MINAPP_ENTRY, DEP_ENTRY, PAID_ENTRY, SUB_ENTRY],
 };
 
 function memoryStorage() {
@@ -106,6 +131,8 @@ function stubLinkdesk(o: {
   disabled?: Array<Record<string, unknown>>;
   pluginLocation?: unknown;
   localRecords?: Array<{ pluginId: string; sourcePath: string; installedAt: number }>;
+  /** R4-3.20：壳权益表（licenses.list 的替身载荷） */
+  entitlements?: Array<{ pluginId: string; exp?: number }>;
 } = {}) {
   const unsub = () => {};
   const linkdesk = {
@@ -114,6 +141,10 @@ function stubLinkdesk(o: {
       get: vi.fn(async (_owner: string, key: string) => (key === "localInstalls" ? o.localRecords : undefined)),
       set: vi.fn(async () => undefined),
       onChange: vi.fn(() => unsub),
+    },
+    licenses: {
+      list: vi.fn(async () => o.entitlements ?? []),
+      verify: vi.fn(async (key: string, _publicKey: string) => ({ valid: false, failureReason: "bad-signature" })),
     },
     events: { on: vi.fn(() => unsub), emit: vi.fn() },
     pluginManager: {
@@ -138,13 +169,14 @@ function stubLinkdesk(o: {
     shell: {
       pluginLocation: vi.fn(async () => o.pluginLocation ?? null),
       openPluginFolder: vi.fn(async () => undefined),
+      openExternal: vi.fn(async () => undefined),
     },
     commands: { registerCommand: vi.fn(), executeCommand: vi.fn(async () => ({ ok: true })) },
     menu: { registerItems: vi.fn() },
     tabs: { create: vi.fn(async () => undefined), openOrFocus: vi.fn(async () => "") },
     toasts: { show: vi.fn() },
     dialog: { confirm: vi.fn(async () => true), open: vi.fn(async () => null) },
-    licenses: { list: vi.fn(async () => []) },
+
   };
   Object.defineProperty(window, "linkdesk", { value: linkdesk, configurable: true });
   return linkdesk as unknown as Stub & typeof linkdesk;
@@ -157,6 +189,7 @@ beforeEach(() => {
   __resetRealmSlots();
   __setCatalogIO(async (url: string) => {
     if (url === OFFICIAL_SOURCE_URL) return JSON.stringify(CATALOG);
+    if (url.endsWith("/authors/demo-author.json")) return JSON.stringify(AUTHOR_BLOCK);
     throw new Error("HTTP 404");
   }, memoryStorage());
 });
@@ -342,5 +375,90 @@ describe("R4-3.16 依赖跳转", () => {  it("依赖行点击 → openPluginDeta
         label: "Demo Dep",
       }),
     );
+  });
+});
+
+describe("R4-3.20/21 付费流（详情）", () => {
+  it("未购买断：获取许可（外跳 licenseUrl）＋我有密钥 → 弹窗；粘贴即时验签（不过→红句）", async () => {
+    api = stubLinkdesk();
+    render(<DetailView pluginId="demo-paid" isActive />);
+    await syncPlugins();
+    // 徽标：详情 = 最全档——价格徽标上标题行
+    await waitFor(() => expect(screen.getByText("买断 ¥68")).toBeTruthy());
+
+    fireEvent.click(screen.getByText("获取许可 ¥68"));
+    await waitFor(() => expect(api.shell.openExternal).toHaveBeenCalledWith("https://example.invalid/buy"));
+
+    fireEvent.click(screen.getByText("我有密钥"));
+    await waitFor(() => expect(screen.getByText("输入许可密钥")).toBeTruthy());
+    // 等作者块公钥到位（懒加载）——公钥随行是「即时验签」契约的一半
+    await waitFor(() => expect(screen.getByText("密钥由作者签名，粘贴后自动验证")).toBeTruthy());
+    fireEvent.change(screen.getByLabelText("许可密钥"), { target: { value: "v1.abc.def" } });
+    await waitFor(() =>
+      expect(api.licenses.verify).toHaveBeenCalledWith("v1.abc.def", "DEMO_AUTHOR_PUBKEY"),
+    );
+    await waitFor(() => expect(screen.getByText("密钥验证未通过——请确认复制完整，或联系作者")).toBeTruthy());
+  });
+
+  it("验签通过 → licenses.list 重读（权益投影收敛）；弹窗自动收起", async () => {
+    api = stubLinkdesk();
+    api.licenses.verify.mockResolvedValue({ valid: true, pluginId: "demo-paid" });
+    const listCallsBefore = api.licenses.list.mock.calls.length;
+    render(<DetailView pluginId="demo-paid" isActive />);
+    await syncPlugins();
+    fireEvent.click(screen.getByText("我有密钥"));
+    await waitFor(() => expect(screen.getByText("输入许可密钥")).toBeTruthy());
+    fireEvent.change(screen.getByLabelText("许可密钥"), { target: { value: "v1.abc.def" } });
+    await waitFor(() => expect(screen.getByText("许可有效——安装已解锁")).toBeTruthy());
+    await act(() => new Promise((r) => setTimeout(r, 1000)));
+    expect(screen.queryByText("输入许可密钥")).toBeNull();
+    expect(api.licenses.list.mock.calls.length).toBeGreaterThan(listCallsBefore);
+  });
+
+  it("许可过期：输入新密钥＋续费（续费走 openExternal）；已购有效 → 安装钮＋已购徽标", async () => {
+    const past = Math.floor(Date.now() / 1000) - 86_400;
+    const future = Math.floor(Date.now() / 1000) + 86_400 * 40; // 40 天后到期——徽标「已购 ✓」档（≤30 天走临期黄）
+    api = stubLinkdesk({ entitlements: [{ pluginId: "demo-paid", exp: past }] });
+    const { unmount } = render(<DetailView pluginId="demo-paid" isActive />);
+    await syncPlugins();
+    await waitFor(() => expect(screen.getByText("输入新密钥")).toBeTruthy());
+    fireEvent.click(screen.getByText("续费"));
+    await waitFor(() => expect(api.shell.openExternal).toHaveBeenCalledWith("https://example.invalid/buy"));
+    unmount();
+    cleanup();
+
+    api = stubLinkdesk({ entitlements: [{ pluginId: "demo-paid", exp: future }] });
+    render(<DetailView pluginId="demo-paid" isActive />);
+    await syncPlugins();
+    await waitFor(() => expect(screen.getByText("已购 ✓")).toBeTruthy());
+    expect(screen.getByRole("button", { name: /安装/ })).toBeTruthy();
+    expect(screen.getByText("买断制 · 许可验证在壳层（本地验签，不联网）")).toBeTruthy();
+  });
+
+  it("订阅：动作钮 = 即将支持（禁用写原因）；说明行给订阅制口径", async () => {
+    api = stubLinkdesk();
+    render(<DetailView pluginId="demo-sub" isActive />);
+    await syncPlugins();
+    await waitFor(() => expect(screen.getByText("订阅 ¥8/月")).toBeTruthy());
+    const soon = screen.getByText("即将支持").closest("button") as HTMLButtonElement;
+    expect(soon.disabled).toBe(true);
+    expect(screen.getByText("订阅制 · 需服务器实时校验——B3 上线后开放购买与自动续费")).toBeTruthy();
+  });
+});
+
+describe("R4-3.22 画廊视频（I12）", () => {
+  it("封面视频：controls 强制、preload=metadata、无 autoplay；图片项照常", async () => {
+    api = stubLinkdesk();
+    render(<DetailView pluginId="demo-paid" isActive />);
+    await syncPlugins();
+    await waitFor(() => expect(document.querySelector(".marketplace-mpd-gallery-video")).toBeTruthy());
+    const video = document.querySelector(".marketplace-mpd-gallery-video") as HTMLVideoElement;
+    expect(video.src).toBe("https://example.invalid/clip.mp4");
+    expect(video.hasAttribute("controls")).toBe(true);
+    expect(video.getAttribute("preload")).toBe("metadata");
+    expect(video.hasAttribute("autoplay")).toBe(false);
+    expect(video.getAttribute("poster")).toBe("https://example.invalid/poster.jpg");
+    const imgs = document.querySelectorAll(".marketplace-mpd-gallery-shot:not(.marketplace-mpd-gallery-video)");
+    expect(imgs.length).toBe(1);
   });
 });

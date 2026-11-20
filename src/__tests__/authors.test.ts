@@ -143,6 +143,14 @@ describe("aggregateAuthorDomain（authorId 聚合）", () => {
   const parsed = parseAuthorBlock(JSON.stringify(BLOCK));
   const block: AuthorBlock = parsed.ok ? parsed.block : ({} as AuthorBlock);
 
+  it("R4-3.21：作者块 publicKey 透出到聚合域（许可弹窗验签的公钥来源）；未声明 = undefined", () => {
+    const withKey: AuthorBlock = { ...block, publicKey: "DEMO_PUBKEY" };
+    const d = aggregateAuthorDomain("demo-author", [withKey], RECORDS, ENTRIES, [], false)!;
+    expect(d.publicKey).toBe("DEMO_PUBKEY");
+    const bare = aggregateAuthorDomain("demo-author", [block], RECORDS, ENTRIES, [], false)!;
+    expect(bare.publicKey).toBeUndefined();
+  });
+
   it("仓级 homepage 生效；插件按 sourceName 归仓；空仓照实 0 件", () => {
     // 合集表故意给空：验证「引用不存在的合集」在聚合期也会记警告
     const d = aggregateAuthorDomain("demo-author", [block], RECORDS, ENTRIES, [], false)!;

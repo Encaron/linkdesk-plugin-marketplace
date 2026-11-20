@@ -11,6 +11,8 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@linkdesk/ui";
+import { licenseDaysLeft, type LicenseView } from "../../../ui";
+import type { PricingDecl } from "../../../services/marketCatalog";
 
 export default function DetailActionBar({
   disabledRow,
@@ -34,6 +36,11 @@ export default function DetailActionBar({
   actButton,
   autoUpdateToggle,
   pinnedNote,
+  pricing,
+  license,
+  onBuy,
+  onHaveKey,
+  onRenew,
   onEnable,
   onDisable,
   onUninstall,
@@ -53,6 +60,14 @@ export default function DetailActionBar({
   belowMinApp?: boolean;
   /** 需 LinkDesk 的最低版本（与禁钮 title 同源；缺 = 不禁） */
   minAppVersion?: string;
+  /** R4-3.20 付费六态：条目定价声明（undefined = 免费）——判定与卡片 `resolveAction` 同构（05 §05 四态矩阵） */
+  pricing?: PricingDecl;
+  /** R4-3.20：壳权益投影（undefined/null = 未购） */
+  license?: LicenseView | null;
+  /** 付费动作（购买/密钥/续费——执行器在门面，与本条 actions 同一条入口纪律） */
+  onBuy?: () => void;
+  onHaveKey?: () => void;
+  onRenew?: () => void;
   busy: boolean;
   updating: boolean;
   installingHere: boolean;
@@ -83,6 +98,23 @@ export default function DetailActionBar({
   const minAppTitle = minAppBlocked
     ? t("需升级 LinkDesk 至 {{version}} 才能安装", { version: minAppVersion })
     : undefined;
+  /* ── R4-3.20 付费六态（判定与卡片 resolveAction 同构：订阅→即将支持；过期→输入新密钥+续费；
+   *  未购→获取许可+我有密钥；有权益→落回安装语义。⛔ 本件只渲染，裁决在壳安装门） ── */
+  const paid = !!pricing;
+  const subscription = pricing?.model === "subscription";
+  const days = licenseDaysLeft(license);
+  const expired = paid && days !== undefined && days < 0;
+  const unowned = paid && !license && !expired;
+  const priceText = pricing ? `${pricing.currency ?? "¥"}${pricing.price ?? 0}` : "";
+  const priceParams = { price: priceText };
+  /* 试用说明行（05 §05 / 03 `.d-trial`：买断/订阅形态一句说明；trialDays 是作者功能门的静态注记） */
+  const paidNote = pricing
+    ? subscription
+      ? t("订阅制 · 需服务器实时校验——B3 上线后开放购买与自动续费")
+      : pricing.trialDays
+        ? `${t("含 {{days}} 天免费试用——试用功能门由作者代码控制，壳不计时", { days: pricing.trialDays })} · ${t("买断制 · 许可验证在壳层（本地验签，不联网）")}`
+        : t("买断制 · 许可验证在壳层（本地验签，不联网）")
+    : null;
   return (
     <div className="marketplace-mpd-acts">
       <div className="marketplace-mpd-acts-row">
@@ -109,6 +141,19 @@ export default function DetailActionBar({
           </span>
         ) : hasInfo ? (
           <>
+            {/* R4-3.20：许可过期（已装也可能）——输入新密钥/续费插在版本动作前（08 v3.64：过期红徽标＋输入新密钥＋续费） */}
+            {expired && (
+              <>
+                <Button variant="success" onClick={onHaveKey}>
+                  {t("输入新密钥")}
+                </Button>
+                {pricing?.licenseUrl && (
+                  <Button variant="ghost" onClick={onRenew} title={t("打开作者销售页续费")}>
+                    {t("续费")}
+                  </Button>
+                )}
+              </>
+            )}
             {/* E6#33c/#33b：版本下拉（有历史）+ 升/降钮首槽（「禁用/卸载」旁——点4 第一段） */}
             {versionPicker}
             {actButton}
@@ -135,6 +180,34 @@ export default function DetailActionBar({
               >
                 <span className="codicon codicon-refresh" /> {t("重试安装")}
               </Button>
+            ) : paid && subscription ? (
+              /* 09 §三·补3：订阅 v1 不可购（需服务器）——「即将支持」禁钮写原因（⛔ 伪装成可装） */
+              <Button variant="success" disabled title={t("订阅需服务器实时校验——B3 上线后开放")}>
+                {t("即将支持")}
+              </Button>
+            ) : expired ? (
+              <>
+                <Button variant="success" onClick={onHaveKey}>
+                  {t("输入新密钥")}
+                </Button>
+                {pricing?.licenseUrl && (
+                  <Button variant="ghost" onClick={onRenew} title={t("打开作者销售页续费")}>
+                    {t("续费")}
+                  </Button>
+                )}
+              </>
+            ) : unowned ? (
+              <>
+                {/* ⛔ 作者未声明 licenseUrl 就不渲染外跳钮（08 v3.64b「弹不弹作者说了算」） */}
+                {pricing?.licenseUrl && (
+                  <Button variant="success" onClick={onBuy} title={t("打开作者销售页——应用内无支付")}>
+                    {t("获取许可 {{price}}", priceParams)}
+                  </Button>
+                )}
+                <Button variant="ghost" onClick={onHaveKey}>
+                  {t("我有密钥")}
+                </Button>
+              </>
             ) : (
               <Button
                 variant="success"
@@ -169,6 +242,9 @@ export default function DetailActionBar({
           {pinnedNote}
         </div>
       ) : null}
+
+      {/* R4-3.20 试用/付费形态说明（05 §05 `.d-trial`：付费条目常驻一行；⛔ 不逐状态复读徽标已有的事实） */}
+      {paidNote && <p className="marketplace-mpd-paid-note">{paidNote}</p>}
     </div>
   );
 }

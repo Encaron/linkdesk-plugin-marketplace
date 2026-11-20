@@ -126,3 +126,14 @@
   background: var(--accent);
   vertical-align: 1px;
 }
+
+/* ═══ R4-3.20 付费形态说明行（05 §05 `.d-trial`：买断/订阅一句形态说明，常驻于付费条目动作列尾） ═══ */
+
+.marketplace-mpd-paid-note {
+  margin: 0;
+  max-width: 100%;
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+  color: var(--text-muted);
+  text-align: right;
+}

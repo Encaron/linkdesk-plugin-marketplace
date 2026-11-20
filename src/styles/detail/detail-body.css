@@ -271,3 +271,13 @@
 }
 /* 悬停帮助卡（E6#120）：卡体收编为壳共享件 HintCard（@linkdesk/ui 0.3.1 起）——
    样式/定位/触发随共享件走，本文件只留状态标（badge）自己的三档变体。 */
+
+/* ═══ R4-3.22（I12）：画廊封面视频项——与图片同版式（.marketplace-mpd-gallery-shot 基座），
+ *  播放语义归元素属性（controls/preload=metadata/无 autoplay，见 DetailOverviewTab）；样式只管尺寸底色。 ═══ */
+
+.marketplace-mpd-gallery-video {
+  width: 320px;
+  height: 200px;
+  object-fit: contain;
+  background: var(--bg-input);
+}

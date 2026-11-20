@@ -288,6 +288,8 @@ export interface AuthorDomain {
   warnings: AuthorWarning[];
   /** 发布者认证：该作者名下任一条目 vendorId 命中（vendors.json 注册表，09 §一·补2） */
   official: boolean;
+  /** R4-3.21：作者块声明的 Ed25519 公钥（许可验签用；壳 `licenses.verify(key, publicKey)` 直收） */
+  publicKey?: string;
 }
 
 /** 声明警告：重复大屏 / 引用不存在的合集（未知板块与缺 collection 键在解析期就记了） */
@@ -435,6 +437,9 @@ export function aggregateAuthorDomain(
     ...(first.intro ? { intro: first.intro } : {}),
     ...(first.introImage ? { introImage: first.introImage } : {}),
     ...(blockStoreTitle ? { storeTitle: blockStoreTitle } : {}),
+    /* R4-3.21（09 §三·补3）：发布者公钥透出——许可弹窗验签的 publicKey 来源（Ed25519 裸 32 字节/
+     *  SPKI 由壳还原）。先到者字段优先，与 name/avatar 同规。⛔ 密钥签名/验签本体在壳，市场只递钥匙。 */
+    ...(first.publicKey ? { publicKey: first.publicKey } : {}),
     repos,
     warnings,
     official: entries.some(

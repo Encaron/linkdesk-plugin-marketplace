@@ -9,7 +9,7 @@
 
 import type { ComponentProps, ReactNode } from "react";
 import { PluginIcon } from "@linkdesk/ui";
-import { Badge, type BadgeDesc } from "../../../ui";
+import { Badge, BadgeRow, type BadgeDesc } from "../../../ui";
 
 export default function DetailHeader({
   pluginId,
@@ -21,6 +21,7 @@ export default function DetailHeader({
   descText,
   isCore,
   source,
+  licBadges,
   actions,
 }: {
   pluginId?: string;
@@ -33,6 +34,8 @@ export default function DetailHeader({
   isCore: boolean;
   /** R4-3.16：来源派生徽标（官方 ✓/官方/社区/本地）——判定链在 `ui/statusTag.sourceBadge`，本件只出画 */
   source?: BadgeDesc;
+  /** R4-3.20：许可徽标（价格/临期/过期/已购）——详情页 = 徽标分层「最全」档（08 v3.64d） */
+  licBadges?: BadgeDesc[];
   actions: ReactNode;
 }) {
   return (
@@ -51,6 +54,7 @@ export default function DetailHeader({
            *  来源徽标派生（entry.official/vendorId ⇒ 官方/社区），⛔ 不读作者自声明、⛔ 按作者名猜。 */}
           {isCore && <Badge desc={{ kind: "core", key: "内置" }} />}
           {source && <Badge desc={source} />}
+          {licBadges && licBadges.length > 0 && <BadgeRow badges={licBadges} />}
         </div>
         {authorText && <p className="marketplace-mpd-subtitle">{authorText}</p>}
         {showDesc && <p className="marketplace-mpd-short-desc">{descText}</p>}

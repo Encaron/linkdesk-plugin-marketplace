@@ -36,8 +36,10 @@ export type {
   ParseResult,
   CatalogVersionChoice,
   CatalogWarning,
+  CatalogScreenshot,
   CategoryRailDecl,
   CollectionDecl,
+  PricingDecl,
   SourceLink,
   VendorRecord,
 } from "./types";

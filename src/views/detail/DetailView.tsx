@@ -47,7 +47,11 @@ import { pickIdentityArt } from "@linkdesk/ui";
 import { useOnlineStatus } from "../../services/marketplaceShared";
 import { authorLabel } from "../../services/installConfirmPayload";
 import { openPluginDetailTab } from "../../services/openDetailTab";
-import { sourceBadge, type BadgeDesc } from "../../ui";
+import { useLicenseEntitlements } from "../../services/licensesView";
+import { openBuyPage } from "../../services/licenseActions";
+import { showToast } from "../../services/hostApi";
+import { sourceBadge, licenseBadges, type BadgeDesc } from "../../ui";
+import LicenseModal from "../store/LicenseModal";
 import type { DetailContributedProps, TabId } from "./DetailView/types";
 import { useDetailIdentity } from "./DetailView/useDetailIdentity";
 import { useDetailVersions } from "./DetailView/useDetailVersions";
@@ -79,6 +83,10 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
   /* #30.9b 离线态（G3）——navigator.onLine false → 安装/更新钮置灰 + 「联网后重试」（不产生失败会话）；
    *  提早在顶声明——版本动作/安装门禁 deps 均读它（TDZ 防御：勿下移，下移即渲染即崩） */
   const online = useOnlineStatus();
+  /* R4-3.20/21 付费流：壳权益只读投影（本插件那条）＋许可弹窗开关；验签成功 → refreshLicenses
+   *  收敛本页与商店/库的同源投影（licensesView 单点） */
+  const { map: licenses, refresh: refreshLicenses } = useLicenseEntitlements();
+  const [licenseOpen, setLicenseOpen] = useState(false);
 
   const id = useDetailIdentity(pluginId);
   const ver = useDetailVersions(id);
@@ -99,7 +107,7 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
     installVer: ver.installVer,
     appVersion: ver.appVersion,
   });
-  const { info, entry, disabled, pending, installed, enabledEntry, pluginsLoading, catalog, localInstalled } = id;
+  const { info, entry, disabled, pending, installed, enabledEntry, pluginsLoading, catalog, localInstalled, displayName } = id;
   /* E6#118：宿主兼容读数（只消费不复算——面缺失/失败 ⇒ undefined ⇒ 状态行「—」） */
   const compat = useCompatReading({ pluginId, entry, installed });
   /* 右上动作列五枚小件（版本/安装下拉 · 版本动作钮 · 自动更新勾 · 已停在 vX）——判据全在 useActionBits，
@@ -158,6 +166,21 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
       ? { kind: "local", key: "本地" }
       : undefined;
 
+  /* R4-3.20：详情页 = 徽标分层「最全」档（08 v3.64d）——许可徽标（价格/临期/过期/已购）上标题行，
+   *  判定与卡片同一 `licenseBadges`（⛔ 详情另写一份）。 */
+  const license = entry ? (licenses.get(entry.id) ?? null) : null;
+  const licBadges = entry ? licenseBadges(entry, license) : [];
+
+  /* R4-3.21：购买/续费外跳（09：buyPage 真机 = openExternal；licenseUrl 未声明不渲染钮）＋许可弹窗 */
+  const handleBuy = () => {
+    const url = entry?.pricing?.licenseUrl;
+    if (!url) return;
+    void openBuyPage(url).then((ok) => {
+      if (!ok) showToast(t("无法打开销售页"), { severity: "warning" });
+    });
+  };
+  const handleRenew = handleBuy;
+
   /* 元数据侧栏数据（E6#30.8b 下载数仅 ready 显；被依赖列表带显示名） */
   const dlCount = ver.dl.status === "ready" ? ver.dl.count : undefined;
   const dependents = data.dependents.map((d) => ({ pluginId: d.pluginId, name: d.manifest.name ?? d.pluginId }));
@@ -182,6 +205,7 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
         descText={descText}
         isCore={isCore}
         source={source}
+        licBadges={licBadges}
         actions={
           <DetailActionBar
             disabledRow={disabled}
@@ -205,6 +229,11 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
             actButton={bits.actButton}
             autoUpdateToggle={bits.autoUpdateToggle}
             pinnedNote={bits.pinnedNote}
+            pricing={entry?.pricing}
+            license={license}
+            onBuy={handleBuy}
+            onHaveKey={() => setLicenseOpen(true)}
+            onRenew={handleRenew}
             onEnable={() => void act.handleEnable()}
             onDisable={() => void act.handleDisable()}
             onUninstall={() => void act.handleUninstall()}
@@ -297,6 +326,15 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
           />
         </div>
       </div>
+
+      {/* ═══ R4-3.21 许可弹窗（密钥输入唯一形态；公钥取条目 authorId 的作者块） ═══ */}
+      <LicenseModal
+        open={licenseOpen}
+        pluginName={displayName}
+        authorId={entry?.authorId}
+        onClose={() => setLicenseOpen(false)}
+        onVerified={refreshLicenses}
+      />
     </div>
   );
 }

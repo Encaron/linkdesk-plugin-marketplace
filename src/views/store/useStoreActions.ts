@@ -6,7 +6,8 @@
  *   - 更新 = `services/marketUpdateAction`（与详情版本动作同一条序列）；
  *   - 重试 = `marketplaceShared.retryMarketInstall`（带确认门，单点）；
  *   - 启/禁/卸 = 壳 `pluginManager` 既有 API（⛔ 新造动作）；
- *   - 购买/续费 = 壳 `shell.openExternal`（T4 白名单闸门）；许可输入 = 棒 10（现留通知位）。
+ *   - 购买/续费 = 壳 `shell.openExternal`（T4 白名单闸门）；
+ *   - 我有密钥/输入新密钥 = 许可弹窗（R4-3.21；弹窗态归 StoreView，本件只发请求）。
  *
  * 卸载二次确认 = 蓝图「同一按钮点两次」（第一次给提示、3.2 秒内再点才执行；08 §三·107）。
  */
@@ -29,7 +30,11 @@ const pm = () => window.linkdesk?.pluginManager;
 
 const UNINSTALL_CONFIRM_MS = 3200;
 
-export function useStoreActions(online: boolean): StoreCardHandlers {
+export function useStoreActions(
+  online: boolean,
+  /** R4-3.21：`have-key` → 许可弹窗（StoreView 持弹窗态；缺省回退通知占位——测试/旧调用面兼容） */
+  onRequestLicense?: (entry: CatalogEntry) => void,
+): StoreCardHandlers {
   const { t } = useTranslation();
   const pendingUninstall = useRef(new Map<string, number>());
 
@@ -115,14 +120,18 @@ export function useStoreActions(online: boolean): StoreCardHandlers {
           return;
         }
         case "have-key":
-          // 棒 10（R4-3.21）落许可弹窗；当前付费条目不存在，此处为显式留位（⛔ 静默死按钮）
+          // R4-3.21：打开许可弹窗（粘贴即时验签→壳入库→refresh）；执行器注入，本件不持弹窗态
+          if (onRequestLicense) {
+            onRequestLicense(entry);
+            return;
+          }
           showToast(t("许可验证将在付费批次接入"), { severity: "info" });
           return;
         default:
           return;
       }
     },
-    [online, onOpen, t],
+    [online, onOpen, t, onRequestLicense],
   );
 
   return { onOpen, onAct };
