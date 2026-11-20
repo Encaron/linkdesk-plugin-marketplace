@@ -55,7 +55,10 @@ export {
   sourceNameOfUrl,
 } from "./sourceUrl";
 
-export { parseCatalog } from "./parse";
+export { parseCatalog, parseCollectionDecl } from "./parse";
+
+/* R4-4.5（批4b）：collections/ 文件夹拆分写法——根级字符串引用为读取入口 + inline 主文件正典合并 */
+export { collectionFileOf, mergeFolderWithInline } from "./collectionsFolder";
 
 export { compareVersions, isVersionNewer, isPrereleaseVersion } from "./semver";
 

@@ -125,6 +125,9 @@ export interface CatalogWarning {
     | "screenshot-video-restricted"
     | "invalid-source-link"
     | "invalid-collection"
+    /** R4-4.5（批4b）：同一合集 id 在主文件与 collections/ 文件夹两处声明——**inline 主文件正典胜**，
+     *  文件夹那份不生效。不警告 = 作者改了文件夹以为生效了其实没有。detail = id。 */
+    | "duplicate-collection"
     /** R4-3.18（05 §02）：抓取/派生型字段缺失——网络源「理论上必有」，缺 = 目录缺字段（异常）。
      *  详情页不画该行（⛔ 不写「未提供」），本警告供来源页「N 条声明提示」暴露。detail = 字段名。 */
     | "missing-entry-field";
@@ -145,6 +148,10 @@ export interface MarketplaceCatalog {
   sources?: SourceLink[];
   /** v2：合集声明（作者仓 marketplace.json 亦可声明） */
   collections?: CollectionDecl[];
+  /** R4-4.5（批4b）：`collections[]` 里的**字符串 id 引用**（拆分写法读取入口——完整声明在
+   *  源根 `collections/<id>.json`；publish v2 维护）。parse 把字符串从 collections 拆到这里，
+   *  load 期**有引用才拉文件**（v1 目录零探针、零新增请求——棒 3 坑 1 纪律）。 */
+  collectionRefs?: string[];
   /** v2：分类 rail 展示顺序 */
   categoryRail?: CategoryRailDecl;
 }

@@ -22,6 +22,8 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCatalog } from "../services/marketCatalog";
+import { PRIMARY_CATEGORY_SLUGS, SUBCATEGORY_SLUGS } from "../services/marketCatalog/categories";
+import { PRIMARY_CATEGORY_SLUGS as KIT_PRIMARY, SUBCATEGORY_SLUGS as KIT_SUBCATEGORY } from "@linkdesk/marketplace-kit";
 import { categoryListFromEntry } from "../services/marketCategories";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -172,5 +174,19 @@ describe("R4-0.5 兼容矩阵——v2 目录双向（R4-2.1 起根级字段进�
     // 「无分类值 ⇒ 落『其他』桶」的数据前提：无 category/categories ⇒ 归并表为空（分组判定随棒 3 落）
     expect(categoryListFromEntry(undefined, undefined)).toEqual([]);
     expect(categoryListFromEntry(r.catalog.plugins[0]!.category, r.catalog.plugins[0]!.categories)).toEqual([]);
+  });
+});
+
+/* ── K2 第三腿（R4-4.2／棒 12 交办）：kit 白名单 ↔ 本仓 parse 白名单 ─────────────────
+ * 棒 11 因启动词红线「市场插件仓本棒不碰」挂账到这里落笔——对账对象 = **本仓实际安装**的
+ * `@linkdesk/marketplace-kit`（node_modules 实读，版本感知，与腿②对 SDK schema 同型）。
+ * 两份名单都转录自正典 04 §5.1；这条腿把「⛔ 两份名单」变成机械事实：任一边扩/删名单即红。 */
+describe("K2 第三腿——kit categoryWhitelist ↔ 本仓 categories 白名单（04 §5.1 同一正典）", () => {
+  it("主分类 7 桶逐只相等（多桶/少桶即红）", () => {
+    expect([...KIT_PRIMARY].sort()).toEqual([...PRIMARY_CATEGORY_SLUGS].sort());
+  });
+
+  it("小分类名单逐桶逐 slug 相等（桶内顺序 = 展示序，同序比对）", () => {
+    expect(KIT_SUBCATEGORY).toEqual(SUBCATEGORY_SLUGS);
   });
 });

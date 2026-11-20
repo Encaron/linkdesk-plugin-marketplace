@@ -17,9 +17,12 @@ import {
   OFFICIAL_SOURCE_URL,
   buildCategoryRailOrder,
   catalogSiblingUrl,
+  collectionFileOf,
   mergeCatalogsWithReceipt,
+  mergeFolderWithInline,
   normalizeSourceUrl,
   parseCatalog,
+  parseCollectionDecl,
   parseVendors,
   sourceNameOfUrl,
   synthesizeEntryFromManifest,
@@ -147,13 +150,17 @@ async function deliverOne(
   if (!("reason" in result)) {
     const parsed = parseCatalog(result.text);
     if (parsed.ok) {
+      // R4-4.5（批4b）：collections/ 文件夹拆分写法——根级**字符串引用**为读取入口，有引用才拉文件
+      // （v1 目录零探针、零新增请求——棒 3 坑 1 纪律）；同 id inline 主文件正典胜。
+      const folder = await fetchCollectionsFolder(url, parsed.catalog.collectionRefs ?? [], force);
+      const mergedColl = mergeFolderWithInline(parsed.catalog.collections, folder.collections);
       return {
         sourceName,
         sourceUrl: url,
         official,
         entries: parsed.catalog.plugins,
-        catalog: parsed.catalog,
-        warnings: parsed.warnings,
+        catalog: { ...parsed.catalog, collections: mergedColl.collections.length > 0 ? mergedColl.collections : parsed.catalog.collections },
+        warnings: [...parsed.warnings, ...folder.warnings, ...mergedColl.warnings],
         staleFallback: result.staleFallback,
       };
     }
@@ -177,6 +184,45 @@ async function deliverOne(
     if (fallback && "reason" in fallback) return { reason: fallback.reason };
   }
   return { reason: "reason" in result ? result.reason : "parse" };
+}
+
+/** collections/ 文件夹读取（R4-4.5）：按根级**字符串引用**逐拉 `collections/<id>.json` → 单件解析。
+ *  🔴 有引用才发请求（refs 空 = 零探针——v1 目录零新增请求）；404/坏文件 = invalid-collection 警告
+ *  （引用列了但文件给不出 = 声明缺陷，作者自查要看得到）。 */
+async function fetchCollectionsFolder(
+  url: string,
+  refs: string[],
+  force: boolean,
+): Promise<{ collections: CollectionDecl[]; warnings: CatalogWarning[] }> {
+  const warnings: CatalogWarning[] = [];
+  if (refs.length === 0) return { collections: [], warnings };
+  const out: CollectionDecl[] = [];
+  for (const id of refs) {
+    const fileUrl = catalogSiblingUrl(url, collectionFileOf(id));
+    if (!fileUrl) {
+      warnings.push({ code: "invalid-collection", detail: id });
+      continue;
+    }
+    const res = await fetchSidecar(fileUrl, force);
+    if (!res.ok) {
+      warnings.push({ code: "invalid-collection", detail: id });
+      continue;
+    }
+    let raw: unknown;
+    try {
+      raw = JSON.parse(res.text);
+    } catch {
+      warnings.push({ code: "invalid-collection", detail: id });
+      continue;
+    }
+    const decl = parseCollectionDecl(raw);
+    if (!decl) {
+      warnings.push({ code: "invalid-collection", detail: id });
+      continue;
+    }
+    out.push(decl);
+  }
+  return { collections: out, warnings };
 }
 
 /** K5 回落链：同目录 plugin.json（只读一次；坏清单 = 回落失败，交原失败原因） */

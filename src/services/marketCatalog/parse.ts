@@ -37,6 +37,7 @@ export function parseCatalog(text: string): ParseResult {
     .filter((p): p is CatalogEntry => p !== null);
   const categoryRail = parseCategoryRail(obj.categoryRail);
   if (categoryRail) warnings.push(...railWarningsOf(categoryRail));
+  const { collections, collectionRefs } = parseCollections(obj.collections, warnings);
 
   return {
     ok: true,
@@ -45,7 +46,8 @@ export function parseCatalog(text: string): ParseResult {
       updatedAt: typeof obj.updatedAt === "string" ? obj.updatedAt : undefined,
       plugins,
       sources: parseSourceLinks(obj.sources, warnings),
-      collections: parseCollections(obj.collections, warnings),
+      collections,
+      collectionRefs,
       categoryRail,
     },
     warnings,
@@ -163,32 +165,53 @@ function parseSourceLinks(raw: unknown, warnings: CatalogWarning[]): SourceLink[
   return out;
 }
 
-/** 根级合集声明（06 §二·3）——id/title/items 三者齐才收；`layout` 封闭枚举外丢弃字段 */
-function parseCollections(raw: unknown, warnings: CatalogWarning[]): CollectionDecl[] | undefined {
-  if (!Array.isArray(raw)) return undefined;
+/** 单条合集声明解析（R4-4.5 抽出——inline 数组与 collections/<id>.json 文件两处共用，⛔ 不开第二份实现）。
+ *  id/title/items 三者齐才收；`layout` 封闭枚举外丢弃字段；形状不合格 → null（警告由调用方记）。 */
+export function parseCollectionDecl(raw: unknown): CollectionDecl | null {
+  if (typeof raw !== "object" || raw === null) return null;
+  const r = raw as Partial<CollectionDecl> | null;
+  if (!r || typeof r.id !== "string" || typeof r.title !== "string" || !Array.isArray(r.items)) return null;
   const layouts = new Set(["banner", "strip", "duo", "grid"]);
-  const out: CollectionDecl[] = [];
+  return {
+    id: r.id,
+    title: r.title,
+    subtitle: typeof r.subtitle === "string" ? r.subtitle : undefined,
+    hint: typeof r.hint === "string" ? r.hint : undefined,
+    // 08 §三·v3.57 U4 / 09 §二：合集级 glow 与 more 两处都认（白名单漏行 = 目录带着声明进来被静默丢）
+    glow: r.glow === false ? false : undefined,
+    more: normalizeMoreLink(r.more),
+    cover: typeof r.cover === "string" ? r.cover : undefined,
+    layout: typeof r.layout === "string" && layouts.has(r.layout) ? r.layout : undefined,
+    items: r.items.filter((id): id is string => typeof id === "string"),
+    order: typeof r.order === "number" ? r.order : undefined,
+  };
+}
+
+/** 根级合集声明（06 §二·3）——R4-4.5 两读：对象 = inline 声明；字符串 = 文件夹引用（进 collectionRefs） */
+function parseCollections(
+  raw: unknown,
+  warnings: CatalogWarning[],
+): { collections: CollectionDecl[] | undefined; collectionRefs: string[] | undefined } {
+  if (!Array.isArray(raw)) return { collections: undefined, collectionRefs: undefined };
+  const decls: CollectionDecl[] = [];
+  const refs: string[] = [];
   for (const item of raw) {
-    const r = item as Partial<CollectionDecl> | null;
-    if (!r || typeof r.id !== "string" || typeof r.title !== "string" || !Array.isArray(r.items)) {
-      warnings.push({ code: "invalid-collection", detail: typeof r?.id === "string" ? r.id : undefined });
+    if (typeof item === "string") {
+      if (/^[a-z][a-z0-9-]*$/.test(item)) refs.push(item);
+      else warnings.push({ code: "invalid-collection", detail: item });
       continue;
     }
-    out.push({
-      id: r.id,
-      title: r.title,
-      subtitle: typeof r.subtitle === "string" ? r.subtitle : undefined,
-      hint: typeof r.hint === "string" ? r.hint : undefined,
-      // 08 §三·v3.57 U4 / 09 §二：合集级 glow 与 more 两处都认（白名单漏行 = 目录带着声明进来被静默丢）
-      glow: r.glow === false ? false : undefined,
-      more: normalizeMoreLink(r.more),
-      cover: typeof r.cover === "string" ? r.cover : undefined,
-      layout: typeof r.layout === "string" && layouts.has(r.layout) ? r.layout : undefined,
-      items: r.items.filter((id): id is string => typeof id === "string"),
-      order: typeof r.order === "number" ? r.order : undefined,
-    });
+    const decl = parseCollectionDecl(item);
+    if (!decl) {
+      warnings.push({ code: "invalid-collection", detail: typeof (item as { id?: unknown })?.id === "string" ? (item as { id: string }).id : undefined });
+      continue;
+    }
+    decls.push(decl);
   }
-  return out;
+  return {
+    collections: decls.length > 0 ? decls : undefined,
+    collectionRefs: refs.length > 0 ? refs : undefined,
+  };
 }
 
 /** 合集级跳转字（09 §二）——label/target 都是字符串才收；target 封闭集合在渲染期校验 */
