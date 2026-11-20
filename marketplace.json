@@ -1,25 +1,32 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-04T23:48:47.471Z",
+  "updatedAt": "2026-11-20T11:59:49.495Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.2.0/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.2.1/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.2.0/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.2.1/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.2.0/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.2.0/marketplace.linkdesk-plugin",
-      "size": 62199,
-      "publishedAt": "2026-11-04T23:48:47.471Z",
+      "category": "productivity",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.2.1/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.2.1/marketplace.linkdesk-plugin",
+      "size": 70887,
+      "publishedAt": "2026-11-20T11:59:49.495Z",
       "versions": [
+        {
+          "version": "1.2.1",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.2.1/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-20T11:59:49.495Z",
+          "changelog": "- **目录解析层 v2（R4-2.1–2.3）**：根级 `sources[]`/`collections[]`/`categoryRail` 进解析面；三源合并序＝官方 → 收录（官方目录根 `sources[]`）→ 用户，同 id 高版本胜；`vendors.json` 判定链（authorId 命中 ⇒ 条目带 `vendorId`「官方 ✓」，UI 零再判）；K5 回落链（用户源仓库根无 `marketplace.json` ⇒ 同目录 `plugin.json` 合成 1 条）；分类封闭名单体检（名单外记声明警告、归「其他」桶不丢）；源记录新形态（`string` / `{url}` / 全记录）读兼容。\n- **服务面（R4-2.4–2.7）**：视图偏好 `ui.prefs` 六键持久化（库/作者/分类的视图与排序，重启后保持）；命令面新增 13 条（偏好/浏览/来源/安装类，安装复用壳 `pluginManager`）；探索列表补双击固定；删除 `tabBehavior.singleton` 死声明。\n- **分类声明**：`category: \"productivity\"`（内置件小类可空）——商店分类抽屉归位，随本次发版进入官方目录条目（R4-2.8/2.9）。"
+        },
         {
           "version": "1.2.0",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.2.0/marketplace.linkdesk-plugin",
@@ -47,8 +54,7 @@
         {
           "version": "1.1.7",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.7/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-30T01:26:14.432Z",
-          "changelog": "- **平台层根治落到本仓产物（SDK 0.1.58 重建，插件源码零改动）**：壳仓 `E6#159` 把 SDK 多表面构建从「每表面一次独立 lib build ＋ 事后搬位」改成 **单次多入口 build**——共享模块只产**一份** chunk（`index-*.js`），各表面按 rollup 自算的相对 specifier 引用它。本版只做一件事：devDep 升到 `@linkdesk/plugin-sdk@0.1.58` 后重建。产物读数 = `realmSlot` 槽指纹 `__linkdesk_pluginSlots__marketplace` 从 **7 处**（1.1.6：主入口 ＋ 6 个表面各内联一份）降到 **1 处**（共享 chunk 内）⇒ 「模块级 = 跨视图唯一真相」**前提复位**——1.1.6 加的 `realmSlot` 槽保留不动，从此是**保险带**而非常规依赖（作者本不该被迫写它）。\n- **体积读数（对照 1.1.6，同一份源码）**：JS 总量 289.0 KB → **117.3 KB**（−59.5%）；`views/BuiltinListView.bundle.js` 34.9 KB → **0.86 KB**、`views/InstalledListView.bundle.js` 35.2 KB → **1.16 KB**、`views/DetailView.bundle.js` 86.9 KB → **51.9 KB**（新增共享 chunk `index-*.js` 33.8 KB，全局一份）；`index.bundle.css` 26.35 KB 仍为单份聚合。出厂 zip **128,455 → 77,089 字节**（−40.0%）。\n- **验收（机械 ＋ 真机）**：机械 = ① 槽指纹计数 1（旧 7）② SDK 产物判据 G1/G2 在**构建期强制**（G1 入口齐备 / G2 共享模块唯一，命中抛 `PACKAGER_RED` 硬失败），本仓 8 表面构建全过；真机 = 与 1.1.6 行为对照（「检查更新」后侧栏与详情页**同帧翻新** · 跨表面搜索过滤生效 · `events.on` 单次订阅）——⏳ 读数随本轮发版对照落。`test` 31 文件 437 例绿 · `verify` 六段绿 · `build` 8/8 表面 · **壳侧零改动**。\n- **为什么单独发一版**：老包（1.1.6 及以前）仍是「各表面自包含」，其跨表面共享状态**只靠 `realmSlot` 兜住**；重建即从根上消失。第三方作者仓同理——**用自己的 SDK 升到 0.1.58 后重发**即自动受益，源码一行不用改。"
+          "publishedAt": "2026-09-30T01:26:14.432Z"
         },
         {
           "version": "1.1.6",
