@@ -108,6 +108,12 @@ export async function loadCatalog(force = false): Promise<CatalogLoadResult> {
   }
 
   const attemptedUrls = [...urls.slice(0, 1), ...collectedUrls, ...urls.slice(1)];
+  const sourceStatus = attempts.map((a, i) => {
+    const d = delivered[i];
+    return "reason" in d
+      ? { sourceName: a.result.sourceName, url: a.url, ok: false, reason: d.reason }
+      : { sourceName: a.result.sourceName, url: a.url, ok: true };
+  });
   return {
     entries,
     state,
@@ -119,6 +125,7 @@ export async function loadCatalog(force = false): Promise<CatalogLoadResult> {
     collections: mergeCollections(ordered),
     warnings: ordered.flatMap((d) => d.warnings.map((w) => ({ ...w, source: d.sourceName }))),
     deduped,
+    sourceStatus,
   };
 }
 

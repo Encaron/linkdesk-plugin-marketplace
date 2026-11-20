@@ -8,17 +8,34 @@
 import type { RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "../../ui";
+import { useAuthorDomain } from "../../services/authors";
 import { useStore } from "./StoreContext";
 
 export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputElement> }) {
   const { t } = useTranslation();
-  const { data, searchInput, setSearchInput, clearSearch, checkUpdates, refreshContent, addSource } = useStore();
+  const { data, route, searchInput, setSearchInput, clearSearch, checkUpdates, refreshContent, addSource } =
+    useStore();
+  // 作者店不提供「添加源」入口（蓝图 head(..., canAdd=false)：店内不出现第四方/外部动作）
+  const canAdd = route.page !== "author";
+  // 店名作者自定（09 §二 storeTitle；缺省「〈作者名〉的 Plugin Store」）——作者店头随域换
+  const { domain } = useAuthorDomain(
+    route.page === "author" ? (route.authorId ?? "") : "",
+    data.catalog.entries.length,
+  );
+  const title =
+    route.page === "author"
+      ? (domain?.storeTitle ?? (domain ? t("{{name}} 的 Plugin Store", { name: domain.name }) : t("作者主页")))
+      : "Plugin Store";
+  const sub =
+    route.page === "author"
+      ? (domain?.intro ?? t("第三方作者店"))
+      : t("发现、安装和管理插件");
   const updateCount = data.updateCount;
   return (
     <div className="marketplace-store-head">
       <div className="marketplace-store-head-title">
-        <h1>Plugin Store</h1>
-        <div className="marketplace-store-head-sub">{t("发现、安装和管理插件")}</div>
+        <h1>{title}</h1>
+        <div className="marketplace-store-head-sub">{sub}</div>
       </div>
       <div className="marketplace-store-head-acts">
         <div className="marketplace-store-search">
@@ -72,15 +89,17 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
           <Icon name="refresh" size="sm" />
           {t("刷新内容")}
         </button>
-        <button
-          type="button"
-          className="marketplace-store-head-add"
-          aria-label={t("添加市场源")}
-          data-hint={t("添加市场源（粘贴 GitHub 仓库地址或 marketplace.json 直链）")}
-          onClick={addSource}
-        >
-          <Icon name="plus" size="sm" />
-        </button>
+        {canAdd && (
+          <button
+            type="button"
+            className="marketplace-store-head-add"
+            aria-label={t("添加市场源")}
+            data-hint={t("添加市场源（粘贴 GitHub 仓库地址或 marketplace.json 直链）")}
+            onClick={addSource}
+          >
+            <Icon name="plus" size="sm" />
+          </button>
+        )}
       </div>
     </div>
   );

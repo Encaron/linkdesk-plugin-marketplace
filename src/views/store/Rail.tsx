@@ -32,7 +32,7 @@ function iconOf(slug: string): IconName {
 
 export function Rail() {
   const { t } = useTranslation();
-  const { data, route, navigate, unreadCats } = useStore();
+  const { data, route, navigate, unreadCats, unreadAuthors } = useStore();
   const { railOrder, errors } = data.catalog;
   const counts = data.railOrderCounts;
   const active = route.page;
@@ -130,6 +130,9 @@ export function Rail() {
           <Icon name="user" size="sm" />
           {t("作者")}
           <span className="marketplace-store-rail-count">{data.authorSourceCount}</span>
+          {unreadAuthors.size > 0 && (
+            <span className="marketplace-store-rail-dot is-new" data-hint={t("有新内容")} />
+          )}
         </button>
         <button
           type="button"

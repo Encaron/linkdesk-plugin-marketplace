@@ -70,6 +70,20 @@ export async function readLocalInstalls(): Promise<LocalInstallRecord[]> {
   }
 }
 
+/** 删一条溯源记录（来源页「移除本地安装」= 卸载后调用；记录丢了不影响已装真相） */
+export async function forgetLocalInstall(pluginId: string): Promise<void> {
+  const s = store();
+  if (!s) return;
+  const records = await readLocalInstalls();
+  const next = records.filter((r) => r.pluginId !== pluginId);
+  if (next.length === records.length) return;
+  try {
+    await s.set(KEY, next);
+  } catch {
+    /* 写失败非致命——记录只提供溯源 */
+  }
+}
+
 /** 记一条安装溯源（同 pluginId 覆盖旧记录——重装换了源文件夹时以最后一次为准） */
 export async function recordLocalInstall(pluginId: string, sourcePath: string): Promise<void> {
   const s = store();

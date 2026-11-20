@@ -87,6 +87,10 @@ export interface CollectionDecl {
   subtitle?: string;
   /** 板块副题说明字——不声明不渲染（09 §五） */
   hint?: string;
+  /** 合集级辉光开关（08 §三·v3.57 U4：section.glow 与 collection.glow **两处都认**） */
+  glow?: boolean;
+  /** 合集级跳转字（09 §二：板块 more 与合集 more 两处都认） */
+  more?: { label?: string; target?: string };
   cover?: string;
   /** 卡片原型映射：banner→hero · strip→sm 横排 · duo→lg×2 · grid→md 网格（05 §四） */
   layout?: "banner" | "strip" | "duo" | "grid";

@@ -15,9 +15,10 @@ import { useTranslation } from "react-i18next";
 
 import { forceRefreshCatalog } from "../../services/marketSources";
 import { getCachedUIPrefs, onUIPrefsChange, readUIPrefs, setViewPrefs } from "../../services/marketplaceShared/uiPrefs";
-import type { UIPrefs } from "../../services/marketplaceShared/uiPrefs";
+import type { AuthorSort, LibSort, UIPrefs } from "../../services/marketplaceShared/uiPrefs";
 import { showToast } from "../../services/hostApi";
 import { markSeen } from "../../services/discoverReads";
+import { refreshAuthorDomains } from "../../services/authors";
 import { consumeStoreNavTarget, getStoreNavTarget, onStoreNavChange } from "../../services/storeNav";
 import { catalogSignature } from "../../services/marketCatalog";
 import type { CatSort, InstallFilters } from "./storeData";
@@ -35,7 +36,11 @@ import { HomeView } from "./home/HomeView";
 import { CategoryView } from "./browse/CategoryView";
 import { SearchResultsView } from "./browse/SearchResultsView";
 import { RankView } from "./browse/RankView";
-import { ComingSoon } from "./browse/ComingSoon";
+import { LibraryView } from "./library/LibraryView";
+import { SourcesView } from "./sources/SourcesView";
+import { AddSourceModal, type AddSourceMode } from "./sources/AddSourceModal";
+import { AuthorsView } from "./authors/AuthorsView";
+import { AuthorStoreView } from "./authors/AuthorStoreView";
 import type { ViewMode } from "../../ui";
 
 import "../../styles/ui/primitives.css";
@@ -43,6 +48,9 @@ import "../../styles/store/store-shell.css";
 import "../../styles/store/store-cards.css";
 import "../../styles/store/store-home.css";
 import "../../styles/store/store-browse.css";
+import "../../styles/store/store-authors.css";
+import "../../styles/store/store-library.css";
+import "../../styles/store/store-sources.css";
 
 const BACKGROUND_CHECK_MS = 60_000;
 const FOCUS_CHECK_MS = 15 * 60_000;
@@ -58,6 +66,7 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
   const [filters, setFiltersState] = useState<InstallFilters>({ ...EMPTY_FILTERS });
   const [subChip, setSubChipState] = useState<string | null>(null);
   const [contentPending, setContentPending] = useState(false);
+  const [addSourceMode, setAddSourceMode] = useState<AddSourceMode | null>(null);
 
   const contentRef = useRef<HTMLDivElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
@@ -87,6 +96,22 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
   const setCatSort = useCallback((s: CatSort) => {
     setPrefs((p) => ({ ...p, catSort: s }));
     void setViewPrefs("cat", { sort: s }).catch(() => {});
+  }, []);
+  const setAuthorView = useCallback((v: ViewMode) => {
+    setPrefs((p) => ({ ...p, authorView: v }));
+    void setViewPrefs("author", { view: v }).catch(() => {});
+  }, []);
+  const setAuthorSort = useCallback((s: AuthorSort) => {
+    setPrefs((p) => ({ ...p, authorSort: s }));
+    void setViewPrefs("author", { sort: s }).catch(() => {});
+  }, []);
+  const setLibView = useCallback((v: ViewMode) => {
+    setPrefs((p) => ({ ...p, libView: v }));
+    void setViewPrefs("lib", { view: v }).catch(() => {});
+  }, []);
+  const setLibSort = useCallback((s: LibSort) => {
+    setPrefs((p) => ({ ...p, libSort: s }));
+    void setViewPrefs("lib", { sort: s }).catch(() => {});
   }, []);
 
   /* ── 滚动位：切视图保存旧位、回原位（⛔ 弹回顶部）；状态变化用 keepScroll ── */
@@ -195,6 +220,8 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
    * 本棒不拿「未访问过」冒充「有新内容」（那会在首访后给整店刷点，语义是假的），故点集恒空；
    * 棒 15 接 contentHash 后只改本处输入，rail 的渲染路径已就位。 */
   const unreadCats = useMemo(() => new Set<string>(), []);
+  // 作者项同理：增量判据（contentHash）归棒 15 #12——本棒只保证「进店即已读」写入与渲染路径就位
+  const unreadAuthors = useMemo(() => new Set<string>(), []);
 
   /* ── 内容热更新的背景检查（R4-3.7 桩）：只**比对签名**、不写 store（⛔ 浏览中静默换内容；应用归「刷新」） ── */
   const backgroundCheck = useCallback(async () => {
@@ -257,7 +284,13 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
 
   const dismissContent = useCallback(() => setContentPending(false), []);
 
-  const addSource = useCallback(() => navigate({ page: "sources" }), [navigate]);
+  const openAddSource = useCallback((mode: "remote" | "local" = "remote") => setAddSourceMode(mode), []);
+  const closeAddSource = useCallback(() => {
+    setAddSourceMode(null);
+    void refreshAuthorDomains();
+  }, []);
+  // 三落点（头部「＋」／作者区空态／来源页）统一打开弹窗——⛔ 导航到来源页占位（R4-3.15）
+  const addSource = useCallback(() => openAddSource("remote"), [openAddSource]);
 
   const value: StoreContextValue = useMemo(
     () => ({
@@ -271,16 +304,22 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
       prefs,
       setCatView,
       setCatSort,
+      setAuthorView,
+      setAuthorSort,
+      setLibView,
+      setLibSort,
       filters,
       setFilters: setFiltersState,
       subChip,
       setSubChip: setSubChipState,
       unreadCats,
+      unreadAuthors,
       contentPending,
       refreshContent,
       dismissContent,
       checkUpdates,
       addSource,
+      openAddSource,
       keepScroll,
     }),
     [
@@ -294,14 +333,20 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
       prefs,
       setCatView,
       setCatSort,
+      setAuthorView,
+      setAuthorSort,
+      setLibView,
+      setLibSort,
       filters,
       subChip,
       unreadCats,
+      unreadAuthors,
       contentPending,
       refreshContent,
       dismissContent,
       checkUpdates,
       addSource,
+      openAddSource,
       keepScroll,
     ],
   );
@@ -322,13 +367,20 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
               {route.page === "category" && <CategoryView slug={category} />}
               {route.page === "search" && <SearchResultsView />}
               {route.page === "rank" && <RankView />}
-              {(route.page === "library" ||
-                route.page === "authors" ||
-                route.page === "sources" ||
-                route.page === "author") && <ComingSoon page={route.page} />}
+              {route.page === "authors" && <AuthorsView />}
+              {route.page === "author" && (
+                <AuthorStoreView
+                  key={`${route.authorId ?? ""}:${route.repoId ?? ""}`}
+                  authorId={route.authorId ?? ""}
+                  repoId={route.repoId}
+                />
+              )}
+              {route.page === "library" && <LibraryView />}
+              {route.page === "sources" && <SourcesView />}
             </CatalogGate>
           </div>
         </div>
+        <AddSourceModal open={addSourceMode !== null} initialMode={addSourceMode ?? "remote"} onClose={closeAddSource} />
       </div>
     </StoreProvider>
   );

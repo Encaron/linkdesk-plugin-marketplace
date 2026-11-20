@@ -122,3 +122,42 @@
   .marketplace-store-grid { grid-template-columns: 1fr; }
   .marketplace-store-cat-title { font-size: 20px; }
 }
+
+/* ── 作者跳转落页（09 §二：预过滤＋显示全部）——过滤标识常驻，清除/显示全部就地生效 ── */
+.marketplace-store-filterbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 2px 10px;
+}
+.marketplace-store-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 7px 5px 12px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent-hover);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.marketplace-store-filter-x {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  line-height: 1;
+}
+.marketplace-store-filter-x:hover { background: color-mix(in srgb, var(--accent) 40%, transparent); }
+
+/* 板块辉光开关（声明 glow:false）——整块回落中性阴影，⛔ 自定辉光色 */
+.marketplace-store-sec.is-no-glow .marketplace-store-card { --marketplace-hue: transparent !important; }
+.marketplace-store-mt10 { margin-top: 10px; }

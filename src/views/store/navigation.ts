@@ -27,7 +27,10 @@ export const HOME_ROUTE: StoreRoute = { page: "home" };
 export function routeKey(route: StoreRoute): string {
   switch (route.page) {
     case "category":
-      return `cat:${route.category ?? ""}`;
+      // 作者跳转字落页（authorId 预过滤）与全量分类页是两条浏览条件——滚动位分开记忆
+      return route.authorId
+        ? `cat:${route.category ?? ""}:${route.authorId}`
+        : `cat:${route.category ?? ""}`;
     case "search":
       return "search";
     case "author":

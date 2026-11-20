@@ -10,6 +10,7 @@
 
 import { useTranslation } from "react-i18next";
 import { EmptyState } from "../../../ui";
+import { useAuthorDomain } from "../../../services/authors";
 import { localizeCategory } from "../../../services/marketCategories";
 import { OrderedCards } from "./OrderedCards";
 import { BrowseToolbar } from "./BrowseToolbar";
@@ -27,15 +28,80 @@ import { useStore } from "../StoreContext";
 
 export function CategoryView({ slug }: { slug: string }) {
   const { t } = useTranslation();
-  const { data, prefs, filters, subChip, setSubChip, keepScroll } = useStore();
+  const { data, prefs, filters, subChip, setSubChip, keepScroll, route, navigate } = useStore();
   const label = localizeCategory((key) => t(key), slug);
   const descKey = CATEGORY_DESC[slug];
-  const bucket = data.catalog.entries.filter((e) => primaryCategoryOf(e) === slug);
+  // 作者跳转字落页（09 §二）：全局分类页＋authorId 预过滤；一次性——rail 重入（无 authorId）即全量
+  const authorId = route.page === "category" ? route.authorId : undefined;
+  const { domain: authorDomain, loading: authorLoading } = useAuthorDomain(
+    authorId ?? "",
+    data.catalog.entries.length,
+  );
+  const allOfCategory = data.catalog.entries.filter((e) => primaryCategoryOf(e) === slug);
+  const authorEntries = authorDomain
+    ? [...new Map(authorDomain.repos.flatMap((r) => r.plugins).map((e) => [e.id, e])).values()]
+    : [];
+  const bucket = authorId
+    ? authorEntries.filter((e) => primaryCategoryOf(e) === slug)
+    : allOfCategory;
   const chips = chipsOf(bucket, slug);
   const untagged = untaggedCountOf(bucket, slug);
   const dlOf = (entry: { downloadUrl?: string }) =>
     entry.downloadUrl ? data.counts.get(entry.downloadUrl) : undefined;
 
+  if (authorId && authorLoading) {
+    return (
+      <div className="marketplace-store-state-card" role="status">
+        <span className="marketplace-ui-spin" aria-hidden="true" />
+        <div>
+          <b>{t("正在加载该作者的插件…")}</b>
+          <span>{t("读取作者域后按分类预过滤")}</span>
+        </div>
+      </div>
+    );
+  }
+  if (authorId && authorDomain && authorEntries.length === 0) {
+    // 作者块还没有可展示的插件（空仓/空源）——诚实空态＋逃生门常驻
+    return (
+      <>
+        <div className="marketplace-store-cat-head" data-spec="04-7-category">
+          <div className="marketplace-store-cat-title">{label}</div>
+          <div className="marketplace-store-cat-sub">
+            {t("{{name}} · {{count}} 个插件", { name: authorDomain.name, count: 0 })}
+          </div>
+        </div>
+        <div className="marketplace-store-filterbar">
+          <span className="marketplace-store-tb-label">{t("已过滤")}</span>
+          <span className="marketplace-store-filter-chip">
+            {authorDomain.name} · 0
+            <button
+              type="button"
+              className="marketplace-store-filter-x"
+              aria-label={t("清除过滤")}
+              onClick={() => navigate({ page: "category", category: slug })}
+            >
+              ✕
+            </button>
+          </span>
+          <button
+            type="button"
+            className="marketplace-ui-chip"
+            onClick={() => navigate({ page: "category", category: slug })}
+          >
+            {t("显示全部")}
+          </button>
+        </div>
+        <EmptyState
+          icon="dots"
+          title={t("「{{name}}」在「{{category}}」下暂无插件", {
+            name: authorDomain.name,
+            category: label,
+          })}
+          sub={t("点上方「显示全部」查看该分类全部插件——逃生门常驻不锁")}
+        />
+      </>
+    );
+  }
   if (bucket.length === 0) {
     return (
       <>
@@ -45,10 +111,41 @@ export function CategoryView({ slug }: { slug: string }) {
             {t("{{count}} 个插件", { count: 0 })} · {descKey ? t(descKey) : ""}
           </div>
         </div>
+        {authorId && authorDomain && (
+          <div className="marketplace-store-filterbar">
+            <span className="marketplace-store-tb-label">{t("已过滤")}</span>
+            <span className="marketplace-store-filter-chip">
+              {authorDomain.name} · 0
+              <button
+                type="button"
+                className="marketplace-store-filter-x"
+                aria-label={t("清除过滤")}
+                onClick={() => navigate({ page: "category", category: slug })}
+              >
+                ✕
+              </button>
+            </span>
+            <button
+              type="button"
+              className="marketplace-ui-chip"
+              onClick={() => navigate({ page: "category", category: slug })}
+            >
+              {t("显示全部")}
+            </button>
+          </div>
+        )}
         <EmptyState
           icon="dots"
-          title={t("「{{name}}」暂无插件", { name: label })}
-          sub={t("空抽屉在 rail 灰显；点入显示诚实空态——不伪装、不报错")}
+          title={
+            authorId && authorDomain
+              ? t("「{{name}}」在「{{category}}」下暂无插件", { name: authorDomain.name, category: label })
+              : t("「{{name}}」暂无插件", { name: label })
+          }
+          sub={
+            authorId
+              ? t("点上方「显示全部」查看该分类全部插件——逃生门常驻不锁")
+              : t("空抽屉在 rail 灰显；点入显示诚实空态——不伪装、不报错")
+          }
         />
       </>
     );
@@ -64,10 +161,34 @@ export function CategoryView({ slug }: { slug: string }) {
       <div className="marketplace-store-cat-head" data-spec="04-7-category">
         <div className="marketplace-store-cat-title">{label}</div>
         <div className="marketplace-store-cat-sub">
-          {t("{{count}} 个插件", { count: shown.length })} · {descKey ? t(descKey) : ""} ·{" "}
-          {t("官方与第三方统一混排（单一统一池）")}
+          {t("{{count}} 个插件", { count: shown.length })}
+          {authorId ? `（${t("全分类 {{count}}", { count: allOfCategory.length })}）` : ""} ·{" "}
+          {descKey ? t(descKey) : ""} · {t("官方与第三方统一混排（单一统一池）")}
         </div>
       </div>
+      {authorId && authorDomain && (
+        <div className="marketplace-store-filterbar">
+          <span className="marketplace-store-tb-label">{t("已过滤")}</span>
+          <span className="marketplace-store-filter-chip">
+            {authorDomain.name} · {bucket.length}
+            <button
+              type="button"
+              className="marketplace-store-filter-x"
+              aria-label={t("清除过滤")}
+              onClick={() => navigate({ page: "category", category: slug })}
+            >
+              ✕
+            </button>
+          </span>
+          <button
+            type="button"
+            className="marketplace-ui-chip"
+            onClick={() => navigate({ page: "category", category: slug })}
+          >
+            {t("显示全部")}
+          </button>
+        </div>
+      )}
       <BrowseToolbar />
       {chipRowVisible && (
         <div className="marketplace-store-chiprow">

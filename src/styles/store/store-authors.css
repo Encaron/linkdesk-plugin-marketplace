@@ -1,0 +1,294 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Marketplace Store · 作者域（作者卡 / 仓卡扇出 / 作者列表 / 作者店门店卡）
+   🔴 蓝图 v3.30 / v3.52 / v3.57 的视觉规格照搬；类名一律 marketplace-store-*。
+   🔴 动效只许 transform/opacity/颜色（机械守则）——⛔ 无实体凸起层/portal。
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 作者卡（首页作者栏 ＋ 作者页平铺共用） ── */
+.marketplace-store-author-card {
+  width: 264px;
+  flex: none;
+  padding: 16px;
+  cursor: pointer;
+}
+.marketplace-store-author-card.has-deck {
+  width: 340px;
+  overflow: hidden;
+  position: relative;
+}
+.marketplace-store-author-card.has-deck .marketplace-store-ac-top,
+.marketplace-store-author-card.has-deck .marketplace-store-ac-intro,
+.marketplace-store-author-card.has-deck .marketplace-store-ac-deck,
+.marketplace-store-author-card.has-deck .marketplace-store-ac-meta {
+  position: relative;
+  z-index: 1;
+}
+/* 作者色晕染：静止极淡、hover 增强（纯渐变无边界 ⇒ 不产生「凸起」） */
+.marketplace-store-author-card.has-deck::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    130% 100% at 8% 0%,
+    color-mix(in srgb, var(--marketplace-hue, transparent) 26%, transparent),
+    transparent 62%
+  );
+  opacity: 0.32;
+  transition: opacity 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.marketplace-store-author-card.has-deck:hover::after { opacity: 0.85; }
+
+.marketplace-store-ac-top { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.marketplace-store-ac-avatar {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-on-accent);
+  overflow: visible;
+}
+.marketplace-store-ac-avatar.is-muted {
+  background: var(--bg-input);
+  color: var(--text-muted);
+}
+.marketplace-store-ac-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+  display: block;
+}
+.marketplace-store-ac-avatar-letter { font-size: 20px; font-weight: 600; line-height: 1; }
+/* 头像光环：hover 出现作者色环＋外发光（transform+opacity） */
+.marketplace-store-ac-ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 16px;
+  pointer-events: none;
+  border: 1.5px solid color-mix(in srgb, var(--marketplace-hue, var(--accent)) 78%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--marketplace-hue, var(--accent)) 48%, transparent);
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.22s cubic-bezier(0.2, 0.7, 0.3, 1), transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.marketplace-store-author-card:hover .marketplace-store-ac-ring { opacity: 1; transform: scale(1); }
+
+.marketplace-store-ac-name {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.marketplace-store-ac-badge { font-size: 10.5px; color: var(--accent-hover); margin-top: 2px; }
+.marketplace-store-ac-intro {
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+/* ── 仓卡扇出：静止＝一沓叠错（只露边），hover＝同一拍扇开成横排 ── */
+.marketplace-store-ac-deck { position: relative; height: 40px; margin: 2px 0 10px; }
+.marketplace-store-ac-repo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 98px;
+  height: 38px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  padding: 0 10px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  transform: translate(calc(var(--i) * 6px), calc(var(--i) * 4px));
+  transition: transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1), border-color 0.22s, background 0.22s;
+}
+.marketplace-store-ac-repo b {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.marketplace-store-ac-repo i { font-style: normal; font-size: 10.5px; color: var(--text-muted); }
+.marketplace-store-author-card:hover .marketplace-store-ac-repo {
+  transform: translate(calc(var(--i) * 104px), 0);
+  border-color: color-mix(in srgb, var(--marketplace-hue, transparent) 45%, var(--border));
+}
+/* 边界 ① 单仓：一张满宽卡＋「唯一仓库」，不假装扇出 */
+.marketplace-store-author-card.is-solo .marketplace-store-ac-deck { height: 38px; }
+.marketplace-store-author-card.is-solo .marketplace-store-ac-repo {
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.marketplace-store-author-card.is-solo:hover .marketplace-store-ac-repo { transform: translateY(-3px); }
+/* 边界 ② 4+ 仓：第三张＝+N 汇总卡 */
+.marketplace-store-ac-repo.is-more b { color: var(--text-secondary); }
+
+.marketplace-store-ac-meta {
+  display: flex;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  align-items: center;
+}
+.marketplace-store-ac-go {
+  margin-left: auto;
+  color: var(--accent-hover);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+/* hover 语言：1.08＋作者色光环/晕染＋斜向高光（全部 transform/opacity） */
+.marketplace-store-author-card:hover {
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 18px 52px -12px color-mix(in srgb, var(--marketplace-hue, var(--accent)) 62%, transparent),
+    var(--shadow-pop);
+  border-color: color-mix(in srgb, var(--marketplace-hue, var(--accent)) 30%, var(--border));
+}
+/* 斜向高光扫描（与本体放大同一拍） */
+.marketplace-store-ac-sheen {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 3;
+  background: linear-gradient(
+    104deg,
+    transparent 38%,
+    color-mix(in srgb, var(--text-primary) 10%, transparent) 48%,
+    transparent 60%
+  );
+  transform: translateX(-130%);
+  opacity: 0;
+  transition: transform 0.24s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.18s linear;
+}
+.marketplace-store-author-card.has-deck:hover .marketplace-store-ac-sheen {
+  transform: translateX(130%);
+  opacity: 1;
+}
+
+/* ── 作者店内：门店切换卡（作者卡同款；官方第一/当前仓 ring；⛔ 第四方） ── */
+.marketplace-store-author-card.is-switch { width: 264px; }
+.marketplace-store-author-card.is-switch:hover { transform: translateY(-3px) scale(1.06); }
+.marketplace-store-author-card.is-switch.is-on {
+  box-shadow: inset 0 0 0 1.5px var(--accent),
+    0 12px 44px -8px color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-card));
+}
+
+/* ── 作者页：平铺网格（auto-fill 340）＋详细行 ── */
+.marketplace-store-author-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+.marketplace-store-author-grid .marketplace-store-author-card { width: auto; }
+.marketplace-store-author-list { display: flex; flex-direction: column; gap: 10px; }
+
+.marketplace-store-author-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.marketplace-store-author-row-av {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-on-accent);
+  font-weight: 600;
+  font-size: 17px;
+}
+.marketplace-store-author-row-main { min-width: 0; flex: 1; }
+.marketplace-store-author-row-name {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.marketplace-store-author-row-tag {
+  font-size: 10.5px;
+  border-radius: 8px;
+  padding: 1px 7px;
+  line-height: 15px;
+  flex: none;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent-hover);
+}
+.marketplace-store-author-row-tag.is-official {
+  border: 1px solid var(--separator);
+  background: transparent;
+  color: var(--text-secondary);
+}
+.marketplace-store-author-row-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.marketplace-store-author-row-go {
+  flex: none;
+  color: var(--text-muted);
+  opacity: 0.5;
+  transition: opacity 0.15s, transform 0.15s, color 0.15s;
+}
+.marketplace-store-author-row:hover .marketplace-store-author-row-go {
+  opacity: 1;
+  transform: translateX(2px);
+  color: var(--accent-hover);
+}
+
+/* 计数药丸（作者行 / 来源页共用） */
+.marketplace-store-src-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  padding: 4px 11px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent-hover);
+  font-size: 11.5px;
+  font-weight: 600;
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.marketplace-store-src-pill b { font-size: 13.5px; }
+
+/* 作者页页头副行（store-head-sub 之上的独立一行） */
+.marketplace-store-page-sub { margin: -10px 2px 14px; }
+
+@media (max-width: 700px) {
+  .marketplace-store-author-grid { grid-template-columns: 1fr; }
+  .marketplace-store-author-card.has-deck,
+  .marketplace-store-author-card.is-switch { width: 300px; }
+}

@@ -1,0 +1,304 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Marketplace Store · 来源管理 + 加源弹窗（v3.31/v3.36）：作者组 / 仓行 / 锁定行 / 弹窗
+   🔴 类名一律 marketplace-store-*；颜色/字号/间距只走令牌；浮层承载归 OverlayPortal（#ld-float-layer）。
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.marketplace-store-src-summary { font-size: 12.5px; color: var(--text-muted); margin: -10px 2px 14px; }
+.marketplace-store-src-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 2px 16px;
+  flex-wrap: wrap;
+}
+.marketplace-store-src-add-big { height: 34px; padding: 0 16px; font-size: 13px; gap: 8px; }
+.marketplace-store-src-topnote { font-size: 11.5px; color: var(--text-muted); }
+
+.marketplace-store-src-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.marketplace-store-src-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+}
+.marketplace-store-src-row.is-locked { background: color-mix(in srgb, var(--accent) 7%, var(--bg-card)); }
+.marketplace-store-src-ico {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-on-accent);
+  font-weight: 600;
+  font-size: 15px;
+}
+.marketplace-store-src-ico.is-muted { background: var(--bg-input); color: var(--text-secondary); }
+.marketplace-store-src-main { min-width: 0; flex: 1; }
+.marketplace-store-src-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.marketplace-store-src-url {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.marketplace-store-src-meta { font-size: 11.5px; color: var(--text-muted); flex: none; }
+.marketplace-store-src-err { color: var(--danger); font-weight: 600; }
+.marketplace-store-src-acts { display: flex; gap: 4px; flex: none; align-items: center; }
+.marketplace-store-src-tag {
+  font-size: 10.5px;
+  border-radius: 8px;
+  padding: 1px 7px;
+  line-height: 15px;
+  flex: none;
+  border: 1px solid var(--separator);
+  color: var(--text-muted);
+}
+.marketplace-store-src-tag.is-official {
+  border-color: var(--separator);
+  color: var(--text-secondary);
+}
+.marketplace-store-src-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: background 0.15s, color 0.15s;
+}
+.marketplace-store-src-icon:hover:not(:disabled) { background: var(--tab-hover-bg); color: var(--text-primary); }
+.marketplace-store-src-icon:disabled { opacity: 0.3; cursor: default; }
+.marketplace-store-src-icon.is-danger:hover:not(:disabled) { color: var(--danger); border-color: var(--danger); }
+.marketplace-store-src-note {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin: 4px 2px 16px;
+  line-height: 1.6;
+}
+
+/* ── 作者组（展示单位）＋仓行（条目单位） ── */
+.marketplace-store-src-group {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  overflow: hidden;
+}
+.marketplace-store-src-ghead {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--text-primary) 4%, transparent);
+}
+.marketplace-store-src-collapse {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: transform 0.16s cubic-bezier(0.2, 0.7, 0.3, 1), background 0.15s;
+}
+.marketplace-store-src-collapse:hover { background: var(--tab-hover-bg); color: var(--text-primary); }
+.marketplace-store-src-group.is-collapsed .marketplace-store-src-collapse { transform: rotate(-90deg); }
+.marketplace-store-src-group.is-collapsed .marketplace-store-src-line { display: none; }
+.marketplace-store-src-enter-name {
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.marketplace-store-src-enter-name:hover { color: var(--accent-hover); }
+.marketplace-store-src-enter {
+  font-size: 11px;
+  color: var(--accent-hover);
+  font-weight: 600;
+  flex: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.marketplace-store-src-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+.marketplace-store-src-warn {
+  font-size: 11px;
+  color: var(--warn);
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+  border-radius: 99px;
+  padding: 3px 9px;
+  flex: none;
+  cursor: help;
+  white-space: nowrap;
+}
+.marketplace-store-src-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 14px 9px 18px;
+  border-top: 1px solid var(--separator);
+}
+/* 停用只淡化文字区，⛔ 不动按钮（v3.36 修） */
+.marketplace-store-src-line.is-off .marketplace-store-src-repo,
+.marketplace-store-src-line.is-off .marketplace-store-src-url,
+.marketplace-store-src-line.is-off .marketplace-store-src-meta { opacity: 0.45; }
+.marketplace-store-src-repo {
+  font-size: 12.5px;
+  font-weight: 600;
+  flex: none;
+  width: 88px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.marketplace-store-src-line .marketplace-store-src-url { flex: 1; min-width: 0; }
+.marketplace-store-cfm-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--danger);
+  cursor: pointer;
+}
+
+/* ── 加源弹窗（OverlayPortal 内；遮罩/弹窗样式本件私有） ── */
+.marketplace-store-modal-bg {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg-window) 55%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-overlay-backdrop, 500);
+  padding: 24px;
+}
+.marketplace-store-modal {
+  width: 520px;
+  max-width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-pop);
+  padding: 20px 20px 16px;
+  z-index: calc(var(--z-overlay-backdrop, 500) + 1);
+}
+.marketplace-store-modal.is-sm { width: 460px; }
+.marketplace-store-modal h2 { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+.marketplace-store-m-sub { font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: 14px; line-height: 1.5; }
+.marketplace-store-m-tabs { display: flex; gap: 6px; margin: 12px 0 10px; }
+.marketplace-store-m-tab {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.marketplace-store-m-tab.is-on {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--text-primary);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+}
+.marketplace-store-m-field {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 9px 12px;
+  transition: border-color 0.15s;
+}
+.marketplace-store-m-field:focus-within { border-color: var(--accent-hover); }
+.marketplace-store-m-field input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+.marketplace-store-m-hint { font-size: 11.5px; color: var(--text-muted); margin: 8px 2px 0; }
+.marketplace-store-m-msg { font-size: var(--font-size-xs); margin: 8px 2px 0; min-height: 17px; }
+.marketplace-store-m-msg.is-bad { color: var(--danger); }
+.marketplace-store-m-msg.is-ok { color: var(--accent-hover); }
+.marketplace-store-m-preview {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-input);
+}
+.marketplace-store-mp-av {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent-hover);
+}
+.marketplace-store-mp-n { font-weight: 600; font-size: 13.5px; }
+.marketplace-store-mp-s { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; word-break: break-all; }
+.marketplace-store-m-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+@media (max-width: 700px) {
+  .marketplace-store-src-repo { width: 64px; }
+  .marketplace-store-src-meta { display: none; }
+}
+
+/* K5 末档模板链接（弹窗内 / 来源行内两用） */
+.marketplace-store-m-link {
+  border: none;
+  background: transparent;
+  color: var(--accent-hover);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  margin: 6px 2px 0;
+}
+.marketplace-store-m-link:hover { color: var(--text-primary); }
+.marketplace-store-m-link.is-inline { margin: 0 0 0 6px; font-size: 11px; }

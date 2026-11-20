@@ -156,6 +156,9 @@ function parseCollections(raw: unknown, warnings: CatalogWarning[]): CollectionD
       title: r.title,
       subtitle: typeof r.subtitle === "string" ? r.subtitle : undefined,
       hint: typeof r.hint === "string" ? r.hint : undefined,
+      // 08 §三·v3.57 U4 / 09 §二：合集级 glow 与 more 两处都认（白名单漏行 = 目录带着声明进来被静默丢）
+      glow: r.glow === false ? false : undefined,
+      more: normalizeMoreLink(r.more),
       cover: typeof r.cover === "string" ? r.cover : undefined,
       layout: typeof r.layout === "string" && layouts.has(r.layout) ? r.layout : undefined,
       items: r.items.filter((id): id is string => typeof id === "string"),
@@ -163,6 +166,15 @@ function parseCollections(raw: unknown, warnings: CatalogWarning[]): CollectionD
     });
   }
   return out;
+}
+
+/** 合集级跳转字（09 §二）——label/target 都是字符串才收；target 封闭集合在渲染期校验 */
+function normalizeMoreLink(raw: unknown): { label?: string; target?: string } | undefined {
+  if (typeof raw !== "object" || raw === null) return undefined;
+  const r = raw as { label?: unknown; target?: unknown };
+  const label = typeof r.label === "string" && r.label.trim() ? r.label : undefined;
+  const target = typeof r.target === "string" && r.target.trim() ? r.target : undefined;
+  return label || target ? { ...(label ? { label } : {}), ...(target ? { target } : {}) } : undefined;
 }
 
 /** 根级 rail 顺序声明（06 §二·3）——形状守卫；名单校验在 railWarningsOf */

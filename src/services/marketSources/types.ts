@@ -52,6 +52,8 @@ export interface CatalogLoadResult {
   warnings: CatalogWarning[];
   /** v2：同 id 多源冲突回执（诊断用；不改变「版本高者胜、平手先到者胜」规则） */
   deduped: MergeConflict[];
+  /** 本趟逐源结果（来源页行状态「目录拉取 X 前 / 加载失败·用缓存」的数据面；R4-3.14） */
+  sourceStatus?: Array<{ sourceName: string; url: string; ok: boolean; reason?: string }>;
 }
 
 /** 目录 IO 注入点类型（jsdom 测试替换） */

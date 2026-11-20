@@ -11,6 +11,7 @@ import type { StoreData } from "./useStoreData";
 import type { StoreCardHandlers } from "./cards/cardParts";
 import type { StoreRoute } from "./navigation";
 import type { CatSort, InstallFilters } from "./storeData";
+import type { AuthorSort, LibSort } from "../../services/marketplaceShared/uiPrefs";
 import type { UIPrefs } from "../../services/marketplaceShared/uiPrefs";
 import type { ViewMode } from "../../ui";
 
@@ -26,10 +27,16 @@ export interface StoreContextValue {
   prefs: UIPrefs;
   setCatView: (v: ViewMode) => void;
   setCatSort: (s: CatSort) => void;
+  setAuthorView: (v: ViewMode) => void;
+  setAuthorSort: (s: AuthorSort) => void;
+  setLibView: (v: ViewMode) => void;
+  setLibSort: (s: LibSort) => void;
   filters: InstallFilters;
   setFilters: (f: InstallFilters) => void;
   /** 发现型未读分类（rail 6px 点；进入即已读） */
   unreadCats: ReadonlySet<string>;
+  /** 发现型未读作者（rail 作者项 6px 点；进店即已读——与分类点同体系） */
+  unreadAuthors: ReadonlySet<string>;
   /** 当前小类 chip（`null` = 全部；`__none` = 未标注兜底） */
   subChip: string | null;
   setSubChip: (chip: string | null) => void;
@@ -38,6 +45,8 @@ export interface StoreContextValue {
   dismissContent: () => void;
   checkUpdates: () => void;
   addSource: () => void;
+  /** 打开加源弹窗（网络/本地两页签；来源页两个大按钮也走这里） */
+  openAddSource: (mode?: "remote" | "local") => void;
   /** 状态变化（排序/筛选/视图/chip）时保滚动位——机械守则：页面不跳 */
   keepScroll: (fn: () => void) => void;
 }
