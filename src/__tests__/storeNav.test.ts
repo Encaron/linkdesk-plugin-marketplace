@@ -10,6 +10,7 @@ import {
   getStoreNavTarget,
   normalizeStoreNavTarget,
   onStoreNavChange,
+  consumeStoreNavTarget,
   publishStoreNav,
   readStoreNavTarget,
 } from "../services/storeNav";
@@ -28,7 +29,7 @@ function makeWorld(initial?: unknown) {
   };
   const pluginState = {
     get: vi.fn(async () => stored),
-    set: vi.fn(async (_k: string, v: unknown) => {
+    set: vi.fn(async (_owner: string, _key: string, v: unknown) => {
       stored = v;
     }),
   };
@@ -99,5 +100,25 @@ describe("publish / read", () => {
     await publishStoreNav({ page: "library" });
     await publishStoreNav({ page: "library" });
     expect(calls).toBe(1);
+  });
+});
+
+describe("consumeStoreNavTarget —— 一次性消费（棒 6 商店壳取读口）", () => {
+  it("读到非 home 意图后复位持久层为 home（不广播、不 notify）", async () => {
+    const w = makeWorld({ page: "category", category: "themes" });
+    const notified: unknown[] = [];
+    const un = onStoreNavChange(() => notified.push(getStoreNavTarget()));
+    expect(await consumeStoreNavTarget()).toEqual({ page: "category", category: "themes" });
+    expect(w.stored()).toEqual({ page: "home" });
+    expect(notified).toEqual([]); // 复位不是导航信号
+    // 第二次消费 = home（信箱已空）
+    expect(await consumeStoreNavTarget()).toEqual({ page: "home" });
+    un();
+  });
+
+  it("已是 home 不写盘（幂等零副作用）", async () => {
+    const w = makeWorld(undefined);
+    expect(await consumeStoreNavTarget()).toEqual({ page: "home" });
+    expect(w.pluginState.set).not.toHaveBeenCalled();
   });
 });

@@ -45,12 +45,12 @@ async function clickAndSettle() {
 }
 
 describe("位置与次序（05 §一·①）", () => {
-  it("钮在动作行**最左**，既有「安装」「市场源」两钮次序零改动", () => {
+  it("钮在动作行**最左**，既有「检查更新」「安装」「市场源」次序零改动（棒 6 在其上新增商店入口）", () => {
     const { container } = render(<SearchView />);
     const row = container.querySelector(".marketplace-ms-header-actions");
     expect(row).toBeTruthy();
     const labels = [...(row as HTMLElement).querySelectorAll("button")].map((b) => (b.textContent ?? "").trim());
-    expect(labels).toEqual(["检查更新", "安装", "市场源"]);
+    expect(labels).toEqual(["进入 Plugin Store", "检查更新", "安装", "市场源"]);
   });
 
   it("🔴 提示挂槽位、不挂钮：钮的可见文字就是它的无障碍名（不给钮传 title/aria-label）", () => {

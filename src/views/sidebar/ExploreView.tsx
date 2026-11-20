@@ -32,8 +32,8 @@ import {
   getMarketplaceSearch,
 } from "../../services/marketplaceShared";
 import { useInstallJobsSubscription } from "../../services/installJobs";
-import { useCatalogStatus } from "./ExploreView/useCatalogStatus";
-import { useCatalogInstall } from "./ExploreView/useCatalogInstall";
+import { useCatalogStatus } from "../../services/catalogStatus";
+import { useMarketInstallAction } from "../../services/marketInstallAction";
 import CatalogRow from "./ExploreView/CatalogRow";
 import { CatalogErrorState, CatalogLoading, CatalogNoMatch, CatalogNone } from "./ExploreView/CatalogEmpty";
 /* E6#86d：侧栏样式已按实测分节拆为 3 件（原 MarketplaceSidebar.css 680 行）——**本处按原文档顺序
@@ -56,7 +56,7 @@ export default function ExploreView() {
   useInstallJobsSubscription();
   const online = useOnlineStatus();
   const { statusOf, identityOf, localLoading } = useCatalogStatus();
-  const { handleInstall } = useCatalogInstall(online);
+  const { handleInstall } = useMarketInstallAction(online);
 
   /* 行点击开详情（E6#30.5b——详情页三态 action bar 的未装验证入口）——与已装列表同款 plugin-detail 标签。
    *  E6#30.7b：目录行带 label（entry.name）——未装目标插件壳 viewRegistry 无 manifest 无法命名

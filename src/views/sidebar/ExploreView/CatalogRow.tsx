@@ -26,8 +26,8 @@ import { useTranslation } from "react-i18next";
 import { PluginIcon, pickIdentityArt } from "@linkdesk/ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import CatalogRowAction from "./CatalogRowAction";
-import { authorLabel, formatSize } from "./catalogRowText";
-import type { LocalIdentity, RowStatus } from "./useCatalogStatus";
+import { authorLabel, formatSize } from "../../../services/catalogText";
+import type { LocalIdentity, RowStatus } from "../../../services/catalogStatus";
 
 export default function CatalogRow({
   entry,

@@ -16,7 +16,7 @@ import {
 } from "../../../services/marketplaceShared";
 import { installJobLabel, pickInstallJob } from "../../../services/installJobs";
 import type { CatalogEntry } from "../../../services/marketCatalog";
-import type { RowStatus } from "./useCatalogStatus";
+import type { RowStatus } from "../../../services/catalogStatus";
 
 export default function CatalogRowAction({
   entry,

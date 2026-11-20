@@ -40,7 +40,7 @@ function ensureMarketplaceCommands(): void {
   // commands:register → 元数据同步 + 池 _poolCommands 存 handler。两半程幂等汇合
   // （registerShellLocalCommand / registerPoolCommandMetadata 各有已有条目分支）。
   // 菜单 slot ID 用字符串字面量（serial-monitor E5.6#11.5h 同款——MenuId 不再 import）。
-  const reg = lk().commands?.registerCommand;
+  const reg = lk()?.commands?.registerCommand;
   if (!reg) return; // 双进程执行——壳/池 preload 均含 commands 命名空间（#56 后），守卫防旧环境
 
   // handler 不声明 _token——两半程 infra 均已剥离 token 占位后才调 handler：
@@ -104,7 +104,7 @@ function ensureMarketplaceCommands(): void {
   // 检查更新/刷新目录/全部已读/视图偏好。handler 与实现边界见 `marketplaceCommands.ts` 头注。
   registerMarketplaceStoreCommands();
 
-  lk().menu?.registerItems?.("marketplaceItemGear", "marketplace", [
+  lk()?.menu?.registerItems?.("marketplaceItemGear", "marketplace", [
     { command: "core.openSettings", group: "navigation", when: "marketplace.extensionHasConfiguration" },
     { command: "theme.pick", group: "navigation", when: "marketplace.extensionHasThemes" }, // E5.8#50.24：theme.pick 归一化命令 id
     { command: "workbench.action.selectLanguage", group: "navigation", when: "marketplace.extensionHasLanguages" },

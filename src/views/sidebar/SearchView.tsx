@@ -75,6 +75,16 @@ export default function SearchView() {
   return (
     <div className="marketplace-ms-header">
       <div className="marketplace-ms-header-actions">
+        {/* 03 §一·2 方案 A：侧栏常驻入口（toolbar 段）——唯一动作 = 命令 marketplace.openStore
+            （GUI 动作 ↔ 命令一一对应；⛔ 视图里另写一份开标签逻辑）。 */}
+        <button
+          className="marketplace-ms-store-btn"
+          onClick={() => void lk()?.commands?.executeCommand?.("marketplace.openStore")}
+          data-hint={t("打开主区 Plugin Store")}
+        >
+          <span className="codicon codicon-shopping-bag" aria-hidden="true" />
+          {t("进入 Plugin Store")}
+        </button>
         {/* 05「插件市场·检查更新」：第三枚钮。2026-09-30 用户拍板改版式——「检查更新」**独占一行**（钮 +
          *  就地注同排），「安装」「市场源」固定在下一行：注出现/消失不再把两颗写操作钮挤得上下跳。
          *  手动绕开 5min 目录缓存 + 重投影刷新「可更新」徽标，零壳改动。 */}

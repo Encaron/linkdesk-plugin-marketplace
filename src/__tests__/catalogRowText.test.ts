@@ -14,7 +14,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { authorLabel, formatSize } from "../views/sidebar/ExploreView/catalogRowText";
+import { authorLabel, formatSize } from "../services/catalogText";
 
 describe("authorLabel（author 兼容 {name,url} / string 两形态——抽展示名）", () => {
   it("string 形态 → 原样；空串 → undefined", () => {

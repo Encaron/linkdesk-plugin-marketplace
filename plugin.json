@@ -267,6 +267,11 @@
           "id": "marketplace-install-confirm",
           "title": "确认安装",
           "render": "src/views/confirm/ConfirmInstall.tsx"
+        },
+        {
+          "id": "marketplace-store",
+          "title": "插件商店",
+          "render": "src/views/store/StoreView.tsx"
         }
       ]
     }

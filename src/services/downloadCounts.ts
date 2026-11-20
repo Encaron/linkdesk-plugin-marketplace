@@ -158,3 +158,70 @@ export function useDownloadCount(downloadUrl?: string): DownloadCountState {
 
   return state;
 }
+
+/* ═══ 批量口（R4-3.5/3.6：首页榜单、分类页「最多下载」排序） ═══
+ *
+ * 为什么要有批量口：商店一屏有几十个条目，逐个调 `useDownloadCount` = 每卡一个 hook + 一次请求；
+ * 榜单排序要的是一张**同源计数表**（一处拉、处处读）。本 hook 用同一份资产级缓存与同一把 fetch，
+ * 只多了「并发上限 + 一张 Map」。
+ *
+ * 并发 3、失败静默（hidden 语义与单条一致：拿不到就不显示，⛔ 造假）；缓存 10 分钟。
+ * ⚠️ 未认证 GitHub API 60 次/小时——首次打开商店最多 N 个资产各一次，10 分钟内重开零请求。
+ */
+const BATCH_CONCURRENCY = 3;
+
+function initialCounts(urls: readonly string[]): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const url of urls) {
+    const t = parseGithubReleaseDownloadUrl(url);
+    if (!t) continue;
+    const hit = readCachedCount(t);
+    if (hit !== undefined) out.set(url, hit);
+  }
+  return out;
+}
+
+/** 批量下载数——返回 `downloadUrl → count`（无数据 = 不在表里，UI 按 hidden 处理） */
+export function useDownloadCounts(downloadUrls: readonly string[]): ReadonlyMap<string, number> {
+  const key = downloadUrls.join("\n");
+  const [counts, setCounts] = useState<Map<string, number>>(() => initialCounts(downloadUrls));
+
+  useEffect(() => {
+    let alive = true;
+    const urls = key ? key.split("\n") : [];
+    setCounts(initialCounts(urls));
+
+    const targets: Array<{ url: string; target: GithubReleaseTarget }> = [];
+    for (const url of urls) {
+      const target = parseGithubReleaseDownloadUrl(url);
+      if (!target) continue;
+      if (readCachedCount(target) !== undefined) continue;
+      targets.push({ url, target });
+    }
+    if (targets.length === 0) return;
+
+    let cursor = 0;
+    const worker = async () => {
+      while (alive && cursor < targets.length) {
+        const item = targets[cursor++];
+        const n = await fetchAssetDownloadCount(item.target);
+        if (!alive || n === null) continue;
+        setCounts((prev) => {
+          if (prev.get(item.url) === n) return prev;
+          const next = new Map(prev);
+          next.set(item.url, n);
+          return next;
+        });
+      }
+    };
+    for (let i = 0; i < Math.min(BATCH_CONCURRENCY, targets.length); i++) void worker();
+
+    return () => {
+      alive = false;
+    };
+    // key 已把整组 URL 归一成字符串——列表内容不变不重拉
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+
+  return counts;
+}

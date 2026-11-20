@@ -1,0 +1,437 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Marketplace Store · 壳层（布局 / rail / 页头 / 常驻条 / 板块节奏 / 状态卡 / 响应式）
+   🔴 类名一律 marketplace-store-* / marketplace-ui-*（硬约束 23）；颜色/半径/字号只走令牌。
+   🔴 状态变化只许 transform/opacity/颜色（机械守则）——hover 不推挤邻居。
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.marketplace-store {
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  background: var(--bg-window);
+  color: var(--text-primary);
+  user-select: text;
+}
+.marketplace-store button,
+.marketplace-store .marketplace-store-card,
+.marketplace-store .marketplace-ui-ic,
+.marketplace-store .marketplace-ui-badge,
+.marketplace-store .marketplace-ui-corner {
+  user-select: none;
+}
+
+/* ── rail（三段式：品牌块 / 浏览 / 固定底栏） ── */
+.marketplace-store-rail {
+  width: 110px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 10px 7px;
+  overflow: hidden;
+  background: var(--bg-side-panel);
+  border-right: 1px solid var(--border);
+}
+.marketplace-store-rail-top {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 7px 8px;
+  margin: 0 -7px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.marketplace-store-rail-home {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 8px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, var(--border));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent 72%);
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.marketplace-store-rail-home:hover {
+  background: color-mix(in srgb, var(--accent) 18%, var(--tab-hover-bg));
+}
+.marketplace-store-rail-home.is-active {
+  border-color: var(--accent-hover);
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--accent) 75%, transparent);
+}
+.marketplace-store-rail-hi {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: var(--text-on-accent);
+}
+.marketplace-store-rail-hi .marketplace-ui-ic { width: 17px; height: 17px; }
+.marketplace-store-rail-htx { min-width: 0; display: flex; flex-direction: column; }
+.marketplace-store-rail-ht { font-size: var(--font-size-sm); font-weight: 700; line-height: 1.25; }
+.marketplace-store-rail-hs { font-size: 9.5px; color: var(--text-secondary); line-height: 1.2; }
+.marketplace-store-rail-scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  margin: 0 -7px;
+  padding: 0 7px;
+}
+.marketplace-store-rail-foot {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--border);
+  margin: 8px -7px 0;
+  padding: 8px 7px 0;
+}
+.marketplace-store-rail-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 2px 4px;
+  text-align: center;
+}
+.marketplace-store-rail-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 12px 4px 10px;
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.marketplace-store-rail-item .marketplace-ui-ic { width: 20px; height: 20px; }
+.marketplace-store-rail-item:hover { background: var(--hover-overlay); color: var(--text-primary); }
+.marketplace-store-rail-item.is-active {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+.marketplace-store-rail-item.is-empty { opacity: 0.5; }
+.marketplace-store-rail-item.is-compact {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 9px;
+  padding: 10px 9px;
+  border-radius: 8px;
+  font-size: var(--font-size-xs);
+  min-height: 38px;
+}
+.marketplace-store-rail-item.is-compact .marketplace-ui-ic { width: 16px; height: 16px; }
+.marketplace-store-rail-count {
+  margin-left: 0;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.marketplace-store-rail-item.is-compact .marketplace-store-rail-count { margin-left: auto; font-size: 11px; }
+.marketplace-store-rail-count.is-warn { color: var(--warning); font-weight: 600; }
+.marketplace-store-rail-gap { height: 12px; }
+.marketplace-store-rail-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--danger);
+  position: absolute;
+  top: 9px;
+  right: 9px;
+}
+.marketplace-store-rail-dot.is-new {
+  background: var(--accent-hover);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent-hover) 60%, transparent);
+}
+.marketplace-store-rail-item.is-compact .marketplace-store-rail-dot {
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+}
+
+/* ── 内容滚动区 / 页面 ── */
+.marketplace-store-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+.marketplace-store-page {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 26px 36px 60px;
+  box-sizing: border-box;
+}
+
+/* ── 页头 ── */
+.marketplace-store-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.marketplace-store-head-title h1 {
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.marketplace-store-head-sub { color: var(--text-muted); font-size: var(--font-size-xs); margin-top: 2px; }
+.marketplace-store-head-acts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.marketplace-store-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 360px;
+  padding: 7px 12px;
+  background: var(--bg-input);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  transition: border-color 0.15s;
+}
+.marketplace-store-search:focus-within { border-color: var(--accent-hover); }
+.marketplace-store-search .marketplace-ui-ic { color: var(--accent-hover); }
+.marketplace-store-search input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+.marketplace-store-search input::placeholder { color: var(--text-secondary); }
+.marketplace-store-search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.marketplace-store-search-clear:hover { background: var(--hover-overlay); color: var(--text-primary); }
+.marketplace-store-head-check {
+  height: 34px;
+  padding: 0 11px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  flex: none;
+}
+.marketplace-store-head-check:hover { color: var(--text-primary); border-color: var(--separator); }
+.marketplace-store-head-count {
+  min-width: 16px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: var(--danger);
+  color: var(--text-on-accent);
+  font-size: 10px;
+  line-height: 15px;
+  text-align: center;
+}
+.marketplace-store-head-add {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: var(--bg-input);
+  color: var(--accent-hover);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.marketplace-store-head-add:hover {
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg-input));
+  transform: scale(1.06);
+}
+
+/* ── 内容已更新常驻条 ── */
+.marketplace-store-content-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 2px 16px;
+  padding: 9px 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+.marketplace-store-content-bar .marketplace-ui-ic { color: var(--accent-hover); flex: none; }
+.marketplace-store-content-bar-text { flex: 1; min-width: 0; }
+.marketplace-store-sbtn {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+.marketplace-store-sbtn:hover { background: var(--tab-hover-bg); color: var(--text-primary); }
+
+/* ── 板块节奏 ── */
+.marketplace-store-sec { margin-bottom: 36px; }
+.marketplace-store-sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.marketplace-store-sec-head h3 {
+  font-size: 16.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.marketplace-store-sec-hint { color: var(--text-muted); font-size: var(--font-size-2xs); }
+.marketplace-store-sec-more {
+  margin-left: auto;
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--accent-hover);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.marketplace-store-sec-more:hover { text-decoration: underline; }
+
+/* ── 状态卡（加载/失败/空） ── */
+.marketplace-store-state-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, 560px);
+  margin: 24px auto;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+.marketplace-store-state-card b { display: block; font-size: var(--font-size-sm); color: var(--text-primary); margin-bottom: 3px; }
+.marketplace-store-state-card span { font-size: var(--font-size-2xs); line-height: 1.5; }
+.marketplace-store-state-icon.is-danger { color: var(--danger); }
+
+/* ── 目录注记（降级/单源失败） ── */
+.marketplace-store-cat-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  margin-bottom: 18px;
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+}
+.marketplace-store-cat-note .marketplace-ui-ic { color: var(--warning); flex: none; }
+
+/* ── 工具类 ── */
+.marketplace-store-fx1 { min-width: 0; flex: 1; }
+.marketplace-store-mn0 { min-width: 0; }
+
+/* ── 响应式（对齐蓝图 1080/900/700 三档） ── */
+@media (max-width: 1080px) {
+  .marketplace-store-rail { width: 96px; }
+}
+@media (max-width: 900px) {
+  .marketplace-store { flex-direction: column; }
+  .marketplace-store-head { flex-wrap: wrap; gap: 10px; }
+  .marketplace-store-head-title h1 { font-size: 20px; }
+  .marketplace-store-head-acts { margin-left: 0; width: 100%; }
+  .marketplace-store-search { width: 100%; max-width: 420px; }
+  .marketplace-store-rail {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 6px 8px;
+    gap: 6px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: thin;
+  }
+  .marketplace-store-rail-top { flex-direction: row; flex-wrap: nowrap; border-bottom: none; margin: 0; padding: 0; gap: 6px; }
+  .marketplace-store-rail-home { width: auto; flex: none; }
+  .marketplace-store-rail-scroll { flex-direction: row; flex-wrap: nowrap; overflow: visible; flex: 0 0 auto; margin: 0; padding: 0; gap: 6px; }
+  .marketplace-store-rail-foot { flex-direction: row; flex-wrap: nowrap; border-top: none; margin: 0; padding: 0; gap: 6px; flex: none; }
+  .marketplace-store-rail-item {
+    flex: 0 0 auto;
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 12px;
+    min-width: 0;
+    border-radius: 8px;
+  }
+  .marketplace-store-rail-label,
+  .marketplace-store-rail-gap { display: none; }
+  .marketplace-store-rail-item.is-compact { height: 40px; }
+  .marketplace-store-rail-count { margin-left: 0; }
+}
+@media (max-width: 700px) {
+  .marketplace-store-page { padding: 18px 16px 48px; }
+  .marketplace-store-head-title h1 { font-size: 18px; }
+  .marketplace-store-search { max-width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketplace-store-rail-home,
+  .marketplace-store-rail-item,
+  .marketplace-store-head-check,
+  .marketplace-store-head-add,
+  .marketplace-store-content-bar {
+    transition-duration: 0.01ms;
+  }
+}

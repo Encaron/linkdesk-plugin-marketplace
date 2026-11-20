@@ -37,6 +37,28 @@
   min-width: 0;
 }
 
+/* 03 §一·2 方案 A：进入主区 Plugin Store 的常驻入口（独占一行，视觉最重；动作 = 命令） */
+.marketplace-ms-store-btn {
+  flex-basis: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--text-primary);
+  font-size: var(--font-size-xs);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.marketplace-ms-store-btn:hover {
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+  border-color: var(--accent-hover);
+}
+
 .marketplace-ms-install-btn {
   display: flex;
   align-items: center;

@@ -151,6 +151,44 @@ export function onStoreNavChange(fn: () => void): () => void {
   };
 }
 
+/**
+ * **消费**一次导航意图（棒 6 商店壳的唯一取读口）。
+ *
+ * 与 `readStoreNavTarget()` 的区别：消费会把持久层复位成 `home`（不广播、不触发监听）——
+ * 意图是「一次性信箱」不是浏览偏好：命令打开某分类 → 商店读到并应用 → 下次冷启动不该又回到那个分类。
+ * 广播路径（已挂载时命令到达）用 `getStoreNavTarget()` 即时取；本函数负责**首挂载/晚挂载**那一次。
+ */
+export async function consumeStoreNavTarget(): Promise<StoreNavTarget> {
+  ensureBridge();
+  if (!state.loaded) {
+    const ps = window.linkdesk?.pluginState;
+    if (ps) {
+      try {
+        const raw = await ps.get(OWNER, KEY);
+        const target = normalizeStoreNavTarget(raw);
+        if (target) {
+          state.target = target;
+          state.loaded = true;
+        }
+      } catch {
+        /* 读失败回落 home */
+      }
+    }
+  }
+  const target = state.target;
+  // 复位信箱（不 notify——调用方已经在应用这条意图；notify 会让监听方再应用一次 home）
+  state.target = DEFAULT_TARGET;
+  state.loaded = true;
+  if (target.page !== "home") {
+    try {
+      await window.linkdesk?.pluginState?.set(OWNER, KEY, DEFAULT_TARGET);
+    } catch {
+      /* 持久失败不影响本次导航 */
+    }
+  }
+  return target;
+}
+
 /** 测试专用：清本模块内存态（槽对象被模块捕获，`__resetRealmSlots` 清不到它）。产线不调。 */
 export function __resetStoreNavState(): void {
   state.target = DEFAULT_TARGET;
