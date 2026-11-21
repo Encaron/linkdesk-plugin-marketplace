@@ -15,6 +15,7 @@ import { useAuthorDomain } from "../../../services/authors";
 import { localizeCategory } from "../../../services/marketCategories";
 import { OrderedCards } from "./OrderedCards";
 import { BrowseToolbar } from "./BrowseToolbar";
+import { StickyBar } from "../StickyBar";
 import { primaryCategoryOf } from "../../../services/marketCatalog";
 import {
   applyInstallFilters,
@@ -201,55 +202,57 @@ export function CategoryView({ slug }: { slug: string }) {
           {descKey ? t(descKey) : ""}
         </div>
       </div>
-      {scoped && scopedName && (officialOnly || authorDomain) && (
-        <div className="marketplace-store-filterbar">
-          <span className="marketplace-store-tb-label">{t("已过滤")}</span>
-          <span className="marketplace-store-filter-chip">
-            {scopedName} · {bucket.length}
+      <StickyBar group>
+        {scoped && scopedName && (officialOnly || authorDomain) && (
+          <div className="marketplace-store-filterbar">
+            <span className="marketplace-store-tb-label">{t("已过滤")}</span>
+            <span className="marketplace-store-filter-chip">
+              {scopedName} · {bucket.length}
+              <button
+                type="button"
+                className="marketplace-store-filter-x"
+                aria-label={t("清除过滤")}
+                onClick={() => navigate({ page: "category", category: slug })}
+              >
+                ✕
+              </button>
+            </span>
             <button
               type="button"
-              className="marketplace-store-filter-x"
-              aria-label={t("清除过滤")}
+              className="marketplace-ui-chip"
               onClick={() => navigate({ page: "category", category: slug })}
             >
-              ✕
+              {t("显示全部")}
             </button>
-          </span>
-          <button
-            type="button"
-            className="marketplace-ui-chip"
-            onClick={() => navigate({ page: "category", category: slug })}
-          >
-            {t("显示全部")}
-          </button>
-        </div>
-      )}
-      <BrowseToolbar />
-      {chipRowVisible && (
-        <div className="marketplace-store-chiprow">
-          {chips.map((chip) => (
-            <button
-              type="button"
-              key={chip}
-              className={`marketplace-ui-chip ${subChip === chip ? "is-on" : ""}`}
-              onClick={() => keepScroll(() => setSubChip(subChip === chip ? null : chip))}
-            >
-              {t(`tag.${chip}` as string)}
-            </button>
-          ))}
-          {untagged > 0 && (
-            <button
-              type="button"
-              className={`marketplace-ui-chip ${subChip === "__none" ? "is-on" : ""}`}
-              data-hint={t("只声明了大类、没有声明小类的插件——不强行归类")}
-              onClick={() => keepScroll(() => setSubChip(subChip === "__none" ? null : "__none"))}
-            >
-              {t("未标注小类 · {{count}}", { count: untagged })}
-            </button>
-          )}
-          <span className="marketplace-store-chip-hint">{t("小类有货即显（≥1）")}</span>
-        </div>
-      )}
+          </div>
+        )}
+        <BrowseToolbar />
+        {chipRowVisible && (
+          <div className="marketplace-store-chiprow">
+            {chips.map((chip) => (
+              <button
+                type="button"
+                key={chip}
+                className={`marketplace-ui-chip ${subChip === chip ? "is-on" : ""}`}
+                onClick={() => keepScroll(() => setSubChip(subChip === chip ? null : chip))}
+              >
+                {t(`tag.${chip}` as string)}
+              </button>
+            ))}
+            {untagged > 0 && (
+              <button
+                type="button"
+                className={`marketplace-ui-chip ${subChip === "__none" ? "is-on" : ""}`}
+                data-hint={t("只声明了大类、没有声明小类的插件——不强行归类")}
+                onClick={() => keepScroll(() => setSubChip(subChip === "__none" ? null : "__none"))}
+              >
+                {t("未标注小类 · {{count}}", { count: untagged })}
+              </button>
+            )}
+            <span className="marketplace-store-chip-hint">{t("小类有货即显（≥1）")}</span>
+          </div>
+        )}
+      </StickyBar>
       {filtered.length === 0 ? (
         <EmptyState
           icon="funnel"

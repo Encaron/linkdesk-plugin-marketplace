@@ -28,6 +28,7 @@ import {
 } from "../../../services/sourceAdmin";
 import { openExternal, showToast } from "../../../services/hostApi";
 import { PLUGIN_TEMPLATE_URL } from "./AddSourceModal";
+import { StickyBar } from "../StickyBar";
 import { useStore } from "../StoreContext";
 import { authorWarningLines } from "../authors/authorWarnings";
 import { catalogWarningLines } from "./catalogWarnings";
@@ -237,19 +238,21 @@ export function SourcesView() {
           plugins: totalPlugins,
         })}
       </div>
-      <div className="marketplace-store-src-topbar">
-        <button type="button" className="marketplace-ui-btn is-primary marketplace-store-src-add-big" onClick={() => openAddSource("remote")}>
-          <Icon name="link" size="sm" />
-          {t("添加网络源")}
-        </button>
-        <button type="button" className="marketplace-ui-btn is-secondary marketplace-store-src-add-big" onClick={() => openAddSource("local")}>
-          <Icon name="folder" size="sm" />
-          {t("添加本地插件")}
-        </button>
-        <span className="marketplace-store-src-topnote">
-          {t("网络源＝仓库地址（同作者多仓自动合并）；本地＝直接选本机文件夹，不走网络")}
-        </span>
-      </div>
+      <StickyBar group>
+        <div className="marketplace-store-src-topbar">
+          <button type="button" className="marketplace-ui-btn is-primary marketplace-store-src-add-big" onClick={() => openAddSource("remote")}>
+            <Icon name="link" size="sm" />
+            {t("添加网络源")}
+          </button>
+          <button type="button" className="marketplace-ui-btn is-secondary marketplace-store-src-add-big" onClick={() => openAddSource("local")}>
+            <Icon name="folder" size="sm" />
+            {t("添加本地插件")}
+          </button>
+          <span className="marketplace-store-src-topnote">
+            {t("网络源＝仓库地址（同作者多仓自动合并）；本地＝直接选本机文件夹，不走网络")}
+          </span>
+        </div>
+      </StickyBar>
 
       <div className="marketplace-store-src-list">
         <div className="marketplace-store-src-row is-locked">

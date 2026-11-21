@@ -12,6 +12,7 @@ import type { AuthorDomain } from "../../../services/authors";
 import { useAuthorDomains } from "../../../services/authors";
 import type { AuthorSort } from "../../../services/marketplaceShared/uiPrefs";
 import { useStore } from "../StoreContext";
+import { StickyBar } from "../StickyBar";
 import { AuthorCard } from "./AuthorCard";
 import { authorPluginCount, sortAuthorDomains } from "./authorsData";
 
@@ -77,16 +78,18 @@ export function AuthorsView() {
           : t("第三方作者的店会出现在这里——先添加市场源")}
       </div>
       {list.length > 0 && (
-        <div className="marketplace-store-toolbar">
-          <span className="marketplace-store-tb-label">{t("排序")}</span>
-          <SortSelect
-            ariaLabel={t("排序")}
-            value={prefs.authorSort}
-            options={SORT_SETS.author}
-            onChange={(v) => setAuthorSort(v as AuthorSort)}
-          />
-          <ViewSeg value={prefs.authorView} onChange={setAuthorView} />
-        </div>
+        <StickyBar group>
+          <div className="marketplace-store-toolbar">
+            <span className="marketplace-store-tb-label">{t("排序")}</span>
+            <SortSelect
+              ariaLabel={t("排序")}
+              value={prefs.authorSort}
+              options={SORT_SETS.author}
+              onChange={(v) => setAuthorSort(v as AuthorSort)}
+            />
+            <ViewSeg value={prefs.authorView} onChange={setAuthorView} />
+          </div>
+        </StickyBar>
       )}
       {list.length === 0 ? (
         <EmptyState

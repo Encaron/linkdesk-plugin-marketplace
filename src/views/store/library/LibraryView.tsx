@@ -41,6 +41,7 @@ import { bulkDisable, bulkUninstall, markAllDiscoverRead, updateAll } from "../.
 import { CardGrid } from "../cards/CardGrid";
 import { cardKeyDown, Tile, type StoreCardContext } from "../cards/cardParts";
 import { useStore } from "../StoreContext";
+import { StickyBar } from "../StickyBar";
 import {
   buildLibraryRows,
   EMPTY_LIB_FILTERS,
@@ -294,57 +295,59 @@ export function LibraryView() {
         </div>
       </div>
 
-      <div className="marketplace-store-lib-toolbar">
-        <div className="marketplace-store-lib-search">
-          <Icon name="search" size="sm" />
-          <input
-            type="text"
-            value={search}
-            placeholder={t("在库中搜索…")}
-            aria-label={t("在库中搜索")}
-            onChange={(e) => setSearch(e.target.value)}
+      <StickyBar group>
+        <div className="marketplace-store-lib-toolbar">
+          <div className="marketplace-store-lib-search">
+            <Icon name="search" size="sm" />
+            <input
+              type="text"
+              value={search}
+              placeholder={t("在库中搜索…")}
+              aria-label={t("在库中搜索")}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          {/* F17（2026-11-21 橱窗判据）：原生 select → 共享 SelectBox（Chrome 原生皮在玻璃/主题下穿帮） */}
+          {/* F34（2026-11-21）：共享 SelectBox 自带皮肤——⛔ 不传自定义 class（双层 border/background = 两侧白边） */}
+          <SelectBox
+            title={t("状态筛选")}
+            value={filters.status}
+            options={[
+              { value: "all", label: t("全部状态") },
+              { value: "upd", label: t("可更新") },
+              { value: "off", label: t("已停用") },
+              { value: "core", label: t("内置") },
+            ]}
+            onChange={(v) => setFilters({ ...filters, status: v as LibFilters["status"] })}
           />
+          <SelectBox
+            title={t("来源筛选")}
+            value={filters.source}
+            options={[
+              { value: "all", label: t("全部来源") },
+              { value: "official", label: t("官方") },
+              { value: "third", label: t("社区") },
+              { value: "local", label: t("本地插件") },
+            ]}
+            onChange={(v) => setFilters({ ...filters, source: v as LibSourceFilter })}
+          />
+          <SelectBox
+            title={t("作者筛选")}
+            value={filters.author}
+            options={[{ value: "all", label: t("全部作者") }, ...authors.map((a) => ({ value: a, label: a }))]}
+            onChange={(v) => setFilters({ ...filters, author: v })}
+          />
+          <SelectBox
+            title={t("仓库筛选")}
+            value={filters.repo}
+            options={[{ value: "all", label: t("全部仓库") }, ...repos.map((r) => ({ value: r, label: r }))]}
+            onChange={(v) => setFilters({ ...filters, repo: v })}
+          />
+          <span className="marketplace-store-tb-label">{t("排序")}</span>
+          <SortSelect ariaLabel={t("排序")} value={prefs.libSort} options={SORT_SETS.lib} onChange={(v) => setLibSort(v as LibSort)} />
+          <ViewSeg value={prefs.libView} onChange={setLibView} />
         </div>
-        {/* F17（2026-11-21 橱窗判据）：原生 select → 共享 SelectBox（Chrome 原生皮在玻璃/主题下穿帮） */}
-        {/* F34（2026-11-21）：共享 SelectBox 自带皮肤——⛔ 不传自定义 class（双层 border/background = 两侧白边） */}
-        <SelectBox
-          title={t("状态筛选")}
-          value={filters.status}
-          options={[
-            { value: "all", label: t("全部状态") },
-            { value: "upd", label: t("可更新") },
-            { value: "off", label: t("已停用") },
-            { value: "core", label: t("内置") },
-          ]}
-          onChange={(v) => setFilters({ ...filters, status: v as LibFilters["status"] })}
-        />
-        <SelectBox
-          title={t("来源筛选")}
-          value={filters.source}
-          options={[
-            { value: "all", label: t("全部来源") },
-            { value: "official", label: t("官方") },
-            { value: "third", label: t("社区") },
-            { value: "local", label: t("本地插件") },
-          ]}
-          onChange={(v) => setFilters({ ...filters, source: v as LibSourceFilter })}
-        />
-        <SelectBox
-          title={t("作者筛选")}
-          value={filters.author}
-          options={[{ value: "all", label: t("全部作者") }, ...authors.map((a) => ({ value: a, label: a }))]}
-          onChange={(v) => setFilters({ ...filters, author: v })}
-        />
-        <SelectBox
-          title={t("仓库筛选")}
-          value={filters.repo}
-          options={[{ value: "all", label: t("全部仓库") }, ...repos.map((r) => ({ value: r, label: r }))]}
-          onChange={(v) => setFilters({ ...filters, repo: v })}
-        />
-        <span className="marketplace-store-tb-label">{t("排序")}</span>
-        <SortSelect ariaLabel={t("排序")} value={prefs.libSort} options={SORT_SETS.lib} onChange={(v) => setLibSort(v as LibSort)} />
-        <ViewSeg value={prefs.libView} onChange={setLibView} />
-      </div>
+      </StickyBar>
 
       {rows.length === 0 ? (
         <EmptyState

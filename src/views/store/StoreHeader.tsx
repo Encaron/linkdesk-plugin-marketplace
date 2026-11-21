@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "../../ui";
 import { useAuthorDomain } from "../../services/authors";
 import { useStore } from "./StoreContext";
+import { StickyBar } from "./StickyBar";
 
 export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputElement> }) {
   const { t } = useTranslation();
@@ -32,7 +33,7 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
       : t("发现、安装和管理插件");
   const updateCount = data.updateCount;
   return (
-    <div className="marketplace-store-head">
+    <StickyBar placement="head" className="marketplace-store-head">
       <div className="marketplace-store-head-title">
         <h1>{title}</h1>
         <div className="marketplace-store-head-sub">{sub}</div>
@@ -101,7 +102,7 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
           </button>
         )}
       </div>
-    </div>
+    </StickyBar>
   );
 }
 

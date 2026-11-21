@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { EmptyState } from "../../../ui";
 import { OrderedCards } from "./OrderedCards";
 import { BrowseToolbar } from "./BrowseToolbar";
+import { StickyBar } from "../StickyBar";
 import { applyInstallFilters, orderEntries, searchEntries, type CatSort } from "../storeData";
 import { useStore } from "../StoreContext";
 
@@ -48,7 +49,9 @@ export function SearchResultsView() {
         />
       ) : (
         <>
-          <BrowseToolbar />
+          <StickyBar group>
+            <BrowseToolbar />
+          </StickyBar>
           {filtered.length === 0 ? (
             <EmptyState icon="funnel" title={t("没有符合筛选条件的插件")} sub={t("试着放宽筛选条件")} />
           ) : (
