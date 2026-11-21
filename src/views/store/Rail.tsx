@@ -115,9 +115,13 @@ export function Rail() {
           {t("库")}
           <span
             className={`marketplace-store-rail-count ${data.updateCount ? "is-warn" : ""}`}
-            data-hint={data.updateCount ? t("{{count}} 个可更新", { count: data.updateCount }) : t("已安装数")}
+            data-hint={
+              data.updateCount
+                ? t("已安装 {{installed}} 个 · {{count}} 个可更新", { installed: data.installedCount, count: data.updateCount })
+                : t("已安装 {{installed}} 个", { installed: data.installedCount })
+            }
           >
-            {data.updateCount || data.installedCount}
+            {data.installedCount}
           </span>
         </button>
         <button

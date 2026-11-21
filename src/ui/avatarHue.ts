@@ -43,14 +43,24 @@ export function hueOf(seed: string): string {
   return HUES[hash(seed) % HUES.length];
 }
 
-/** 头像底：135° 双档渐变（蓝图 `hueBG` 同形；`C8` = 78% alpha） */
+/**
+ * 头像底：135° 双档渐变（蓝图 `hueBG` 同形；`C8` = 78% alpha）。
+ *
+ * 🔴 用**长手** `backgroundImage` ＋ 显式 `backgroundOrigin:"border-box"`——⛔ 不用 `background` 简写：
+ *   简写会把 background-origin 重置回 padding-box，而全局 box-sizing:border-box 下 padding-box 比
+ *   边框盒每边小 1px ⇒ 渐变只铺到 padding-box，那 1px 落在边框底下；边框半透明（玻璃主题）时
+ *   就露成一条 1px 串色/白边（同型先例：壳 16b05ec57「分段预览色块边缘串色」，2026-10-07）。
+ */
 export function hueBG(hue: string): CSSProperties {
-  return { background: `linear-gradient(135deg, ${hue}, ${hue}C8)` };
+  return { backgroundImage: `linear-gradient(135deg, ${hue}, ${hue}C8)`, backgroundOrigin: "border-box" };
 }
 
-/** 封面/大图底：128° 三段渐变（蓝图 `artBG` 同形） */
+/** 封面/大图底：128° 三段渐变（蓝图 `artBG` 同形）——长手＋border-box，理由同上（F25/F13 根因）。 */
 export function artBG(hue: string): CSSProperties {
-  return { background: `linear-gradient(128deg, ${hue} 0%, ${hue}B8 55%, ${hue}70 100%)` };
+  return {
+    backgroundImage: `linear-gradient(128deg, ${hue} 0%, ${hue}B8 55%, ${hue}70 100%)`,
+    backgroundOrigin: "border-box",
+  };
 }
 
 /** 条目种子——优先 pluginId（同一插件各卡同色），没有则退名字 */

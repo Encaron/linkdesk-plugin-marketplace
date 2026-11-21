@@ -31,6 +31,7 @@ import { PLUGIN_TEMPLATE_URL } from "./AddSourceModal";
 import { useStore } from "../StoreContext";
 import { authorWarningLines } from "../authors/authorWarnings";
 import { catalogWarningLines } from "./catalogWarnings";
+import { summarizeWarnings } from "./warningSummary";
 import { agoText, groupRemoteSources, type AuthorSourceGroup, type SourceRowView } from "./sourcesData";
 
 type PendingRemove =
@@ -97,10 +98,9 @@ export function SourcesView() {
   const officialCount = data.catalog.entries.filter((e) => e.official).length;
   /* R4-3.18：官方源也是网络源——目录条目缺抓取字段 / 分类声明越界同样要在来源页留痕。
    * 官方源不走作者组（恒锁定行），故单独按 warning.source 过滤。 */
-  const officialWarningLines = catalogWarningLines(
-    t,
-    data.catalog.warnings.filter((w) => !!w.source && w.source === data.catalog.sourceNames[0]),
-  );
+  const officialWarnings = data.catalog.warnings.filter((w) => !!w.source && w.source === data.catalog.sourceNames[0]);
+  const officialWarningLines = catalogWarningLines(t, officialWarnings);
+  const officialWarnSummary = summarizeWarnings(t, officialWarnings);
   const totalPlugins = domains.reduce((n, d) => n + d.repos.reduce((m, r) => m + r.plugins.length, 0), 0);
 
   const toggleCollapse = (id: string) => {
@@ -220,7 +220,7 @@ export function SourcesView() {
   return (
     <>
       <div className="marketplace-store-src-summary">
-        {t("{{authors}} 位作者 · {{sources}} 个作者源 · {{local}} 个本地插件 · 共 {{plugins}} 个插件（官方源恒内置）", {
+        {t("{{authors}} 位作者 · {{sources}} 个作者源 · {{local}} 个本地插件 · 作者源共 {{plugins}} 个插件（官方源恒内置，不计入）", {
           authors: groups.length,
           sources: enabledSources,
           local: localRecords.length,
@@ -257,7 +257,7 @@ export function SourcesView() {
           <span className="marketplace-store-src-meta">{t("{{count}} 个插件 · 恒内置", { count: officialCount })}</span>
           {officialWarningLines.length > 0 && (
             <span className="marketplace-store-src-warn" data-hint={officialWarningLines.join("\n")}>
-              {t("{{count}} 条声明提示", { count: officialWarningLines.length })}
+              {officialWarnSummary.label}
             </span>
           )}
           <div className="marketplace-store-src-acts">
@@ -274,6 +274,7 @@ export function SourcesView() {
             ...authorWarningLines(t, group.warnings),
             ...catalogWarningLines(t, group.catalogWarnings),
           ];
+          const warnSummary = summarizeWarnings(t, [...group.warnings, ...group.catalogWarnings]);
           return (
             <div
               key={group.authorId}
@@ -319,7 +320,7 @@ export function SourcesView() {
                 </div>
                 {lines.length > 0 && (
                   <span className="marketplace-store-src-warn" data-hint={lines.join("\n")}>
-                    {t("{{count}} 条声明提示", { count: lines.length })}
+                    {warnSummary.label}
                   </span>
                 )}
                 <span className="marketplace-store-src-pill">

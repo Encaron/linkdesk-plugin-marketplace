@@ -170,8 +170,10 @@ describe("来源管理（R4-3.14/3.15）", () => {
     const container = await goto("sources");
     await waitFor(() => expect(screen.getByText("官方 Plugin Store")).toBeTruthy());
     await waitFor(() => expect(screen.getAllByText("Demo Author").length).toBeGreaterThan(0));
-    // 声明提示：block 里两个 hero → 1 条
-    expect(screen.getByText("1 条声明提示")).toBeTruthy();
+    // 声明提示：block 里两个 hero → 聚合短标「重复大屏 ×1」（F5）；明细仍在 data-hint
+    const warn = screen.getByText("重复大屏 ×1");
+    expect(warn).toBeTruthy();
+    expect(warn.getAttribute("data-hint") ?? "").toContain("只有第 1 个占据置顶首视觉");
 
     // 源级停用：写回原始数组（string → 记录 + enabled:false）
     const toggle = container.querySelector(".marketplace-store-src-line .marketplace-store-sbtn") as HTMLElement;

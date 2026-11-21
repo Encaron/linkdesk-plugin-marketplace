@@ -62,6 +62,8 @@
   justify-content: center;
   overflow: hidden;
   color: var(--text-on-accent);
+  /* F25（同型先例 壳 16b05ec57）：渐变铺贴几何必须按边框盒算——否则半透明边框下露 1px 白边 */
+  background-origin: border-box;
 }
 .marketplace-store-art-icon {
   width: 66px;
@@ -146,6 +148,17 @@
   transition: opacity 0.18s cubic-bezier(0.2, 0.7, 0.3, 1), transform 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
   z-index: 2;
 }
+/* F14 单层呈现（2026-11-21 用户同意）：展开层出现时，被它盖住的**主面同内容**退场——
+   同一内容同一时刻只呈现一份；否则玻璃下透过展开层还能看到下层放大本体的形状/颜色。 */
+.marketplace-store-card.is-small:hover .marketplace-store-cs-top,
+.marketplace-store-card.is-small:focus-within .marketplace-store-cs-top,
+.marketplace-store-card.is-grid:hover .marketplace-store-cg-top,
+.marketplace-store-card.is-grid:hover .marketplace-store-cg-stats,
+.marketplace-store-card.is-grid:focus-within .marketplace-store-cg-top,
+.marketplace-store-card.is-grid:focus-within .marketplace-store-cg-stats {
+  visibility: hidden;
+}
+
 .marketplace-store-card:hover .marketplace-store-x-over,
 .marketplace-store-card:focus-within .marketplace-store-x-over {
   opacity: 1;
