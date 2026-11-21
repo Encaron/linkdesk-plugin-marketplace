@@ -6,6 +6,10 @@
 .marketplace-store-hero-wrap {
   position: relative; /* F10：箭头的定位锚（画面外两侧） */
   margin-bottom: 4px;
+  /* 窄容器文字地板（2026-11-21 用户报「分屏/缩窄后 hero 标题一行一个字」）：fr 的最小值 =
+     min-content，CJK 的 min-content 就是 1 个字 ⇒ 窄下来必一字一行。正解 = 按**容器实宽**
+     切单列（容器查询，分屏组同样生效）＋网格给显式地板。 */
+  container-type: inline-size;
 }
 .marketplace-store-hero {
   position: relative;
@@ -28,9 +32,16 @@
 .marketplace-store-hero-slide {
   min-width: 100%;
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  /* 地板 240px：文案列不再被压成一字一行 */
+  grid-template-columns: minmax(240px, 1.1fr) minmax(0, 0.9fr);
   min-height: 270px;
   cursor: pointer;
+}
+/* 容器 < 620px：切单列（文案在上、图在下）——分屏组/窄面板与窗口缩放同规 */
+@container (max-width: 620px) {
+  .marketplace-store-hero-slide { grid-template-columns: 1fr; }
+  .marketplace-store-hero-copy { padding: 24px 22px 20px; }
+  .marketplace-store-art.is-hero { min-height: 120px; }
 }
 .marketplace-store-hero-copy {
   padding: 30px 8px 26px 34px;

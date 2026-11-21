@@ -175,6 +175,8 @@
 
 /* ═══ ActionButton ═══ */
 .marketplace-ui-btn {
+  /* 窄容器不给按钮无限压扁：最大宽 = 容器宽，内部文案走省略号 */
+  max-width: 100%;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -194,7 +196,13 @@
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.marketplace-ui-btn-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.marketplace-ui-btn-label {
+  /* 窄容器文字地板（2026-11-21）：按钮文案单行省略——⛔ 被压成一字一行/竖条 */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .marketplace-ui-btn.is-primary { background: var(--accent); color: var(--text-on-accent); }
 .marketplace-ui-btn.is-primary:hover:not(:disabled) { background: var(--accent-hover); }
 .marketplace-ui-btn.is-secondary { border-color: var(--border); color: var(--text-secondary); }

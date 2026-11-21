@@ -230,7 +230,8 @@
 /* ── duo（编辑精选：左文案 / 右大图） ── */
 .marketplace-store-card.is-duo {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
+  /* 同 hero：fr 的 min-content 对 CJK = 1 字 ⇒ 显式地板，窄则整列下沉 */
+  grid-template-columns: minmax(220px, 1.05fr) minmax(0, 0.95fr);
   min-height: 192px;
   cursor: pointer;
   overflow: hidden;

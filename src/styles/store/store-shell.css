@@ -17,6 +17,17 @@
 .marketplace-store .marketplace-store-card,
 .marketplace-store .marketplace-ui-ic,
 .marketplace-store .marketplace-ui-badge,
+/* ═══ 窄容器文字地板（范式 · 2026-11-21 用户抓漏后立）═══
+   症状：分屏/窗口缩窄后，标题、按钮、说明出现「一行一个字」竖排，或横条露出浏览器原生滚动条。
+   根因两类：① CSS Grid/Flex 的 fr / auto 最小尺寸 = min-content——CJK 的 min-content 就是 1 个字；
+             ② 横向滚动容器没关原生滚动条（Chromium 默认画一条原生条）。
+   纪律（四条，新面照抄）：
+     1) 分栏网格一律给地板：`minmax(<地板>, Xfr)`；容器再窄就按**容器查询**切单列（不靠窗口宽）。
+     2) 文本块一律 `min-width: 0` ＋ 行数上限（-webkit-line-clamp）或单行省略（nowrap+ellipsis）。
+     3) 按钮文案单行省略（`.marketplace-ui-btn-label`），按钮自身 `max-width: 100%`。
+     4) 横向滚动容器一律 `scrollbar-width: none` ＋ `::-webkit-scrollbar{display:none}`（哑滚动）。
+   ⛔ 只在个别页面补丁＝未归一化；新组件落码前先过这四条。 */
+
 .marketplace-store .marketplace-ui-corner {
   user-select: none;
 }
@@ -398,8 +409,10 @@
     gap: 6px;
     border-right: none;
     border-bottom: 1px solid var(--border);
-    scrollbar-width: thin;
+    /* 2026-11-21 用户报：窄窗横条露出 Chrome 原生滚动条 ⇒ 隐藏（与横排板块同一纪律：哑滚动） */
+    scrollbar-width: none;
   }
+  .marketplace-store-rail::-webkit-scrollbar { display: none; }
   .marketplace-store-rail-top { flex-direction: row; flex-wrap: nowrap; border-bottom: none; margin: 0; padding: 0; gap: 6px; }
   .marketplace-store-rail-home { width: auto; flex: none; }
   .marketplace-store-rail-scroll { flex-direction: row; flex-wrap: nowrap; overflow: visible; flex: 0 0 auto; margin: 0; padding: 0; gap: 6px; }
