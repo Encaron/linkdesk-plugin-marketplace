@@ -460,6 +460,15 @@
   transform: translateY(var(--surface-lift)) scale(var(--surface-scale));
 }
 .marketplace-store-card.is-row:hover { transform-origin: left center; }
+/* 带展开面的卡（small/grid）：面与磨砂由 `.x-over` 独占——卡体再挂 backdrop-filter 会形成
+   backdrop root，把子层越界区的采样截断（玻璃主题下＝里面磨砂、长大那截透明）。 */
+.marketplace-store-card:has(.marketplace-store-x-over):hover,
+.marketplace-store-card:has(.marketplace-store-x-over):focus-within {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
 
 /* ── 工具类 ── */
 .marketplace-store-fx1 { min-width: 0; flex: 1; }
