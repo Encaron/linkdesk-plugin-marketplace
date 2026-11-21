@@ -173,6 +173,21 @@
   font-size: 12px;
   font-weight: 700;
 }
+/* 2026-11-22 用户口径（F47 收尾）：两行价格**去实底**——实底胶囊看着像按钮。
+   层级只靠文字：模型词浅色（secondary/500），金额强调色加粗；⛔ 不加底/不加框。
+   仅作用于 stacked+paid（小卡窄位）；单行角标维持原样。 */
+.marketplace-ui-corner.is-stacked.is-paid {
+  background: none;
+  color: var(--text-primary);
+}
+.marketplace-ui-corner.is-stacked.is-paid .marketplace-ui-corner-model {
+  color: var(--text-secondary);
+  font-weight: 500;
+  opacity: 1;
+}
+.marketplace-ui-corner.is-stacked.is-paid .marketplace-ui-corner-amount {
+  color: var(--accent);
+}
 .marketplace-ui-corner.is-paid { background: var(--accent); color: var(--text-on-accent); }
 .marketplace-ui-corner.is-update { background: var(--marketplace-update-bg); color: var(--marketplace-update-fg); }
 .marketplace-ui-corner.is-expired { background: var(--danger); color: var(--text-on-accent); }
