@@ -70,15 +70,16 @@
   object-fit: cover;
 }
 
-/* ── small（装机必备：236×84 · 10:3.6） ── */
+/* ── small（装机必备：236×84 · 10:3.6） ──
+   🔴 卡体只是**占位**：面（背景/边框/磨砂）与内容全部由 `.x-over` 一处拥有（F39 单面）。 */
 .marketplace-store-card.is-small {
   width: 236px;
   height: 84px;
   flex: none;
-  padding: 0 16px;
-  display: flex;
-  align-items: center;
+  padding: 0;
   cursor: pointer;
+  background: transparent;
+  border-color: transparent;
 }
 .marketplace-store-cs-top { display: flex; gap: 13px; align-items: center; width: 100%; min-width: 0; }
 .marketplace-store-cs-name {
@@ -92,7 +93,13 @@
 .marketplace-store-cs-free { margin-left: auto; }
 
 /* ── grid（网格卡 ≥260） ── */
-.marketplace-store-card.is-grid { padding: 16px; cursor: pointer; }
+.marketplace-store-card.is-grid {
+  padding: 0;
+  cursor: pointer;
+  min-height: 96px;
+  background: transparent;
+  border-color: transparent;
+}
 .marketplace-store-cg-top { display: flex; gap: 12px; align-items: flex-start; }
 .marketplace-store-cg-name {
   font-size: var(--font-size-md);
@@ -106,77 +113,80 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  margin-top: 12px;
+  margin-top: 10px;
   color: var(--text-muted);
   font-size: var(--font-size-2xs);
   font-variant-numeric: tabular-nums;
 }
 .marketplace-store-cg-corner { max-width: 50%; }
 
-/* ── 原位放大展开面（small/grid · 归一化 2026-11-21） ──
-   🔴 单份内容＋单一面：卡体只是**布局占位**（背景/边框交给展开面），展开面只放新增信息。
-   🔴 单一 backdrop root：卡体 ⛔ 不挂 backdrop-filter——父子都挂时，子层只能采到父层边界内的
-      backdrop，越界区（长大的那截）会失去磨砂 ⇒ 玻璃主题下出现「里面磨砂、外面透明」。
-     磨砂只由展开面一处拥有（覆盖整个展开区）。 */
-.marketplace-store-card.is-small,
-.marketplace-store-card.is-grid {
-  background: transparent;
-  border-color: transparent;
+/* 主题卡/双大卡：统一阴影只做底座；变体保留自己的**主题色辉光**（F40 · 用户报「光辉没了」） */
+.marketplace-store-card.is-mega:hover {
+  box-shadow: 0 14px 50px -8px color-mix(in srgb, var(--marketplace-hue, transparent) 65%, transparent),
+    var(--shadow-pop);
 }
+.marketplace-store-card.is-duo:hover {
+  box-shadow: 0 12px 44px -8px color-mix(in srgb, var(--marketplace-hue, transparent) 60%, transparent),
+    var(--shadow-pop);
+}
+
+/* ── 原位放大展开面（small/grid · F39 单面＝唯一出处） ──
+   🔴 一个面、一份内容、一个 backdrop root：
+      - 卡体不画背景/边框、不挂 backdrop-filter（父子同挂会截断子层越界区采样）；
+      - 面 **居中**（top:50% + translateY(-50%)）、**高度随内容**——回到上一版的紧凑尺寸，
+        展开量与轨道上下余量对齐 ⇒ 不再被横滚容器裁剪；
+      - 头部与新增信息同在这一个面里，展开＝同一内容重排（⛔ 不复制）。 */
 .marketplace-store-x-over {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
   min-height: 100%;
-  padding: 0 16px 14px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  /* 常态＝卡面本体（唯一的面）；磨砂只在悬停态加（见下） */
+  justify-content: flex-start;
+  gap: 6px;
   opacity: 1;
   visibility: visible;
   pointer-events: none;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  transition: inset 0.22s cubic-bezier(0.2, 0.7, 0.3, 1), min-height 0.22s cubic-bezier(0.2, 0.7, 0.3, 1),
-    border-color 0.16s, box-shadow 0.2s;
+  transition: left 0.18s cubic-bezier(0.2, 0.7, 0.3, 1), right 0.18s cubic-bezier(0.2, 0.7, 0.3, 1),
+    border-color 0.16s, box-shadow 0.2s, backdrop-filter 0.18s;
   z-index: 0;
-}
-/* 主面头部/统计浮在展开面之上——同一内容只呈现一份 */
-.marketplace-store-cs-top,
-.marketplace-store-cg-top,
-.marketplace-store-cg-stats {
-  position: relative;
-  z-index: 1;
 }
 .marketplace-store-card.is-small:hover .marketplace-store-x-over,
 .marketplace-store-card.is-small:focus-within .marketplace-store-x-over,
 .marketplace-store-card.is-grid:hover .marketplace-store-x-over,
 .marketplace-store-card.is-grid:focus-within .marketplace-store-x-over {
-  inset: -12px -16px auto -16px;
-  min-height: calc(100% + 132px);
+  left: -16px;
+  right: -16px;
   pointer-events: auto;
   border-color: var(--separator);
   box-shadow: var(--shadow-pop);
-  /* 磨砂只在这一处拥有（卡体已排除）——整个展开区一次采样，越界区长出的部分同样有玻璃 */
   backdrop-filter: var(--surface-blur);
   -webkit-backdrop-filter: var(--surface-blur);
 }
+/* 新增信息：0fr→1fr 高度动画（面高度随内容，居中不偏移） */
 .marketplace-store-x-more {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.22s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.marketplace-store-x-more-inner {
+  overflow: hidden;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: auto;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.16s cubic-bezier(0.2, 0.7, 0.3, 1);
+  gap: 6px;
 }
 .marketplace-store-card:hover .marketplace-store-x-more,
-.marketplace-store-card:focus-within .marketplace-store-x-more {
-  opacity: 1;
-  visibility: visible;
-}
-.marketplace-store-x-acts { display: flex; gap: 8px; align-items: center; }
+.marketplace-store-card:focus-within .marketplace-store-x-more { grid-template-rows: 1fr; }
+.marketplace-store-x-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+.marketplace-store-x-acts { display: flex; gap: 6px; align-items: center; margin-left: auto; }
 .marketplace-store-x-desc {
   font-size: var(--font-size-2xs);
   color: var(--text-secondary);
@@ -186,7 +196,6 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.marketplace-store-x-badges { margin-top: 2px; }
 
 /* ── mega（主题专区：312 宽 / 封面 200 / 脚区 60 / 灰条上延） ── */
 .marketplace-store-card.is-mega {
@@ -346,14 +355,13 @@
   text-overflow: ellipsis;
 }
 .marketplace-store-rr-cat { font-size: var(--font-size-2xs); color: var(--text-muted); margin-top: 1px; }
-/* ── 右侧单槽（F26 · 归一化）：价格角标在流内，下载量/动作在同一槽里互斥淡入淡出——⛔ 不再绝对定位压角标 ── */
+/* ── 右侧单槽（F26 + F41）：价格角标在流内；下载量与动作钮**常显并排**（⛔ 不再 hover 才换出） ── */
 .marketplace-store-rr-corner { flex: none; }
 .marketplace-store-rr-slot {
-  position: relative;
   flex: none;
-  min-width: 132px;
   display: flex;
   align-items: center;
+  gap: 10px;
   justify-content: flex-end;
 }
 .marketplace-store-rr-dl {
@@ -361,24 +369,13 @@
   font-size: var(--font-size-2xs);
   font-variant-numeric: tabular-nums;
   flex: none;
-  transition: opacity 0.15s;
 }
 .marketplace-store-rr-act {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 6px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
+  flex: none;
 }
-.marketplace-store-rank-row:hover .marketplace-store-rr-dl,
-.marketplace-store-rank-row:focus-within .marketplace-store-rr-dl { opacity: 0; }
-.marketplace-store-rank-row:hover .marketplace-store-rr-act,
-.marketplace-store-rank-row:focus-within .marketplace-store-rr-act { opacity: 1; visibility: visible; }
 
 /* ── 组头（分组排序：同组挨一起、组间 A→Z） ── */
 .marketplace-store-group-h {

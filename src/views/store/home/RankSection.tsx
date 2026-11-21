@@ -21,7 +21,7 @@ export function RankSection() {
     <section className="marketplace-store-sec" data-spec="04-6">
       <SectionHead
         title={t("热门下载")}
-        hint={t("按下载数排序——全源合并 top 8（计算位，与完整榜单同源）")}
+        hint={t("按下载量排序，取前 8")}
         more={{ label: t("完整榜单"), onClick: () => navigate({ page: "rank" }) }}
       />
       <div>

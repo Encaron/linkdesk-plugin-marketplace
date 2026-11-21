@@ -24,7 +24,7 @@ export function RankView() {
       </div>
       <div className="marketplace-store-cat-note">
         <Icon name="alert" size="sm" />
-        {t("全源合并计算（官方＋已添加作者源），来源随行标注；将来接服务器换真实统计")}
+        {t("按下载量排序，来自你添加的所有来源")}
       </div>
       <div>
         {rows.map((entry, i) => (

@@ -230,7 +230,7 @@ export function SourcesView() {
   return (
     <>
       <div className="marketplace-store-src-summary">
-        {t("{{authors}} 位作者 · {{sources}} 个作者源 · {{local}} 个本地插件 · 作者源共 {{plugins}} 个插件（官方源恒内置，不计入）", {
+        {t("{{authors}} 位作者 · {{sources}} 个作者源 · {{local}} 个本地插件 · 作者来源共 {{plugins}} 个插件（官方来源另计）", {
           authors: groups.length,
           sources: enabledSources,
           local: localRecords.length,
@@ -264,7 +264,7 @@ export function SourcesView() {
             </div>
             <div className="marketplace-store-src-url">{data.catalog.sourceNames[0] ?? "raw.githubusercontent.com"}</div>
           </div>
-          <span className="marketplace-store-src-meta">{t("{{count}} 个插件 · 恒内置", { count: officialCount })}</span>
+          <span className="marketplace-store-src-meta">{t("{{count}} 个插件 · 内置", { count: officialCount })}</span>
           {officialWarningLines.length > 0 && (
             <span className="marketplace-store-src-warn" data-hint={hintOf(t, officialWarningLines)}>
               {officialWarnSummary.label}
@@ -493,7 +493,7 @@ export function SourcesView() {
       </div>
 
       <div className="marketplace-store-src-note">
-        {t("排序影响：首页作者卡排列 ＋ 非 GitHub 作者的身份兜底。")}
+        {t("排序会影响首页作者卡的顺序。")}
         <br />
         {t("停用＝源级（不拉取/不进商店，已装插件照常运行）；移除＝删源与缓存（已装插件保留，可勾选一并卸载）。")}
       </div>

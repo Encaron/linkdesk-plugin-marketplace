@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════
    Marketplace Store · UI 原语件样式（R4-3.1–3.3）
-   唯一来源：ViewSeg / SortChips / EmptyState / Badge / CornerTag / ActionButton / MoreMenu。
+   唯一来源：ViewSeg / SortSelect / EmptyState / Badge / CornerTag / ActionButton / MoreMenu。
    🔴 类名一律 `marketplace-` 前缀（硬约束 23：插件自有类名不得借宿主保留名）。
    🔴 颜色/半径/字号只走主题令牌；插件私有色值集中在 `.marketplace-store` 的变量块（唯一 raw 值处）。
    🔴 状态变化只许 transform/opacity/颜色（机械守则）——⛔ display/width/height 参与状态展示。
@@ -57,13 +57,7 @@
   color: var(--text-primary);
 }
 
-/* ═══ SortChips ═══ */
-.marketplace-ui-chips {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-}
+/* ═══ 小类 chip（排序已改下拉，容器类删除；chip 仍用于分类页小类） ═══ */
 .marketplace-ui-chip {
   font-size: var(--font-size-2xs);
   color: var(--text-secondary);

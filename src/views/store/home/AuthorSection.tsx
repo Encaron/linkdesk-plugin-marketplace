@@ -27,7 +27,7 @@ export function AuthorSection() {
       <section className="marketplace-store-sec" data-spec="04-6-authors">
         <SectionHead
           title={t("作者")}
-          hint={t("万物皆可插件——第三方作者的店，点击进入他们的主页（hover 看仓卡扇出）")}
+          hint={t("每个作者都是一家小店，点开看看他的全部插件")}
         />
         {/* F27b 归一化（2026-11-21）：作者横排走**同一个 Strip 原语**——此前手写 strip-row，
             没有箭头/滚轮/peek 吸附 ⇒ 与主题专区/热门横滚不是一套行为 */}
@@ -48,7 +48,7 @@ export function AuthorSection() {
     <section className="marketplace-store-sec" data-spec="04-6-authors">
       <SectionHead
         title={t("作者")}
-        hint={t("万物皆可插件——第三方作者的店，点击进入他们的主页（hover 看仓卡扇出）")}
+        hint={t("每个作者都是一家小店，点开看看他的全部插件")}
       />
       <Strip ariaLabel={t("作者")}>
         <div

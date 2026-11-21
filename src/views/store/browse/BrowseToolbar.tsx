@@ -9,7 +9,7 @@ import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ContextMenu } from "@linkdesk/ui";
 import type { MenuItemDescriptor } from "@linkdesk/contracts";
-import { Icon, SORT_SETS, SortChips, ViewSeg } from "../../../ui";
+import { Icon, SORT_SETS, SortSelect, ViewSeg } from "../../../ui";
 import { EMPTY_FILTERS, filterCount, type CatSort, type InstallFilters } from "../storeData";
 import { useStore } from "../StoreContext";
 
@@ -109,8 +109,7 @@ export function BrowseToolbar() {
   const { prefs, setCatSort, setCatView } = useStore();
   return (
     <div className="marketplace-store-toolbar">
-      <span className="marketplace-store-tb-label">{t("排序")}</span>
-      <SortChips value={prefs.catSort} options={SORT_SETS.cat} onChange={(v) => setCatSort(v as CatSort)} />
+      <SortSelect ariaLabel={t("排序")} value={prefs.catSort} options={SORT_SETS.cat} onChange={(v) => setCatSort(v as CatSort)} />
       <FilterMenu />
       <ViewSeg value={prefs.catView} onChange={setCatView} />
     </div>

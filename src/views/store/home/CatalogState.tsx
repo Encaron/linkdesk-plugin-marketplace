@@ -68,7 +68,7 @@ export function CatalogGate({ children }: { children: React.ReactNode }) {
   if (data.catalog.loading || data.localLoading) return <CatalogLoading />;
   if (data.catalog.entries.length === 0) {
     if (data.catalog.state === "ok") {
-      return <EmptyState icon="dots" title={t("暂无插件")} sub={t("源已连上，但目录里还没有插件——不伪装、不报错")} />;
+      return <EmptyState icon="dots" title={t("暂无插件")} sub={t("这个来源还没有插件")} />;
     }
     return <CatalogErrorState />;
   }

@@ -178,7 +178,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
       <EmptyState
         icon="folder"
         title={t("该作者还没有声明任何仓库")}
-        sub={t("作者块里 repos[] 为空——店面无内容可展示（不伪装、不报错）")}
+        sub={t("这个作者还没有仓库")}
       />
     );
   }

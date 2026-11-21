@@ -43,18 +43,8 @@ export function Strip({
     sync();
     row.addEventListener("scroll", sync, { passive: true });
 
-    /* F27b（2026-11-21）：纵向滚轮 → 横向滚动；**到端放行**（⛔ 把页面的纵向滚动困在横排里） */
-    const onWheel = (ev: WheelEvent) => {
-      if (Math.abs(ev.deltaY) <= Math.abs(ev.deltaX)) return; // 原生横滑（触控板）交给浏览器
-      const max = row.scrollWidth - row.clientWidth;
-      if (max <= 1) return;
-      const atStart = row.scrollLeft <= 0;
-      const atEnd = row.scrollLeft >= max - 1;
-      if ((ev.deltaY > 0 && atEnd) || (ev.deltaY < 0 && atStart)) return;
-      ev.preventDefault();
-      row.scrollLeft += ev.deltaY;
-    };
-    row.addEventListener("wheel", onWheel, { passive: false });
+    /* 🔴 只有 hero 有「滚轮翻页」（任务口径）：横排容器 ⛔ 劫持纵向滚轮——
+       否则用户被一页页翻完才能继续滚页面。触控板横滑/Shift+滚轮是浏览器原生，不拦。 */
 
     /* F28（用户裁决 2026-11-21）：peek 卡——悬停/聚焦时若卡片未完整可见（留 20px 展开余量），
        先吸附到完整可见再展开；吸附后 320ms 内不再触发，避免指针落到新卡上连跳。 */
@@ -86,7 +76,6 @@ export function Strip({
     }
     return () => {
       row.removeEventListener("scroll", sync);
-      row.removeEventListener("wheel", onWheel);
       row.removeEventListener("pointerover", onOver);
       row.removeEventListener("focusin", onFocusIn);
       ro?.disconnect();

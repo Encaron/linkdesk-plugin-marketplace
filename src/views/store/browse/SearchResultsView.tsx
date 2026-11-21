@@ -37,8 +37,7 @@ export function SearchResultsView() {
       <div className="marketplace-store-cat-head" data-spec="04-7-search">
         <div className="marketplace-store-cat-title">{t("搜索")}</div>
         <div className="marketplace-store-cat-sub">
-          {t("{{count}} 个结果", { count: hits.length })} · 「{query}」 ·{" "}
-          {t("官方与第三方统一混排（单一统一池）")}
+          {t("{{count}} 个结果", { count: hits.length })} · 「{query}」
         </div>
       </div>
       {hits.length === 0 ? (

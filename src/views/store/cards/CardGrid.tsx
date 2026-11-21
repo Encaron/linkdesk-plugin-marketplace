@@ -50,38 +50,41 @@ export const CardGrid = memo(function CardGrid({
       onClick={open}
       onKeyDown={(e) => cardKeyDown(e, open)}
     >
-      <div className="marketplace-store-cg-top">
-        <Tile entry={entry} identity={ctx.installedIdentity} />
-        <div className="marketplace-store-fx1">
-          <div className="marketplace-store-cg-name">{entry.name}</div>
-          <div className="marketplace-store-cg-author">{tAuthor(entry)}</div>
-        </div>
-        <CornerTag baseClass="marketplace-ui-corner marketplace-store-cg-corner" tag={status} />
-      </div>
-      {dl && (
-        <div className="marketplace-store-cg-stats">
-          <span className="marketplace-store-cg-dl" data-hint={t("下载量")}>
-            ▾ {dl}
-          </span>
-        </div>
-      )}
+      {/* 单面（F39）：卡体只是占位，头部/统计/新增信息都在同一个面里——面居中、高度随内容 */}
       <div className="marketplace-store-x-over">
-        {/* 归一化（F30）：展开面只放**新增信息**——图标/名/作者已在主面，⛔ 不再复制一份 */}
-        <div className="marketplace-store-x-more">
-          {entry.description && <div className="marketplace-store-x-desc">{entry.description}</div>}
-          <div className="marketplace-store-x-badges">
-            <BadgeRow badges={badgesOfCard(entry, ctx)} />
+        <div className="marketplace-store-cg-top">
+          <Tile entry={entry} identity={ctx.installedIdentity} />
+          <div className="marketplace-store-fx1">
+            <div className="marketplace-store-cg-name">{entry.name}</div>
+            <div className="marketplace-store-cg-author">{tAuthor(entry)}</div>
           </div>
-          <div className="marketplace-store-x-acts">
-            {!(ctx.state === "installed" && restatesState(action)) && (
-            <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
-          )}
-            <MoreMenu
-              pluginId={entry.id}
-              disabled={ctx.state === "disabled"}
-              items={items}
-              onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))}
-            />
+          <CornerTag baseClass="marketplace-ui-corner marketplace-store-cg-corner" tag={status} />
+        </div>
+        {dl && (
+          <div className="marketplace-store-cg-stats">
+            <span className="marketplace-store-cg-dl" data-hint={t("下载量")}>
+              ▾ {dl}
+            </span>
+          </div>
+        )}
+        {/* 展开只放新增信息（简介/徽标/动作），头部只有一份 */}
+        <div className="marketplace-store-x-more">
+          <div className="marketplace-store-x-more-inner">
+            {entry.description && <div className="marketplace-store-x-desc">{entry.description}</div>}
+            <div className="marketplace-store-x-foot">
+              <BadgeRow badges={badgesOfCard(entry, ctx)} />
+              <div className="marketplace-store-x-acts">
+                {!(ctx.state === "installed" && restatesState(action)) && (
+                  <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
+                )}
+                <MoreMenu
+                  pluginId={entry.id}
+                  disabled={ctx.state === "disabled"}
+                  items={items}
+                  onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

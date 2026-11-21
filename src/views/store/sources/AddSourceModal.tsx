@@ -94,7 +94,7 @@ export function AddSourceModal({
         : decision.reason === "bad-url"
           ? t("只认 GitHub 仓库主页（github.com/owner/repo）或 marketplace.json 直链")
           : decision.reason === "official"
-            ? t("官方源恒内置，无需添加")
+            ? t("官方来源已内置，无需添加")
             : t("该源已在列表中");
     setMessage(text ? { kind: "bad", text } : null);
     return false;
@@ -154,7 +154,7 @@ export function AddSourceModal({
       if (!r.ok) {
         const text =
           r.reason === "official"
-            ? t("官方源恒内置，无需添加")
+            ? t("官方来源已内置，无需添加")
             : r.reason === "duplicate"
               ? t("该源已在列表中")
               : r.reason === "network"
@@ -230,7 +230,7 @@ export function AddSourceModal({
         kind: "bad",
         text:
           r?.reason === "official"
-            ? t("官方源恒内置，无需添加")
+            ? t("官方来源已内置，无需添加")
             : r?.reason === "duplicate"
               ? t("该源已在列表中")
               : t("添加失败（{{reason}}）", { reason: r?.reason ?? "io" }),

@@ -7,7 +7,7 @@
  */
 
 import { useTranslation } from "react-i18next";
-import { EmptyState, SortChips, SORT_SETS, ViewSeg, hueBG, hueOf, Icon } from "../../../ui";
+import { EmptyState, SORT_SETS, SortSelect, ViewSeg, hueBG, hueOf, Icon } from "../../../ui";
 import type { AuthorDomain } from "../../../services/authors";
 import { useAuthorDomains } from "../../../services/authors";
 import type { AuthorSort } from "../../../services/marketplaceShared/uiPrefs";
@@ -78,8 +78,8 @@ export function AuthorsView() {
       </div>
       {list.length > 0 && (
         <div className="marketplace-store-toolbar">
-          <span className="marketplace-store-tb-label">{t("排序")}</span>
-          <SortChips
+          <SortSelect
+            ariaLabel={t("排序")}
             value={prefs.authorSort}
             options={SORT_SETS.author}
             onChange={(v) => setAuthorSort(v as AuthorSort)}

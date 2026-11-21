@@ -171,7 +171,7 @@ export function CategoryView({ slug }: { slug: string }) {
           sub={
             authorId
               ? t("点上方「显示全部」查看该分类全部插件——逃生门常驻不锁")
-              : t("空抽屉在 rail 灰显；点入显示诚实空态——不伪装、不报错")
+              : t("这个分类还没有插件")
           }
         />
       </>
@@ -188,7 +188,7 @@ export function CategoryView({ slug }: { slug: string }) {
         <div className="marketplace-store-cat-sub">
           {t("{{count}} 个插件", { count: shown.length })}
           {authorId ? `（${t("全分类 {{count}}", { count: allOfCategory.length })}）` : ""} ·{" "}
-          {descKey ? t(descKey) : ""} · {t("官方与第三方统一混排（单一统一池）")}
+          {descKey ? t(descKey) : ""}
         </div>
       </div>
       {authorId && authorDomain && (

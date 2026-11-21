@@ -25,7 +25,7 @@ export {
 export { Badge, BadgeRow } from "./Badge";
 export { CornerTag } from "./CornerTag";
 export { ViewSeg, type ViewMode } from "./ViewSeg";
-export { SortChips, SORT_SETS, sortOptionsOf, type SortContext, type SortOption } from "./SortChips";
+export { SortSelect, SORT_SETS, sortOptionsOf, type SortContext, type SortOption } from "./SortSelect";
 export { EmptyState } from "./EmptyState";
 export { ChunkedReveal, CHUNK_SIZE_DEFAULT } from "./ChunkedReveal";
 export {

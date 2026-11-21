@@ -1,8 +1,8 @@
 /**
- * SortChips — 排序 chips 的**唯一来源**（蓝图 `sortChips()/applySort()` 的 R4 落位，10 §一）。
+ * SortSelect — 排序的**唯一实现**（F42 · 2026-11-21）：共享 `SelectBox`（单选下拉）。
  *
- * 规则：`SORT_SETS` 只放**选项**（值 + i18n key）；页面只给 ctx 与当前值、收变更回调。
- * ⛔ 不在页面里 `options.map(button)` 自拼第二份 chips。
+ * 规则同旧 SortChips：`SORT_SETS` 只放**选项**（值 + i18n key）；页面只给 ctx 与当前值、收变更回调。
+ * ⛔ 不在页面里自拼第二份排序控件；⛔ 不再用一排 chips 占整行。
  *
  * 取值域 = 蓝图 v3 真实读数（与 `marketplaceShared/uiPrefs.ts` 的 CatSort/LibSort/AuthorSort 同域）：
  *   lib   = name / updated / size / source / author / repo
@@ -11,6 +11,7 @@
  */
 
 import { useTranslation } from "react-i18next";
+import { SelectBox } from "@linkdesk/ui";
 
 export type SortContext = "lib" | "cat" | "author";
 
@@ -48,7 +49,7 @@ export function sortOptionsOf(ctx: SortContext): readonly SortOption[] {
   return SORT_SETS[ctx] ?? SORT_SETS.cat;
 }
 
-export function SortChips({
+export function SortSelect({
   value,
   options,
   onChange,
@@ -61,21 +62,13 @@ export function SortChips({
 }) {
   const { t } = useTranslation();
   return (
-    <div className="marketplace-ui-chips" role="group" aria-label={ariaLabel ?? t("排序")}>
-      {options.map((o) => (
-        <button
-          type="button"
-          key={o.value}
-          className={`marketplace-ui-chip ${value === o.value ? "is-on" : ""}`}
-          data-sort={o.value}
-          aria-pressed={value === o.value}
-          onClick={() => onChange(o.value)}
-        >
-          {t(o.key)}
-        </button>
-      ))}
-    </div>
+    <SelectBox
+      title={ariaLabel ?? t("排序")}
+      value={value}
+      options={options.map((o) => ({ value: o.value, label: t(o.key) }))}
+      onChange={onChange}
+    />
   );
 }
 
-export default SortChips;
+export default SortSelect;
