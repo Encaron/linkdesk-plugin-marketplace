@@ -118,6 +118,7 @@ describe("readStoreState —— AI 读取面", () => {
     const s = await readStoreState();
     expect(s.route).toEqual({ page: "category", category: "themes", authorId: "linkdesk-fixture-alice" });
     expect(s.visibleEntryIds).toEqual(["demo-alice-theme"]);
+    expect(s.visibleAuthorIds).toEqual([]);
     expect(s.navCommands).toEqual([
       "marketplace.openStore",
       "marketplace.openCategory",
@@ -171,5 +172,40 @@ describe("readStoreState —— AI 读取面", () => {
     ]);
     expect(s.sources).toHaveLength(2);
     expect(s.counts).toEqual({ entries: 6, installed: 2, updates: 0, authors: 1, remoteSources: 1 });
+  });
+});
+
+describe("visibleEntryIds —— 各页可见切片", () => {
+  it("首页：hero/合集/主题专区/热门下载并集", async () => {
+    mocks.route = { page: "home" };
+    const s = await readStoreState();
+    expect(s.visibleEntryIds).toEqual(
+      expect.arrayContaining(["demo-bundle", "demo-sub", "demo-alice-theme", "demo-installed"]),
+    );
+    expect(s.visibleEntryIds).toHaveLength(6);
+    expect(s.visibleAuthorIds).toEqual(["linkdesk-fixture-alice"]);
+  });
+
+  it("排行榜：全源 Top（无缓存计数时按名稳定排序，最多 50）", async () => {
+    mocks.route = { page: "rank" };
+    const s = await readStoreState();
+    expect(s.visibleEntryIds).toHaveLength(6);
+  });
+
+  it("库：已装/停用 ∪ 已购未安装（不含未购主题）", async () => {
+    mocks.route = { page: "library" };
+    const s = await readStoreState();
+    expect(s.visibleEntryIds).toEqual(
+      expect.arrayContaining(["demo-installed", "demo-core", "demo-disabled", "demo-bundle", "demo-sub"]),
+    );
+    expect(s.visibleEntryIds).not.toContain("demo-alice-theme");
+    expect(s.visibleEntryIds).toHaveLength(5);
+  });
+
+  it("作者列表：条目为空、作者按名可读", async () => {
+    mocks.route = { page: "authors" };
+    const s = await readStoreState();
+    expect(s.visibleEntryIds).toEqual([]);
+    expect(s.visibleAuthorIds).toEqual(["linkdesk-fixture-alice"]);
   });
 });

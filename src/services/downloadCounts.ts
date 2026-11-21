@@ -78,6 +78,12 @@ function writeCachedCount(t: GithubReleaseTarget, count: number): void {
   }
 }
 
+/** 已缓存的资产级下载数（`getState` 榜单排序用；未缓存 = undefined，⛔ 不主动拉网络）。 */
+export function readCachedDownloadCount(downloadUrl?: string): number | undefined {
+  const target = parseGithubReleaseDownloadUrl(downloadUrl);
+  return target ? readCachedCount(target) : undefined;
+}
+
 /* ═══ 拉取（单飞去重——StrictMode/重入防双 fetch） ═══ */
 
 const _inflight = new Map<string, Promise<number | null>>();

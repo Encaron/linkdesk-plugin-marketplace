@@ -19,6 +19,7 @@ import type { CatalogEntry } from "./marketCatalog";
 import { primaryCategoryOf } from "./marketCatalog";
 import { getCatalogResult } from "./marketplaceShared/catalogStore";
 import { derivePackageState, type LocalEntryInfo, type PackageState } from "./catalogStatus";
+import { readCachedDownloadCount } from "./downloadCounts";
 import { readSourceRecords, type SourceRecord } from "./marketSources";
 import { ensureAuthorDomains, getLoadedAuthorDomains, knownAuthorIds } from "./authors";
 import { NAV_COMMANDS, readCurrentStoreRoute, type StoreNavTarget } from "./storeNav";
@@ -33,6 +34,7 @@ export interface StoreReadEntry {
   category?: string;
   categories?: string[];
   sourceName?: string;
+  downloadUrl?: string;
   /** 原样声明：免费件无此字段；买断/订阅看 model/price/currency/period */
   pricing?: CatalogEntry["pricing"];
   /** 本地状态（唯一推导：install / installed / update / disabled） */
@@ -84,8 +86,10 @@ export interface StoreReadState {
   ok: true;
   /** 当前实际页面（不是最后一条命令意图） */
   route: StoreNavTarget;
-  /** 当前路由下实际可见的条目 id（分类页按 category+authorId、作者店按仓过滤；其余页回全量） */
+  /** 当前路由下实际可见的条目 id（分类页按 category+authorId、作者店按仓、首页/榜单/库按各自可见集） */
   visibleEntryIds: string[];
+  /** 当前页可见作者（首页/作者列表按名排序；作者店只有当前作者；其它页空） */
+  visibleAuthorIds: string[];
   /** 每个页面一条导航命令（AI 可据此切页） */
   navCommands: string[];
   entries: StoreReadEntry[];
@@ -155,6 +159,7 @@ export async function readStoreState(): Promise<StoreReadState> {
       category: entry.category,
       categories: entry.categories,
       sourceName: entry.sourceName,
+      downloadUrl: entry.downloadUrl,
       pricing: entry.pricing,
       state,
       core,
@@ -178,29 +183,82 @@ export async function readStoreState(): Promise<StoreReadState> {
     repos: a.repos.map((r) => ({ id: r.id, name: r.name, pluginIds: r.plugins.map((p) => p.id) })),
   }));
 
+  const unique = (ids: string[]) => [...new Set(ids)];
+  const topByDownloads = (n: number) =>
+    [...entries]
+      .sort((a, b) => {
+        const da = readCachedDownloadCount(a.downloadUrl) ?? -1;
+        const db = readCachedDownloadCount(b.downloadUrl) ?? -1;
+        return db - da || a.name.localeCompare(b.name, "zh");
+      })
+      .slice(0, n)
+      .map((e) => e.id);
+
   const visibleEntryIds = (() => {
-    if (route.page === "category") {
-      return entries
-        .filter(
-          (e) =>
-            primaryCategoryOf(e) === route.category &&
-            (!route.authorId || (e.authorId ?? "").toLowerCase() === route.authorId.toLowerCase()),
-        )
-        .map((e) => e.id);
+    switch (route.page) {
+      case "category":
+        return entries
+          .filter(
+            (e) =>
+              primaryCategoryOf(e) === route.category &&
+              (!route.authorId || (e.authorId ?? "").toLowerCase() === route.authorId.toLowerCase()),
+          )
+          .map((e) => e.id);
+      case "author": {
+        const domain = authors.find((a) => a.authorId.toLowerCase() === route.authorId.toLowerCase());
+        if (!domain) return entries.map((e) => e.id);
+        const inStore = new Set(domain.repos.flatMap((r) => r.pluginIds));
+        return entries.filter((e) => inStore.has(e.id)).map((e) => e.id);
+      }
+      case "home": {
+        const banner = catalog.collections.find((c) => c.layout === "banner");
+        const sections = [...catalog.collections]
+          .filter((c) => c.layout !== "banner")
+          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        return unique([
+          ...(banner?.items ?? []).slice(0, 5),
+          ...sections.flatMap((c) => c.items),
+          ...entries.filter((e) => primaryCategoryOf(e) === "themes").map((e) => e.id),
+          ...topByDownloads(8),
+        ]);
+      }
+      case "rank":
+        return topByDownloads(50);
+      case "library": {
+        const installed = new Set(list.map((p) => p.pluginId));
+        const disabledSet = new Set(disabled.map((p) => p.pluginId));
+        const installedIds = entries
+          .filter((e) => installed.has(e.id) || disabledSet.has(e.id))
+          .map((e) => e.id);
+        const purchasedIds = entries
+          .filter((e) => !!e.pricing && licenseById.has(e.id) && !installed.has(e.id))
+          .map((e) => e.id);
+        return unique([...installedIds, ...purchasedIds]);
+      }
+      case "search": {
+        const q = route.query.trim().toLowerCase();
+        if (!q) return entries.map((e) => e.id);
+        return entries
+          .filter((e) => [e.name, e.id, e.description ?? ""].some((s) => s.toLowerCase().includes(q)))
+          .map((e) => e.id);
+      }
+      default:
+        return [];
     }
-    if (route.page === "author") {
-      const domain = authors.find((a) => a.authorId.toLowerCase() === route.authorId.toLowerCase());
-      if (!domain) return entries.map((e) => e.id);
-      const inStore = new Set(domain.repos.flatMap((r) => r.pluginIds));
-      return entries.filter((e) => inStore.has(e.id)).map((e) => e.id);
-    }
-    return entries.map((e) => e.id);
   })();
+
+  const visibleAuthorIds =
+    route.page === "home" || route.page === "authors"
+      ? [...authors].sort((a, b) => a.name.localeCompare(b.name, "zh")).map((a) => a.authorId)
+      : route.page === "author"
+        ? [route.authorId]
+        : [];
 
   return {
     ok: true,
     route,
     visibleEntryIds,
+    visibleAuthorIds,
     navCommands: Object.values(NAV_COMMANDS),
     entries,
     collections: catalog.collections.map((c) => ({
