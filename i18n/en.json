@@ -658,5 +658,7 @@
   "{{count}} 位作者": "{{count}} authors",
   "设置来源分组默认收起": "Default collapse source groups",
   "来源分组默认收起": "Collapse source groups by default",
-  "打开「来源」页时，官方/作者分组默认折叠（点组头整行展开）。命令 marketplace.setSourcesDefaultCollapsed 写同一键。": "When opening Sources, collapse official/author groups by default (click a group header to expand). The command marketplace.setSourcesDefaultCollapsed writes the same key."
+  "打开「来源」页时，官方/作者分组默认折叠（点组头整行展开）。命令 marketplace.setSourcesDefaultCollapsed 写同一键。": "When opening Sources, collapse official/author groups by default (click a group header to expand). The command marketplace.setSourcesDefaultCollapsed writes the same key.",
+  "点击市场图标时同时打开商店": "Open the store when clicking the marketplace icon",
+  "关闭（默认）时，点侧栏市场图标只切换侧栏；开启后同时打开 Plugin Store 标签页。": "Off by default: clicking the marketplace icon only switches the sidebar. Turn on to also open the Plugin Store tab."
 }

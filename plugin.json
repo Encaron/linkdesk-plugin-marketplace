@@ -256,6 +256,12 @@
           "title": "来源分组默认收起",
           "default": false,
           "description": "打开「来源」页时，官方/作者分组默认折叠（点组头整行展开）。命令 marketplace.setSourcesDefaultCollapsed 写同一键。"
+        },
+        "marketplace.openTabOnIcon": {
+          "type": "boolean",
+          "title": "点击市场图标时同时打开商店",
+          "default": false,
+          "description": "关闭（默认）时，点侧栏市场图标只切换侧栏；开启后同时打开 Plugin Store 标签页。"
         }
       }
     },
