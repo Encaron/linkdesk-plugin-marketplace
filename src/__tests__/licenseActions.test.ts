@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { keyShapeOk, verifyFailText, verifyLicenseKey } from "../services/licenseActions";
+import { keyShapeOk, requestLicenseDialog, verifyFailText, verifyLicenseKey } from "../services/licenseActions";
 
 const ORIG = (window as unknown as { linkdesk?: unknown }).linkdesk;
 const t = (k: string, o?: Record<string, unknown>) =>
@@ -61,5 +61,40 @@ describe("keyShapeOk / verifyFailText", () => {
     expect(verifyFailText(t, "machine-mismatch")).toBe("这份密钥绑定的是另一台机器——在本机无法使用");
     expect(verifyFailText(t, "bad-signature")).toBe("密钥验证未通过——请确认复制完整，或联系作者");
     expect(verifyFailText(t, undefined)).toBe("密钥验证未通过——请确认复制完整，或联系作者");
+  });
+});
+
+describe("requestLicenseDialog（F20：壳共享对话框通道）", () => {
+  afterEach(() => {
+    Object.defineProperty(window, "linkdesk", { value: ORIG, configurable: true });
+  });
+
+  it("有 confirmContent ⇒ 走壳 content 弹窗（pluginId=marketplace / viewId=marketplace-license），回 ok", async () => {
+    const confirmContent = vi.fn(async () => true);
+    Object.defineProperty(window, "linkdesk", { value: { dialog: { confirmContent } }, configurable: true });
+    const r = await requestLicenseDialog({ pluginName: "Demo 插件", authorId: "demo-author" });
+    expect(r).toBe("ok");
+    expect(confirmContent).toHaveBeenCalledWith({
+      pluginId: "marketplace",
+      viewId: "marketplace-license",
+      payload: { pluginName: "Demo 插件", authorId: "demo-author" },
+    });
+  });
+
+  it("用户取消 ⇒ cancel；壳面缺失/抛错 ⇒ unsupported（调用方回落本地弹窗）", async () => {
+    Object.defineProperty(window, "linkdesk", {
+      value: { dialog: { confirmContent: vi.fn(async () => false) } },
+      configurable: true,
+    });
+    expect(await requestLicenseDialog({ pluginName: "x" })).toBe("cancel");
+
+    Object.defineProperty(window, "linkdesk", { value: {}, configurable: true });
+    expect(await requestLicenseDialog({ pluginName: "x" })).toBe("unsupported");
+
+    Object.defineProperty(window, "linkdesk", {
+      value: { dialog: { confirmContent: vi.fn(async () => { throw new Error("boom"); }) } },
+      configurable: true,
+    });
+    expect(await requestLicenseDialog({ pluginName: "x" })).toBe("unsupported");
   });
 });

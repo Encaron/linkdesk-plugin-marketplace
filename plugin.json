@@ -269,6 +269,11 @@
           "render": "src/views/confirm/ConfirmInstall.tsx"
         },
         {
+          "id": "marketplace-license",
+          "title": "输入许可密钥",
+          "render": "src/views/confirm/LicenseDialog.tsx"
+        },
+        {
           "id": "marketplace-store",
           "title": "插件商店",
           "render": "src/views/store/StoreView.tsx"

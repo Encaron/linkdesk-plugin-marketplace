@@ -52,6 +52,7 @@ import { openBuyPage } from "../../services/licenseActions";
 import { showToast } from "../../services/hostApi";
 import { sourceBadge, licenseBadges, type BadgeDesc } from "../../ui";
 import LicenseModal from "../store/LicenseModal";
+import { requestLicenseDialog } from "../../services/licenseActions";
 import type { DetailContributedProps, TabId } from "./DetailView/types";
 import { useDetailIdentity } from "./DetailView/useDetailIdentity";
 import { useDetailVersions } from "./DetailView/useDetailVersions";
@@ -232,7 +233,13 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
             pricing={entry?.pricing}
             license={license}
             onBuy={handleBuy}
-            onHaveKey={() => setLicenseOpen(true)}
+            onHaveKey={() => {
+              /* F20：首选壳对话框通道（与安装确认同一机制）；壳面不可用才落本地 OverlayPortal 版 */
+              void requestLicenseDialog({ pluginName: displayName, authorId: entry?.authorId }).then((r) => {
+                if (r === "unsupported") setLicenseOpen(true);
+                else if (r === "ok") refreshLicenses();
+              });
+            }}
             onRenew={handleRenew}
             onEnable={() => void act.handleEnable()}
             onDisable={() => void act.handleDisable()}

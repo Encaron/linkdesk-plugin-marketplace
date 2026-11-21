@@ -12,6 +12,38 @@
 
 import { licensesApi, openExternal, type LicenseEntitlementView } from "./hostApi";
 
+/** 壳对话框通道载荷（`dialog.confirmContent` → DialogHost content 槽 → LicenseDialog 视图） */
+export interface LicenseDialogPayload {
+  pluginName: string;
+  authorId?: string;
+}
+
+/**
+ * 许可弹窗**首选入口**（F20）：走壳共享对话框通道——与安装确认同一机制（遮罩/居中/Esc/焦点锁/
+ * 玻璃面板皮由壳提供）。返回：
+ *   - `"ok"`：弹窗已结算（验签通过后关）；调用方 refresh 权益投影；
+ *   - `"cancel"`：用户取消；
+ *   - `"unsupported"`：壳无 content 弹窗面（旧壳/预览/测试）⇒ 调用方回落市场内 `LicenseModal`。
+ * ⛔ 不在这里自绘第二套弹窗外壳。
+ */
+export async function requestLicenseDialog(payload: LicenseDialogPayload): Promise<"ok" | "cancel" | "unsupported"> {
+  const dlg = (window.linkdesk as unknown as {
+    dialog?: { confirmContent?: (o: { pluginId: string; viewId: string; payload: unknown }) => Promise<boolean> };
+  } | undefined)?.dialog;
+  if (!dlg || typeof dlg.confirmContent !== "function") return "unsupported";
+  try {
+    const ok = await dlg.confirmContent({
+      pluginId: "marketplace",
+      viewId: "marketplace-license",
+      payload,
+    });
+    return ok ? "ok" : "cancel";
+  } catch {
+    // 壳面存在但调用失败（如无可用内容槽）⇒ 回落本地弹窗（诚实降级，不悬挂）
+    return "unsupported";
+  }
+}
+
 export type VerifyFailureReason =
   | "bad-key-format"
   | "bad-public-key"

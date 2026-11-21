@@ -55,6 +55,7 @@ import { LibraryView } from "./library/LibraryView";
 import { SourcesView } from "./sources/SourcesView";
 import { AddSourceModal, type AddSourceMode } from "./sources/AddSourceModal";
 import { LicenseModal } from "./LicenseModal";
+import { requestLicenseDialog } from "../../services/licenseActions";
 import { AuthorsView } from "./authors/AuthorsView";
 import { AuthorStoreView } from "./authors/AuthorStoreView";
 import type { CatalogEntry } from "../../services/marketCatalog";
@@ -73,7 +74,18 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
   const { t } = useTranslation();
   const data = useStoreData();
   const [licenseEntry, setLicenseEntry] = useState<CatalogEntry | null>(null);
-  const actions = useStoreActions(data.online, setLicenseEntry);
+  /* F20（2026-11-21 用户口径）：许可弹窗首选壳共享对话框通道（与安装确认同机制）；
+     壳面不可用（旧壳/预览/测试）才落本地 OverlayPortal 版 */
+  const openLicense = useCallback(
+    (entry: CatalogEntry) => {
+      void requestLicenseDialog({ pluginName: entry.name, authorId: entry.authorId }).then((r) => {
+        if (r === "unsupported") setLicenseEntry(entry);
+        else if (r === "ok") data.refreshLicenses();
+      });
+    },
+    [data],
+  );
+  const actions = useStoreActions(data.online, openLicense);
 
   const [route, setRoute] = useState<StoreRoute>(HOME_ROUTE);
   const [searchInput, setSearchInputState] = useState("");
