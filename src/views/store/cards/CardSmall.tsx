@@ -20,6 +20,7 @@ import {
   type StoreCardContext,
   type StoreCardHandlers,
 } from "./cardParts";
+import { useStickyClearance } from "./useStickyClearance";
 
 /** memo 化（R4-5.3/I2）：卡片 props 全量判等——状态 tick 只重渲真实变化的那几张 */
 export const CardSmall = memo(function CardSmall({
@@ -32,6 +33,7 @@ export const CardSmall = memo(function CardSmall({
   handlers: StoreCardHandlers;
 }) {
   const { t } = useTranslation();
+  const clearance = useStickyClearance<HTMLDivElement>();
   const open = () => handlers.onOpen(entry);
   const status = statusOfCard(entry, ctx);
   const action = actionOfCard(entry, ctx, jobLabelOf(t, ctx.job));
@@ -39,6 +41,11 @@ export const CardSmall = memo(function CardSmall({
   const label = t("{{name}}——查看详情", { name: entry.name });
   return (
     <div
+      ref={clearance.ref}
+      onPointerEnter={clearance.onPointerEnter}
+      onPointerLeave={clearance.onPointerLeave}
+      onFocus={clearance.onFocus}
+      onBlur={clearance.onBlur}
       className="marketplace-store-card is-small"
       role="button"
       tabIndex={0}

@@ -22,6 +22,7 @@ import {
   type StoreCardContext,
   type StoreCardHandlers,
 } from "./cardParts";
+import { useStickyClearance } from "./useStickyClearance";
 
 /** memo 化（R4-5.3/I2）：卡片 props 全量判等——500 条目分块挂载后，状态 tick 只重渲真实变化的那几张 */
 export const CardGrid = memo(function CardGrid({
@@ -34,6 +35,7 @@ export const CardGrid = memo(function CardGrid({
   handlers: StoreCardHandlers;
 }) {
   const { t } = useTranslation();
+  const clearance = useStickyClearance<HTMLDivElement>();
   const open = () => handlers.onOpen(entry);
   const status = statusOfCard(entry, ctx);
   const action = actionOfCard(entry, ctx, jobLabelOf(t, ctx.job));
@@ -41,6 +43,11 @@ export const CardGrid = memo(function CardGrid({
   const dl = dlText(ctx.dl);
   return (
     <div
+      ref={clearance.ref}
+      onPointerEnter={clearance.onPointerEnter}
+      onPointerLeave={clearance.onPointerLeave}
+      onFocus={clearance.onFocus}
+      onBlur={clearance.onBlur}
       className="marketplace-store-card is-grid"
       role="button"
       tabIndex={0}
