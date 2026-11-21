@@ -236,6 +236,8 @@
   "检查所有插件的更新": "Check all plugins for updates",
   "重新拉取目录内容（首页/合集/顺序）——不影响插件版本": "Re-fetch catalog content (home, collections, order) — this does not affect plugin versions",
   "首页内容已更新——刷新后显示最新轮播与合集；你的滚动位置、筛选与排序会保留": "Home content updated — refresh to show the latest carousel and collections; your scroll position, filters, and sort will be kept",
+  "首页内容已更新 · 刷新": "Home content updated · Refresh",
+  "内容已更新于 {{time}}": "Content updated at {{time}}",
   "刷新": "Refresh",
   "忽略": "Ignore",
   "左移": "Scroll left",

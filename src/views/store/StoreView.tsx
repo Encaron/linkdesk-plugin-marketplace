@@ -13,14 +13,29 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { forceRefreshCatalog } from "../../services/marketSources";
 import { getCachedUIPrefs, onUIPrefsChange, readUIPrefs, setViewPrefs } from "../../services/marketplaceShared/uiPrefs";
 import type { AuthorSort, LibSort, UIPrefs } from "../../services/marketplaceShared/uiPrefs";
 import { showToast } from "../../services/hostApi";
-import { markSeen } from "../../services/discoverReads";
+import {
+  catalogKeysOf,
+  computeKeyHashes,
+  EMPTY_DISCOVER_READS,
+  markSeen,
+  onDiscoverReadsChange,
+  readDiscoverReads,
+  unreadDiscoverKeys,
+  type DiscoverReads,
+} from "../../services/discoverReads";
+import { notifyInfo } from "../../services/marketplaceShared/notifications";
 import { refreshAuthorDomains } from "../../services/authors";
 import { consumeStoreNavTarget, getStoreNavTarget, onStoreNavChange } from "../../services/storeNav";
-import { catalogSignature } from "../../services/marketCatalog";
+import {
+  checkContentNow,
+  onContentWatchSettled,
+  startContentWatch,
+  stopContentWatch,
+  type ContentWatchOutcome,
+} from "../../services/contentWatch";
 import type { CatSort, InstallFilters } from "./storeData";
 import { EMPTY_FILTERS } from "./storeData";
 
@@ -54,9 +69,6 @@ import "../../styles/store/store-authors.css";
 import "../../styles/store/store-library.css";
 import "../../styles/store/store-sources.css";
 
-const BACKGROUND_CHECK_MS = 60_000;
-const FOCUS_CHECK_MS = 15 * 60_000;
-
 export default function StoreView({ isActive = true }: { isActive?: boolean }) {
   const { t } = useTranslation();
   const data = useStoreData();
@@ -69,6 +81,8 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
   const [filters, setFiltersState] = useState<InstallFilters>({ ...EMPTY_FILTERS });
   const [subChip, setSubChipState] = useState<string | null>(null);
   const [contentPending, setContentPending] = useState(false);
+  const [contentAppliedAt, setContentAppliedAt] = useState<string | null>(null);
+  const [discoverReads, setDiscoverReads] = useState<DiscoverReads>(EMPTY_DISCOVER_READS);
   const [addSourceMode, setAddSourceMode] = useState<AddSourceMode | null>(null);
 
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -77,7 +91,9 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
   routeRef.current = route;
   const searchReturn = useRef<StoreRoute>(HOME_ROUTE);
   const lastScrollKey = useRef(routeKey(HOME_ROUTE));
-  const lastContentCheck = useRef(0);
+  const isActiveRef = useRef(isActive);
+  isActiveRef.current = isActive;
+  const nextOpenApplyRef = useRef(false);
 
   /* ── UI 偏好（视图/排序——唯一读写口；命令 setViewPrefs 写同一处） ── */
   useEffect(() => {
@@ -218,62 +234,78 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [isActive]);
 
-  /* ── 发现型已读：进入分类/作者店即持久写入（数据面，`discoverReads` 唯一属主） ──
-   * ⚠️ 视觉上的 6px 新内容点由**内容签名增量**驱动（06 §八·补；contentHash 判据属棒 15 #12）——
-   * 本棒不拿「未访问过」冒充「有新内容」（那会在首访后给整店刷点，语义是假的），故点集恒空；
-   * 棒 15 接 contentHash 后只改本处输入，rail 的渲染路径已就位。 */
-  const unreadCats = useMemo(() => new Set<string>(), []);
-  // 作者项同理：增量判据（contentHash）归棒 15 #12——本棒只保证「进店即已读」写入与渲染路径就位
-  const unreadAuthors = useMemo(() => new Set<string>(), []);
-
-  /* ── 内容热更新的背景检查（R4-3.7 桩）：只**比对签名**、不写 store（⛔ 浏览中静默换内容；应用归「刷新」） ── */
-  const backgroundCheck = useCallback(async () => {
-    const now = Date.now();
-    if (now - lastContentCheck.current < BACKGROUND_CHECK_MS) return;
-    lastContentCheck.current = now;
-    // 首趟目录未到 ⇒ 空 vs 全量会被误判成「内容已更新」——不比对（首开绝不弹常驻条）
-    if (data.catalog.entries.length === 0) return;
-    try {
-      const next = await forceRefreshCatalog(); // 只取新目录；不写 catalogStore
-      const before = catalogSignature(
-        data.catalog.entries,
-        data.catalog.collections,
-        data.catalog.railOrder,
-      );
-      const after = catalogSignature(next.entries, next.collections, next.railOrder);
-      if (after !== before) setContentPending(true);
-    } catch {
-      /* 后台检查失败不打扰（来源页注记承担可见性） */
-    }
-  }, [data.catalog.entries, data.catalog.collections, data.catalog.railOrder]);
-
+  /* ── 发现型已读（数据面，`discoverReads` 唯一属主）：进入即已读（路由 effect 写入）＋
+   *    contentHash 增量点集（R4-5.6/#12——键 ∉ 读集 ∪（已读但逐键签名变了，「又上新」重开点，
+   *    06 §八·补））。rail 的 6px 点渲染路径棒 6 已就位，这里只供点集。 */
   useEffect(() => {
-    if (!isActive) return;
-    void backgroundCheck();
-  }, [isActive, backgroundCheck]);
-
-  useEffect(() => {
-    if (!isActive) return;
-    const onFocus = () => {
-      if (Date.now() - lastContentCheck.current < FOCUS_CHECK_MS) return;
-      void backgroundCheck();
+    let alive = true;
+    void readDiscoverReads().then((r) => alive && setDiscoverReads(r));
+    const un = onDiscoverReadsChange(() => {
+      void readDiscoverReads().then((r) => alive && setDiscoverReads(r));
+    });
+    return () => {
+      alive = false;
+      un();
     };
-    window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
-  }, [isActive, backgroundCheck]);
+  }, []);
 
-  /* ── 手动动作（命令面唯一入口） ── */
-  const checkUpdates = useCallback(async () => {
-    const r = await checkUpdatesFromStore();
-    if (!r.ok) {
-      showToast(t("检查更新失败"), { severity: "warning", key: "check-updates" });
-      return;
-    }
-    showToast(
-      r.count > 0 ? t("检查完成 · 发现 {{count}} 个可用更新", { count: r.count }) : t("所有插件已是最新"),
-      { severity: "success", key: "check-updates" },
-    );
+  const keySetsAndHashes = useMemo(
+    () => ({ keys: catalogKeysOf(data.catalog.entries), hashes: computeKeyHashes(data.catalog.entries) }),
+    [data.catalog.entries],
+  );
+  const unreadCats = useMemo(
+    () => new Set(unreadDiscoverKeys(discoverReads, keySetsAndHashes.keys, keySetsAndHashes.hashes).cats),
+    [discoverReads, keySetsAndHashes],
+  );
+  const unreadAuthors = useMemo(
+    () => new Set(unreadDiscoverKeys(discoverReads, keySetsAndHashes.keys, keySetsAndHashes.hashes).sources),
+    [discoverReads, keySetsAndHashes],
+  );
+
+  /* ── 内容热更新（R4-5.6/#12）：触发面/节流/退避/contentHash 比对全在 `contentWatch` 服务，UI 只消费回执 ── */
+  useEffect(() => {
+    const un = onContentWatchSettled((o: ContentWatchOutcome) => {
+      if (!o.ran || !o.changed) return;
+      if (isActiveRef.current) {
+        // 正在看该店：常驻条＋轻 Toast（带「刷新」动作）——⛔ 静默换内容（06 §六 §4）
+        setContentPending(true);
+        showToast(t("首页内容已更新 · 刷新"), {
+          severity: "info",
+          key: "content-updated",
+          action: { title: t("刷新"), command: "marketplace.refreshCatalog" },
+        });
+      } else {
+        nextOpenApplyRef.current = true; // 商店不可见时到达 → 下次打开直接应用（06 §六 §4）
+      }
+      // 持久记录（铃铛面板一条——忽略 ≠ 删除；06 §六 §3）
+      notifyInfo(t("首页内容已更新——刷新后显示最新轮播与合集；你的滚动位置、筛选与排序会保留"));
+    });
+    startContentWatch();
+    return () => {
+      un();
+      stopContentWatch();
+    };
   }, [t]);
+
+  useEffect(() => {
+    if (!isActive) return;
+    // 变更到达时商店不可见 → 下次打开直接应用＋一次性信息行（06 §六 §4）；随后照常走 60s 节流检查
+    if (nextOpenApplyRef.current) {
+      nextOpenApplyRef.current = false;
+      void refreshContentFromStore().then((r) => {
+        if (r.ok) {
+          setContentAppliedAt(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+        }
+      });
+    }
+    void checkContentNow("store-open");
+  }, [isActive]);
+
+  /* ── 手动动作（命令面唯一入口）── 完成路径轻反馈已收进 updateCheck 服务（R4-5.7 单入口：
+      按钮与命令面共用一份，⛔ 视图再自弹一份） */
+  const checkUpdates = useCallback(async () => {
+    await checkUpdatesFromStore();
+  }, []);
 
   const refreshContent = useCallback(async () => {
     const r = await refreshContentFromStore();
@@ -286,6 +318,7 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
   }, [t]);
 
   const dismissContent = useCallback(() => setContentPending(false), []);
+  const dismissApplied = useCallback(() => setContentAppliedAt(null), []);
 
   const openAddSource = useCallback((mode: "remote" | "local" = "remote") => setAddSourceMode(mode), []);
   const closeAddSource = useCallback(() => {
@@ -318,8 +351,10 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
       unreadCats,
       unreadAuthors,
       contentPending,
+      contentAppliedAt,
       refreshContent,
       dismissContent,
+      dismissApplied,
       checkUpdates,
       addSource,
       openAddSource,
@@ -345,8 +380,10 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
       unreadCats,
       unreadAuthors,
       contentPending,
+      contentAppliedAt,
       refreshContent,
       dismissContent,
+      dismissApplied,
       checkUpdates,
       addSource,
       openAddSource,

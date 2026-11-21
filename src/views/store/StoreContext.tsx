@@ -43,6 +43,9 @@ export interface StoreContextValue {
   contentPending: boolean;
   refreshContent: () => void;
   dismissContent: () => void;
+  /** 「内容已更新于 HH:MM」一次性信息行（变更到达时商店不可见 → 下次打开直接应用，06 §六 §4） */
+  contentAppliedAt: string | null;
+  dismissApplied: () => void;
   checkUpdates: () => void;
   addSource: () => void;
   /** 打开加源弹窗（网络/本地两页签；来源页两个大按钮也走这里） */

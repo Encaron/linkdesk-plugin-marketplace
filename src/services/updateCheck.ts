@@ -23,12 +23,19 @@
  *
  * 依赖方向：本模块在 `updateDiscovery` 与 `marketplaceShared` **之上**（两只都只向下 import，无回边）——
  *   `marketCatalog → marketSources → updateDiscovery → marketplaceShared → updateCheck`。
+ *
+ * R4-5.7（#11 Toast 接入）：完成路径的轻反馈**收进本模块**（单入口）——此前只有商店头部按钮路径
+ *  弹 Toast，命令面（`marketplace.checkUpdates`，AI/CLI 同款）完成即静默。轻 Toast = 恰好在场的
+ *  补充（TransientToast 单存储双形态，01-API契约）；铃铛面板记录仍归发现腿（`messages.ts`），
+ *  ⛔ 本模块不另起第二通知面。i18next 直用（notifications.ts/messages.ts 先例）。
  */
 
+import i18n from "i18next";
 import { runUpdateDiscovery } from "./updateDiscovery";
 import type { DiscoveryPlan } from "./updateDiscovery";
 import { reprojectCatalog } from "./marketplaceShared/catalogStore";
 import { scheduleDataRefresh } from "./marketplaceShared/pluginsStore";
+import { showToast } from "./hostApi";
 
 export interface UpdateCheckResult {
   /** `ok` = 比过了（含「没有可更新」这一结论）；`failed` = 判不了（目录取不到/坏 parse、读盘不可信） */
@@ -42,19 +49,31 @@ export interface UpdateCheckResult {
 const failed = (): UpdateCheckResult => ({ state: "failed", updatableCount: 0, checkedAt: Date.now() });
 
 /** 手动检查更新——顺序判据见文件头。**本函数不抛**：任何失败都折成 `state:"failed"`，
- *  让按钮无论如何都回得到可用态（⛔ 不许出现「卡在检查中」的按钮）。 */
+ *  让按钮无论如何都回得到可用态（⛔ 不许出现「卡在检查中」的按钮）。
+ *  完成路径发轻 Toast（key 去重防连点刷屏）——按钮路径与命令路径共用这一份（R4-5.7 单入口）。 */
 export async function checkForPluginUpdates(): Promise<UpdateCheckResult> {
   try {
     const plan: DiscoveryPlan | null = await runUpdateDiscovery(true);
-    if (plan === null) return failed();
+    if (plan === null) {
+      showToast(i18n.t("检查更新失败"), { severity: "warning", key: "check-updates" });
+      return failed();
+    }
     await reprojectCatalog();
     // 2026-09-30 用户报障兜底：探索/详情行的「可更新」判定除了目录条目还吃**已装列表 store**（本地版本 +
     // 住所闸 updatable，`useCatalogStatus` 交叉比对）——目录新鲜而该 store 陈旧时行依旧不翻。手动检查是
     // 用户「现在就要对上」的显式动作 ⇒ 重投影之外把已装列表也强拉一趟（microtask 合并，幂等、零额外成本）。
     scheduleDataRefresh();
-    return { state: "ok", updatableCount: plan.candidates.length, checkedAt: Date.now() };
+    const count = plan.candidates.length;
+    showToast(
+      count > 0
+        ? i18n.t("检查完成 · 发现 {{count}} 个可用更新", { count })
+        : i18n.t("所有插件已是最新"),
+      { severity: "success", key: "check-updates" },
+    );
+    return { state: "ok", updatableCount: count, checkedAt: Date.now() };
   } catch {
     // 读盘/目录/配置任一处抛（如预览环境无 configuration 面）——一律「判不了」，不把异常漏给调用方
+    showToast(i18n.t("检查更新失败"), { severity: "warning", key: "check-updates" });
     return failed();
   }
 }

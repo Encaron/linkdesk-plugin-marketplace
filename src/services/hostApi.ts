@@ -39,8 +39,18 @@ export function licensesApi(): LicensesLike | null {
   return typeof candidate.list === "function" ? (candidate as LicensesLike) : null;
 }
 
+/** Toast 动作（01-API契约：最多 1 个，超限由壳层降级面板） */
+export interface ToastAction {
+  title: string;
+  command?: string;
+  args?: unknown[];
+}
+
 /** 壳轻 Toast（棒 0 `window.linkdesk.toasts`，顶层平铺；⛔ 无 ui.toasts 层级）。缺面静默。 */
-export function showToast(message: string, opts?: { key?: string; severity?: "info" | "success" | "warning"; ttl?: number }): void {
+export function showToast(
+  message: string,
+  opts?: { key?: string; severity?: "info" | "success" | "warning"; ttl?: number; action?: ToastAction },
+): void {
   const lk = window.linkdesk as unknown as { toasts?: ToastsLike } | undefined;
   try {
     lk?.toasts?.show({ message, ...opts });

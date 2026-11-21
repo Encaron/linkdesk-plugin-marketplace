@@ -60,11 +60,12 @@ export interface CatalogLoadResult {
 export type FetchFn = (url: string) => Promise<string>;
 export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem"> | null;
 
-/** 单源结果——text = 已通过 parse 校验的交付物（实时或缓存）；reason = 彻底失败原因（无缓存可兜）。
+/** 单源结果——text = 已通过 parse 校验的交付物（实时或缓存）；reason = 彻底失败原因（无缓存可兜；
+ *  `rate-limited` = HTTP 403 限流，R4-5.6 内容热更新退避直接封顶）。
  *  official：该源即官方默认源（E6#30.8f——官方身份与拉取 URL 同源判定，缓存/网络路径一致携带） */
 export type SourceResult =
   | { sourceName: string; official: boolean; text: string; fresh: boolean; staleFallback: boolean }
-  | { sourceName: string; official: boolean; reason: "network" | "parse" };
+  | { sourceName: string; official: boolean; reason: "network" | "parse" | "rate-limited" };
 
 /** 侧车文件（vendors.json / plugin.json）拉取结果——与目录源分开：不参与主状态判定。
  *  missing = HTTP 404（K5 回落链据它给「未找到 marketplace.json / plugin.json」文案）。 */

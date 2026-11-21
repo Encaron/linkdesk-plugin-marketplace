@@ -41,10 +41,11 @@ export async function fetchOne(url: string, force: boolean): Promise<SourceResul
   let text: string;
   try {
     text = await fetchText(url);
-  } catch {
+  } catch (err) {
     // 网络失败 → stale 缓存兜底；无缓存 = 该源不可达
     if (cached) return { sourceName, official, text: cached.text, fresh: false, staleFallback: true };
-    return { sourceName, official, reason: "network" };
+    // R4-5.6：限流（HTTP 403）单独成因——内容热更新退避按 06 §六 §5 直接封顶 30min
+    return { sourceName, official, reason: /HTTP 403/.test(String(err)) ? "rate-limited" : "network" };
   }
 
   if (isParseable(text)) {

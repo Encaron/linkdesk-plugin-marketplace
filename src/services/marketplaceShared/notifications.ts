@@ -28,6 +28,13 @@ export function notifyError(message: string): void {
   if (show) void show(message, { type: "error", source: MARKET_SOURCE });
 }
 
+/** 发一条 info 面板记录——内容热更新的持久记录（06 §六 §3：轻 Toast 只是「恰好在场」的补充，
+ *  铃铛面板可回看才是正身；忽略 ≠ 删除）。进程不可用静默 no-op。 */
+export function notifyInfo(message: string): void {
+  const show = lk()?.notifications?.show;
+  if (show) void show(message, { type: "info", source: MARKET_SOURCE });
+}
+
 /** 失败终局——归因 + 失败 toast[重试]。返回 false 供调用方直接当结果用。
  *  行内失败态由 job 行表达（壳侧 job 表 terminal:"failed" + error；市场视图经 `useInstallJob` 读），
  *  本函数不再写任何会话状态。 */
