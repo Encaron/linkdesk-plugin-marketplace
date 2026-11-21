@@ -464,7 +464,7 @@
   "门店切换": "Store switch",
   "该分类下暂无插件": "No plugins in this category yet",
   "再点一次该瓷片可收起": "Click the tile again to collapse",
-  "作者声明了这间仓但还没上架——空仓照实显示，不隐藏不报错": "The author declared this repo but has not published anything yet — shown honestly, hidden never, errors none",
+  "作者还没往这个仓库上架插件——过阵子再来看看": "The author hasn't published anything here yet — check back later",
   "正在加载该作者的插件…": "Loading this author's plugins…",
   "读取作者域后按分类预过滤": "Pre-filtering by category after the author domain loads",
   "已过滤": "Filtered",

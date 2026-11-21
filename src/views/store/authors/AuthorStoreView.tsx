@@ -168,7 +168,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
             <EmptyState
               icon="dots"
               title={t("「{{name}}」暂无插件", { name: repo.name })}
-              sub={t("作者声明了这间仓但还没上架——空仓照实显示，不隐藏不报错")}
+              sub={t("作者还没往这个仓库上架插件——过阵子再来看看")}
             />
           </section>
         );
@@ -279,7 +279,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
             <EmptyState
               icon="dots"
               title={t("「{{name}}」暂无插件", { name: repo.name })}
-              sub={t("作者声明了这间仓但还没上架——空仓照实显示，不隐藏不报错")}
+              sub={t("作者还没往这个仓库上架插件——过阵子再来看看")}
             />
           ) : (
             <div className="marketplace-store-grid">
@@ -302,7 +302,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
           <EmptyState
             icon="dots"
             title={t("「{{name}}」暂无插件", { name: repo.name })}
-            sub={t("作者声明了这间仓但还没上架——空仓照实显示，不隐藏不报错")}
+            sub={t("作者还没往这个仓库上架插件——过阵子再来看看")}
           />
         ) : (
           <>
