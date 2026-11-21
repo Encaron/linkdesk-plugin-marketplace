@@ -30,6 +30,9 @@
         = Chromium 121+ 会忽略 webkit 伪元素（样式不生效）。
    ⛔ 只在个别页面补丁＝未归一化；新组件落码前先过这四条。 */
 
+.marketplace-store :is(h1, h2, h3, p, b, span, button) { min-width: 0; }
+.marketplace-store .marketplace-ui-btn { flex: none; }
+
 .marketplace-store .marketplace-ui-corner {
   user-select: none;
 }

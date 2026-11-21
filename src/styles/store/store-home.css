@@ -43,6 +43,28 @@
   .marketplace-store-hero-copy { padding: 24px 22px 20px; }
   .marketplace-store-art.is-hero { min-height: 120px; }
 }
+/* 容器 < 420px：字号降档＋内边距收紧（仍在可读区间） */
+@container (max-width: 420px) {
+  .marketplace-store-hero-copy { padding: 18px 16px 16px; }
+  .marketplace-store-hero-copy h2 { font-size: 21px; }
+  .marketplace-store-art.is-hero { min-height: 96px; }
+}
+/* 容器 < 320px：**禁止竖排**——标题/说明改单行省略（宁可截断也不一字一行）；
+   图区收成一条色带（保留视觉标识，不占高度） */
+@container (max-width: 320px) {
+  .marketplace-store-hero-copy h2,
+  .marketplace-store-hero-copy p {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: unset;
+    max-width: 100%;
+  }
+  .marketplace-store-hero-copy h2 { font-size: 19px; }
+  .marketplace-store-art.is-hero { min-height: 64px; }
+  .marketplace-store-art.is-hero .marketplace-store-art-icon { width: 48px; height: 48px; }
+}
 .marketplace-store-hero-copy {
   padding: 30px 8px 26px 34px;
   display: flex;
