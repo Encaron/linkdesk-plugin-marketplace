@@ -430,7 +430,9 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
               {route.page === "authors" && <AuthorsView />}
               {route.page === "author" && (
                 <AuthorStoreView
-                  key={`${route.authorId ?? ""}:${route.repoId ?? ""}`}
+                  /* 只按作者 key：切仓（repoId 变）不重挂载，仓库横排保留滚动位；
+                     作者换人才重挂载（新作者店从顶部开始）。 */
+                  key={route.authorId ?? ""}
                   authorId={route.authorId ?? ""}
                   repoId={route.repoId}
                 />

@@ -148,6 +148,14 @@
 .marketplace-store-author-card:focus-visible .marketplace-store-ac-repo i {
   opacity: 1;
 }
+/* 顶层仓卡静止磨砂（2026-11-22 用户实机）：下面几张卡是半透玻璃，边缘会透上来；
+   顶层吃一层同款磨砂把它压下去。hover/键盘聚焦时父卡已挂 backdrop-filter ⇒ 子层撤掉，
+   避免父子同挂形成 backdrop root（F39 的玻璃边界纪律）。 */
+.marketplace-store-author-card:not(:hover):not(:focus-visible) .marketplace-store-ac-repo:last-child {
+  background: var(--bg-card);
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
+}
 /* 边界 ① 单仓：一张满宽卡＋「唯一仓库」，不假装扇出 */
 .marketplace-store-author-card.is-solo .marketplace-store-ac-deck { height: 38px; }
 .marketplace-store-author-card.is-solo .marketplace-store-ac-repo {
