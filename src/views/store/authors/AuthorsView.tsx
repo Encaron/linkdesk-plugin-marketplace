@@ -78,6 +78,7 @@ export function AuthorsView() {
       </div>
       {list.length > 0 && (
         <div className="marketplace-store-toolbar">
+          <span className="marketplace-store-tb-label">{t("排序")}</span>
           <SortSelect
             ariaLabel={t("排序")}
             value={prefs.authorSort}

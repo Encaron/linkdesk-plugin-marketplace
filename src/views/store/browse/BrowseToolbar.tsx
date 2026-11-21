@@ -109,6 +109,7 @@ export function BrowseToolbar() {
   const { prefs, setCatSort, setCatView } = useStore();
   return (
     <div className="marketplace-store-toolbar">
+      <span className="marketplace-store-tb-label">{t("排序")}</span>
       <SortSelect ariaLabel={t("排序")} value={prefs.catSort} options={SORT_SETS.cat} onChange={(v) => setCatSort(v as CatSort)} />
       <FilterMenu />
       <ViewSeg value={prefs.catView} onChange={setCatView} />

@@ -340,6 +340,7 @@ export function LibraryView() {
           options={[{ value: "all", label: t("全部仓库") }, ...repos.map((r) => ({ value: r, label: r }))]}
           onChange={(v) => setFilters({ ...filters, repo: v })}
         />
+        <span className="marketplace-store-tb-label">{t("排序")}</span>
         <SortSelect ariaLabel={t("排序")} value={prefs.libSort} options={SORT_SETS.lib} onChange={(v) => setLibSort(v as LibSort)} />
         <ViewSeg value={prefs.libView} onChange={setLibView} />
       </div>
