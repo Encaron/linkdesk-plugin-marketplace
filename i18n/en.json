@@ -648,5 +648,6 @@
   "{{currency}}{{price}}": "{{currency}}{{price}}",
   "打开排行榜": "Open leaderboard",
   "打开作者列表": "Open author list",
-  "读取市场状态": "Read marketplace state"
+  "读取市场状态": "Read marketplace state",
+  "{{count}} 位作者": "{{count}} authors"
 }

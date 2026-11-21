@@ -8,7 +8,7 @@
  * 键盘（U3）：rail 内 ←→↑↓ 移动焦点（绑容器，重绘不失效）。
  */
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../../ui";
 import { localizeCategory } from "../../services/marketCategories";
@@ -38,6 +38,28 @@ export function Rail() {
   const active = route.page;
   const activeCategory = route.page === "category" ? route.category : undefined;
 
+  const railRef = useRef<HTMLElement | null>(null);
+
+  /* 窄窗横条（≤900 时 rail 竖转横）：鼠标纵向滚轮→横向滚动；到端放行给页面滚动。
+     竖排 rail（flex-direction ≠ row）或无横向溢出时不接管。原生监听必须 passive:false 才能 preventDefault。 */
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    const onWheel = (ev: WheelEvent) => {
+      if (getComputedStyle(el).flexDirection !== "row") return;
+      const max = el.scrollWidth - el.clientWidth;
+      if (max <= 1) return;
+      if (Math.abs(ev.deltaX) < 2 && Math.abs(ev.deltaY) < 2) return;
+      const delta = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
+      const next = Math.min(max, Math.max(0, el.scrollLeft + delta));
+      if (next === el.scrollLeft) return; // 到端放行
+      ev.preventDefault();
+      el.scrollLeft = next;
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
   const onKeyDown = useCallback((ev: React.KeyboardEvent<HTMLElement>) => {
     if (!["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft"].includes(ev.key)) return;
     const items = [...(ev.currentTarget.querySelectorAll("button:not([disabled])") as NodeListOf<HTMLElement>)];
@@ -49,7 +71,7 @@ export function Rail() {
   }, []);
 
   return (
-    <nav className="marketplace-store-rail" aria-label={t("商店分类导航")} onKeyDown={onKeyDown}>
+    <nav ref={railRef} className="marketplace-store-rail" aria-label={t("商店分类导航")} onKeyDown={onKeyDown}>
       <div className="marketplace-store-rail-top">
         <button
           type="button"
@@ -133,7 +155,12 @@ export function Rail() {
         >
           <Icon name="user" size="sm" />
           {t("作者")}
-          <span className="marketplace-store-rail-count">{data.authorSourceCount}</span>
+          <span
+            className="marketplace-store-rail-count"
+            data-hint={t("{{count}} 位作者", { count: data.authorCount })}
+          >
+            {data.authorCount}
+          </span>
           {unreadAuthors.size > 0 && (
             <span className="marketplace-store-rail-dot is-new" data-hint={t("有新内容")} />
           )}

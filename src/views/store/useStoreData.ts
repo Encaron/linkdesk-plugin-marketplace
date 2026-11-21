@@ -16,6 +16,7 @@ import { pickInstallJob, useInstallJobsSubscription } from "../../services/insta
 import { useLicenseEntitlements } from "../../services/licensesView";
 import { useDownloadCounts } from "../../services/downloadCounts";
 import { readSourceRecords } from "../../services/marketSources";
+import { useAuthorDomains } from "../../services/authors";
 import type { StoreCardContext } from "./cards/cardParts";
 import { countByBucket } from "./storeData";
 
@@ -30,6 +31,8 @@ export interface StoreData {
   updateCount: number;
   /** 已配置的作者源数（remote；作者卡区的空态判据——0 = 还没有作者源） */
   authorSourceCount: number;
+  /** 作者卡数量（作者域聚合后的作者数；rail「作者」徽标——⛔ 不是源数） */
+  authorCount: number;
   counts: ReadonlyMap<string, number>;
   /** rail 逐分类计数（空桶 0；rail 灰显与「其他」桶同源） */
   railOrderCounts: ReadonlyMap<string, number>;
@@ -41,6 +44,7 @@ export interface StoreData {
 
 export function useStoreData(): StoreData {
   const catalog = useMarketplaceCatalog();
+  const { domains: authorDomains } = useAuthorDomains(catalog.entries.length);
   // 订阅一次 job 表（壳广播全量快照）——卡片内用纯函数 pickInstallJob 现查，⛔ 每卡一个订阅
   useInstallJobsSubscription();
   const online = useOnlineStatus();
@@ -88,6 +92,7 @@ export function useStoreData(): StoreData {
     installedCount: all.length,
     updateCount,
     authorSourceCount,
+    authorCount: authorDomains.length,
     counts,
     railOrderCounts,
     refreshLicenses,

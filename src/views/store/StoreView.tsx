@@ -20,6 +20,7 @@ import {
   catalogKeysOf,
   computeKeyHashes,
   EMPTY_DISCOVER_READS,
+  markAllRead,
   markSeen,
   onDiscoverReadsChange,
   readDiscoverReads,
@@ -165,6 +166,8 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
     saveScroll(routeKey(prev), contentRef.current?.scrollTop ?? 0);
     if (next.page === "category" && next.category) void markSeen("category", next.category);
     if (next.page === "author" && next.authorId) void markSeen("author", next.authorId);
+    // 作者列表页 = 作者入口；进入即清全部作者未读点（与分类/作者店同一「进入即已读」口径）
+    if (next.page === "authors") void markAllRead("author");
     if (next.page !== "search") setSearchInputState("");
     setSubChipState(null); // 小类过滤是一次性浏览条件；切页清掉（排序/视图仍记忆）
     setRoute(next);
