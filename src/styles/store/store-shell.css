@@ -549,6 +549,8 @@
        .marketplace-store-rank-row,
        .marketplace-store-lib-row,
        .marketplace-store-src-row,
+       .marketplace-store-src-ghead,
+       .marketplace-store-src-line,
        .marketplace-store-hero) {
   --surface-blur: blur(16px) saturate(1.15);
   --surface-lift: -3px;

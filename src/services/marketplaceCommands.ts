@@ -33,6 +33,7 @@ import {
   setMarketplaceSearch,
 } from "./marketplaceShared/searchState";
 import { setViewPrefs } from "./marketplaceShared/uiPrefs";
+import { setSourcesDefaultCollapsed } from "./sourcesPrefs";
 import { openPluginDetailTab } from "./openDetailTab";
 import i18n from "i18next";
 
@@ -347,6 +348,25 @@ export async function runSetViewPrefs(args?: unknown): Promise<{ ok: boolean; re
   }
 }
 
+/** 来源分组默认收起/展开（设置页同键；命令与 UI 共用唯一写口） */
+export async function runSetSourcesDefaultCollapsed(
+  args?: unknown,
+): Promise<{ ok: boolean; collapsed?: boolean; reason?: string }> {
+  const rec = asRecord(args);
+  const raw = Array.isArray(args)
+    ? args[0]
+    : typeof args === "boolean"
+      ? args
+      : rec.collapsed;
+  if (typeof raw !== "boolean") return { ok: false, reason: "bad-arg" };
+  try {
+    const ok = await setSourcesDefaultCollapsed(raw);
+    return ok ? { ok: true, collapsed: raw } : { ok: false, reason: "unsupported" };
+  } catch {
+    return { ok: false, reason: "io" };
+  }
+}
+
 /* ═══ 注册（入口模块链顶层调用——见 marketplaceShared/commands.ts 的注册时机说明） ═══ */
 
 /** 本组命令的 id → handler → title（title 必须与 plugin.json 逐字一致；其余元数据只在 manifest） */
@@ -367,6 +387,7 @@ const COMMANDS: Array<[string, (args?: unknown) => Promise<unknown>, string]> = 
   ["marketplace.refreshCatalog", () => runRefreshCatalog(), "刷新目录内容"],
   ["marketplace.markAllRead", (a) => runMarkAllRead(a), "全部标为已读"],
   ["marketplace.setViewPrefs", (a) => runSetViewPrefs(a), "设置视图偏好"],
+  ["marketplace.setSourcesDefaultCollapsed", (a) => runSetSourcesDefaultCollapsed(a), "设置来源分组默认收起"],
 ];
 
 /**

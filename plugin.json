@@ -219,6 +219,20 @@
             "description": "{ page:\"lib\"|\"author\"|\"cat\", view?: \"grid\"|\"list\", sort?: string }"
           }
         ]
+      },
+      {
+        "id": "marketplace.setSourcesDefaultCollapsed",
+        "title": "设置来源分组默认收起",
+        "category": "插件市场",
+        "description": "设置「来源」页作者/官方分组打开时默认收起还是展开（true=默认收起）。落盘 marketplace.sourcesDefaultCollapsed；设置页同键可调。回执 {ok, collapsed} 或 {ok:false, reason}",
+        "params": [
+          {
+            "name": "collapsed",
+            "type": "boolean",
+            "required": true,
+            "description": "true = 默认收起；false = 默认展开"
+          }
+        ]
       }
     ],
     "i18n": {
@@ -236,6 +250,12 @@
           ],
           "description": "商店拉取哪些目录。官方目录内置；添加作者仓库 URL 即可发现该作者的插件（该仓库根目录需有 marketplace.json）。",
           "uiHint": "stringList"
+        },
+        "marketplace.sourcesDefaultCollapsed": {
+          "type": "boolean",
+          "title": "来源分组默认收起",
+          "default": false,
+          "description": "打开「来源」页时，官方/作者分组默认折叠（点组头整行展开）。命令 marketplace.setSourcesDefaultCollapsed 写同一键。"
         }
       }
     },

@@ -122,12 +122,12 @@ afterEach(() => {
   Reflect.deleteProperty(window, "linkdesk");
 });
 
-describe("注册面 —— 16 条新命令", () => {
-  it("id/title 逐条对得上 manifest；返回注册条数 16", () => {
+describe("注册面 —— 17 条新命令", () => {
+  it("id/title 逐条对得上 manifest；返回注册条数 17", () => {
     const registerCommand = vi.fn();
     Object.defineProperty(window, "linkdesk", { value: { commands: { registerCommand } }, configurable: true });
 
-    expect(registerMarketplaceStoreCommands()).toBe(16);
+    expect(registerMarketplaceStoreCommands()).toBe(17);
     const calls = registerCommand.mock.calls as Array<[string, unknown, { title: string }]>;
     expect(calls.map(([id]) => id)).toEqual([
       "marketplace.openStore",
@@ -146,6 +146,7 @@ describe("注册面 —— 16 条新命令", () => {
       "marketplace.refreshCatalog",
       "marketplace.markAllRead",
       "marketplace.setViewPrefs",
+      "marketplace.setSourcesDefaultCollapsed",
     ]);
     expect(calls.map(([, , meta]) => meta.title)).toEqual([
       "打开插件市场",
@@ -164,6 +165,7 @@ describe("注册面 —— 16 条新命令", () => {
       "刷新目录内容",
       "全部标为已读",
       "设置视图偏好",
+      "设置来源分组默认收起",
     ]);
   });
 

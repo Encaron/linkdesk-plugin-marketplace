@@ -1,4 +1,7 @@
 {
+  "打开「来源」页时，官方/作者分组默认折叠（点组头整行展开）。命令 marketplace.setSourcesDefaultCollapsed 写同一键。": "打开「来源」页时，官方/作者分组默认折叠（点组头整行展开）。命令 marketplace.setSourcesDefaultCollapsed 写同一键。",
+  "来源分组默认收起": "来源分组默认收起",
+  "设置来源分组默认收起": "设置来源分组默认收起",
   "category.serial": "串口",
   "category.editor": "编辑器",
   "category.file": "文件",
@@ -445,6 +448,7 @@
   "已停用——插件停止运行，数据保留": "已停用——插件停止运行，数据保留",
   "进入该作者主页": "进入该作者主页",
   "折叠本地插件": "折叠本地插件",
+  "展开本地插件": "展开本地插件",
   "未找到 marketplace.json 或 plugin.json——仓库根需有其一": "未找到 marketplace.json 或 plugin.json——仓库根需有其一",
   "打开插件模板（npx create-linkdesk-plugin@latest）": "打开插件模板（npx create-linkdesk-plugin@latest）",
   "模板": "模板",

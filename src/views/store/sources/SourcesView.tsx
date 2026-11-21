@@ -11,13 +11,15 @@
  * 本件只读展示＋调单点，⛔ 自己读写配置。
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { OverlayPortal } from "@linkdesk/ui";
 import { EmptyState, hueBG, Icon } from "../../../ui";
 import { normalizeSourceUrl, sourceNameOfUrl } from "../../../services/marketCatalog";
 import { readSourceRecords, type SourceRecord } from "../../../services/marketSources";
 import { OFFICIAL_AUTHOR_ID, useAuthorDomains, refreshAuthorDomains } from "../../../services/authors";
+import { onSourcesDefaultCollapsedChange, readSourcesDefaultCollapsed } from "../../../services/sourcesPrefs";
 import { scheduleDataRefresh, useMarketplacePlugins } from "../../../services/marketplaceShared";
 import { readLocalInstalls, forgetLocalInstall, type LocalInstallRecord } from "../../../services/localInstalls";
 import {
@@ -95,6 +97,8 @@ export function SourcesView() {
   );
   const [localRecords, reloadLocal] = useLocalInstalls(installedIds);
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
+  const [defaultCollapsed, setDefaultCollapsed] = useState(false);
+  const collapseTouched = useRef(false);
   const [pending, setPending] = useState<PendingRemove | null>(null);
   const [removeInstalled, setRemoveInstalled] = useState(false);
 
@@ -119,7 +123,33 @@ export function SourcesView() {
     0,
   );
 
+  /* 默认开合：设置页/命令写同一配置键；用户手动点过之后本次会话以用户为准 */
+  useEffect(() => {
+    let alive = true;
+    void readSourcesDefaultCollapsed().then((v) => {
+      if (alive) setDefaultCollapsed(v);
+    });
+    const un = onSourcesDefaultCollapsedChange((v) => setDefaultCollapsed(v));
+    return () => {
+      alive = false;
+      un();
+    };
+  }, []);
+
+  /* 组头整行可点：id 集合变化时按默认值初始化；用户点过之后不再被设置改动覆盖 */
+  const groupSig = [
+    OFFICIAL_AUTHOR_ID,
+    ...groups.map((g) => g.authorId.toLowerCase()),
+    ...(localRecords.length > 0 ? ["__local"] : []),
+  ].join("|");
+  useEffect(() => {
+    if (collapseTouched.current || !groupSig) return;
+    const ids = groupSig.split("|").filter(Boolean);
+    setCollapsed(defaultCollapsed ? new Set(ids) : new Set());
+  }, [defaultCollapsed, groupSig]);
+
   const toggleCollapse = (id: string) => {
+    collapseTouched.current = true;
     setCollapsed((cur) => {
       const next = new Set(cur);
       if (next.has(id)) next.delete(id);
@@ -127,6 +157,22 @@ export function SourcesView() {
       return next;
     });
   };
+
+  /** 整行可点：组头 role=button；内部按钮（进店）自己 stopPropagation，键盘事件不重复触发 */
+  const headProps = (id: string, isCollapsed: boolean, label: string) => ({
+    role: "button" as const,
+    tabIndex: 0,
+    "aria-expanded": !isCollapsed,
+    "aria-label": label,
+    onClick: () => toggleCollapse(id),
+    onKeyDown: (e: ReactKeyboardEvent) => {
+      if ((e.target as HTMLElement | null)?.closest("button")) return;
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleCollapse(id);
+      }
+    },
+  });
 
   const afterWrite = useCallback(() => {
     reloadRecords();
@@ -268,36 +314,36 @@ export function SourcesView() {
             <div
               className={`marketplace-store-src-group ${isCollapsed ? "is-collapsed" : ""}`.trim()}
             >
-              <div className="marketplace-store-src-ghead">
-                <button
-                  type="button"
-                  className="marketplace-store-src-collapse"
-                  aria-label={isCollapsed ? t("展开该作者的源") : t("折叠该作者的源")}
-                  onClick={() => toggleCollapse(OFFICIAL_AUTHOR_ID)}
-                >
+              <div
+                className="marketplace-store-src-ghead"
+                {...headProps(
+                  OFFICIAL_AUTHOR_ID,
+                  isCollapsed,
+                  isCollapsed ? t("展开该作者的源") : t("折叠该作者的源"),
+                )}
+              >
+                <span className="marketplace-store-src-collapse" aria-hidden="true">
                   <Icon name="chevron-right" size="sm" />
-                </button>
+                </span>
                 <span className="marketplace-store-src-ico" style={{ background: "var(--accent)" }}>
                   <Icon name="bag" />
                 </span>
                 <div className="marketplace-store-src-main">
                   <div className="marketplace-store-src-name">
-                    <button
-                      type="button"
-                      className="marketplace-store-src-enter-name"
-                      onClick={() => navigate({ page: "author", authorId: OFFICIAL_AUTHOR_ID })}
-                    >
-                      {t("官方 Plugin Store")}
-                    </button>
+                    <span className="marketplace-store-src-enter-name">{t("官方 Plugin Store")}</span>
                     <span className="marketplace-store-src-tag is-official">{t("官方 ✓")}</span>
                     <span className="marketplace-store-src-tag">{t("内置")}</span>
-                    <span
+                    <button
+                      type="button"
                       className="marketplace-store-src-enter"
-                      onClick={() => navigate({ page: "author", authorId: OFFICIAL_AUTHOR_ID })}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate({ page: "author", authorId: OFFICIAL_AUTHOR_ID });
+                      }}
                     >
                       {t("进入该作者主页")}
                       <Icon name="chevron-right" size="sm" />
-                    </span>
+                    </button>
                   </div>
                   <div className="marketplace-store-src-sub">
                     {t("{{count}} 个市场源 · 官方内置，不可移除", { count: 1 })}
@@ -351,39 +397,39 @@ export function SourcesView() {
               key={group.authorId}
               className={`marketplace-store-src-group ${isCollapsed ? "is-collapsed" : ""}`.trim()}
             >
-              <div className="marketplace-store-src-ghead">
-                <button
-                  type="button"
-                  className="marketplace-store-src-collapse"
-                  aria-label={isCollapsed ? t("展开该作者的源") : t("折叠该作者的源")}
-                  onClick={() => toggleCollapse(group.authorId.toLowerCase())}
-                >
+              <div
+                className="marketplace-store-src-ghead"
+                {...headProps(
+                  group.authorId.toLowerCase(),
+                  isCollapsed,
+                  isCollapsed ? t("展开该作者的源") : t("折叠该作者的源"),
+                )}
+              >
+                <span className="marketplace-store-src-collapse" aria-hidden="true">
                   <Icon name="chevron-right" size="sm" />
-                </button>
+                </span>
                 <span className="marketplace-store-src-ico" style={hueBG(group.hue)}>
                   {group.name.slice(0, 1)}
                 </span>
                 <div className="marketplace-store-src-main">
                   <div className="marketplace-store-src-name">
-                    <button
-                      type="button"
-                      className="marketplace-store-src-enter-name"
-                      onClick={() => navigate({ page: "author", authorId: group.authorId })}
-                    >
-                      {group.name}
-                    </button>
+                    <span className="marketplace-store-src-enter-name">{group.name}</span>
                     <span
                       className={`marketplace-store-src-tag ${group.official ? "is-official" : ""}`}
                     >
                       {group.official ? t("官方 ✓") : "GitHub"}
                     </span>
-                    <span
+                    <button
+                      type="button"
                       className="marketplace-store-src-enter"
-                      onClick={() => navigate({ page: "author", authorId: group.authorId })}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate({ page: "author", authorId: group.authorId });
+                      }}
                     >
                       {t("进入该作者主页")}
                       <Icon name="chevron-right" size="sm" />
-                    </span>
+                    </button>
                   </div>
                   <div className="marketplace-store-src-sub">
                     {t("{{count}} 个市场源 · 同一作者多个仓库自动合并", { count: group.rows.length })}
@@ -490,15 +536,17 @@ export function SourcesView() {
 
         {localRecords.length > 0 && (
           <div className={`marketplace-store-src-group ${collapsed.has("__local") ? "is-collapsed" : ""}`.trim()}>
-            <div className="marketplace-store-src-ghead">
-              <button
-                type="button"
-                className="marketplace-store-src-collapse"
-                aria-label={t("折叠本地插件")}
-                onClick={() => toggleCollapse("__local")}
-              >
+            <div
+              className="marketplace-store-src-ghead"
+              {...headProps(
+                "__local",
+                collapsed.has("__local"),
+                collapsed.has("__local") ? t("展开本地插件") : t("折叠本地插件"),
+              )}
+            >
+              <span className="marketplace-store-src-collapse" aria-hidden="true">
                 <Icon name="chevron-right" size="sm" />
-              </button>
+              </span>
               <span className="marketplace-store-src-ico is-muted">
                 <Icon name="folder" />
               </span>
