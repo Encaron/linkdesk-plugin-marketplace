@@ -182,9 +182,17 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  /* 收起时移出 Tab 序（0fr 只是视觉裁剪，键盘仍能聚焦到不可见按钮） */
+  visibility: hidden;
+  transition: visibility 0s 0.22s;
 }
 .marketplace-store-card:hover .marketplace-store-x-more,
 .marketplace-store-card:focus-within .marketplace-store-x-more { grid-template-rows: 1fr; }
+.marketplace-store-card:hover .marketplace-store-x-more-inner,
+.marketplace-store-card:focus-within .marketplace-store-x-more-inner {
+  visibility: visible;
+  transition-delay: 0s;
+}
 .marketplace-store-x-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
 .marketplace-store-x-acts { display: flex; gap: 6px; align-items: center; margin-left: auto; }
 .marketplace-store-x-desc {
