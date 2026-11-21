@@ -68,7 +68,13 @@ export function AuthorsView() {
   const official = sorted.find((d) => d.authorId === OFFICIAL_AUTHOR_ID);
   const list = official ? [official, ...sorted.filter((d) => d !== official)] : sorted;
   const totalPlugins = list.reduce((n, d) => n + authorPluginCount(d), 0);
-  const open = (domain: AuthorDomain) => navigate({ page: "author", authorId: domain.authorId });
+  /* 官方的主页 = 官方首页（不是作者店兜底页）；第三方进各自作者店 */
+  const open = (domain: AuthorDomain) =>
+    navigate(
+      domain.authorId === OFFICIAL_AUTHOR_ID
+        ? { page: "home" }
+        : { page: "author", authorId: domain.authorId },
+    );
 
   return (
     <>

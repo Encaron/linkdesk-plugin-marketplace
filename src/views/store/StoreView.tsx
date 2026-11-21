@@ -28,7 +28,7 @@ import {
   type DiscoverReads,
 } from "../../services/discoverReads";
 import { notifyInfo } from "../../services/marketplaceShared/notifications";
-import { refreshAuthorDomains } from "../../services/authors";
+import { OFFICIAL_AUTHOR_ID, refreshAuthorDomains } from "../../services/authors";
 import { consumeStoreNavTarget, getStoreNavTarget, onStoreNavChange, setCurrentStoreRoute } from "../../services/storeNav";
 import {
   checkContentNow,
@@ -186,6 +186,11 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
     setSubChipState(null); // 小类过滤是一次性浏览条件；切页清掉（排序/视图仍记忆）
     setRoute(next);
   }, []);
+
+  /* 防旧意图/外部命令把官方落到作者店兜底页：官方主页 = 官方首页 */
+  useEffect(() => {
+    if (route.page === "author" && route.authorId === OFFICIAL_AUTHOR_ID) navigate(HOME_ROUTE);
+  }, [route, navigate]);
 
   /* ── 搜索（键入即搜索；清空回原视图；焦点由常驻输入框保持） ── */
   const setSearchInput = useCallback(

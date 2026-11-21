@@ -26,6 +26,7 @@ import { checkForPluginUpdates } from "./updateCheck";
 import { markAllRead, type DiscoverReadKind } from "./discoverReads";
 import { recordLocalInstall } from "./localInstalls";
 import { publishStoreNav, type StoreNavTarget } from "./storeNav";
+import { OFFICIAL_AUTHOR_ID } from "./authors";
 import { getCatalogResult, refreshCatalogNow } from "./marketplaceShared/catalogStore";
 import { readStoreState } from "./storeRead";
 import {
@@ -205,6 +206,11 @@ export async function runOpenLibrary(): Promise<OpenTabResult> {
 export async function runOpenAuthor(args?: unknown): Promise<OpenTabResult> {
   const authorId = stringArg(args, "authorId", 0);
   if (!authorId) return { ok: false, tabId: "" };
+  /* 官方的主页 = 官方首页；不进入作者店兜底页 */
+  if (authorId === OFFICIAL_AUTHOR_ID) {
+    await publishStoreNav({ page: "home" }, true);
+    return openStoreTab();
+  }
   const repoId = stringArg(args, "repoId", 1);
   const target: StoreNavTarget = repoId
     ? { page: "author", authorId, repoId }

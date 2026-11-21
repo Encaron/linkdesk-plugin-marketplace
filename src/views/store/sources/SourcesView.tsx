@@ -338,7 +338,7 @@ export function SourcesView() {
                       className="marketplace-store-src-enter"
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate({ page: "author", authorId: OFFICIAL_AUTHOR_ID });
+                        navigate({ page: "home" });
                       }}
                     >
                       {t("进入该作者主页")}
