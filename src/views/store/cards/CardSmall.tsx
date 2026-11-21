@@ -53,10 +53,13 @@ export const CardSmall = memo(function CardSmall({
         <div className="marketplace-store-cs-top">
           <Tile entry={entry} identity={ctx.installedIdentity} className="is-lg" />
           <div className="marketplace-store-fx1">
+            {/* 标题独占一行（长价格不再抢宽）；角标下沉到分类行，长文案省略 */}
             <div className="marketplace-store-cs-name">{entry.name}</div>
-            <div className="marketplace-store-cs-cat">{tCategory(t, entry)}</div>
+            <div className="marketplace-store-cs-meta">
+              <span className="marketplace-store-cs-cat">{tCategory(t, entry)}</span>
+              <CornerTag stacked baseClass="marketplace-ui-corner marketplace-store-cs-free" tag={status} />
+            </div>
           </div>
-          <CornerTag baseClass="marketplace-ui-corner marketplace-store-cs-free" tag={status} />
         </div>
         {/* 展开只放新增信息（简介/徽标/动作），头部只有一份 */}
         <div className="marketplace-store-x-more">

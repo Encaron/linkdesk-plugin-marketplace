@@ -32,6 +32,10 @@ export interface StatusTag {
   key: string;
   params?: Record<string, string | number>;
   kind: CornerKind;
+  /** 卡片两行呈现（付费价）：模型词与金额分开——金额**永远完整显示**（⛔ 截价格）。
+   *  仅 `stacked` 角标消费；其余消费方仍用 `key/params` 的整句。 */
+  modelKey?: string;
+  amount?: { key: string; params?: Record<string, string | number> };
 }
 
 /** 许可剩余天数（向上取整；已过期 = 负数）；undefined = 永久/无 exp */
@@ -70,20 +74,26 @@ export function statusTag(entry: Pick<CatalogEntry, "pricing">, ctx: StatusConte
 
   if (pricing) {
     if (pricing.model === "subscription") {
+      const params = {
+        currency: pricing.currency ?? "¥",
+        price: pricing.price ?? 0,
+        period: pricing.period ?? "月",
+      };
       return {
         key: "订阅 {{currency}}{{price}}/{{period}}",
-        params: {
-          currency: pricing.currency ?? "¥",
-          price: pricing.price ?? 0,
-          period: pricing.period ?? "月",
-        },
+        params,
         kind: "paid",
+        modelKey: "订阅",
+        amount: { key: "{{currency}}{{price}}/{{period}}", params },
       };
     }
+    const params = { currency: pricing.currency ?? "¥", price: pricing.price ?? 0 };
     return {
       key: "买断 {{currency}}{{price}}",
-      params: { currency: pricing.currency ?? "¥", price: pricing.price ?? 0 },
+      params,
       kind: "paid",
+      modelKey: "买断",
+      amount: { key: "{{currency}}{{price}}", params },
     };
   }
   return { key: "免费", kind: "free" };

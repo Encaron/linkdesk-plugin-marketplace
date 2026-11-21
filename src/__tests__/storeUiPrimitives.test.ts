@@ -68,6 +68,9 @@ describe("statusTag —— 九级优先级", () => {
       key: "订阅 {{currency}}{{price}}/{{period}}",
       params: { currency: "¥", price: 8, period: "月" },
       kind: "paid",
+      // 卡片两行呈现（2026-11-22）：模型词/金额分开，金额完整显示（⛔ 截价格）
+      modelKey: "订阅",
+      amount: { key: "{{currency}}{{price}}/{{period}}", params: { currency: "¥", price: 8, period: "月" } },
     });
     expect(statusTag(entry({ pricing: { model: "paid", price: 30 } }), { state: "install", now: NOW }).kind).toBe("paid");
     expect(statusTag(entry(), { state: "install", now: NOW })).toEqual({ key: "免费", kind: "free" });

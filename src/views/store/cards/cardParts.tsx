@@ -89,8 +89,14 @@ export function statusOfCard(entry: CatalogEntry, ctx: StoreCardContext): Status
   return statusTag(entry, { state: ctx.state, license: ctx.license });
 }
 
+/** 角标已出口的状态族——hover 徽标行不再重复（同一事实画两遍＝用户报的「两个价格」）。
+ *  角标（CornerTag）永远显示最要紧的那一个状态；这里只留**非状态**徽标（来源/内置/失败）。 */
+const STATUS_BADGE_KINDS = new Set(["price", "soon", "expired", "owned", "installed", "update", "muted"]);
+
 export function badgesOfCard(entry: CatalogEntry, ctx: StoreCardContext): BadgeDesc[] {
-  return allBadges(entry, { state: ctx.state, core: ctx.core, license: ctx.license });
+  return allBadges(entry, { state: ctx.state, core: ctx.core, license: ctx.license }).filter(
+    (b) => !STATUS_BADGE_KINDS.has(b.kind),
+  );
 }
 
 export function actionOfCard(

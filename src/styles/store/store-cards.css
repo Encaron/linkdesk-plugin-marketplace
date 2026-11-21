@@ -89,14 +89,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.marketplace-store-cs-cat { font-size: var(--font-size-2xs); color: var(--text-muted); margin-top: 3px; }
-.marketplace-store-cs-free { margin-left: auto; }
+/* 分类行：分类左、角标右（标题独占上一行，价值高文案不再互相抢宽） */
+.marketplace-store-cs-meta { display: flex; align-items: center; gap: 8px; min-width: 0; margin-top: 3px; }
+.marketplace-store-cs-cat {
+  font-size: var(--font-size-2xs);
+  color: var(--text-muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.marketplace-store-cs-free { margin-left: auto; flex: none; }
 
 /* ── grid（网格卡 ≥260） ── */
 .marketplace-store-card.is-grid {
   padding: 0;
   cursor: pointer;
-  min-height: 96px;
+  min-height: 108px;
   background: transparent;
   border-color: transparent;
 }
@@ -108,7 +117,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.marketplace-store-cg-author { font-size: var(--font-size-2xs); color: var(--text-muted); margin-top: 2px; }
+.marketplace-store-cg-meta { display: flex; align-items: center; gap: 8px; min-width: 0; margin-top: 2px; }
+.marketplace-store-cg-author {
+  font-size: var(--font-size-2xs);
+  color: var(--text-muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .marketplace-store-cg-stats {
   display: flex;
   gap: 12px;
@@ -118,7 +135,7 @@
   font-size: var(--font-size-2xs);
   font-variant-numeric: tabular-nums;
 }
-.marketplace-store-cg-corner { max-width: 50%; }
+.marketplace-store-cg-corner { margin-left: auto; flex: none; }
 
 /* 辉光＝**声明式**（F40 · 2026-11-21）：卡型只声明 `--surface-glow`，统一 hover 规则负责应用；
    ⛔ 不再为某类卡单独写 hover box-shadow。任何卡型想要辉光＝加一行变量（值里可用 --marketplace-hue）。 */
@@ -218,7 +235,7 @@
 }
 .marketplace-store-cm-name { font-size: var(--font-size-md); font-weight: 600; }
 .marketplace-store-cm-cat { font-size: var(--font-size-2xs); color: var(--text-muted); margin-top: 2px; }
-.marketplace-store-cm-free { margin-left: auto; }
+.marketplace-store-cm-free { margin-left: auto; max-width: 55%; }
 .marketplace-store-cm-band {
   position: absolute;
   left: 0;
@@ -286,7 +303,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.marketplace-store-cd-corner { margin: 0 0 8px; align-self: flex-start; }
+.marketplace-store-cd-corner { margin: 0 0 8px; align-self: flex-start; max-width: 100%; }
 .marketplace-store-cd-acts { display: flex; gap: 8px; align-items: center; }
 .marketplace-store-art.is-duo { min-height: 100%; }
 .marketplace-store-art.is-duo .marketplace-store-art-icon { width: 78px; height: 78px; }
@@ -359,7 +376,7 @@
 }
 .marketplace-store-rr-cat { font-size: var(--font-size-2xs); color: var(--text-muted); margin-top: 1px; }
 /* ── 右侧单槽（F26 + F41）：价格角标在流内；下载量与动作钮**常显并排**（⛔ 不再 hover 才换出） ── */
-.marketplace-store-rr-corner { flex: none; }
+.marketplace-store-rr-corner { flex: 0 1 auto; max-width: 45%; }
 .marketplace-store-rr-slot {
   flex: none;
   display: flex;
@@ -411,6 +428,9 @@
 }
 .marketplace-store-strip-row::-webkit-scrollbar { display: none; }
 .marketplace-store-strip-row.is-rows2 {
+  /* 展开面上下各留够余量（两行价格 + 2 行简介也不裁）——只加轨道内边距，⛔ 不动卡片高度 */
+  padding-top: 48px;
+  padding-bottom: 48px;
   display: grid;
   grid-auto-flow: column;
   grid-template-rows: repeat(2, 84px);

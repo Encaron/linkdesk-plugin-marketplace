@@ -55,10 +55,13 @@ export const CardGrid = memo(function CardGrid({
         <div className="marketplace-store-cg-top">
           <Tile entry={entry} identity={ctx.installedIdentity} />
           <div className="marketplace-store-fx1">
+            {/* 标题独占一行；角标下沉到作者行，长文案省略 */}
             <div className="marketplace-store-cg-name">{entry.name}</div>
-            <div className="marketplace-store-cg-author">{tAuthor(entry)}</div>
+            <div className="marketplace-store-cg-meta">
+              <span className="marketplace-store-cg-author">{tAuthor(entry)}</span>
+              <CornerTag baseClass="marketplace-ui-corner marketplace-store-cg-corner" tag={status} />
+            </div>
           </div>
-          <CornerTag baseClass="marketplace-ui-corner marketplace-store-cg-corner" tag={status} />
         </div>
         {dl && (
           <div className="marketplace-store-cg-stats">

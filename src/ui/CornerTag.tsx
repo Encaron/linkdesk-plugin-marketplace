@@ -13,16 +13,31 @@ export function CornerTag({
   tag,
   baseClass,
   className,
+  stacked,
 }: {
   tag: StatusTag;
   /** 语境基类（如 `marketplace-store-cs-free`）——修饰类由状态 kind 追加 */
   baseClass: string;
   className?: string;
+  /** 两行呈现（卡片头部窄位）：模型词 / 金额分开——金额完整显示，⛔ 省略号 */
+  stacked?: boolean;
 }) {
   const { t } = useTranslation();
+  const label = t(tag.key, tag.params);
+  if (stacked && tag.modelKey && tag.amount) {
+    return (
+      <span
+        className={`${baseClass} is-${tag.kind} is-stacked ${className ?? ""}`.trim()}
+        data-hint={label}
+      >
+        <span className="marketplace-ui-corner-model">{t(tag.modelKey)}</span>
+        <span className="marketplace-ui-corner-amount">{t(tag.amount.key, tag.amount.params)}</span>
+      </span>
+    );
+  }
   return (
     <span className={`${baseClass} is-${tag.kind} ${className ?? ""}`.trim()}>
-      {t(tag.key, tag.params)}
+      {label}
     </span>
   );
 }

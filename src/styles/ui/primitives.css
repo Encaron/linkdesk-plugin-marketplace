@@ -153,6 +153,26 @@
   flex: none;
   white-space: nowrap;
 }
+
+/* 两行角标（卡片头部窄位）：模型词 / 金额分开——**金额完整显示，⛔ 省略号**。
+   2026-11-22 用户口径：价格是主信息，宁可行高/换布局也不截字。 */
+.marketplace-ui-corner.is-stacked {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  line-height: 1.25;
+  border-radius: 8px;
+}
+.marketplace-ui-corner.is-stacked .marketplace-ui-corner-model {
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+.marketplace-ui-corner.is-stacked .marketplace-ui-corner-amount {
+  font-size: 12px;
+  font-weight: 700;
+}
 .marketplace-ui-corner.is-paid { background: var(--accent); color: var(--text-on-accent); }
 .marketplace-ui-corner.is-update { background: var(--marketplace-update-bg); color: var(--marketplace-update-fg); }
 .marketplace-ui-corner.is-expired { background: var(--danger); color: var(--text-on-accent); }

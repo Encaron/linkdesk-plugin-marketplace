@@ -641,5 +641,9 @@
   "作者来源共 {{plugins}} 个插件（官方来源另计）": "{{plugins}} plugin(s) from author sources (official sources counted separately)",
   "{{count}} 个插件 · 内置": "{{count}} plugins · built in",
   "排序会影响首页作者卡的顺序。": "Sorting changes the order of author cards on the home page.",
-  "官方来源已内置，无需添加": "Official sources are built in — no need to add them"
+  "官方来源已内置，无需添加": "Official sources are built in — no need to add them",
+  "订阅": "Subscription",
+  "买断": "Buyout",
+  "{{currency}}{{price}}/{{period}}": "{{currency}}{{price}}/{{period}}",
+  "{{currency}}{{price}}": "{{currency}}{{price}}"
 }
