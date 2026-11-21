@@ -28,7 +28,7 @@ import {
 } from "../../services/discoverReads";
 import { notifyInfo } from "../../services/marketplaceShared/notifications";
 import { refreshAuthorDomains } from "../../services/authors";
-import { consumeStoreNavTarget, getStoreNavTarget, onStoreNavChange } from "../../services/storeNav";
+import { consumeStoreNavTarget, getStoreNavTarget, onStoreNavChange, setCurrentStoreRoute } from "../../services/storeNav";
 import {
   checkContentNow,
   onContentWatchSettled,
@@ -42,7 +42,7 @@ import { EMPTY_FILTERS } from "./storeData";
 import { StoreProvider, type StoreContextValue } from "./StoreContext";
 import { useStoreData } from "./useStoreData";
 import { checkUpdatesFromStore, refreshContentFromStore, useStoreActions } from "./useStoreActions";
-import { HOME_ROUTE, readScroll, routeFromNav, routeKey, sameRoute, saveScroll, type StoreRoute } from "./navigation";
+import { HOME_ROUTE, readScroll, routeFromNav, routeKey, routeToNavTarget, sameRoute, saveScroll, type StoreRoute } from "./navigation";
 import { Rail } from "./Rail";
 import { StoreHeader } from "./StoreHeader";
 import { ContentBar } from "./home/ContentBar";
@@ -101,6 +101,11 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
   const searchRef = useRef<HTMLInputElement | null>(null);
   const routeRef = useRef(route);
   routeRef.current = route;
+
+  // AI 友好读取面：每次实际导航后回写当前路由（marketplace.getState 读源；命令意图另有 storeNav 信箱）
+  useEffect(() => {
+    setCurrentStoreRoute(routeToNavTarget(route));
+  }, [route]);
   const searchReturn = useRef<StoreRoute>(HOME_ROUTE);
   const lastScrollKey = useRef(routeKey(HOME_ROUTE));
   const isActiveRef = useRef(isActive);

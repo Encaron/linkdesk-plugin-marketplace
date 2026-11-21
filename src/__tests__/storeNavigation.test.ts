@@ -1,6 +1,6 @@
 /**
  * navigation —— 商店会话级导航（路由键 / 滚动位记忆 / storeNav 意图映射）。
- * 钉住：切视图回原位；同路由不重复导航；rank 不进持久意图面。
+ * 钉住：切视图回原位；同路由不重复导航；**每个页面（含 rank/authors）都能被意图映射到**。
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
@@ -10,6 +10,7 @@ import {
   readScroll,
   routeFromNav,
   routeKey,
+  routeToNavTarget,
   sameRoute,
   saveScroll,
   type StoreRoute,
@@ -36,17 +37,41 @@ describe("滚动位记忆（会话级）", () => {
   });
 });
 
-describe("routeFromNav / sameRoute", () => {
-  it("六种意图映射；home 兜底", () => {
+describe("routeFromNav / routeToNavTarget / sameRoute", () => {
+  it("八种意图映射；home 兜底", () => {
     expect(routeFromNav({ page: "home" })).toEqual(HOME_ROUTE);
     expect(routeFromNav({ page: "category", category: "development" })).toEqual({
       page: "category",
       category: "development",
     });
+    expect(
+      routeFromNav({ page: "category", category: "themes", authorId: "linkdesk-fixture-alice" }),
+    ).toEqual({
+      page: "category",
+      category: "themes",
+      authorId: "linkdesk-fixture-alice",
+    });
+    expect(routeFromNav({ page: "rank" })).toEqual({ page: "rank" });
+    expect(routeFromNav({ page: "authors" })).toEqual({ page: "authors" });
     expect(routeFromNav({ page: "library" })).toEqual({ page: "library" });
     expect(routeFromNav({ page: "author", authorId: "a" })).toEqual({ page: "author", authorId: "a" });
     expect(routeFromNav({ page: "sources" })).toEqual({ page: "sources" });
     expect(routeFromNav({ page: "search", query: "serial" })).toEqual({ page: "search", query: "serial" });
+  });
+
+  it("routeToNavTarget 反向：实际路由回写（供 getState 读当前页）", () => {
+    expect(routeToNavTarget({ page: "rank" })).toEqual({ page: "rank" });
+    expect(routeToNavTarget({ page: "authors" })).toEqual({ page: "authors" });
+    expect(routeToNavTarget({ page: "category", category: "themes", authorId: "a" })).toEqual({
+      page: "category",
+      category: "themes",
+      authorId: "a",
+    });
+    expect(routeToNavTarget({ page: "author", authorId: "a", repoId: "r" })).toEqual({
+      page: "author",
+      authorId: "a",
+      repoId: "r",
+    });
   });
 
   it("sameRoute 逐字段比较（缺省 = 空串）", () => {

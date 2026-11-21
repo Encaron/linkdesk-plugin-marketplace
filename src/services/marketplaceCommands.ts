@@ -1,8 +1,8 @@
 /**
- * marketplaceCommands —— I15 命令面（09 §三·补 14 行：新增 13 ＋既有 addSource）。
+ * marketplaceCommands —— I15 命令面（09 §三·补：新增 16 ＋既有 addSource）。
  *
  * 为什么集中在一个文件：09 的规则是「每个 GUI 动作都有可编程入口，且**同一动作只有一个 id**」。
- * 这 13 条是「打开/导航/搜索/本地安装/移源/检查更新/刷新目录/全部已读/记住视图」的**唯一入口**，
+ * 这 16 条是「打开/导航/读取/搜索/本地安装/移源/检查更新/刷新目录/全部已读/记住视图」的**唯一入口**，
  * 商店 UI（棒 6–10）与 AI（命令面板/CLI/MCP）走同一条路——⛔ 视图里再各写一份。
  *
  * 复用纪律（09 §三·补末行）：
@@ -27,6 +27,7 @@ import { markAllRead, type DiscoverReadKind } from "./discoverReads";
 import { recordLocalInstall } from "./localInstalls";
 import { publishStoreNav, type StoreNavTarget } from "./storeNav";
 import { getCatalogResult, refreshCatalogNow } from "./marketplaceShared/catalogStore";
+import { readStoreState } from "./storeRead";
 import {
   listenMarketplaceSearchBroadcast,
   setMarketplaceSearch,
@@ -174,7 +175,21 @@ export async function runOpenStore(): Promise<OpenTabResult> {
 export async function runOpenCategory(args?: unknown): Promise<OpenTabResult> {
   const category = stringArg(args, "category", 0);
   if (!category) return { ok: false, tabId: "" };
-  await publishStoreNav({ page: "category", category });
+  const authorId = stringArg(args, "authorId", 1);
+  const target: StoreNavTarget = authorId
+    ? { page: "category", category, authorId }
+    : { page: "category", category };
+  await publishStoreNav(target);
+  return openStoreTab();
+}
+
+export async function runOpenRank(): Promise<OpenTabResult> {
+  await publishStoreNav({ page: "rank" });
+  return openStoreTab();
+}
+
+export async function runOpenAuthors(): Promise<OpenTabResult> {
+  await publishStoreNav({ page: "authors" });
   return openStoreTab();
 }
 
@@ -210,6 +225,11 @@ export async function runSearch(args?: unknown): Promise<OpenTabResult> {
   }
   await publishStoreNav({ page: "search", query });
   return openStoreTab();
+}
+
+/** AI 读取面（`marketplace.getState`）——当前实际路由 + 目录 + 本地状态 + 权益 + 作者/来源；只读。 */
+export async function runGetState() {
+  return readStoreState();
 }
 
 export async function runOpenPlugin(args?: unknown): Promise<OpenTabResult> {
@@ -330,11 +350,14 @@ export async function runSetViewPrefs(args?: unknown): Promise<{ ok: boolean; re
 const COMMANDS: Array<[string, (args?: unknown) => Promise<unknown>, string]> = [
   ["marketplace.openStore", () => runOpenStore(), "打开插件市场"],
   ["marketplace.openCategory", (a) => runOpenCategory(a), "打开分类"],
+  ["marketplace.openRank", () => runOpenRank(), "打开排行榜"],
+  ["marketplace.openAuthors", () => runOpenAuthors(), "打开作者列表"],
   ["marketplace.openLibrary", () => runOpenLibrary(), "打开我的库"],
   ["marketplace.openAuthor", (a) => runOpenAuthor(a), "打开作者主页"],
   ["marketplace.openPlugin", (a) => runOpenPlugin(a), "打开插件详情"],
   ["marketplace.openSources", () => runOpenSources(), "打开来源管理"],
   ["marketplace.search", (a) => runSearch(a), "搜索插件市场"],
+  ["marketplace.getState", () => runGetState(), "读取市场状态"],
   ["marketplace.addLocalPlugin", (a) => runAddLocalPlugin(a), "添加本地插件"],
   ["marketplace.removeSource", (a) => runRemoveSource(a), "移除市场源"],
   ["marketplace.checkUpdates", () => runCheckUpdates(), "检查插件更新"],
@@ -344,7 +367,7 @@ const COMMANDS: Array<[string, (args?: unknown) => Promise<unknown>, string]> = 
 ];
 
 /**
- * 注册 13 条命令。
+ * 注册 16 条命令。
  * @returns 注册成功的条数（0 = `window.linkdesk.commands` 不可用）
  */
 export function registerMarketplaceStoreCommands(): number {

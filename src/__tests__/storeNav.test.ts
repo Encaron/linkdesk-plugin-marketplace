@@ -12,7 +12,9 @@ import {
   onStoreNavChange,
   consumeStoreNavTarget,
   publishStoreNav,
+  readCurrentStoreRoute,
   readStoreNavTarget,
+  setCurrentStoreRoute,
 } from "../services/storeNav";
 import { __resetRealmSlots } from "../services/realmSlot";
 
@@ -49,12 +51,21 @@ afterEach(() => {
 });
 
 describe("normalizeStoreNavTarget", () => {
-  it("六种页面形态；缺主键/未知页 ⇒ null", () => {
+  it("八种页面形态；缺主键/未知页 ⇒ null", () => {
     expect(normalizeStoreNavTarget({ page: "home" })).toEqual({ page: "home" });
     expect(normalizeStoreNavTarget({ page: "category", category: " development " })).toEqual({
       page: "category",
       category: "development",
     });
+    expect(
+      normalizeStoreNavTarget({ page: "category", category: "themes", authorId: " linkdesk-fixture-alice " }),
+    ).toEqual({
+      page: "category",
+      category: "themes",
+      authorId: "linkdesk-fixture-alice",
+    });
+    expect(normalizeStoreNavTarget({ page: "rank" })).toEqual({ page: "rank" });
+    expect(normalizeStoreNavTarget({ page: "authors" })).toEqual({ page: "authors" });
     expect(normalizeStoreNavTarget({ page: "library" })).toEqual({ page: "library" });
     expect(normalizeStoreNavTarget({ page: "author", authorId: "owner-two" })).toEqual({
       page: "author",
@@ -120,5 +131,22 @@ describe("consumeStoreNavTarget —— 一次性消费（棒 6 商店壳取读�
     const w = makeWorld(undefined);
     expect(await consumeStoreNavTarget()).toEqual({ page: "home" });
     expect(w.pluginState.set).not.toHaveBeenCalled();
+  });
+});
+
+describe("current route —— 实际页面回写/读取（marketplace.getState 读源）", () => {
+  it("写内存 + pluginState；readCurrentStoreRoute 读得回（含 authorId 预过滤）", async () => {
+    const w = makeWorld();
+    setCurrentStoreRoute({ page: "category", category: "themes", authorId: "linkdesk-fixture-alice" });
+    expect(w.pluginState.set).toHaveBeenCalledWith("marketplace", "storeRoute", {
+      page: "category",
+      category: "themes",
+      authorId: "linkdesk-fixture-alice",
+    });
+    expect(await readCurrentStoreRoute()).toEqual({
+      page: "category",
+      category: "themes",
+      authorId: "linkdesk-fixture-alice",
+    });
   });
 });

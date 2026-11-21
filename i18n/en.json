@@ -645,5 +645,8 @@
   "订阅": "Subscription",
   "买断": "Buyout",
   "{{currency}}{{price}}/{{period}}": "{{currency}}{{price}}/{{period}}",
-  "{{currency}}{{price}}": "{{currency}}{{price}}"
+  "{{currency}}{{price}}": "{{currency}}{{price}}",
+  "打开排行榜": "Open leaderboard",
+  "打开作者列表": "Open author list",
+  "读取市场状态": "Read marketplace state"
 }

@@ -1,5 +1,5 @@
 /**
- * storeNav —— 商店**导航意图**（跨表面 / 跨进程唯一入口，R4-2.5 六条 open* 命令的落点）。
+ * storeNav —— 商店**导航意图**（跨表面 / 跨进程唯一入口，R4-2.5 八条导航命令的落点）。
  *
  * 为什么需要它：命令（`marketplace.openCategory` 等）要告诉「商店 UI 去哪个页」，但
  *   - 命令可能跑在**壳渲染进程**（外部 AI 经命令面板/CLI），商店 UI 住在**池渲染进程**；
@@ -17,17 +17,35 @@ import { realmSlot } from "./realmSlot";
 
 export type StoreNavTarget =
   | { page: "home" }
-  | { page: "category"; category: string }
+  | { page: "category"; category: string; authorId?: string }
+  | { page: "rank" }
+  | { page: "authors" }
   | { page: "library" }
   | { page: "author"; authorId: string; repoId?: string }
   | { page: "sources" }
   | { page: "search"; query: string };
+
+/** 每个页面的导航命令（**AI 友好化覆盖门禁**：新增页面 ⇒ `Record` 缺键直接 tsc 红；
+ *  测试再对账「命令已注册」＋「plugin.json 已声明」两件事）。 */
+export const NAV_COMMANDS: Record<StoreNavTarget["page"], string> = {
+  home: "marketplace.openStore",
+  category: "marketplace.openCategory",
+  rank: "marketplace.openRank",
+  authors: "marketplace.openAuthors",
+  library: "marketplace.openLibrary",
+  author: "marketplace.openAuthor",
+  sources: "marketplace.openSources",
+  search: "marketplace.search",
+};
 
 const OWNER = "marketplace";
 const KEY = "storeNav";
 const CHANNEL = "marketplace:storeNav";
 
 const DEFAULT_TARGET: StoreNavTarget = { page: "home" };
+
+/** 当前**实际**路由（UI 每次导航后回写；与上面的「意图信箱」分开——意图是命令要去的页，现状是用户点到的页）。 */
+let currentRoute: StoreNavTarget = DEFAULT_TARGET;
 
 interface NavState {
   target: StoreNavTarget;
@@ -53,8 +71,14 @@ export function normalizeStoreNavTarget(raw: unknown): StoreNavTarget | null {
       return { page: "home" };
     case "category": {
       const category = typeof r.category === "string" ? r.category.trim() : "";
-      return category ? { page: "category", category } : null;
+      if (!category) return null;
+      const authorId = typeof r.authorId === "string" && r.authorId.trim() ? r.authorId.trim() : undefined;
+      return authorId ? { page: "category", category, authorId } : { page: "category", category };
     }
+    case "rank":
+      return { page: "rank" };
+    case "authors":
+      return { page: "authors" };
     case "library":
       return { page: "library" };
     case "author": {
@@ -102,6 +126,31 @@ function ensureBridge(): void {
 export function getStoreNavTarget(): StoreNavTarget {
   ensureBridge();
   return state.target;
+}
+
+/** UI 实际导航后回写当前路由（`marketplace.getState` 的读源；同时落 pluginState 供跨进程读）。 */
+export function setCurrentStoreRoute(target: StoreNavTarget): void {
+  currentRoute = target;
+  try {
+    void window.linkdesk?.pluginState?.set(OWNER, "storeRoute", target);
+  } catch {
+    /* 预览环境无持久层——内存值仍可用 */
+  }
+}
+
+/** 读当前实际路由（优先持久层，跨进程；没有则回内存值）。 */
+export async function readCurrentStoreRoute(): Promise<StoreNavTarget> {
+  const ps = window.linkdesk?.pluginState;
+  if (ps) {
+    try {
+      const raw = await ps.get(OWNER, "storeRoute");
+      const target = normalizeStoreNavTarget(raw);
+      if (target) return target;
+    } catch {
+      /* 读失败回内存 */
+    }
+  }
+  return currentRoute;
 }
 
 /** 读意图（优先持久层——晚挂载的商店壳靠这一步拿到「命令打开的是哪个页」） */

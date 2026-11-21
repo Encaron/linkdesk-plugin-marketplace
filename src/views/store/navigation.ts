@@ -56,11 +56,17 @@ export function __resetScrollMemory(): void {
   scrollMemory.clear();
 }
 
-/** storeNav 持久意图 → 商店路由（rank 无命令入口，不在映射面） */
+/** storeNav 持久意图 → 商店路由（每页都有对应命令，见 NAV_COMMANDS） */
 export function routeFromNav(t: StoreNavTarget): StoreRoute {
   switch (t.page) {
     case "category":
-      return { page: "category", category: t.category };
+      return t.authorId
+        ? { page: "category", category: t.category, authorId: t.authorId }
+        : { page: "category", category: t.category };
+    case "rank":
+      return { page: "rank" };
+    case "authors":
+      return { page: "authors" };
     case "library":
       return { page: "library" };
     case "author":
@@ -71,6 +77,32 @@ export function routeFromNav(t: StoreNavTarget): StoreRoute {
       return { page: "search", query: t.query };
     default:
       return HOME_ROUTE;
+  }
+}
+
+/** 会话路由 → storeNav 目标（供 `marketplace.getState` 读“当前实际页”；与命令意图同形）。 */
+export function routeToNavTarget(route: StoreRoute): StoreNavTarget {
+  switch (route.page) {
+    case "category":
+      return route.authorId
+        ? { page: "category", category: route.category ?? "", authorId: route.authorId }
+        : { page: "category", category: route.category ?? "" };
+    case "rank":
+      return { page: "rank" };
+    case "authors":
+      return { page: "authors" };
+    case "library":
+      return { page: "library" };
+    case "author":
+      return route.repoId
+        ? { page: "author", authorId: route.authorId ?? "", repoId: route.repoId }
+        : { page: "author", authorId: route.authorId ?? "" };
+    case "sources":
+      return { page: "sources" };
+    case "search":
+      return { page: "search", query: route.query ?? "" };
+    default:
+      return { page: "home" };
   }
 }
 

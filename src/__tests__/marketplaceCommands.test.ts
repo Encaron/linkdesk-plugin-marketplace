@@ -12,6 +12,7 @@
  */
 
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
+import { readFileSync } from "node:fs";
 
 const mocks = vi.hoisted(() => ({
   checkForPluginUpdates: vi.fn(),
@@ -20,6 +21,7 @@ const mocks = vi.hoisted(() => ({
   setViewPrefs: vi.fn(),
   getCatalogResult: vi.fn(),
   recordLocalInstall: vi.fn(),
+  readStoreState: vi.fn(),
 }));
 
 vi.mock("../services/updateCheck", () => ({
@@ -38,6 +40,9 @@ vi.mock("../services/marketplaceShared/uiPrefs", () => ({
 vi.mock("../services/localInstalls", () => ({
   recordLocalInstall: mocks.recordLocalInstall,
 }));
+vi.mock("../services/storeRead", () => ({
+  readStoreState: mocks.readStoreState,
+}));
 /** 测试环境不初始化插件 i18next（t() 恒 undefined）——命令面只透传 label，钉键原文即可 */
 vi.mock("i18next", () => ({ default: { t: (k: string) => k } }));
 
@@ -45,11 +50,14 @@ import {
   registerMarketplaceStoreCommands,
   runAddLocalPlugin,
   runCheckUpdates,
+  runGetState,
   runMarkAllRead,
   runOpenAuthor,
+  runOpenAuthors,
   runOpenCategory,
   runOpenLibrary,
   runOpenPlugin,
+  runOpenRank,
   runOpenSources,
   runOpenStore,
   runRefreshCatalog,
@@ -62,7 +70,7 @@ import {
   listenMarketplaceSearchBroadcast,
   __resetSearchState,
 } from "../services/marketplaceShared/searchState";
-import { __resetStoreNavState } from "../services/storeNav";
+import { __resetStoreNavState, NAV_COMMANDS } from "../services/storeNav";
 
 type Handler = (payload: unknown) => void;
 
@@ -114,21 +122,24 @@ afterEach(() => {
   Reflect.deleteProperty(window, "linkdesk");
 });
 
-describe("注册面 —— 13 条新命令", () => {
-  it("id/title 逐条对得上 manifest；返回注册条数 13", () => {
+describe("注册面 —— 16 条新命令", () => {
+  it("id/title 逐条对得上 manifest；返回注册条数 16", () => {
     const registerCommand = vi.fn();
     Object.defineProperty(window, "linkdesk", { value: { commands: { registerCommand } }, configurable: true });
 
-    expect(registerMarketplaceStoreCommands()).toBe(13);
+    expect(registerMarketplaceStoreCommands()).toBe(16);
     const calls = registerCommand.mock.calls as Array<[string, unknown, { title: string }]>;
     expect(calls.map(([id]) => id)).toEqual([
       "marketplace.openStore",
       "marketplace.openCategory",
+      "marketplace.openRank",
+      "marketplace.openAuthors",
       "marketplace.openLibrary",
       "marketplace.openAuthor",
       "marketplace.openPlugin",
       "marketplace.openSources",
       "marketplace.search",
+      "marketplace.getState",
       "marketplace.addLocalPlugin",
       "marketplace.removeSource",
       "marketplace.checkUpdates",
@@ -139,11 +150,14 @@ describe("注册面 —— 13 条新命令", () => {
     expect(calls.map(([, , meta]) => meta.title)).toEqual([
       "打开插件市场",
       "打开分类",
+      "打开排行榜",
+      "打开作者列表",
       "打开我的库",
       "打开作者主页",
       "打开插件详情",
       "打开来源管理",
       "搜索插件市场",
+      "读取市场状态",
       "添加本地插件",
       "移除市场源",
       "检查插件更新",
@@ -156,6 +170,40 @@ describe("注册面 —— 13 条新命令", () => {
   it("commands 面缺席 ⇒ 返回 0（不抛）", () => {
     Object.defineProperty(window, "linkdesk", { value: {}, configurable: true });
     expect(registerMarketplaceStoreCommands()).toBe(0);
+  });
+});
+
+describe("AI 友好化门禁 —— 每个页面都有可调命令", () => {
+  it("NAV_COMMANDS 全覆盖：每条命令既已注册又已在 plugin.json 声明", () => {
+    const registerCommand = vi.fn();
+    Object.defineProperty(window, "linkdesk", { value: { commands: { registerCommand } }, configurable: true });
+    registerMarketplaceStoreCommands();
+    const registered = new Set((registerCommand.mock.calls as Array<[string]>).map(([id]) => id));
+    const manifest = JSON.parse(readFileSync("plugin.json", "utf8")) as {
+      contributes?: { commands?: Array<{ id?: string }> };
+    };
+    const declared = new Set((manifest.contributes?.commands ?? []).map((c) => c.id));
+    for (const [page, commandId] of Object.entries(NAV_COMMANDS)) {
+      expect(registered.has(commandId), `${page} → ${commandId} 未注册`).toBe(true);
+      expect(declared.has(commandId), `${page} → ${commandId} 未声明`).toBe(true);
+    }
+  });
+});
+
+describe("marketplace.getState —— AI 读取面接线", () => {
+  it("直接返回 readStoreState 的结构化快照（不点 DOM）", async () => {
+    const snap = {
+      ok: true as const,
+      route: { page: "home" as const },
+      navCommands: Object.values(NAV_COMMANDS),
+      entries: [],
+      collections: [],
+      authors: [],
+      sources: [],
+      counts: { entries: 0, installed: 0, updates: 0, authors: 0, remoteSources: 0 },
+    };
+    mocks.readStoreState.mockResolvedValue(snap);
+    expect(await runGetState()).toEqual(snap);
   });
 });
 
@@ -172,6 +220,13 @@ describe("导航命令 —— 意图信箱 + 标签页", () => {
   it.each([
     ["openCategory", () => runOpenCategory("development"), { page: "category", category: "development" }],
     ["openCategory(对象形)", () => runOpenCategory({ category: "themes" }), { page: "category", category: "themes" }],
+    [
+      "openCategory(+authorId 对象形)",
+      () => runOpenCategory({ category: "themes", authorId: "linkdesk-fixture-alice" }),
+      { page: "category", category: "themes", authorId: "linkdesk-fixture-alice" },
+    ],
+    ["openRank", () => runOpenRank(), { page: "rank" }],
+    ["openAuthors", () => runOpenAuthors(), { page: "authors" }],
     ["openLibrary", () => runOpenLibrary(), { page: "library" }],
     ["openSources", () => runOpenSources(), { page: "sources" }],
     ["openAuthor", () => runOpenAuthor("owner-two"), { page: "author", authorId: "owner-two" }],

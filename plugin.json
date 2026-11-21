@@ -44,15 +44,34 @@
         "id": "marketplace.openCategory",
         "title": "打开分类",
         "category": "插件市场",
-        "description": "打开插件市场并导航到某分类页（rail 分类 slug，如 development/hardware/theme）。回执 {ok, tabId}",
+        "description": "打开插件市场并导航到某分类页（rail 分类 slug，如 development/hardware/themes）；可选 authorId 只显示该作者的插件（作者店「更多」落页）。回执 {ok, tabId}",
         "params": [
           {
             "name": "category",
             "type": "string",
             "required": true,
             "description": "主分类 slug（04 §5.1 封闭名单；other = 其他桶）"
+          },
+          {
+            "name": "authorId",
+            "type": "string",
+            "description": "可选：作者聚合键——只显示该作者在该分类下的插件（不传 = 全量分类页）"
           }
         ]
+      },
+      {
+        "id": "marketplace.openRank",
+        "title": "打开排行榜",
+        "category": "插件市场",
+        "description": "打开插件市场并导航到「排行榜」（全源热门下载 Top 50）。回执 {ok, tabId}",
+        "params": []
+      },
+      {
+        "id": "marketplace.openAuthors",
+        "title": "打开作者列表",
+        "category": "插件市场",
+        "description": "打开插件市场并导航到「作者」列表页（全部作者卡）。回执 {ok, tabId}",
+        "params": []
       },
       {
         "id": "marketplace.openLibrary",
@@ -119,6 +138,13 @@
             "description": "搜索词（空串 = 清空搜索）"
           }
         ]
+      },
+      {
+        "id": "marketplace.getState",
+        "title": "读取市场状态",
+        "category": "插件市场",
+        "description": "只读：返回当前实际路由（含 authorId/repoId/query）、每页导航命令、目录条目（价格/分类/作者/来源/本地状态/可执行能力）、合集、作者与其仓库/插件、来源列表与计数。AI 读取面唯一入口——⛔ 不靠截图/DOM。",
+        "params": []
       },
       {
         "id": "marketplace.addLocalPlugin",
