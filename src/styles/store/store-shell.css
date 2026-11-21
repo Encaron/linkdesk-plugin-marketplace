@@ -25,7 +25,9 @@
      1) 分栏网格一律给地板：`minmax(<地板>, Xfr)`；容器再窄就按**容器查询**切单列（不靠窗口宽）。
      2) 文本块一律 `min-width: 0` ＋ 行数上限（-webkit-line-clamp）或单行省略（nowrap+ellipsis）。
      3) 按钮文案单行省略（`.marketplace-ui-btn-label`），按钮自身 `max-width: 100%`。
-     4) 横向滚动容器一律 `scrollbar-width: none` ＋ `::-webkit-scrollbar{display:none}`（哑滚动）。
+     4) 横向滚动容器**保留拖动**：用 `::-webkit-scrollbar*` 主题化细条（6px 圆头）；
+        ⛔ 直接删条 = 后面内容点不到；⛔ 放任原生条 = 不跟主题；⛔ 同时设 `scrollbar-width`
+        = Chromium 121+ 会忽略 webkit 伪元素（样式不生效）。
    ⛔ 只在个别页面补丁＝未归一化；新组件落码前先过这四条。 */
 
 .marketplace-store .marketplace-ui-corner {
@@ -409,10 +411,20 @@
     gap: 6px;
     border-right: none;
     border-bottom: 1px solid var(--border);
-    /* 2026-11-21 用户报：窄窗横条露出 Chrome 原生滚动条 ⇒ 隐藏（与横排板块同一纪律：哑滚动） */
-    scrollbar-width: none;
+    /* 窄窗横条（2026-11-21 用户三次校正）：**保留可拖**——⛔ 不能删条（删了后面分类点不到）；
+       只把 Chromium 原生丑条换成主题化细条（6px、圆头、弱化轨道）。
+       ⚠️ 只用 ::-webkit-scrollbar 定制：Chromium 121+ 一旦设了标准属性 `scrollbar-width/
+       scrollbar-color`，会**忽略** webkit 伪元素（实测 barH 恒 11px、样式不生效）。 */
   }
-  .marketplace-store-rail::-webkit-scrollbar { display: none; }
+  .marketplace-store-rail::-webkit-scrollbar { height: 6px; }
+  .marketplace-store-rail::-webkit-scrollbar-track { background: transparent; }
+  .marketplace-store-rail::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--text-muted) 45%, transparent);
+    border-radius: 999px;
+  }
+  .marketplace-store-rail::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--text-muted) 70%, transparent);
+  }
   .marketplace-store-rail-top { flex-direction: row; flex-wrap: nowrap; border-bottom: none; margin: 0; padding: 0; gap: 6px; }
   .marketplace-store-rail-home { width: auto; flex: none; }
   .marketplace-store-rail-scroll { flex-direction: row; flex-wrap: nowrap; overflow: visible; flex: 0 0 auto; margin: 0; padding: 0; gap: 6px; }
