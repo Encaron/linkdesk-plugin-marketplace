@@ -628,5 +628,20 @@
   "未找到 marketplace.json 或 plugin.json——仓库根需有其一": "Neither marketplace.json nor plugin.json was found — the repo root needs one of them",
   "打开插件模板（npx create-linkdesk-plugin@latest）": "Open the plugin template (npx create-linkdesk-plugin@latest)",
   "模板": "Template",
-  "操作": "Actions"
+  "操作": "Actions",
+  "重复大屏": "Duplicate hero",
+  "未知板块": "Unknown section",
+  "缺失合集": "Missing collection",
+  "未注册分类": "Unregistered category",
+  "未注册小类": "Unregistered subcategory",
+  "分类栏越界": "Rail category not allowed",
+  "源声明不合形": "Malformed source",
+  "合集声明不合形": "Malformed collection",
+  "缺抓取字段": "Missing metadata field",
+  "{{name}} ×{{count}}": "{{name}} ×{{count}}",
+  " · +{{count}} 类": " · +{{count}} more",
+  "{{authors}} 位作者 · {{sources}} 个作者源 · {{local}} 个本地插件 · 作者源共 {{plugins}} 个插件（官方源恒内置，不计入）": "{{authors}} author(s) · {{sources}} author source(s) · {{local}} local plugin(s) · {{plugins}} plugin(s) from author sources (official source is built in and not counted)",
+  "已安装 {{installed}} 个": "{{installed}} installed",
+  "已安装 {{installed}} 个 · {{count}} 个可更新": "{{installed}} installed · {{count}} updatable",
+  "…还有 {{count}} 条": "…and {{count}} more"
 }

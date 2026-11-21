@@ -454,5 +454,20 @@
   "未找到 marketplace.json 或 plugin.json——仓库根需有其一": "未找到 marketplace.json 或 plugin.json——仓库根需有其一",
   "打开插件模板（npx create-linkdesk-plugin@latest）": "打开插件模板（npx create-linkdesk-plugin@latest）",
   "模板": "模板",
-  "操作": "操作"
+  "操作": "操作",
+  "重复大屏": "重复大屏",
+  "未知板块": "未知板块",
+  "缺失合集": "缺失合集",
+  "未注册分类": "未注册分类",
+  "未注册小类": "未注册小类",
+  "分类栏越界": "分类栏越界",
+  "源声明不合形": "源声明不合形",
+  "合集声明不合形": "合集声明不合形",
+  "缺抓取字段": "缺抓取字段",
+  "{{name}} ×{{count}}": "{{name}} ×{{count}}",
+  " · +{{count}} 类": " · +{{count}} 类",
+  "{{authors}} 位作者 · {{sources}} 个作者源 · {{local}} 个本地插件 · 作者源共 {{plugins}} 个插件（官方源恒内置，不计入）": "{{authors}} 位作者 · {{sources}} 个作者源 · {{local}} 个本地插件 · 作者源共 {{plugins}} 个插件（官方源恒内置，不计入）",
+  "已安装 {{installed}} 个": "已安装 {{installed}} 个",
+  "已安装 {{installed}} 个 · {{count}} 个可更新": "已安装 {{installed}} 个 · {{count}} 个可更新",
+  "…还有 {{count}} 条": "…还有 {{count}} 条"
 }
