@@ -63,6 +63,7 @@ export { collectionFileOf, mergeFolderWithInline } from "./collectionsFolder";
 export { compareVersions, isVersionNewer, isPrereleaseVersion } from "./semver";
 
 export {
+  officialCollections,
   stableLatestVersion,
   versionDownloadUrl,
   updateToVersion,

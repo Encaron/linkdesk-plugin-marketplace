@@ -12,7 +12,7 @@ import { useStore } from "../StoreContext";
 
 export function Hero() {
   const { data } = useStore();
-  const banner = data.catalog.collections.find((c) => c.layout === "banner");
+  const banner = data.catalog.collections.find((c) => c.official === true && c.layout === "banner");
   const slides = useMemo(() => {
     if (!banner) return [];
     const byId = new Map(data.catalog.entries.map((e) => [e.id, e]));

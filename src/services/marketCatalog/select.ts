@@ -5,8 +5,14 @@
  * 这些函数是**版本判据的单点**——视图层消费它们即与发现/铃铛同判据，杜绝判定分裂。
  */
 
-import type { CatalogEntry, CatalogVersionChoice } from "./types";
+import type { CatalogEntry, CatalogVersionChoice, CollectionDecl } from "./types";
 import { compareVersions, isPrereleaseVersion, isVersionNewer } from "./semver";
+
+/** 官方首页策展位只吃官方目录（09 §三·补3）——合集带 merge 注入 `official`。
+ *  作者源合集仍留在全量目录，供作者店 homepage 引用，⛔ 不进官方首页 curation。 */
+export function officialCollections(collections: readonly CollectionDecl[]): CollectionDecl[] {
+  return collections.filter((c) => c.official === true);
+}
 
 /** 条目稳定版最新——versions[] 最新在前取首个非 prerelease；旧格式无 versions[] → 顶层 version（本身非 prerelease 才返回）。
  *  undefined = 条目无稳定版可提示（§二·四：全 prerelease 不提示，beta 只走手动安装 #33c 版本下拉）。 */

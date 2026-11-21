@@ -97,6 +97,10 @@ export interface CollectionDecl {
   /** 成员 pluginId 引用——缺失条目静默跳过（照目录 merge 防御语义） */
   items: string[];
   order?: number;
+  /** 合并注入：来源仓库名（owner/repo）——官方首页策展位只吃官方目录（09 §三·补3） */
+  sourceName?: string;
+  /** 合并注入：该合集来自官方默认目录源 */
+  official?: boolean;
 }
 
 /** 分类 rail 展示顺序声明（06 §二·3）——未注册 slug 落「其他」桶，不报错 */

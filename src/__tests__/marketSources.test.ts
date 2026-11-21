@@ -503,7 +503,20 @@ describe("marketSources v2（R4-2.1/2.2/2.3）", () => {
       "other",
     ]);
     expect(r.collections).toEqual([
-      { id: "picks", title: "编辑推荐", subtitle: undefined, hint: undefined, cover: undefined, layout: undefined, items: ["demo-alpha"], order: undefined },
+      {
+        id: "picks",
+        title: "编辑推荐",
+        subtitle: undefined,
+        hint: undefined,
+        glow: undefined,
+        more: undefined,
+        cover: undefined,
+        layout: undefined,
+        items: ["demo-alpha"],
+        order: undefined,
+        sourceName: OFFICIAL_NAME,
+        official: true,
+      },
     ]);
     expect(r.warnings).toEqual([
       { code: "unknown-category", entryId: "demo-alpha", detail: "made-up", source: OFFICIAL_NAME },

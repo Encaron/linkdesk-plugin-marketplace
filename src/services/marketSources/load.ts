@@ -257,11 +257,15 @@ function collectSourceUrls(links: SourceLink[] | undefined, existingUrls: string
   return out;
 }
 
-/** 合集声明合并——同 id 先到者胜（官方 → 收录 → 用户）；无声明 = 空数组 */
+/** 合集声明合并——同 id 先到者胜（官方 → 收录 → 用户）；无声明 = 空数组。
+ *  合并时注入来源身份：官方首页策展位只吃 `official === true`（09 §三·补3），
+ *  作者源合集仍留在全量目录里供作者店 homepage 引用。 */
 function mergeCollections(sources: Delivered[]): CollectionDecl[] {
   const byId = new Map<string, CollectionDecl>();
   for (const d of sources) {
-    for (const c of d.catalog.collections ?? []) if (!byId.has(c.id)) byId.set(c.id, c);
+    for (const c of d.catalog.collections ?? []) {
+      if (!byId.has(c.id)) byId.set(c.id, { ...c, sourceName: d.sourceName, official: d.official });
+    }
   }
   return [...byId.values()];
 }

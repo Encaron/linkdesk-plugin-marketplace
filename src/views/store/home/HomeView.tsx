@@ -9,7 +9,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import type { CatalogEntry } from "../../../services/marketCatalog";
-import { primaryCategoryOf } from "../../../services/marketCatalog";
+import { officialCollections, primaryCategoryOf } from "../../../services/marketCatalog";
 import { CardMega } from "../cards/CardMega";
 import { useStore } from "../StoreContext";
 import { Strip } from "../Strip";
@@ -25,12 +25,16 @@ export function HomeView() {
   const { data, actions, navigate } = useStore();
   const collections = useMemo(
     () =>
-      [...data.catalog.collections]
+      // 策展位只吃官方目录（09 §三·补3）；作者源合集只进作者店，⛔ 不漏到官方首页
+      [...officialCollections(data.catalog.collections)]
         .filter((c) => c.layout !== "banner")
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
     [data.catalog.collections],
   );
-  const themes = data.catalog.entries.filter((e) => primaryCategoryOf(e) === "themes");
+  // 主题专区同为官方策展位：只列官方源主题（全量主题走「全部主题」分类页）
+  const themes = data.catalog.entries.filter(
+    (e) => e.official === true && primaryCategoryOf(e) === "themes",
+  );
 
   return (
     <>
