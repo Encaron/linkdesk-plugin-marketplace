@@ -9,7 +9,7 @@
 import { useTranslation } from "react-i18next";
 import { EmptyState, SORT_SETS, SortSelect, ViewSeg, hueBG, hueOf, Icon } from "../../../ui";
 import type { AuthorDomain } from "../../../services/authors";
-import { useAuthorDomains } from "../../../services/authors";
+import { OFFICIAL_AUTHOR_ID, useAuthorDomains } from "../../../services/authors";
 import type { AuthorSort } from "../../../services/marketplaceShared/uiPrefs";
 import { useStore } from "../StoreContext";
 import { StickyBar } from "../StickyBar";
@@ -63,7 +63,10 @@ export function AuthorsView() {
   const { t } = useTranslation();
   const { data, prefs, setAuthorSort, setAuthorView, navigate, addSource } = useStore();
   const { domains } = useAuthorDomains(data.catalog.entries.length);
-  const list = sortAuthorDomains(domains, prefs.authorSort as AuthorSort);
+  const sorted = sortAuthorDomains(domains, prefs.authorSort as AuthorSort);
+  /* 官方也是作者：固定排在第一位（作者页/来源页同一身份；首页作者区仍只展示第三方，见 AuthorSection） */
+  const official = sorted.find((d) => d.authorId === OFFICIAL_AUTHOR_ID);
+  const list = official ? [official, ...sorted.filter((d) => d !== official)] : sorted;
   const totalPlugins = list.reduce((n, d) => n + authorPluginCount(d), 0);
   const open = (domain: AuthorDomain) => navigate({ page: "author", authorId: domain.authorId });
 
@@ -71,11 +74,11 @@ export function AuthorsView() {
     <>
       <div className="marketplace-store-head-sub marketplace-store-page-sub">
         {list.length
-          ? t("{{count}} 位第三方作者 · 共 {{plugins}} 个插件——点任一作者进入其店铺", {
+          ? t("{{count}} 位作者 · 共 {{plugins}} 个插件——点任一作者进入其店铺", {
               count: list.length,
               plugins: totalPlugins,
             })
-          : t("第三方作者的店会出现在这里——先添加市场源")}
+          : t("作者的店会出现在这里——先添加市场源")}
       </div>
       {list.length > 0 && (
         <StickyBar group>

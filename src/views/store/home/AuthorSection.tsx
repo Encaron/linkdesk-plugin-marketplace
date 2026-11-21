@@ -9,7 +9,7 @@
 
 import { useTranslation } from "react-i18next";
 import { Icon } from "../../../ui";
-import { useAuthorDomains } from "../../../services/authors";
+import { OFFICIAL_AUTHOR_ID, useAuthorDomains } from "../../../services/authors";
 import { useStore } from "../StoreContext";
 import { SectionHead } from "./SectionHead";
 import { AuthorCard } from "../authors/AuthorCard";
@@ -20,7 +20,11 @@ export function AuthorSection() {
   const { t } = useTranslation();
   const { data, addSource, navigate } = useStore();
   const { domains } = useAuthorDomains(data.catalog.entries.length);
-  const list = sortAuthorDomains(domains, "name");
+  /* 首页就是官方店：作者区只展示第三方作者；官方作为作者出现在「作者」页与来源页 */
+  const list = sortAuthorDomains(
+    domains.filter((d) => d.authorId !== OFFICIAL_AUTHOR_ID),
+    "name",
+  );
 
   if (list.length > 0) {
     return (

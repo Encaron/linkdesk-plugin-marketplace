@@ -33,6 +33,9 @@ import { readSourceRecords, type SourceRecord } from "./marketSources";
 import { getCatalogResult } from "./marketplaceShared/catalogStore";
 import { realmSlot } from "./realmSlot";
 
+/** 官方作者域（合成身份）：官方目录条目没有 authorId，但官方也按「一个作者多个仓库」展示 */
+export const OFFICIAL_AUTHOR_ID = "official";
+
 /* ═══ 作者块 schema（09 §二；键名与 09 逐字一致） ═══ */
 
 export type AuthorSectionType = "hero" | "collection" | "grid" | "rank";
@@ -472,10 +475,12 @@ export async function knownAuthorIds(): Promise<string[]> {
   for (const rec of await readSourceRecords()) {
     if (rec.kind === "remote" && rec.enabled && rec.authorId) ids.add(rec.authorId);
   }
-  for (const entry of getCatalogResult().entries) {
+  const entries = getCatalogResult().entries;
+  for (const entry of entries) {
     const id = entry.authorId?.trim();
     if (id) ids.add(id);
   }
+  if (entries.some((e) => e.official)) ids.add(OFFICIAL_AUTHOR_ID);
   return [...ids];
 }
 
@@ -498,8 +503,46 @@ async function candidateUrls(authorId: string): Promise<string[]> {
   return out;
 }
 
+/** 官方作者域（合成）：官方目录条目不声明 authorId，但作者页/来源页按同一套作者 UI 展示。
+ *  仓库 = 官方条目的 sourceName 分组（官方可能不止一个仓），插件 = 该源在官方目录里的条目。 */
+export function officialDomainOf(all: readonly CatalogEntry[]): AuthorDomain | null {
+  const entries = all.filter((e) => e.official);
+  if (entries.length === 0) return null;
+  const bySource = new Map<string, CatalogEntry[]>();
+  for (const e of entries) {
+    const key = e.sourceName || "official";
+    const list = bySource.get(key);
+    if (list) list.push(e);
+    else bySource.set(key, [e]);
+  }
+  const repos: AuthorRepoView[] = [...bySource.entries()].map(([sourceName, plugins]) => {
+    const repo = sourceName.includes("/") ? sourceName.split("/")[1] : sourceName;
+    return {
+      id: repo,
+      name: repo === "linkdesk-marketplace" ? "官方目录" : repo,
+      intro: "官方内置与精选插件",
+      plugins,
+    };
+  });
+  return {
+    authorId: OFFICIAL_AUTHOR_ID,
+    name: "官方 Plugin Store",
+    avatar: "linkdesk://marketplace/resources/icon-brand.svg",
+    intro: "官方内置插件与精选主题",
+    storeTitle: "官方 Plugin Store",
+    repos,
+    warnings: [],
+    official: true,
+  };
+}
+
+function buildOfficialDomain(): AuthorDomain | null {
+  return officialDomainOf(getCatalogResult().entries);
+}
+
 /** 单 id 构建：逐候选源拉 `authors/<id>.json`（404/坏块跳过），聚合多块 */
 async function buildAuthorDomain(authorId: string): Promise<AuthorDomain | null> {
+  if (authorId === OFFICIAL_AUTHOR_ID) return buildOfficialDomain();
   const [records, urls] = await Promise.all([readSourceRecords(), candidateUrls(authorId)]);
   const blocks: AuthorBlock[] = [];
   let officialBlock = false;

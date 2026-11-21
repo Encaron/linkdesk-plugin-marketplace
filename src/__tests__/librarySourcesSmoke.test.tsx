@@ -176,7 +176,9 @@ describe("来源管理（R4-3.14/3.15）", () => {
     expect(warn.getAttribute("data-hint") ?? "").toContain("只有第 1 个占据置顶首视觉");
 
     // 源级停用：写回原始数组（string → 记录 + enabled:false）
-    const toggle = container.querySelector(".marketplace-store-src-line .marketplace-store-sbtn") as HTMLElement;
+    const toggle = [...container.querySelectorAll(".marketplace-store-src-line .marketplace-store-sbtn")].find(
+      (b) => !(b as HTMLButtonElement).disabled,
+    ) as HTMLElement;
     fireEvent.click(toggle);
     await waitFor(() => expect(api.configuration.set).toHaveBeenCalled());
     const written = api.configuration.set.mock.calls[0][1] as Array<{ enabled?: boolean }>;

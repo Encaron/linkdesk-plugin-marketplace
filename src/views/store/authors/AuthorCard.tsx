@@ -13,11 +13,11 @@
 
 import { useTranslation } from "react-i18next";
 import { hueBG, hueOf, Icon, type IconName } from "../../../ui";
-import type { AuthorDomain } from "../../../services/authors";
+import { OFFICIAL_AUTHOR_ID, type AuthorDomain } from "../../../services/authors";
 import { authorDeckOf, authorDeckRestCount, authorPluginCount } from "./authorsData";
 
 function authorBadgeText(t: (k: string, o?: Record<string, unknown>) => string, domain: AuthorDomain): string {
-  const identity = t("身份：GitHub");
+  const identity = domain.authorId === OFFICIAL_AUTHOR_ID ? t("内置") : t("身份：GitHub");
   return `${domain.official ? t("官方 ✓") : t("社区源")} · ${t("{{count}} 个仓库", {
     count: domain.repos.length,
   })} · ${identity}`;

@@ -17,7 +17,7 @@ import { OverlayPortal } from "@linkdesk/ui";
 import { EmptyState, hueBG, Icon } from "../../../ui";
 import { normalizeSourceUrl, sourceNameOfUrl } from "../../../services/marketCatalog";
 import { readSourceRecords, type SourceRecord } from "../../../services/marketSources";
-import { useAuthorDomains, refreshAuthorDomains } from "../../../services/authors";
+import { OFFICIAL_AUTHOR_ID, useAuthorDomains, refreshAuthorDomains } from "../../../services/authors";
 import { scheduleDataRefresh, useMarketplacePlugins } from "../../../services/marketplaceShared";
 import { readLocalInstalls, forgetLocalInstall, type LocalInstallRecord } from "../../../services/localInstalls";
 import {
@@ -112,7 +112,12 @@ export function SourcesView() {
   const officialWarnings = data.catalog.warnings.filter((w) => !!w.source && w.source === data.catalog.sourceNames[0]);
   const officialWarningLines = catalogWarningLines(t, officialWarnings);
   const officialWarnSummary = summarizeWarnings(t, officialWarnings);
-  const totalPlugins = domains.reduce((n, d) => n + d.repos.reduce((m, r) => m + r.plugins.length, 0), 0);
+  /* 官方也进作者计数（作者页 4 位一致）；「作者来源共 N 个插件」只算第三方，官方另计 */
+  const thirdPartyDomains = domains.filter((d) => d.authorId !== OFFICIAL_AUTHOR_ID);
+  const totalPlugins = thirdPartyDomains.reduce(
+    (n, d) => n + d.repos.reduce((m, r) => m + r.plugins.length, 0),
+    0,
+  );
 
   const toggleCollapse = (id: string) => {
     setCollapsed((cur) => {
@@ -232,7 +237,7 @@ export function SourcesView() {
     <>
       <div className="marketplace-store-src-summary">
         {t("{{authors}} 位作者 · {{sources}} 个作者源 · {{local}} 个本地插件 · 作者来源共 {{plugins}} 个插件（官方来源另计）", {
-          authors: groups.length,
+          authors: groups.length + (officialCount > 0 ? 1 : 0),
           sources: enabledSources,
           local: localRecords.length,
           plugins: totalPlugins,
@@ -255,30 +260,83 @@ export function SourcesView() {
       </StickyBar>
 
       <div className="marketplace-store-src-list">
-        <div className="marketplace-store-src-row is-locked">
-          <span className="marketplace-store-src-ico" style={{ background: "var(--accent)" }}>
-            <Icon name="bag" />
-          </span>
-          <div className="marketplace-store-src-main">
-            <div className="marketplace-store-src-name">
-              {t("官方 Plugin Store")}
-              <span className="marketplace-store-src-tag is-official">{t("官方")}</span>
-              <span className="marketplace-store-src-tag">{t("内置")}</span>
+        {/* 官方也是作者：与下方作者组同一套组头/行 UI（可折叠、可进店）；唯一差异是不可移除 */}
+        {(() => {
+          const isCollapsed = collapsed.has(OFFICIAL_AUTHOR_ID);
+          const repoName = (data.catalog.sourceNames[0] ?? "").split("/")[1] || "linkdesk-marketplace";
+          return (
+            <div
+              className={`marketplace-store-src-group ${isCollapsed ? "is-collapsed" : ""}`.trim()}
+            >
+              <div className="marketplace-store-src-ghead">
+                <button
+                  type="button"
+                  className="marketplace-store-src-collapse"
+                  aria-label={isCollapsed ? t("展开该作者的源") : t("折叠该作者的源")}
+                  onClick={() => toggleCollapse(OFFICIAL_AUTHOR_ID)}
+                >
+                  <Icon name="chevron-right" size="sm" />
+                </button>
+                <span className="marketplace-store-src-ico" style={{ background: "var(--accent)" }}>
+                  <Icon name="bag" />
+                </span>
+                <div className="marketplace-store-src-main">
+                  <div className="marketplace-store-src-name">
+                    <button
+                      type="button"
+                      className="marketplace-store-src-enter-name"
+                      onClick={() => navigate({ page: "author", authorId: OFFICIAL_AUTHOR_ID })}
+                    >
+                      {t("官方 Plugin Store")}
+                    </button>
+                    <span className="marketplace-store-src-tag is-official">{t("官方 ✓")}</span>
+                    <span className="marketplace-store-src-tag">{t("内置")}</span>
+                    <span
+                      className="marketplace-store-src-enter"
+                      onClick={() => navigate({ page: "author", authorId: OFFICIAL_AUTHOR_ID })}
+                    >
+                      {t("进入该作者主页")}
+                      <Icon name="chevron-right" size="sm" />
+                    </span>
+                  </div>
+                  <div className="marketplace-store-src-sub">
+                    {t("{{count}} 个市场源 · 官方内置，不可移除", { count: 1 })}
+                  </div>
+                </div>
+                {officialWarningLines.length > 0 && (
+                  <span className="marketplace-store-src-warn" data-hint={hintOf(t, officialWarningLines)}>
+                    {officialWarnSummary.label}
+                  </span>
+                )}
+                <span className="marketplace-store-src-pill">
+                  <b>1</b> {t("个仓库")}
+                </span>
+                <span className="marketplace-store-src-pill">
+                  <b>{officialCount}</b> {t("个插件")}
+                </span>
+              </div>
+              <div className="marketplace-store-src-line">
+                <span className="marketplace-store-src-repo">{repoName}</span>
+                <span className="marketplace-store-src-url" data-hint={data.catalog.sourceNames[0]}>
+                  {data.catalog.sourceNames[0] ?? "raw.githubusercontent.com"}
+                </span>
+                <span className="marketplace-store-src-meta">
+                  {t("{{count}} 个插件 · 内置", { count: officialCount })}
+                </span>
+                <div className="marketplace-store-src-acts">
+                  <button
+                    type="button"
+                    className="marketplace-store-sbtn"
+                    disabled
+                    data-hint={t("官方源不可移除、不参与排序")}
+                  >
+                    {t("不可操作")}
+                  </button>
+                </div>
+              </div>
             </div>
-            <div className="marketplace-store-src-url">{data.catalog.sourceNames[0] ?? "raw.githubusercontent.com"}</div>
-          </div>
-          <span className="marketplace-store-src-meta">{t("{{count}} 个插件 · 内置", { count: officialCount })}</span>
-          {officialWarningLines.length > 0 && (
-            <span className="marketplace-store-src-warn" data-hint={hintOf(t, officialWarningLines)}>
-              {officialWarnSummary.label}
-            </span>
-          )}
-          <div className="marketplace-store-src-acts">
-            <button type="button" className="marketplace-store-sbtn" disabled data-hint={t("官方源不可移除、不参与排序")}>
-              {t("不可操作")}
-            </button>
-          </div>
-        </div>
+          );
+        })()}
 
         {groups.map((group) => {
           const isCollapsed = collapsed.has(group.authorId.toLowerCase());

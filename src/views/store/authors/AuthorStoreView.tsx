@@ -21,7 +21,7 @@ import { EmptyState, hueOf } from "../../../ui";
 import type { CatalogEntry, CollectionDecl } from "../../../services/marketCatalog";
 import { groupByPrimaryCategory, primaryCategoryOf } from "../../../services/marketCatalog";
 import type { AuthorDomain, AuthorMoreDecl, AuthorRepoView, AuthorSectionDecl } from "../../../services/authors";
-import { useAuthorDomain } from "../../../services/authors";
+import { OFFICIAL_AUTHOR_ID, useAuthorDomain } from "../../../services/authors";
 import { localizeCategory } from "../../../services/marketCategories";
 import { CardGrid } from "../cards/CardGrid";
 import { CategoryTile } from "../cards/CategoryTile";
@@ -225,11 +225,18 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
     );
   };
 
+  const officialStore = authorId === OFFICIAL_AUTHOR_ID;
+  const officialCount = data.catalog.entries.filter((e) => e.official).length;
   return (
     <>
       <div className="marketplace-store-crumb">
-        {t("作者店内")} · <b>{domain.name}</b> ·{" "}
-        {t("身份：GitHub（随目录缓存；从未取到→灰形占位）——店内不出现第四方；官方与切仓用下方门店卡")}
+        {officialStore ? (
+          t("官方 Plugin Store · 官方内置与精选")
+        ) : (
+          <>
+            {t("作者店内")} · <b>{domain.name}</b> · GitHub
+          </>
+        )}
       </div>
 
       {heroIndex >= 0 && heroSlides.length > 0 ? (
@@ -240,29 +247,31 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
 
       <div className="marketplace-store-sec">
         <Strip ariaLabel={t("门店切换")}>
-          <AuthorSwitchCard
-            title={t("官方 Plugin Store")}
-            badge={t("官方 · 点击返回")}
-            intro={t("官方运营的插件与主题精选——覆盖全部分类。")}
-            meta={t("{{count}} 个插件", { count: data.catalog.entries.length })}
-            goLabel={t("返回官方")}
-            icon="bag"
-            hue={undefined}
-            onOpen={() => navigate({ page: "home" })}
-            ariaLabel={t("返回官方 Plugin Store")}
-          />
+          {!officialStore && (
+            <AuthorSwitchCard
+              title={t("官方 Plugin Store")}
+              badge={t("官方 · 点击返回")}
+              intro={t("官方运营的插件与主题精选——覆盖全部分类。")}
+              meta={t("{{count}} 个插件", { count: officialCount })}
+              goLabel={t("返回官方")}
+              icon="bag"
+              hue={undefined}
+              onOpen={() => navigate({ page: "home" })}
+              ariaLabel={t("返回官方 Plugin Store")}
+            />
+          )}
           {domain.repos.map((r) => {
             const current = r.id === repo.id;
             return (
               <AuthorSwitchCard
                 key={r.id}
                 title={r.name}
-                badge={r.image ? t("作者自建仓库 · 有门面图") : t("作者自建仓库 · 灰占位（身份未缓存演示）")}
+                badge={officialStore ? t("内置") : t("作者自建仓库")}
                 intro={r.intro}
                 meta={t("{{count}} 个插件", { count: r.plugins.length })}
                 goLabel={current ? t("当前仓库") : t("切换到该仓库")}
                 current={current}
-                icon={r.image ? "folder" : "user"}
+                icon={officialStore ? "bag" : r.image ? "folder" : "user"}
                 hue={r.image ? hue : undefined}
                 onOpen={() => navigate({ page: "author", authorId: domain.authorId, repoId: r.id })}
                 ariaLabel={t("{{name}}——切换到该仓库", { name: r.name })}
