@@ -137,27 +137,56 @@ export function sourceBadge(entry: Pick<CatalogEntry, "official" | "vendorId">):
       : { kind: "third", key: "社区" };
 }
 
-/** 许可徽标（蓝图 licBadge：过期 > 临期 > 已购 > 价格；⛔ 静默降级） */
+/** 价格徽标（单条）——买断/订阅价；⛔ 只由下面两个许可函数调用，避免第三份取字。 */
+function priceBadgeOf(entry: Pick<CatalogEntry, "pricing">): BadgeDesc {
+  const p = entry.pricing!;
+  return p.model === "subscription"
+    ? {
+        kind: "price",
+        key: "订阅 {{currency}}{{price}}/{{period}}",
+        params: { currency: p.currency ?? "¥", price: p.price ?? 0, period: p.period ?? "月" },
+      }
+    : {
+        kind: "price",
+        key: "买断 {{currency}}{{price}}",
+        params: { currency: p.currency ?? "¥", price: p.price ?? 0 },
+      };
+}
+
+/**
+ * **单徽标位**的许可徽标（库行 / 「已购未安装」行等一次只画一枚的位置）——
+ * 优先级照蓝图 licBadge：过期 ＞ 临期 ＞ 已购 ＞ 价格。
+ * 🔴 单徽标位 ⛔ 不许拿 `licenseBadges()[0]`：那是**多徽标行**（临期时是 [价格, 到期天数]），
+ *    第一项是价格，会把「剩 N 天」画成价格（2026-11-22 用户抓漏）。
+ * 临期文案与卡面 `statusTag` 同口径：订阅「订阅剩 N 天」/ 买断「剩 N 天」。
+ */
+export function licenseBadgeOf(
+  entry: Pick<CatalogEntry, "pricing">,
+  license: LicenseView | null | undefined,
+  now = Date.now(),
+): BadgeDesc | null {
+  if (!isPaid(entry)) return null;
+  const days = licenseDaysLeft(license, now);
+  if (days !== undefined && days < 0) return { kind: "expired", key: "许可已过期" };
+  if (days !== undefined && days <= 30) {
+    return entry.pricing!.model === "subscription"
+      ? { kind: "soon", key: "订阅剩 {{days}} 天", params: { days } }
+      : { kind: "soon", key: "剩 {{days}} 天", params: { days } };
+  }
+  if (license) return { kind: "owned", key: "已购 ✓" };
+  return priceBadgeOf(entry);
+}
+
+/** 许可徽标**多枚行**（详情头部 / 全量徽标：过期 ＞ 临期[价格＋天数] ＞ 已购 ＞ 价格；⛔ 静默降级）。
+ *  单徽标位请用 `licenseBadgeOf()`。 */
 export function licenseBadges(
   entry: Pick<CatalogEntry, "pricing">,
   license: LicenseView | null | undefined,
   now = Date.now(),
 ): BadgeDesc[] {
   if (!isPaid(entry)) return [];
-  const p = entry.pricing!;
   const days = licenseDaysLeft(license, now);
-  const price: BadgeDesc =
-    p.model === "subscription"
-      ? {
-          kind: "price",
-          key: "订阅 {{currency}}{{price}}/{{period}}",
-          params: { currency: p.currency ?? "¥", price: p.price ?? 0, period: p.period ?? "月" },
-        }
-      : {
-          kind: "price",
-          key: "买断 {{currency}}{{price}}",
-          params: { currency: p.currency ?? "¥", price: p.price ?? 0 },
-        };
+  const price = priceBadgeOf(entry);
   if (days !== undefined && days < 0) return [{ kind: "expired", key: "许可已过期" }];
   if (days !== undefined && days <= 30) {
     return [price, { kind: "soon", key: "{{days}} 天后到期", params: { days } }];

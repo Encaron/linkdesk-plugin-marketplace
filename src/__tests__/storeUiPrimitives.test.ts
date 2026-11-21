@@ -12,6 +12,7 @@ import { describe, it, expect } from "vitest";
 import type { CatalogEntry } from "../services/marketCatalog";
 import {
   allBadges,
+  licenseBadgeOf,
   licenseDaysLeft,
   moreMenuItems,
   resolveAction,
@@ -82,6 +83,41 @@ describe("licenseDaysLeft", () => {
     expect(licenseDaysLeft(null, NOW)).toBeUndefined();
     expect(licenseDaysLeft({}, NOW)).toBeUndefined();
     expect(licenseDaysLeft(expIn(-2), NOW)).toBe(-2);
+  });
+});
+
+describe("licenseBadgeOf —— 单徽标位（过期 > 临期 > 已购 > 价格）", () => {
+  it("过期 → 许可已过期（⛔ 不再画成已购）", () => {
+    expect(licenseBadgeOf(entry({ pricing: { model: "paid", price: 30 } }), expIn(-2), NOW)).toEqual({
+      kind: "expired",
+      key: "许可已过期",
+    });
+  });
+
+  it("买断临期 → 剩 N 天；订阅临期 → 订阅剩 N 天（⛔ 不取多徽标行的价格）", () => {
+    expect(licenseBadgeOf(entry({ pricing: { model: "paid", price: 30 } }), expIn(7), NOW)).toEqual({
+      kind: "soon",
+      key: "剩 {{days}} 天",
+      params: { days: 7 },
+    });
+    expect(licenseBadgeOf(entry({ pricing: { model: "subscription", price: 10 } }), expIn(20), NOW)).toEqual({
+      kind: "soon",
+      key: "订阅剩 {{days}} 天",
+      params: { days: 20 },
+    });
+  });
+
+  it("永久权益 → 已购 ✓；未购 → 价格；免费 → null", () => {
+    expect(licenseBadgeOf(entry({ pricing: { model: "paid", price: 30 } }), {}, NOW)).toEqual({
+      kind: "owned",
+      key: "已购 ✓",
+    });
+    expect(licenseBadgeOf(entry({ pricing: { model: "paid", price: 30 } }), null, NOW)).toEqual({
+      kind: "price",
+      key: "买断 {{currency}}{{price}}",
+      params: { currency: "¥", price: 30 },
+    });
+    expect(licenseBadgeOf(entry(), {}, NOW)).toBeNull();
   });
 });
 

@@ -19,7 +19,7 @@ import {
   EmptyState,
   ChunkedReveal,
   Icon,
-  licenseBadges,
+  licenseBadgeOf,
   MoreMenu,
   moreMenuItems,
   resolveAction,
@@ -69,8 +69,9 @@ function useLocalInstallRecords(): LocalInstallRecord[] {
 }
 
 function badgeOfRow(row: LibraryRow): BadgeDesc {
-  const lic = licenseBadges(row.entry, row.license);
-  if (lic.length > 0) return lic[0];
+  // 单徽标位唯一出口：过期 > 临期 > 已购 > 价格（⛔ 不拿多徽标行的第一项当单状态）
+  const lic = licenseBadgeOf(row.entry, row.license);
+  if (lic) return lic;
   if (row.core) return { kind: "core", key: "内置" };
   if (row.state === "disabled") return { kind: "muted", key: "已停用" };
   if (row.state === "update") return { kind: "update", key: "可更新" };
@@ -481,7 +482,7 @@ export function LibraryView() {
                     <span className="marketplace-store-lib-sub">{t("已购未安装")}</span>
                   </span>
                   <span className="marketplace-store-lib-state">
-                    <Badge desc={{ kind: "owned", key: "已购 ✓" }} />
+                    <Badge desc={badgeOfRow(row)} />
                   </span>
                   <span className="marketplace-store-lib-act">
                     <ActionButton action={rowAction(row, ctx, t)} onAct={(id) => actions.onAct(entry, id)} />

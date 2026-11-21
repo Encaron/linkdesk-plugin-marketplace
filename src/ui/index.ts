@@ -11,6 +11,7 @@ export {
   statusTag,
   allBadges,
   licenseBadges,
+  licenseBadgeOf,
   sourceBadge,
   sourceKind,
   isPaid,
