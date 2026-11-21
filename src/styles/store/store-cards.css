@@ -23,7 +23,7 @@
 .marketplace-store-tile {
   width: 40px;
   height: 40px;
-  border-radius: 9px;
+  border-radius: var(--radius-lg);
   flex: none;
   display: flex;
   align-items: center;
@@ -31,7 +31,7 @@
   color: var(--text-on-accent);
   overflow: hidden;
 }
-.marketplace-store-tile.is-lg { width: 48px; height: 48px; border-radius: 11px; }
+.marketplace-store-tile.is-lg { width: 48px; height: 48px; border-radius: var(--radius-lg); }
 .marketplace-store-tile .plugin-icon { width: 22px; height: 22px; }
 .marketplace-store-tile.is-lg .plugin-icon { width: 28px; height: 28px; }
 .marketplace-store-tile .plugin-icon--img {
@@ -287,7 +287,7 @@
   font-weight: 600;
   border: 1px solid var(--separator);
   color: var(--text-secondary);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: 1px 8px;
   margin-bottom: 10px;
 }
@@ -451,7 +451,7 @@
   transform: translateY(-50%);
   width: 28px;
   height: 28px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: var(--bg-input);
   color: var(--text-secondary);
   display: flex;

@@ -81,7 +81,7 @@
   font-weight: 600;
   color: var(--text-on-accent);
   background: var(--accent);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: 2px 9px;
   margin-bottom: 12px;
 }
@@ -132,7 +132,7 @@
   transform: translateY(-50%);
   width: 30px;
   height: 30px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--bg-input) 80%, transparent);
   color: var(--text-secondary);
   display: flex;
@@ -160,7 +160,7 @@
 .marketplace-store-hero-dot {
   width: 7px;
   height: 7px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: var(--separator);
   padding: 0;
   border: none;
@@ -190,7 +190,7 @@
 .marketplace-store-ae-ico {
   width: 40px;
   height: 40px;
-  border-radius: 11px;
+  border-radius: var(--radius-lg);
   flex: none;
   display: flex;
   align-items: center;
@@ -221,7 +221,7 @@
 .marketplace-store-ct-icon {
   width: 40px;
   height: 40px;
-  border-radius: 11px;
+  border-radius: var(--radius-lg);
   flex: none;
   display: flex;
   align-items: center;

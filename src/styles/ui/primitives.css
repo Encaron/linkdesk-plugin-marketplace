@@ -28,14 +28,14 @@
 .marketplace-ui-more-item:focus-visible {
   outline: 2px solid var(--accent-hover);
   outline-offset: 1px;
-  border-radius: 3px;
+  border-radius: var(--radius-xs);
 }
 
 /* ═══ ViewSeg（平铺在前、详细在后——顺序全站固定） ═══ */
 .marketplace-ui-seg {
   display: flex;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   margin-left: auto;
   flex: none;
@@ -62,7 +62,7 @@
   font-size: var(--font-size-2xs);
   color: var(--text-secondary);
   border: 1px solid var(--separator);
-  border-radius: 13px;
+  border-radius: var(--radius-lg);
   padding: 3px 11px;
   cursor: pointer;
   background: transparent;
@@ -100,7 +100,7 @@
 /* ═══ Badge（目录语义徽标十类） ═══ */
 .marketplace-ui-badge {
   font-size: var(--font-size-2xs);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 1px 7px;
   line-height: 15px;
   flex: none;
@@ -147,7 +147,7 @@
   font-weight: 700;
   font-size: 12px;
   padding: 2px 9px;
-  border-radius: 99px;
+  border-radius: var(--radius-pill);
   letter-spacing: 0.02em;
   line-height: 1.4;
   flex: none;
@@ -162,7 +162,7 @@
   align-items: flex-end;
   text-align: right;
   line-height: 1.25;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
 }
 .marketplace-ui-corner.is-stacked .marketplace-ui-corner-model {
   font-size: 10px;
@@ -249,7 +249,7 @@
   height: 12px;
   border: 2px solid var(--text-on-accent);
   border-top-color: transparent;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   animation: marketplace-ui-spin 0.8s linear infinite;
   flex: none;
 }
@@ -259,7 +259,7 @@
 .marketplace-ui-icon-btn {
   width: 28px;
   height: 28px;
-  border-radius: 7px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-secondary);

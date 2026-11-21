@@ -45,7 +45,7 @@
   position: relative;
   width: 52px;
   height: 52px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   flex: none;
   display: flex;
   align-items: center;
@@ -60,7 +60,7 @@
 .marketplace-store-ac-avatar-img {
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   object-fit: cover;
   display: block;
 }
@@ -69,7 +69,7 @@
 .marketplace-store-ac-ring {
   position: absolute;
   inset: -5px;
-  border-radius: 16px;
+  border-radius: var(--radius-2xl);
   pointer-events: none;
   border: 1.5px solid color-mix(in srgb, var(--marketplace-hue, var(--accent)) 78%, transparent);
   box-shadow: 0 0 20px color-mix(in srgb, var(--marketplace-hue, var(--accent)) 48%, transparent);
@@ -112,7 +112,7 @@
   justify-content: center;
   gap: 1px;
   padding: 0 10px;
-  border-radius: 9px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background: var(--bg-input);
   transform: translate(calc(var(--i) * 6px), calc(var(--i) * 4px));
@@ -245,7 +245,7 @@
 .marketplace-store-author-row-av {
   width: 44px;
   height: 44px;
-  border-radius: 11px;
+  border-radius: var(--radius-lg);
   flex: none;
   display: flex;
   align-items: center;
@@ -264,7 +264,7 @@
 }
 .marketplace-store-author-row-tag {
   font-size: 10.5px;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 1px 7px;
   line-height: 15px;
   flex: none;
@@ -302,7 +302,7 @@
   align-items: baseline;
   gap: 3px;
   padding: 4px 11px;
-  border-radius: 99px;
+  border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--accent-hover);
   font-size: 11.5px;

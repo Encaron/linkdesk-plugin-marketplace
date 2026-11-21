@@ -76,7 +76,7 @@
   gap: 9px;
   width: 100%;
   padding: 9px 8px;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--accent) 42%, var(--border));
   background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent 72%);
   color: var(--text-primary);
@@ -94,7 +94,7 @@
 .marketplace-store-rail-hi {
   width: 30px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   background: var(--accent);
   display: flex;
   align-items: center;
@@ -164,7 +164,7 @@
   justify-content: flex-start;
   gap: 9px;
   padding: 10px 9px;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   font-size: var(--font-size-xs);
   min-height: 38px;
 }
@@ -182,7 +182,7 @@
 .marketplace-store-rail-dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: var(--danger);
   position: absolute;
   top: 9px;
@@ -216,7 +216,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   border: 1px solid var(--border);
   background: var(--bg-card);
   color: var(--text-secondary);
@@ -260,7 +260,7 @@
   background: var(--bg-window-solid, var(--bg-window));
   -webkit-backdrop-filter: var(--surface-blur);
   backdrop-filter: var(--surface-blur);
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--border) 65%, transparent);
 }
 .marketplace-store-sticky.is-head {
@@ -333,7 +333,7 @@
   justify-content: center;
   width: 20px;
   height: 20px;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   border: none;
   background: transparent;
   color: var(--text-muted);
@@ -343,7 +343,7 @@
 .marketplace-store-head-check {
   height: 34px;
   padding: 0 11px;
-  border-radius: 9px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -358,7 +358,7 @@
 .marketplace-store-head-count {
   min-width: 16px;
   padding: 0 5px;
-  border-radius: 99px;
+  border-radius: var(--radius-pill);
   background: var(--danger);
   color: var(--text-on-accent);
   font-size: 10px;
@@ -368,7 +368,7 @@
 .marketplace-store-head-add {
   width: 34px;
   height: 34px;
-  border-radius: 9px;
+  border-radius: var(--radius-lg);
   flex: none;
   display: flex;
   align-items: center;
@@ -392,7 +392,7 @@
   margin: 0 2px 16px;
   padding: 9px 12px;
   border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
-  border-radius: 9px;
+  border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
   font-size: var(--font-size-xs);
   color: var(--text-secondary);
@@ -402,7 +402,7 @@
 .marketplace-store-sbtn {
   height: 28px;
   padding: 0 10px;
-  border-radius: 7px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-secondary);
@@ -574,7 +574,7 @@
   .marketplace-store-rail::-webkit-scrollbar-track { background: transparent; }
   .marketplace-store-rail::-webkit-scrollbar-thumb {
     background: color-mix(in srgb, var(--text-muted) 45%, transparent);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
   }
   .marketplace-store-rail::-webkit-scrollbar-thumb:hover {
     background: color-mix(in srgb, var(--text-muted) 70%, transparent);
@@ -592,7 +592,7 @@
     height: 40px;
     padding: 0 12px;
     min-width: 0;
-    border-radius: 8px;
+    border-radius: var(--radius-lg);
   }
   .marketplace-store-rail-label,
   .marketplace-store-rail-gap { display: none; }
