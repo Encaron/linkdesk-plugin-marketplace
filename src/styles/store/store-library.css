@@ -68,6 +68,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  /* 窄容器文字地板（范式）：窄时右列（大小/状态/动作）换行下沉，主列不被压成省略号一条 */
+  flex-wrap: wrap;
+  row-gap: 6px;
   padding: 10px 12px;
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -99,7 +102,7 @@
   width: 16px;
   height: 16px;
 }
-.marketplace-store-lib-main { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.marketplace-store-lib-main { min-width: 160px; flex: 1 1 160px; display: flex; flex-direction: column; }
 .marketplace-store-lib-name {
   font-size: 13.5px;
   font-weight: 600;

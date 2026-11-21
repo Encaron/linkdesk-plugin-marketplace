@@ -14,12 +14,16 @@
 .marketplace-mpd-details-layout {
   display: flex;
   gap: 32px;
+  /* 窄容器文字地板（范式 · 2026-11-21 第三轮补扫）：按**容器实宽**收单列，
+     不靠窗口宽——分屏/右侧再开面板时详情正文同样不被右栏挤成一字一行。 */
+  container-type: inline-size;
 }
 
 .marketplace-mpd-details-main {
-  flex: 1;
-  min-width: 0;
+  flex: 1 1 280px;
+  min-width: 280px;
 }
+
 
 .marketplace-mpd-description {
   font-size: var(--font-size-md);
@@ -280,4 +284,11 @@
   height: 200px;
   object-fit: contain;
   background: var(--bg-input);
+}
+
+/* 容器 < 700px：右栏隐藏（08 v3.55 同口径，只是判定从窗口宽改成容器宽） */
+@container (max-width: 700px) {
+  /* ⚠️ 容器自身不能被自己的 @container 命中——这里只写后代（main/sidebar） */
+  .marketplace-mpd-info-sidebar { display: none; }
+  .marketplace-mpd-details-main { min-width: 0; flex: 1 1 auto; }
 }
