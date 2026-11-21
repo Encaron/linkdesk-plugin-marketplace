@@ -451,7 +451,7 @@
 .marketplace-store-strip.is-no-overflow .marketplace-store-strip-arrow { display: none; }
 
 /* 窄屏：页边距只剩 16px，装不下外置钮 ⇒ 轨道自身左右缩进 42px，钮回到缩进区（仍不压内容、左右对称） */
-@media (max-width: 900px) {
+@container (max-width: 900px) {
   .marketplace-store-strip-row.is-duo .marketplace-store-card.is-duo { flex-basis: 100%; }
   .marketplace-store-card.is-mega { width: 262px; }
   .marketplace-store-strip { padding: 0 42px; }
@@ -459,7 +459,7 @@
   .marketplace-store-strip-arrow.is-l { left: 6px; }
   .marketplace-store-strip-arrow.is-r { right: 6px; }
 }
-@media (max-width: 700px) {
+@container (max-width: 700px) {
   .marketplace-store-card.is-duo { grid-template-columns: 1fr; }
   .marketplace-store-art.is-duo { min-height: 140px; }
 }

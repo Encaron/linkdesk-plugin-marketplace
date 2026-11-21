@@ -203,7 +203,7 @@
 }
 .marketplace-store-lib-sec-hint { font-size: 11px; }
 
-@media (max-width: 700px) {
+@container (max-width: 700px) {
   .marketplace-store-lib-search { width: 100%; }
   .marketplace-store-lib-size { display: none; }
   .marketplace-store-lib-state { width: auto; }

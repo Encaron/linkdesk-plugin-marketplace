@@ -63,7 +63,7 @@
 .marketplace-store-crumb { font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: 6px; }
 .marketplace-store-crumb b { color: var(--text-primary); font-size: 15px; font-weight: 600; }
 
-@media (max-width: 700px) {
+@container (max-width: 700px) {
   .marketplace-store-grid { grid-template-columns: 1fr; }
   .marketplace-store-cat-title { font-size: 20px; }
 }

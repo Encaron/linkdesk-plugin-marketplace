@@ -475,10 +475,10 @@
 .marketplace-store-mn0 { min-width: 0; }
 
 /* ── 响应式（对齐蓝图 1080/900/700 三档） ── */
-@media (max-width: 1080px) {
+@container (max-width: 1080px) {
   .marketplace-store-rail { width: 96px; }
 }
-@media (max-width: 900px) {
+@container (max-width: 900px) {
   .marketplace-store { flex-direction: column; }
   .marketplace-store-head { flex-wrap: wrap; gap: 10px; }
   .marketplace-store-head-title h1 { font-size: 20px; }
@@ -528,7 +528,7 @@
   .marketplace-store-rail-item.is-compact { height: 40px; }
   .marketplace-store-rail-count { margin-left: 0; }
 }
-@media (max-width: 700px) {
+@container (max-width: 700px) {
   .marketplace-store-page { padding: 18px 16px 48px; }
   .marketplace-store-head-title h1 { font-size: 18px; }
   .marketplace-store-search { max-width: 100%; }

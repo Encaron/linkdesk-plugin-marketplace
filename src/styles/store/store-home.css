@@ -254,11 +254,11 @@
   color: var(--accent-hover);
 }
 
-@media (max-width: 900px) {
+@container (max-width: 900px) {
   .marketplace-store-hero-slide { grid-template-columns: 1fr; }
   .marketplace-store-art.is-hero { min-height: 150px; }
 }
-@media (max-width: 700px) {
+@container (max-width: 700px) {
   .marketplace-store-hero-copy { padding: 20px; }
   .marketplace-store-hero-copy h2 { font-size: 21px; }
   .marketplace-store-hero-meta { gap: 8px; }

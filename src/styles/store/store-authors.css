@@ -291,7 +291,7 @@
 /* 作者页页头副行（store-head-sub 之上的独立一行） */
 .marketplace-store-page-sub { margin: -10px 2px 14px; }
 
-@media (max-width: 700px) {
+@container (max-width: 700px) {
   .marketplace-store-author-grid { grid-template-columns: 1fr; }
   .marketplace-store-author-card.has-deck,
   .marketplace-store-author-card.is-switch { width: 300px; }
