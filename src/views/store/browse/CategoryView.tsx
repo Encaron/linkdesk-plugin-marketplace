@@ -32,8 +32,10 @@ export function CategoryView({ slug }: { slug: string }) {
   const { data, prefs, filters, subChip, setSubChip, keepScroll, route, navigate } = useStore();
   const label = localizeCategory((key) => t(key), slug);
   const descKey = CATEGORY_DESC[slug];
-  // 作者跳转字落页（09 §二）：全局分类页＋authorId 预过滤；一次性——rail 重入（无 authorId）即全量
-  const authorId = route.page === "category" ? route.authorId : undefined;
+  // 页主范围（2026-11-22 用户归一化拍板）：官方店 = official 源预过滤，作者店 = authorId 预过滤；
+  // 两者都是「谁的页面只看谁的」；rail 重入（无范围）即全量。
+  const officialOnly = route.page === "category" && route.official === true;
+  const authorId = !officialOnly && route.page === "category" ? route.authorId : undefined;
   const { domain: authorDomain, loading: authorLoading } = useAuthorDomain(
     authorId ?? "",
     data.catalog.entries.length,
@@ -42,6 +44,10 @@ export function CategoryView({ slug }: { slug: string }) {
   const allOfCategory = useMemo(
     () => data.catalog.entries.filter((e) => primaryCategoryOf(e) === slug),
     [data.catalog.entries, slug],
+  );
+  const officialEntries = useMemo(
+    () => allOfCategory.filter((e) => e.official === true),
+    [allOfCategory],
   );
   const authorEntries = useMemo(
     () =>
@@ -52,11 +58,15 @@ export function CategoryView({ slug }: { slug: string }) {
   );
   const bucket = useMemo(
     () =>
-      authorId
-        ? authorEntries.filter((e) => primaryCategoryOf(e) === slug)
-        : allOfCategory,
-    [authorId, authorEntries, allOfCategory, slug],
+      officialOnly
+        ? officialEntries
+        : authorId
+          ? authorEntries.filter((e) => primaryCategoryOf(e) === slug)
+          : allOfCategory,
+    [officialOnly, officialEntries, authorId, authorEntries, allOfCategory, slug],
   );
+  const scoped = officialOnly || !!authorId;
+  const scopedName = officialOnly ? t("官方 Plugin Store") : authorDomain?.name;
   const filtered = useMemo(
     () => applyInstallFilters(bucket, filters, data.statusOf),
     [bucket, filters, data.statusOf],
@@ -138,11 +148,11 @@ export function CategoryView({ slug }: { slug: string }) {
             {t("{{count}} 个插件", { count: 0 })} · {descKey ? t(descKey) : ""}
           </div>
         </div>
-        {authorId && authorDomain && (
+        {scoped && scopedName && (
           <div className="marketplace-store-filterbar">
             <span className="marketplace-store-tb-label">{t("已过滤")}</span>
             <span className="marketplace-store-filter-chip">
-              {authorDomain.name} · 0
+              {scopedName} · 0
               <button
                 type="button"
                 className="marketplace-store-filter-x"
@@ -164,12 +174,12 @@ export function CategoryView({ slug }: { slug: string }) {
         <EmptyState
           icon="dots"
           title={
-            authorId && authorDomain
-              ? t("「{{name}}」在「{{category}}」下暂无插件", { name: authorDomain.name, category: label })
+            scoped && scopedName
+              ? t("「{{name}}」在「{{category}}」下暂无插件", { name: scopedName, category: label })
               : t("「{{name}}」暂无插件", { name: label })
           }
           sub={
-            authorId
+            scoped
               ? t("点上方「显示全部」查看该分类全部插件——逃生门常驻不锁")
               : t("这个分类还没有插件")
           }
@@ -187,15 +197,15 @@ export function CategoryView({ slug }: { slug: string }) {
         <div className="marketplace-store-cat-title">{label}</div>
         <div className="marketplace-store-cat-sub">
           {t("{{count}} 个插件", { count: shown.length })}
-          {authorId ? `（${t("全分类 {{count}}", { count: allOfCategory.length })}）` : ""} ·{" "}
+          {scoped ? `（${t("全分类 {{count}}", { count: allOfCategory.length })}）` : ""} ·{" "}
           {descKey ? t(descKey) : ""}
         </div>
       </div>
-      {authorId && authorDomain && (
+      {scoped && scopedName && (officialOnly || authorDomain) && (
         <div className="marketplace-store-filterbar">
           <span className="marketplace-store-tb-label">{t("已过滤")}</span>
           <span className="marketplace-store-filter-chip">
-            {authorDomain.name} · {bucket.length}
+            {scopedName} · {bucket.length}
             <button
               type="button"
               className="marketplace-store-filter-x"

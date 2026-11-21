@@ -48,7 +48,7 @@ export function HomeView() {
           <SectionHead
             title={t("主题专区")}
             hint={t("一套配方换一个心情")}
-            more={{ label: t("全部主题"), onClick: () => navigate({ page: "category", category: "themes" }) }}
+            more={{ label: t("全部主题"), onClick: () => navigate({ page: "category", category: "themes", official: true }) }}
           />
           <Strip variant="mega" ariaLabel={t("主题专区")}>
             {themes.map((entry: CatalogEntry) => (

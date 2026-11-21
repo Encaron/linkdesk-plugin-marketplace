@@ -34,6 +34,8 @@ export interface StoreReadEntry {
   category?: string;
   categories?: string[];
   sourceName?: string;
+  /** 官方默认目录源条目（官方店「更多」的页主范围判据） */
+  official?: boolean;
   downloadUrl?: string;
   /** 原样声明：免费件无此字段；买断/订阅看 model/price/currency/period */
   pricing?: CatalogEntry["pricing"];
@@ -159,6 +161,7 @@ export async function readStoreState(): Promise<StoreReadState> {
       category: entry.category,
       categories: entry.categories,
       sourceName: entry.sourceName,
+      official: entry.official,
       downloadUrl: entry.downloadUrl,
       pricing: entry.pricing,
       state,
@@ -197,6 +200,11 @@ export async function readStoreState(): Promise<StoreReadState> {
   const visibleEntryIds = (() => {
     switch (route.page) {
       case "category":
+        if (route.official) {
+          return entries
+            .filter((e) => e.official === true && primaryCategoryOf(e) === route.category)
+            .map((e) => e.id);
+        }
         return entries
           .filter(
             (e) =>
@@ -211,14 +219,16 @@ export async function readStoreState(): Promise<StoreReadState> {
         return entries.filter((e) => inStore.has(e.id)).map((e) => e.id);
       }
       case "home": {
-        const banner = catalog.collections.find((c) => c.layout === "banner");
+        const banner = catalog.collections.find((c) => c.official === true && c.layout === "banner");
         const sections = [...catalog.collections]
-          .filter((c) => c.layout !== "banner")
+          .filter((c) => c.official === true && c.layout !== "banner")
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
         return unique([
           ...(banner?.items ?? []).slice(0, 5),
           ...sections.flatMap((c) => c.items),
-          ...entries.filter((e) => primaryCategoryOf(e) === "themes").map((e) => e.id),
+          ...entries
+            .filter((e) => e.official === true && primaryCategoryOf(e) === "themes")
+            .map((e) => e.id),
           ...topByDownloads(8),
         ]);
       }

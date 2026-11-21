@@ -176,9 +176,12 @@ export async function runOpenCategory(args?: unknown): Promise<OpenTabResult> {
   const category = stringArg(args, "category", 0);
   if (!category) return { ok: false, tabId: "" };
   const authorId = stringArg(args, "authorId", 1);
+  const official = asRecord(args).official === true || (Array.isArray(args) && args[2] === true);
   const target: StoreNavTarget = authorId
     ? { page: "category", category, authorId }
-    : { page: "category", category };
+    : official
+      ? { page: "category", category, official: true }
+      : { page: "category", category };
   await publishStoreNav(target, true);
   return openStoreTab();
 }

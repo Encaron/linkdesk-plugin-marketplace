@@ -17,7 +17,7 @@ import { realmSlot } from "./realmSlot";
 
 export type StoreNavTarget =
   | { page: "home" }
-  | { page: "category"; category: string; authorId?: string }
+  | { page: "category"; category: string; authorId?: string; official?: boolean }
   | { page: "rank" }
   | { page: "authors" }
   | { page: "library" }
@@ -73,7 +73,9 @@ export function normalizeStoreNavTarget(raw: unknown): StoreNavTarget | null {
       const category = typeof r.category === "string" ? r.category.trim() : "";
       if (!category) return null;
       const authorId = typeof r.authorId === "string" && r.authorId.trim() ? r.authorId.trim() : undefined;
-      return authorId ? { page: "category", category, authorId } : { page: "category", category };
+      const official = r.official === true ? true : undefined;
+      if (authorId) return { page: "category", category, authorId };
+      return official ? { page: "category", category, official: true } : { page: "category", category };
     }
     case "rank":
       return { page: "rank" };

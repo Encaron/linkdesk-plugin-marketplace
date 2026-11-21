@@ -64,6 +64,13 @@ describe("normalizeStoreNavTarget", () => {
       category: "themes",
       authorId: "linkdesk-fixture-alice",
     });
+    expect(
+      normalizeStoreNavTarget({ page: "category", category: "themes", official: true }),
+    ).toEqual({
+      page: "category",
+      category: "themes",
+      official: true,
+    });
     expect(normalizeStoreNavTarget({ page: "rank" })).toEqual({ page: "rank" });
     expect(normalizeStoreNavTarget({ page: "authors" })).toEqual({ page: "authors" });
     expect(normalizeStoreNavTarget({ page: "library" })).toEqual({ page: "library" });

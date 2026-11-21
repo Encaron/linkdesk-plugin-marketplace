@@ -225,6 +225,11 @@ describe("导航命令 —— 意图信箱 + 标签页", () => {
       () => runOpenCategory({ category: "themes", authorId: "linkdesk-fixture-alice" }),
       { page: "category", category: "themes", authorId: "linkdesk-fixture-alice" },
     ],
+    [
+      "openCategory(+official 对象形)",
+      () => runOpenCategory({ category: "themes", official: true }),
+      { page: "category", category: "themes", official: true },
+    ],
     ["openRank", () => runOpenRank(), { page: "rank" }],
     ["openAuthors", () => runOpenAuthors(), { page: "authors" }],
     ["openLibrary", () => runOpenLibrary(), { page: "library" }],

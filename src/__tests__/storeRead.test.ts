@@ -77,6 +77,7 @@ beforeEach(() => {
         authorId: "linkdesk-fixture-alice",
         category: "themes",
       }),
+      entry({ id: "demo-official-dev", name: "官方开发件", author: "官方", category: "development", official: true }),
     ],
     collections: [{ id: "col-bob", title: "Bob 的效率双件", layout: "duo", items: ["demo-bundle", "demo-sub"] }],
     railOrder: ["development", "productivity", "other"],
@@ -171,7 +172,7 @@ describe("readStoreState —— AI 读取面", () => {
       },
     ]);
     expect(s.sources).toHaveLength(2);
-    expect(s.counts).toEqual({ entries: 6, installed: 2, updates: 0, authors: 1, remoteSources: 1 });
+    expect(s.counts).toEqual({ entries: 7, installed: 2, updates: 0, authors: 1, remoteSources: 1 });
   });
 });
 
@@ -182,14 +183,20 @@ describe("visibleEntryIds —— 各页可见切片", () => {
     expect(s.visibleEntryIds).toEqual(
       expect.arrayContaining(["demo-bundle", "demo-sub", "demo-alice-theme", "demo-installed"]),
     );
-    expect(s.visibleEntryIds).toHaveLength(6);
+    expect(s.visibleEntryIds).toHaveLength(7);
     expect(s.visibleAuthorIds).toEqual(["linkdesk-fixture-alice"]);
   });
 
   it("排行榜：全源 Top（无缓存计数时按名稳定排序，最多 50）", async () => {
     mocks.route = { page: "rank" };
     const s = await readStoreState();
-    expect(s.visibleEntryIds).toHaveLength(6);
+    expect(s.visibleEntryIds).toHaveLength(7);
+  });
+
+  it("官方分类：只留 official 源（官方店「更多」落页）", async () => {
+    mocks.route = { page: "category", category: "development", official: true };
+    const s = await readStoreState();
+    expect(s.visibleEntryIds).toEqual(["demo-official-dev"]);
   });
 
   it("库：已装/停用 ∪ 已购未安装（不含未购主题）", async () => {

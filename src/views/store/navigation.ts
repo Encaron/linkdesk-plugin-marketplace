@@ -19,6 +19,8 @@ export interface StoreRoute {
   query?: string;
   authorId?: string;
   repoId?: string;
+  /** 官方店主的分类预过滤（与 authorId 互斥；分类落页的页主范围统一参数） */
+  official?: boolean;
 }
 
 export const HOME_ROUTE: StoreRoute = { page: "home" };
@@ -27,10 +29,12 @@ export const HOME_ROUTE: StoreRoute = { page: "home" };
 export function routeKey(route: StoreRoute): string {
   switch (route.page) {
     case "category":
-      // 作者跳转字落页（authorId 预过滤）与全量分类页是两条浏览条件——滚动位分开记忆
+      // 页主范围（作者 / 官方）与全量分类页是三条浏览条件——滚动位分开记忆
       return route.authorId
         ? `cat:${route.category ?? ""}:${route.authorId}`
-        : `cat:${route.category ?? ""}`;
+        : route.official
+          ? `cat:${route.category ?? ""}:official`
+          : `cat:${route.category ?? ""}`;
     case "search":
       return "search";
     case "author":
@@ -62,7 +66,9 @@ export function routeFromNav(t: StoreNavTarget): StoreRoute {
     case "category":
       return t.authorId
         ? { page: "category", category: t.category, authorId: t.authorId }
-        : { page: "category", category: t.category };
+        : t.official
+          ? { page: "category", category: t.category, official: true }
+          : { page: "category", category: t.category };
     case "rank":
       return { page: "rank" };
     case "authors":
@@ -86,7 +92,9 @@ export function routeToNavTarget(route: StoreRoute): StoreNavTarget {
     case "category":
       return route.authorId
         ? { page: "category", category: route.category ?? "", authorId: route.authorId }
-        : { page: "category", category: route.category ?? "" };
+        : route.official
+          ? { page: "category", category: route.category ?? "", official: true }
+          : { page: "category", category: route.category ?? "" };
     case "rank":
       return { page: "rank" };
     case "authors":
@@ -113,6 +121,7 @@ export function sameRoute(a: StoreRoute, b: StoreRoute): boolean {
     (a.category ?? "") === (b.category ?? "") &&
     (a.query ?? "") === (b.query ?? "") &&
     (a.authorId ?? "") === (b.authorId ?? "") &&
+    (a.official === true) === (b.official === true) &&
     (a.repoId ?? "") === (b.repoId ?? "")
   );
 }

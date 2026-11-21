@@ -51,6 +51,11 @@ describe("routeFromNav / routeToNavTarget / sameRoute", () => {
       category: "themes",
       authorId: "linkdesk-fixture-alice",
     });
+    expect(routeFromNav({ page: "category", category: "themes", official: true })).toEqual({
+      page: "category",
+      category: "themes",
+      official: true,
+    });
     expect(routeFromNav({ page: "rank" })).toEqual({ page: "rank" });
     expect(routeFromNav({ page: "authors" })).toEqual({ page: "authors" });
     expect(routeFromNav({ page: "library" })).toEqual({ page: "library" });
@@ -66,6 +71,11 @@ describe("routeFromNav / routeToNavTarget / sameRoute", () => {
       page: "category",
       category: "themes",
       authorId: "a",
+    });
+    expect(routeToNavTarget({ page: "category", category: "themes", official: true })).toEqual({
+      page: "category",
+      category: "themes",
+      official: true,
     });
     expect(routeToNavTarget({ page: "author", authorId: "a", repoId: "r" })).toEqual({
       page: "author",

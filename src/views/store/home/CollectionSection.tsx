@@ -11,12 +11,28 @@ import { CollectionRenderer } from "../CollectionRenderer";
 import { useStore } from "../StoreContext";
 
 export function CollectionSection({ collection }: { collection: CollectionDecl }) {
-  const { data } = useStore();
+  const { data, navigate } = useStore();
   const items = useMemo(() => {
     const byId = new Map(data.catalog.entries.map((e) => [e.id, e]));
     return collection.items.map((id) => byId.get(id)).filter((e): e is CatalogEntry => !!e);
   }, [collection, data.catalog.entries]);
-  return <CollectionRenderer collection={collection} items={items} />;
+  // 官方合集声明的「更多」也按页主范围落页：官方店 = official 源预过滤（2026-11-22 归一化拍板）
+  const more = useMemo(() => {
+    const label = collection.more?.label;
+    const target = collection.more?.target;
+    if (!label || !target) return undefined;
+    if (target === "rank") return { label, onClick: () => navigate({ page: "rank" }) };
+    if (target.startsWith("category:")) {
+      const slug = target.slice("category:".length);
+      if (!slug) return undefined;
+      return {
+        label,
+        onClick: () => navigate({ page: "category", category: slug, official: true }),
+      };
+    }
+    return undefined;
+  }, [collection.more, navigate]);
+  return <CollectionRenderer collection={collection} items={items} more={more} />;
 }
 
 export default CollectionSection;

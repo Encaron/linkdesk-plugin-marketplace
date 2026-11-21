@@ -44,7 +44,7 @@
         "id": "marketplace.openCategory",
         "title": "打开分类",
         "category": "插件市场",
-        "description": "打开插件市场并导航到某分类页（rail 分类 slug，如 development/hardware/themes）；可选 authorId 只显示该作者的插件（作者店「更多」落页）。回执 {ok, tabId}",
+        "description": "打开插件市场并导航到某分类页（rail 分类 slug，如 development/hardware/themes）；可选 authorId/official 按页主范围预过滤（作者店/官方店的「更多」落页）。回执 {ok, tabId}",
         "params": [
           {
             "name": "category",
@@ -56,6 +56,11 @@
             "name": "authorId",
             "type": "string",
             "description": "可选：作者聚合键——只显示该作者在该分类下的插件（不传 = 全量分类页）"
+          },
+          {
+            "name": "official",
+            "type": "boolean",
+            "description": "可选：true = 只显示官方源在该分类下的插件（官方店「更多」落页；与 authorId 互斥）"
           }
         ]
       },
