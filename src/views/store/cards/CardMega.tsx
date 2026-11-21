@@ -60,7 +60,12 @@ export const CardMega = memo(function CardMega({
         <div className="marketplace-store-cm-band-row">
           <BadgeRow badges={badgesOfCard(entry, ctx)} />
           <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
-          <MoreMenu items={items} onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))} />
+          <MoreMenu
+            pluginId={entry.id}
+            disabled={ctx.state === "disabled"}
+            items={items}
+            onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))}
+          />
         </div>
       </div>
     </div>

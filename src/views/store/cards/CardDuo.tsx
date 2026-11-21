@@ -51,7 +51,12 @@ export function CardDuo({
         <CornerTag baseClass="marketplace-ui-corner marketplace-store-cd-corner" tag={status} />
         <div className="marketplace-store-cd-acts">
           <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
-          <MoreMenu items={items} onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))} />
+          <MoreMenu
+            pluginId={entry.id}
+            disabled={ctx.state === "disabled"}
+            items={items}
+            onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))}
+          />
         </div>
       </div>
       <Art entry={entry} identity={ctx.installedIdentity} className="is-duo" />

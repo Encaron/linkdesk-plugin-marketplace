@@ -73,7 +73,12 @@ export const CardGrid = memo(function CardGrid({
             <div className="marketplace-store-x-cat">{tAuthor(entry)}</div>
           </div>
           <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
-          <MoreMenu items={items} onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))} />
+          <MoreMenu
+            pluginId={entry.id}
+            disabled={ctx.state === "disabled"}
+            items={items}
+            onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))}
+          />
         </div>
         {entry.description && <div className="marketplace-store-x-desc">{entry.description}</div>}
         <div className="marketplace-store-x-badges">

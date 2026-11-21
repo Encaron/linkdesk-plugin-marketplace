@@ -1,13 +1,14 @@
 /**
- * MoreMenu — 卡片「⋯」菜单的**唯一实现**（五卡同构）。
+ * MoreMenu — 卡片「⋯」菜单的**唯一实现**。
  *
- * 🔴 F21（2026-11-21 用户定稿「橱窗判据」）：菜单本体＝**共享 `<ContextMenu>`**（@linkdesk/ui）
- *    ——此前卡内绝对定位自绘版被横滚容器裁剪（「查看详情/禁用」下半截被切的真机实拍）＋玻璃下
- *    半透透底；共享件浮层根内永不裁剪＋玻璃皮现成＋外点/Esc/子菜单/快捷键标注全白得。
- *    ⛔ 回退卡内自绘面板（同型裁剪必复发）。
- * 项仍由纯函数 `moreMenuItems()` 推导（随装态）；**disabled 项不渲染**（ContextMenu 无置灰形态——
- *    core 的卸载项直接隐藏＝诚实；置灰原因留在卡面动作钮上）。
- * 整卡＝开详情，菜单动作不能误触：按钮/菜单动作 `stopPropagation`。
+ * 🔴 F21b（2026-11-21 用户抓「一套逻辑两个实现」）：菜单**不再手工拼项**——与侧栏齿轮菜单共用
+ *   同一份 `marketplaceItemGear` 注册表（`services/marketplaceShared/commands.ts` 里的 registerItems）：
+ *   - 当条件（`marketplace.extensionHasThemes/Languages/Config…`）→ 主题/语言/设置子菜单自动出现；
+ *   - `group:"delete"` → 卸载自动红（与侧栏完全同色同交互）；
+ *   - 快捷键/图标/禁用态全由壳菜单机制一处提供。
+ *   卡片这边只做两件事：打开前按插件 manifest 设 context key、打开后清理。
+ *   未安装条目没有可管理项 ⇒ 只给「查看详情」（onSelect 注入项）。
+ * 菜单本体走共享 `<ContextMenu>`（浮层根内，永不裁剪）；外观仍为原磨砂（本笔零视觉改动）。
  */
 
 import { useRef, useState } from "react";
@@ -16,32 +17,60 @@ import { useTranslation } from "react-i18next";
 import type { MenuItemDescriptor } from "@linkdesk/contracts";
 import { Icon } from "./icons";
 import type { ActionId, MoreItem } from "./ActionButton";
+import {
+  applyExtensionMenuContext,
+  clearExtensionMenuContext,
+  EXTENSION_MENU_ID,
+  findInstalledPlugin,
+} from "../services/extensionMenu";
 
 export function MoreMenu({
+  pluginId,
   items,
   onSelect,
+  disabled,
   className,
 }: {
+  /** 条目 pluginId（注册表菜单的 context） */
+  pluginId: string;
   items: MoreItem[];
   onSelect: (id: ActionId) => void;
+  /** 已禁用态（context key `marketplace.pluginDisabled` 用） */
+  disabled?: boolean;
   className?: string;
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [anchor, setAnchor] = useState({ x: 0, y: 0 });
+  /** 已装条目 → 走共享注册表菜单；未装 → 只给「查看详情」注入项 */
+  const [registered, setRegistered] = useState<boolean | null>(null);
   const btnRef = useRef<HTMLButtonElement | null>(null);
 
-  const openMenu = () => {
+  const openMenu = async () => {
     const r = btnRef.current?.getBoundingClientRect();
     if (r) setAnchor({ x: r.right, y: r.bottom + 4 });
+    // 侧栏列表可能尚未预热 ⇒ 拉一次再判定（未装条目只给「查看详情」）
+    const installed = await findInstalledPlugin(pluginId);
+    if (installed) {
+      applyExtensionMenuContext(installed.manifest, !!disabled);
+      setRegistered(true);
+    } else {
+      setRegistered(false);
+    }
     setOpen(true);
   };
 
-  /** MoreItem → 注入描述符：onSelect 池侧回调（关菜单→派发动作）；disabled 项不渲染 */
-  const descriptors: MenuItemDescriptor[] = items
-    .filter((m) => !m.disabled)
+  const closeMenu = () => {
+    if (registered) clearExtensionMenuContext();
+    setOpen(false);
+    setRegistered(null);
+  };
+
+  /** 未装条目的最小菜单（注入项；onSelect 就地回调） */
+  const fallback: MenuItemDescriptor[] = items
+    .filter((m) => m.id === "open")
     .map((m) => ({
-      command: "", // 仅作 id 载体；动作走 onSelect（不注册壳命令）
+      command: "",
       label: t(m.labelKey),
       group: t("更多动作"),
       onSelect: () => {
@@ -62,19 +91,28 @@ export function MoreMenu({
         aria-expanded={open}
         onClick={(e) => {
           e.stopPropagation();
-          if (open) setOpen(false);
-          else openMenu();
+          if (open) closeMenu();
+          else void openMenu();
         }}
       >
         <Icon name="dots" size="sm" />
       </button>
-      {open && (
+      {open && registered === true && (
+        <ContextMenu
+          menuId={EXTENSION_MENU_ID}
+          anchor={anchor}
+          context={{ pluginId }}
+          variant="non-modal"
+          onClose={closeMenu}
+        />
+      )}
+      {open && registered === false && (
         <ContextMenu
           menuId="marketplace-more"
           anchor={anchor}
           variant="non-modal"
-          onClose={() => setOpen(false)}
-          items={descriptors}
+          onClose={closeMenu}
+          items={fallback}
         />
       )}
     </div>

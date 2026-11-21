@@ -7,31 +7,11 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ContextMenu, PluginIcon, pickIdentityArt } from "@linkdesk/ui";
+import { applyExtensionMenuContext, clearExtensionMenuContext } from "../services/extensionMenu";
 // E5.8#20-c：契约化——插件列表类型走 @linkdesk/contracts（零 @src/core）
 import type { PluginListEntry, PluginListSubset } from "@linkdesk/contracts";
 
 const pm = () => window.linkdesk?.pluginManager;
-
-/** 齿轮菜单打开时设置 context key（菜单项 when 条件消费） */
-function applyExtensionContextKeys(manifest: PluginListSubset, isDisabled: boolean): void {
-  const c = manifest?.contributes ?? {};
-  window.linkdesk?.contextKey?.set("marketplace.pluginDisabled", isDisabled);
-  window.linkdesk?.contextKey?.set("marketplace.extensionHasThemes", !!c.themes);
-  window.linkdesk?.contextKey?.set("marketplace.extensionHasLanguages", !!c.languages);
-  window.linkdesk?.contextKey?.set("marketplace.extensionHasIconThemes", !!c.iconThemes);
-  window.linkdesk?.contextKey?.set("marketplace.extensionHasConfiguration", !!c.configuration);
-  window.linkdesk?.contextKey?.set("marketplace.extensionHasKeybindings", !!c.keybindings);
-}
-
-/** 齿轮菜单关闭时清理 context key */
-function clearExtensionContextKeys(): void {
-  window.linkdesk?.contextKey?.set("marketplace.pluginDisabled", false);
-  window.linkdesk?.contextKey?.set("marketplace.extensionHasThemes", false);
-  window.linkdesk?.contextKey?.set("marketplace.extensionHasLanguages", false);
-  window.linkdesk?.contextKey?.set("marketplace.extensionHasIconThemes", false);
-  window.linkdesk?.contextKey?.set("marketplace.extensionHasConfiguration", false);
-  window.linkdesk?.contextKey?.set("marketplace.extensionHasKeybindings", false);
-}
 
 interface ExtensionItemProps {
   plugin: PluginListEntry;
@@ -67,7 +47,7 @@ export function ExtensionItem({ plugin, onClick, onDoubleClick, updateTo }: Exte
     e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     const disabled = await pm().isDisabled(plugin.pluginId);
-    applyExtensionContextKeys(plugin.manifest, disabled);
+    applyExtensionMenuContext(plugin.manifest, disabled);
     setGearMenuAnchor({ x: rect.right, y: rect.bottom });
   };
 
@@ -119,7 +99,7 @@ export function ExtensionItem({ plugin, onClick, onDoubleClick, updateTo }: Exte
               anchor={gearMenuAnchor}
               context={{ pluginId: plugin.pluginId }}
               onClose={() => {
-                clearExtensionContextKeys();
+                clearExtensionMenuContext();
                 setGearMenuAnchor(null);
               }}
             />

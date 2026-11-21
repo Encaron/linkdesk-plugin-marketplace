@@ -70,7 +70,12 @@ export const RankRow = memo(function RankRow({
       {dl && <span className="marketplace-store-rr-dl">▾ {dl}</span>}
       <span className="marketplace-store-rr-act">
         <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
-        <MoreMenu items={items} onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))} />
+        <MoreMenu
+            pluginId={entry.id}
+            disabled={ctx.state === "disabled"}
+            items={items}
+            onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))}
+          />
       </span>
     </div>
   );
