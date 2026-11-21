@@ -5,7 +5,7 @@
 
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { ActionButton, BadgeRow, CornerTag, entryHue, MoreMenu } from "../../../ui";
+import { ActionButton, restatesState, BadgeRow, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import {
   actionOfCard,
@@ -60,29 +60,29 @@ export const CardGrid = memo(function CardGrid({
       </div>
       {dl && (
         <div className="marketplace-store-cg-stats">
-          <span data-hint={t("下载量")}>
+          <span className="marketplace-store-cg-dl" data-hint={t("下载量")}>
             ▾ {dl}
           </span>
         </div>
       )}
       <div className="marketplace-store-x-over">
-        <div className="marketplace-store-x-head">
-          <Tile entry={entry} identity={ctx.installedIdentity} />
-          <div className="marketplace-store-fx1">
-            <div className="marketplace-store-x-name">{entry.name}</div>
-            <div className="marketplace-store-x-cat">{tAuthor(entry)}</div>
+        {/* 归一化（F30）：展开面只放**新增信息**——图标/名/作者已在主面，⛔ 不再复制一份 */}
+        <div className="marketplace-store-x-more">
+          {entry.description && <div className="marketplace-store-x-desc">{entry.description}</div>}
+          <div className="marketplace-store-x-badges">
+            <BadgeRow badges={badgesOfCard(entry, ctx)} />
           </div>
-          <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
-          <MoreMenu
-            pluginId={entry.id}
-            disabled={ctx.state === "disabled"}
-            items={items}
-            onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))}
-          />
-        </div>
-        {entry.description && <div className="marketplace-store-x-desc">{entry.description}</div>}
-        <div className="marketplace-store-x-badges">
-          <BadgeRow badges={badgesOfCard(entry, ctx)} />
+          <div className="marketplace-store-x-acts">
+            {!(ctx.state === "installed" && restatesState(action)) && (
+            <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
+          )}
+            <MoreMenu
+              pluginId={entry.id}
+              disabled={ctx.state === "disabled"}
+              items={items}
+              onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))}
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@
 
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { ActionButton, BadgeRow, CornerTag, entryHue, MoreMenu } from "../../../ui";
+import { ActionButton, restatesState, BadgeRow, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import {
   actionOfCard,
@@ -59,7 +59,9 @@ export const CardMega = memo(function CardMega({
         {entry.description && <div className="marketplace-store-cm-band-desc">{entry.description}</div>}
         <div className="marketplace-store-cm-band-row">
           <BadgeRow badges={badgesOfCard(entry, ctx)} />
-          <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
+          {!(ctx.state === "installed" && restatesState(action)) && (
+            <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
+          )}
           <MoreMenu
             pluginId={entry.id}
             disabled={ctx.state === "disabled"}

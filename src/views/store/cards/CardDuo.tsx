@@ -4,7 +4,7 @@
  */
 
 import { useTranslation } from "react-i18next";
-import { ActionButton, CornerTag, entryHue, MoreMenu } from "../../../ui";
+import { ActionButton, restatesState, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import {
   actionOfCard,
@@ -50,7 +50,9 @@ export function CardDuo({
         {entry.description && <div className="marketplace-store-cd-desc">{entry.description}</div>}
         <CornerTag baseClass="marketplace-ui-corner marketplace-store-cd-corner" tag={status} />
         <div className="marketplace-store-cd-acts">
-          <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
+          {!(ctx.state === "installed" && restatesState(action)) && (
+            <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
+          )}
           <MoreMenu
             pluginId={entry.id}
             disabled={ctx.state === "disabled"}

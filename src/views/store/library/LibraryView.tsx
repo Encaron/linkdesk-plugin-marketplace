@@ -23,6 +23,7 @@ import {
   MoreMenu,
   moreMenuItems,
   resolveAction,
+  restatesState,
   SORT_SETS,
   SortChips,
   ViewSeg,
@@ -38,7 +39,7 @@ import { installJobLabel } from "../../../services/installJobs";
 import type { LibSort } from "../../../services/marketplaceShared/uiPrefs";
 import { bulkDisable, bulkUninstall, markAllDiscoverRead, updateAll } from "../../../services/libraryActions";
 import { CardGrid } from "../cards/CardGrid";
-import { cardKeyDown, type StoreCardContext } from "../cards/cardParts";
+import { cardKeyDown, Tile, type StoreCardContext } from "../cards/cardParts";
 import { useStore } from "../StoreContext";
 import {
   buildLibraryRows,
@@ -199,6 +200,9 @@ export function LibraryView() {
   const renderRow = (row: LibraryRow) => {
     const ctx = data.ctxOf(row.entry);
     const badge = badgeOfRow(row);
+    const act = rowAction(row, ctx, t);
+    // F32（2026-11-21）：状态由徽标一处出口——「已安装」动作钮不再渲染（同一事实画两遍）
+    const redundantAct = restatesState(act);
     return (
       <div
         key={row.entry.id}
@@ -222,6 +226,8 @@ export function LibraryView() {
             onClick={(e) => e.stopPropagation()}
           />
         )}
+        {/* F31（2026-11-21）：库是管理中枢——图标是主信息源（扫一眼就认），不再只有文字 */}
+        <Tile entry={row.entry} identity={ctx.installedIdentity} />
         <span className="marketplace-store-lib-main">
           <span className="marketplace-store-lib-name">
             {row.entry.name}
@@ -238,8 +244,12 @@ export function LibraryView() {
           <Badge desc={badge} />
         </span>
         <span className="marketplace-store-lib-act">
-          <ActionButton action={rowAction(row, ctx, t)} onAct={(id) => actions.onAct(row.entry, id)} />
+          {!redundantAct && (
+            <ActionButton action={act} onAct={(id) => actions.onAct(row.entry, id)} />
+          )}
           <MoreMenu
+            pluginId={row.entry.id}
+            disabled={row.state === "disabled"}
             items={moreMenuItems(row.entry, { state: row.state, core: row.core })}
             onSelect={(id) => (id === "open" ? actions.onOpen(row.entry) : actions.onAct(row.entry, id))}
           />
@@ -295,8 +305,8 @@ export function LibraryView() {
           />
         </div>
         {/* F17（2026-11-21 橱窗判据）：原生 select → 共享 SelectBox（Chrome 原生皮在玻璃/主题下穿帮） */}
+        {/* F34（2026-11-21）：共享 SelectBox 自带皮肤——⛔ 不传自定义 class（双层 border/background = 两侧白边） */}
         <SelectBox
-          className="marketplace-store-lib-select"
           title={t("状态筛选")}
           value={filters.status}
           options={[
@@ -308,7 +318,6 @@ export function LibraryView() {
           onChange={(v) => setFilters({ ...filters, status: v as LibFilters["status"] })}
         />
         <SelectBox
-          className="marketplace-store-lib-select"
           title={t("来源筛选")}
           value={filters.source}
           options={[
@@ -320,14 +329,12 @@ export function LibraryView() {
           onChange={(v) => setFilters({ ...filters, source: v as LibSourceFilter })}
         />
         <SelectBox
-          className="marketplace-store-lib-select"
           title={t("作者筛选")}
           value={filters.author}
           options={[{ value: "all", label: t("全部作者") }, ...authors.map((a) => ({ value: a, label: a }))]}
           onChange={(v) => setFilters({ ...filters, author: v })}
         />
         <SelectBox
-          className="marketplace-store-lib-select"
           title={t("仓库筛选")}
           value={filters.repo}
           options={[{ value: "all", label: t("全部仓库") }, ...repos.map((r) => ({ value: r, label: r }))]}
@@ -468,6 +475,7 @@ export function LibraryView() {
                   onClick={() => actions.onOpen(entry)}
                   onKeyDown={(e) => cardKeyDown(e, () => actions.onOpen(entry))}
                 >
+                  <Tile entry={entry} identity={ctx.installedIdentity} />
                   <span className="marketplace-store-lib-main">
                     <span className="marketplace-store-lib-name">{entry.name}</span>
                     <span className="marketplace-store-lib-sub">{t("已购未安装")}</span>

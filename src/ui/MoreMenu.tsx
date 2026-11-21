@@ -66,9 +66,11 @@ export function MoreMenu({
     setRegistered(null);
   };
 
-  /** 未装条目的最小菜单（注入项；onSelect 就地回调） */
+  /** 注入项回退（F33 · 2026-11-21）：注册表不可用时**不再只给「查看详情」**——
+      调用方注入的完整动作集（查看详情/启用/禁用/卸载…）原样呈现；禁用态项不出（title 已由主面提示）。
+      ⛔ 两条路（注册表/注入项）保持同一份动作语义，别让库与分类页长出两套菜单。 */
   const fallback: MenuItemDescriptor[] = items
-    .filter((m) => m.id === "open")
+    .filter((m) => !m.disabled)
     .map((m) => ({
       command: "",
       label: t(m.labelKey),

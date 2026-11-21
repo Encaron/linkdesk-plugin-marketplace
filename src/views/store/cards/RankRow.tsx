@@ -5,7 +5,7 @@
 
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { ActionButton, CornerTag, entryHue, MoreMenu } from "../../../ui";
+import { ActionButton, restatesState, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import {
   actionOfCard,
@@ -67,15 +67,20 @@ export const RankRow = memo(function RankRow({
         </div>
       </div>
       <CornerTag baseClass="marketplace-ui-corner marketplace-store-rr-corner" tag={status} />
-      {dl && <span className="marketplace-store-rr-dl">▾ {dl}</span>}
-      <span className="marketplace-store-rr-act">
-        <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
-        <MoreMenu
+      {/* F26 单槽：下载量与动作钮在同一个槽里互斥——⛔ 不再绝对定位压到价格角标上 */}
+      <span className="marketplace-store-rr-slot">
+        {dl && <span className="marketplace-store-rr-dl">▾ {dl}</span>}
+        <span className="marketplace-store-rr-act">
+          {!(ctx.state === "installed" && restatesState(action)) && (
+            <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
+          )}
+          <MoreMenu
             pluginId={entry.id}
             disabled={ctx.state === "disabled"}
             items={items}
             onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))}
           />
+        </span>
       </span>
     </div>
   );

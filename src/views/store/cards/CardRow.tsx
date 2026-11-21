@@ -5,7 +5,7 @@
 
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
-import { ActionButton, Badge, entryHue, MoreMenu, sourceBadge } from "../../../ui";
+import { ActionButton, restatesState, Badge, entryHue, MoreMenu, sourceBadge } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import {
   actionOfCard,
@@ -60,7 +60,9 @@ export const CardRow = memo(function CardRow({
           ▾ {dl}
         </span>
       )}
-      <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
+      {!(ctx.state === "installed" && restatesState(action)) && (
+            <ActionButton action={action} onAct={(id) => handlers.onAct(entry, id)} />
+          )}
       <MoreMenu
             pluginId={entry.id}
             disabled={ctx.state === "disabled"}

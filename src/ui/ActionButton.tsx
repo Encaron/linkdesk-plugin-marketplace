@@ -116,7 +116,8 @@ export function resolveAction(entry: CatalogEntry, ctx: ActionContext): Resolved
   if (job?.state === "running") {
     return {
       id: "cancel",
-      labelKey: "安装中 {{label}}",
+      // F32（2026-11-21）：jobLabel 已自带阶段名（下载中 62%/解压中…）——⛔ 不再外面再套「安装中」
+      labelKey: "{{label}}",
       params: { label: ctx.jobLabel ?? "" },
       kind: "primary",
       busy: true,
@@ -180,6 +181,15 @@ export function moreMenuItems(entry: CatalogEntry, ctx: Pick<ActionContext, "sta
 }
 
 /* ═══ 渲染件 ═══ */
+
+/**
+ * F32 归一化（2026-11-21）：某动作只是在**复述状态**时，动作槽不再渲染它——
+ * 「已安装」已由角标（statusTag）/徽标（Badge）唯一出口，动作钮再写一遍 = 同一事实画两遍。
+ * ⛔ 不在各卡型里各判一次：所有卡面/库行共用这一个判据。
+ */
+export function restatesState(action: ResolvedAction): boolean {
+  return action.id === "install" && action.labelKey === "已安装";
+}
 
 export function ActionButton({
   action,

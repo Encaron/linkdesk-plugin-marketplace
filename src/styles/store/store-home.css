@@ -23,6 +23,9 @@
 .marketplace-store-hero:hover {
   transform: scale(1.02);
   box-shadow: 0 14px 60px -8px color-mix(in srgb, var(--marketplace-hue, transparent) 75%, transparent), var(--shadow-pop);
+  /* 卡面语言唯一出处（store-shell）：hero 与卡/行同一套磨砂——⛔ 不再只有它没有玻璃 */
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
   z-index: 30;
 }
 .marketplace-store-hero-track {
@@ -180,7 +183,7 @@
   color: var(--text-secondary);
 }
 .marketplace-store-author-empty:hover {
-  transform: scale(1.03);
+  /* 抬升/磨砂走 store-shell 唯一出处；这里只补引导卡自己的强调色 */
   border-color: var(--accent-hover);
   box-shadow: var(--shadow-pop);
 }
@@ -212,7 +215,7 @@
   cursor: pointer;
 }
 .marketplace-store-cat-tile:hover {
-  transform: scale(1.08);
+  /* 抬升幅度 = store-shell 声明表（--surface-scale: 1.08）；这里只补分类瓷片的强调阴影 */
   box-shadow: 0 12px 44px -8px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 .marketplace-store-ct-icon {

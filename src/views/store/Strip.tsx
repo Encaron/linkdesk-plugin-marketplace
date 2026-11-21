@@ -42,6 +42,43 @@ export function Strip({
     if (!row) return;
     sync();
     row.addEventListener("scroll", sync, { passive: true });
+
+    /* F27b（2026-11-21）：纵向滚轮 → 横向滚动；**到端放行**（⛔ 把页面的纵向滚动困在横排里） */
+    const onWheel = (ev: WheelEvent) => {
+      if (Math.abs(ev.deltaY) <= Math.abs(ev.deltaX)) return; // 原生横滑（触控板）交给浏览器
+      const max = row.scrollWidth - row.clientWidth;
+      if (max <= 1) return;
+      const atStart = row.scrollLeft <= 0;
+      const atEnd = row.scrollLeft >= max - 1;
+      if ((ev.deltaY > 0 && atEnd) || (ev.deltaY < 0 && atStart)) return;
+      ev.preventDefault();
+      row.scrollLeft += ev.deltaY;
+    };
+    row.addEventListener("wheel", onWheel, { passive: false });
+
+    /* F28（用户裁决 2026-11-21）：peek 卡——悬停/聚焦时若卡片未完整可见（留 20px 展开余量），
+       先吸附到完整可见再展开；吸附后 320ms 内不再触发，避免指针落到新卡上连跳。 */
+    let snapLock = 0;
+    const snap = (target: EventTarget | null) => {
+      const el = target instanceof Element ? target.closest<HTMLElement>(".marketplace-store-card, .marketplace-store-rank-row") : null;
+      if (!el) return;
+      const now = performance.now();
+      if (now < snapLock) return;
+      const r = el.getBoundingClientRect();
+      const v = row.getBoundingClientRect();
+      const pad = 20;
+      let delta = 0;
+      if (r.left < v.left + pad) delta = r.left - (v.left + pad);
+      else if (r.right > v.right - pad) delta = r.right - (v.right - pad);
+      if (Math.abs(delta) < 2) return;
+      snapLock = now + 320;
+      row.scrollBy({ left: delta, behavior: "smooth" });
+    };
+    const onOver = (ev: Event) => snap(ev.target);
+    const onFocusIn = (ev: Event) => snap(ev.target);
+    row.addEventListener("pointerover", onOver);
+    row.addEventListener("focusin", onFocusIn);
+
     let ro: ResizeObserver | null = null;
     if (typeof ResizeObserver !== "undefined") {
       ro = new ResizeObserver(sync);
@@ -49,6 +86,9 @@ export function Strip({
     }
     return () => {
       row.removeEventListener("scroll", sync);
+      row.removeEventListener("wheel", onWheel);
+      row.removeEventListener("pointerover", onOver);
+      row.removeEventListener("focusin", onFocusIn);
       ro?.disconnect();
     };
   }, [sync]);

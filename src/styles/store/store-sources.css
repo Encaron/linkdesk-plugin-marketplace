@@ -312,6 +312,8 @@
   text-decoration: underline;
   padding: 0;
   margin: 6px 2px 0;
+  /* F38（300px 普查）：模板/文档类短链接单行——⛔ 不许两字挤成两行 */
+  white-space: nowrap;
 }
 .marketplace-store-m-link:hover { color: var(--text-primary); }
 .marketplace-store-m-link.is-inline { margin: 0 0 0 6px; font-size: 11px; }

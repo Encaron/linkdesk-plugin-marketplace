@@ -32,6 +32,7 @@ export {
   ActionButton,
   resolveAction,
   moreMenuItems,
+  restatesState,
   type ActionContext,
   type ActionId,
   type MoreItem,

@@ -30,7 +30,11 @@
         = Chromium 121+ 会忽略 webkit 伪元素（样式不生效）。
    ⛔ 只在个别页面补丁＝未归一化；新组件落码前先过这四条。 */
 
-.marketplace-store :is(h1, h2, h3, p, b, span, button) { min-width: 0; }
+/* 低频基底（F36 · 2026-11-21）：此前写成 `.marketplace-store :is(span,…)`（0,1,1），
+   比所有卡/行的类规则（0,1,0）都高 ⇒ 库行 `min-width:160px`、排行槽 `min-width:132px` 等地板被静默吃掉。
+   正解 = `:where()` 把**元素侧**特异性清零（保留 `.marketplace-store` 这一层类锚），
+   于是本仓后续样式表里的类声明（同 0,1,0、来源更晚）都能正常覆盖它。 */
+.marketplace-store :where(h1, h2, h3, p, b, span, button) { min-width: 0; }
 /* 短标签（2–4 字）一律单行：竖排比截断更难看（300px 容器普查唯一剩下的 6 处就是这类） */
 .marketplace-store-tb-label,
 .marketplace-ui-corner,
@@ -349,8 +353,18 @@
   font-weight: 600;
   letter-spacing: -0.01em;
   margin: 0;
+  /* F38（300px 普查）：标题是板块名，⛔ 不许被副题压成两字一行 */
+  flex: none;
+  white-space: nowrap;
 }
-.marketplace-store-sec-hint { color: var(--text-muted); font-size: var(--font-size-2xs); }
+.marketplace-store-sec-hint {
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .marketplace-store-sec-more {
   margin-left: auto;
   font-size: var(--font-size-md);
@@ -396,6 +410,56 @@
   font-size: var(--font-size-xs);
 }
 .marketplace-store-cat-note .marketplace-ui-ic { color: var(--warning); flex: none; }
+
+/* ═══ 卡面语言（唯一出处 · 2026-11-21 用户裁决：统一磨砂玻璃＋单份内容＋声明式抬升）═══
+   1) 面 = 半透底（--bg-card）；**hover/focus = 磨砂玻璃＋抬升**——磨砂是「凸出来」的语言。
+      所有卡面/行面/hero 共用这一条，⛔ 各卡型不再各写 backdrop-filter。
+   2) 抬升幅度只由变体声明一行 `--surface-scale`（下表），组件与页面 CSS ⛔ 再写 transform 数字。
+   3) 展开态只呈现一份内容：展开层只放「新增信息」（简介/徽标/动作），⛔ 不再复制名字/图标/分类。
+   4) 层级：悬停面 30 < 箭头 60——箭头永远在内容之上、且住在视口外沟槽里（F27）。 */
+:where(.marketplace-store-card,
+       .marketplace-store-rank-row,
+       .marketplace-store-lib-row,
+       .marketplace-store-src-row,
+       .marketplace-store-hero) {
+  --surface-blur: blur(16px) saturate(1.15);
+  --surface-lift: -3px;
+  --surface-scale: 1.02;
+}
+/* 抬升倍率声明表（唯一调参处——改一个数即可，⛔ 别去组件里找 scale） */
+.marketplace-store-card.is-small { --surface-scale: 1.08; }
+.marketplace-store-card.is-grid { --surface-scale: 1.06; }
+.marketplace-store-card.is-mega { --surface-scale: 1.14; }
+.marketplace-store-card.is-duo { --surface-scale: 1.06; }
+.marketplace-store-card.is-row { --surface-scale: 1.02; }
+.marketplace-store-rank-row { --surface-scale: 1.03; }
+.marketplace-store-lib-row { --surface-scale: 1.02; }
+.marketplace-store-src-row { --surface-scale: 1.02; }
+.marketplace-store-cat-tile { --surface-scale: 1.08; }
+.marketplace-store-author-card { --surface-scale: 1.08; }
+.marketplace-store-author-card.is-switch { --surface-scale: 1.06; }
+
+:where(.marketplace-store-card,
+       .marketplace-store-rank-row,
+       .marketplace-store-lib-row,
+       .marketplace-store-src-row):hover,
+:where(.marketplace-store-card,
+       .marketplace-store-rank-row,
+       .marketplace-store-lib-row,
+       .marketplace-store-src-row):focus-within {
+  background: var(--bg-card);
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
+  box-shadow: var(--shadow-pop);
+  z-index: 30;
+}
+:where(.marketplace-store-card,
+       .marketplace-store-rank-row,
+       .marketplace-store-lib-row,
+       .marketplace-store-src-row):hover {
+  transform: translateY(var(--surface-lift)) scale(var(--surface-scale));
+}
+.marketplace-store-card.is-row:hover { transform-origin: left center; }
 
 /* ── 工具类 ── */
 .marketplace-store-fx1 { min-width: 0; flex: 1; }

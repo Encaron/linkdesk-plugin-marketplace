@@ -14,6 +14,7 @@ import { useStore } from "../StoreContext";
 import { SectionHead } from "./SectionHead";
 import { AuthorCard } from "../authors/AuthorCard";
 import { sortAuthorDomains } from "../authors/authorsData";
+import { Strip } from "../Strip";
 
 export function AuthorSection() {
   const { t } = useTranslation();
@@ -28,17 +29,17 @@ export function AuthorSection() {
           title={t("作者")}
           hint={t("万物皆可插件——第三方作者的店，点击进入他们的主页（hover 看仓卡扇出）")}
         />
-        <div className="marketplace-store-strip">
-          <div className="marketplace-store-strip-row">
-            {list.map((domain) => (
-              <AuthorCard
-                key={domain.authorId}
-                domain={domain}
-                onOpen={() => navigate({ page: "author", authorId: domain.authorId })}
-              />
-            ))}
-          </div>
-        </div>
+        {/* F27b 归一化（2026-11-21）：作者横排走**同一个 Strip 原语**——此前手写 strip-row，
+            没有箭头/滚轮/peek 吸附 ⇒ 与主题专区/热门横滚不是一套行为 */}
+        <Strip ariaLabel={t("作者")}>
+          {list.map((domain) => (
+            <AuthorCard
+              key={domain.authorId}
+              domain={domain}
+              onOpen={() => navigate({ page: "author", authorId: domain.authorId })}
+            />
+          ))}
+        </Strip>
       </section>
     );
   }
@@ -49,9 +50,8 @@ export function AuthorSection() {
         title={t("作者")}
         hint={t("万物皆可插件——第三方作者的店，点击进入他们的主页（hover 看仓卡扇出）")}
       />
-      <div className="marketplace-store-strip">
-        <div className="marketplace-store-strip-row">
-          <div
+      <Strip ariaLabel={t("作者")}>
+        <div
             className="marketplace-store-card marketplace-store-author-empty"
             role="button"
             tabIndex={0}
@@ -74,8 +74,7 @@ export function AuthorSection() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
+      </Strip>
     </section>
   );
 }
