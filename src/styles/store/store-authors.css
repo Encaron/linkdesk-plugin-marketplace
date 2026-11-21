@@ -314,7 +314,7 @@
 .marketplace-store-src-pill b { font-size: 13.5px; }
 
 /* 作者页页头副行（store-head-sub 之上的独立一行） */
-.marketplace-store-page-sub { margin: -10px 2px 14px; }
+.marketplace-store-page-sub { margin: 4px 2px 14px; }
 
 @container (max-width: 700px) {
   .marketplace-store-author-grid { grid-template-columns: 1fr; }

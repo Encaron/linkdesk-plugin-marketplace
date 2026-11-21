@@ -242,29 +242,43 @@
 
 /* ── 粘性条（唯一实现 = views/store/StickyBar.tsx）──────────────────────
    页头、分类/搜索/库/作者的工具栏、来源添加入口共用这一层机制：
-   位置/层级/底色/模糊/页头高度接续只写在这里，各页只塞内容。⛔ 页面里不再写 position:sticky。 */
+   位置/层级/底色/模糊/页头高度接续只写在这里，各页只塞内容。⛔ 页面里不再写 position:sticky。
+   玻璃面画在 ::before 上并向左右外扩 bleed——hover 放大的卡面比内容列宽，边界必须盖住它；
+   ⛔ 不给本体加横向 padding（否则标题/工具行与下方卡片错位）。 */
 .marketplace-store-sticky {
+  --marketplace-sticky-bleed: 28px;
   --surface-blur: blur(16px) saturate(1.15);
   position: sticky;
   top: var(--marketplace-sticky-head, 0px);
   z-index: 66;
-  background: color-mix(in srgb, var(--bg-window) 90%, transparent);
+}
+.marketplace-store-sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(-1 * var(--marketplace-sticky-bleed));
+  z-index: -1;
+  background: var(--bg-window-solid, var(--bg-window));
   -webkit-backdrop-filter: var(--surface-blur);
   backdrop-filter: var(--surface-blur);
+  border-radius: 0 0 12px 12px;
   box-shadow: 0 1px 0 color-mix(in srgb, var(--border) 65%, transparent);
 }
 .marketplace-store-sticky.is-head {
   top: 0;
   z-index: 70;
-  margin: 0 -2px;
-  padding: 6px 2px 12px;
+  margin: 0;
+  padding: 8px 0 12px;
+}
+/* 页头下还接着工具组：两组拼成一块连续玻璃，只有最底一组圆下角 */
+.marketplace-store:has(.marketplace-store-sticky.is-group) .marketplace-store-sticky.is-head::before {
+  border-radius: 0;
 }
 .marketplace-store-sticky.is-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin: 0 -2px 6px;
-  padding: 8px 2px;
+  margin-bottom: 6px;
+  padding: 8px 0;
 }
 .marketplace-store-sticky.is-group > * { margin: 0; }
 
@@ -586,6 +600,7 @@
   .marketplace-store-rail-count { margin-left: 0; }
 }
 @container (max-width: 700px) {
+  .marketplace-store-sticky { --marketplace-sticky-bleed: 16px; }
   .marketplace-store-page { padding: 18px 16px 48px; }
   .marketplace-store-head-title h1 { font-size: 18px; }
   .marketplace-store-search { max-width: 100%; }
