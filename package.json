@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@linkdesk/contracts": "^0.1.48",
-    "@linkdesk/ui": "^0.2.64"
+    "@linkdesk/ui": "^0.2.66"
   },
   "devDependencies": {
     "@linkdesk/marketplace-kit": "^0.1.0",
