@@ -23,14 +23,12 @@ import { groupByPrimaryCategory, primaryCategoryOf } from "../../../services/mar
 import type { AuthorDomain, AuthorMoreDecl, AuthorRepoView, AuthorSectionDecl } from "../../../services/authors";
 import { useAuthorDomain } from "../../../services/authors";
 import { localizeCategory } from "../../../services/marketCategories";
-import { CardDuo } from "../cards/CardDuo";
 import { CardGrid } from "../cards/CardGrid";
-import { CardMega } from "../cards/CardMega";
-import { CardSmall } from "../cards/CardSmall";
 import { CategoryTile } from "../cards/CategoryTile";
 import { RankRow } from "../cards/RankRow";
 import { categoryIcon } from "../categoryIcon";
 import { rankEntries } from "../storeData";
+import { CollectionRenderer } from "../CollectionRenderer";
 import { SectionHead } from "../home/SectionHead";
 import { Strip } from "../Strip";
 import { useStore } from "../StoreContext";
@@ -91,47 +89,12 @@ function CollectionBlock({
   repo: AuthorRepoView;
   domain: AuthorDomain;
 }) {
-  const { data, actions, navigate } = useStore();
+  const { navigate } = useStore();
   const items = collection.items
     .map((id) => repo.plugins.find((p) => p.id === id))
     .filter((e): e is CatalogEntry => !!e);
-  if (items.length === 0) return null;
-  const moreDecl = section.more ?? collection.more;
-  const more = resolveMore(moreDecl, domain, navigate);
-  const noGlow = section.glow === false || collection.glow === false;
-  const head = <SectionHead title={collection.title} hint={collection.hint ?? collection.subtitle} more={more ?? undefined} />;
-  // 板块级 layout 优先（09 schema homepageSection.layout），退合集声明（06 §二·3）
-  const layout = section.layout ?? collection.layout;
-  return (
-    <section className={`marketplace-store-sec ${noGlow ? "is-no-glow" : ""}`.trim()} data-spec="04-6">
-      {head}
-      {section.layout === "mega" || layout === "mega" ? (
-        <Strip variant="mega" ariaLabel={collection.title}>
-          {items.map((entry) => (
-            <CardMega key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} />
-          ))}
-        </Strip>
-      ) : layout === "duo" || section.layout === "duo" ? (
-        <Strip variant="duo" ariaLabel={collection.title}>
-          {items.slice(0, 2).map((entry) => (
-            <CardDuo key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} tag={collection.title} />
-          ))}
-        </Strip>
-      ) : layout === "grid" && !section.layout ? (
-        <div className="marketplace-store-grid">
-          {items.map((entry) => (
-            <CardGrid key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} />
-          ))}
-        </div>
-      ) : (
-        <Strip variant="rows2" ariaLabel={collection.title}>
-          {items.map((entry) => (
-            <CardSmall key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} />
-          ))}
-        </Strip>
-      )}
-    </section>
-  );
+  const more = resolveMore(section.more ?? collection.more, domain, navigate);
+  return <CollectionRenderer collection={collection} items={items} section={section} more={more} />;
 }
 
 export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId?: string }) {
