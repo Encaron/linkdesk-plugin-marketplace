@@ -3,8 +3,9 @@
  *
  * 钉四层：
  *   ① **注册面**：恰好 13 条新命令、id 与 title 逐字对得上 manifest；
- *   ② **导航面**：store 命令把意图写进 `storeNav` 信箱（跨进程）+ openOrFocus 打开/聚焦商店标签，
- *      tabId 由 `tab:activated` 回执取真值；`openPlugin` 走 create（pinned 缺省 true + label 解析）；
+ *   ② **导航面**：store 命令把意图写进 `storeNav` 信箱（跨进程）+ openOrFocus 带 `{pluginId}` 打开/聚焦商店标签
+ *      （R4-V.2 真机修正：不带则壳把裸 type 当插件 id，面板画「不可用」），tabId 由 `tabs.list` 按 type 认领；
+ *      `openPlugin` 走 create（pinned 缺省 true + label 解析）；
  *   ③ **数据面**：本地安装/移源/检查更新/刷新目录/全部已读/视图偏好各自调**既有唯一入口**
  *      （⛔ 第二套逻辑——本文件只测接线与回执）；
  *   ④ **回执形状**：照 09 §三·补表（含两条实现的边界：create 无 tabId、坏参不装成功）。
@@ -37,6 +38,8 @@ vi.mock("../services/marketplaceShared/uiPrefs", () => ({
 vi.mock("../services/localInstalls", () => ({
   recordLocalInstall: mocks.recordLocalInstall,
 }));
+/** 测试环境不初始化插件 i18next（t() 恒 undefined）——命令面只透传 label，钉键原文即可 */
+vi.mock("i18next", () => ({ default: { t: (k: string) => k } }));
 
 import {
   registerMarketplaceStoreCommands,
@@ -79,8 +82,10 @@ function makeWorld(overrides: Record<string, unknown> = {}) {
   const fire = (channel: string, payload: unknown) => subs.get(channel)?.forEach((fn) => fn(payload));
 
   const tabs = {
+    /** R4-V.2 起 openOrFocus 带 {pluginId}（真机壳按 opts 归属面板）；回执走 tab:activated
+     *  （广播 tab.pluginId = "marketplace"——序列化 DTO 无 type 字段，tabs.list 认领路不通） */
     openOrFocus: vi.fn(async (type: string) => {
-      fire("tab:activated", { tabId: `tab-${type}`, pluginId: type });
+      fire("tab:activated", { tabId: `tab-${type}`, pluginId: "marketplace" });
     }),
     create: vi.fn(async () => undefined),
   };
@@ -155,11 +160,11 @@ describe("注册面 —— 13 条新命令", () => {
 });
 
 describe("导航命令 —— 意图信箱 + 标签页", () => {
-  it("openStore：意图 home 落盘/广播 + openOrFocus 商店 tab + tabId 取自 tab:activated", async () => {
+  it("openStore：意图 home 落盘/广播 + openOrFocus 带 {pluginId}（真机壳按 opts 归属面板）+ tabId 取自 tab:activated", async () => {
     const w = makeWorld();
 
     expect(await runOpenStore()).toEqual({ ok: true, tabId: "tab-marketplace-store" });
-    expect(w.tabs.openOrFocus).toHaveBeenCalledWith("marketplace-store");
+    expect(w.tabs.openOrFocus).toHaveBeenCalledWith("marketplace-store", { pluginId: "marketplace", label: "插件商店" });
     expect(w.pluginState.set).toHaveBeenCalledWith("marketplace", "storeNav", { page: "home" });
     expect(w.events.emit).toHaveBeenCalledWith("marketplace:storeNav", { page: "home" });
   });

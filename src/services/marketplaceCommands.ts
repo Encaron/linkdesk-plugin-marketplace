@@ -33,8 +33,12 @@ import {
 } from "./marketplaceShared/searchState";
 import { setViewPrefs } from "./marketplaceShared/uiPrefs";
 import { openPluginDetailTab } from "./openDetailTab";
+import i18n from "i18next";
 
 const lk = () => window.linkdesk;
+
+/** 本插件 id——真机壳 tab defaults 的 pluginId = `opts.pluginId ?? type`（R4-V.2 实机修正） */
+const OWNER = "marketplace";
 
 /** 作者源配置键——真相源 = 本仓 `plugin.json` 的 `contributes.configuration` 同名键 */
 const CONFIG_KEY = "marketplace.marketplaceSources";
@@ -68,9 +72,14 @@ function stringArg(args: unknown, key: string, index: number): string {
 
 /* ═══ 打开标签页 ═══ */
 
-/** 等 `tab:activated`（openOrFocus 的壳侧回执通道）——超时回落空串，⛔ 不让命令无限等 */
+/** tabs.list 快照的局部窄化形——插件仓钉装的 @linkdesk/contracts 类型面尚未收录 list（壳已实装，M1 AI#3）；
+ *  照 installFlow 的 catalogUrl 先例局部收窄，⛔ 升 contracts 前不加宽 */
+/** 等 `tab:activated`（openOrFocus 的壳侧回执通道）——超时回落空串，⛔ 不让命令无限等。
+ *  🔴 匹配键 = `pluginId === OWNER`（"marketplace"）：R4-V.2 带 `{pluginId}` 后 tab.pluginId 不再等于
+ *  STORE_TAB_TYPE；且序列化 DTO（serializeGroups）**没有 type 字段**（tabs.list 认领路走不通）。
+ *  详情标签的 DTO pluginId 恒为 "plugin-detail"（壳侧不设 pluginId）⇒ "marketplace" 只会命中
+ *  商店/入口两类标签——本 waiter 紧跟 openOrFocus 发出，首个激活事件即本次聚焦的商店。 */
 function waitTabActivated(
-  type: string,
   timeoutMs = 800,
 ): { promise: Promise<string>; cancel: () => void } {
   const on = lk()?.events?.on;
@@ -94,7 +103,7 @@ function waitTabActivated(
     };
     try {
       un = on<{ tabId?: string; pluginId?: string }>("tab:activated", (p) => {
-        if (p?.pluginId === type && typeof p.tabId === "string") finish(p.tabId);
+        if (p?.pluginId === OWNER && typeof p.tabId === "string") finish(p.tabId);
       });
     } catch {
       resolve("");
@@ -105,13 +114,17 @@ function waitTabActivated(
   return { promise, cancel: () => finish("") };
 }
 
-/** 打开/聚焦商店标签页（singleton——`openOrFocus` 按 type 去重） */
+/** 打开/聚焦商店标签页（singleton——`openOrFocus` 按 type 去重）。
+ *  🔴 R4-V.2 真机缺陷修正（2026-11-21 隔离实例实机复现）：主区视图 tab 不带 `{pluginId}` 时，
+ *  壳按 `opts.pluginId ?? resolveLegacyPluginId(type) ?? type` 把裸 type 当插件 id ⇒
+ *  面板画「插件 "marketplace-store" 不可用」；带上 pluginId 后池按插件入口装载（入口别名渲染同一 StoreView）。
+ *  label 用词典既有键（en.json "插件商店"）——否则 tab 标签回落裸 type 串。 */
 async function openStoreTab(): Promise<OpenTabResult> {
   const tabs = lk()?.tabs;
   if (!tabs?.openOrFocus) return { ok: false, tabId: "" };
-  const waiter = waitTabActivated(STORE_TAB_TYPE);
+  const waiter = waitTabActivated();
   try {
-    await tabs.openOrFocus(STORE_TAB_TYPE);
+    await tabs.openOrFocus(STORE_TAB_TYPE, { pluginId: OWNER, label: i18n.t("插件商店") });
   } catch {
     waiter.cancel();
     return { ok: false, tabId: "" };
