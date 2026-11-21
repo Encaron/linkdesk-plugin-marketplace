@@ -29,11 +29,21 @@ describe("categoryListFromEntry（并集去重保序）", () => {
   });
 });
 
-describe("localizeCategory（category.* 键 → 译文，无键回退 slug 原文）", () => {
+describe("localizeCategory（category.* → tag.* → slug 原文三级回退——R4-5.4/I3）", () => {
   it("键在表 → 译文；不在表 → 回退原始 slug", () => {
     const t = mkT({ "category.zigzag": "Zigzag" });
     expect(localizeCategory(t, "zigzag")).toBe("Zigzag");
     expect(localizeCategory(t, "wobble")).toBe("wobble");
+  });
+
+  it("category.* 缺、tag.* 有（小类封闭名单）→ 取 tag.* 译文——详情行与 chips 同一份表", () => {
+    const t = mkT({ "tag.zigzag": "Zigzag 子类" });
+    expect(localizeCategory(t, "zigzag")).toBe("Zigzag 子类");
+  });
+
+  it("category.* 优先于 tag.*（主桶两表都有的 slug 不被 tag 表盖掉）", () => {
+    const t = mkT({ "category.zigzag": "主桶译名", "tag.zigzag": "子类译名" });
+    expect(localizeCategory(t, "zigzag")).toBe("主桶译名");
   });
 });
 

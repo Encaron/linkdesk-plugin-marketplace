@@ -5,6 +5,7 @@
  * 输入焦点由常驻搜索框保持（StoreHeader 不随页面重绘换节点）；清空回原视图（StoreView 导航层）。
  */
 
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { EmptyState } from "../../../ui";
 import { OrderedCards } from "./OrderedCards";
@@ -16,11 +17,20 @@ export function SearchResultsView() {
   const { t } = useTranslation();
   const { data, prefs, filters, route, searchInput } = useStore();
   const query = (route.query ?? searchInput).trim();
-  const hits = searchEntries(data.catalog.entries, query);
-  const filtered = applyInstallFilters(hits, filters, data.statusOf);
-  const dlOf = (entry: { downloadUrl?: string }) =>
-    entry.downloadUrl ? data.counts.get(entry.downloadUrl) : undefined;
-  const nodes = orderEntries(filtered, prefs.catSort as CatSort, dlOf);
+  // R4-5.3/I2：命中链 memo 化——500 条目不随无关状态 tick 重排；nodes 身份稳定 ⇒ ChunkedReveal 不误重置
+  const hits = useMemo(() => searchEntries(data.catalog.entries, query), [data.catalog.entries, query]);
+  const filtered = useMemo(
+    () => applyInstallFilters(hits, filters, data.statusOf),
+    [hits, filters, data.statusOf],
+  );
+  const dlOf = useCallback(
+    (entry: { downloadUrl?: string }) => (entry.downloadUrl ? data.counts.get(entry.downloadUrl) : undefined),
+    [data.counts],
+  );
+  const nodes = useMemo(
+    () => orderEntries(filtered, prefs.catSort as CatSort, dlOf),
+    [filtered, prefs.catSort, dlOf],
+  );
 
   return (
     <>

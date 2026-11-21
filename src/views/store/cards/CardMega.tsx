@@ -3,6 +3,7 @@
  * hover＝本体放大 1.12＋灰条向上延伸（标语/简介/按钮长进条里，字不碰封面——v3.7 拍板）。
  */
 
+import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { ActionButton, BadgeRow, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
@@ -11,6 +12,7 @@ import {
   Art,
   badgesOfCard,
   cardKeyDown,
+  cardPropsEqual,
   jobLabelOf,
   menuOfCard,
   statusOfCard,
@@ -19,7 +21,8 @@ import {
   type StoreCardHandlers,
 } from "./cardParts";
 
-export function CardMega({
+/** memo 化（R4-5.3/I2）：卡片 props 全量判等——状态 tick 只重渲真实变化的那几张 */
+export const CardMega = memo(function CardMega({
   entry,
   ctx,
   handlers,
@@ -62,6 +65,6 @@ export function CardMega({
       </div>
     </div>
   );
-}
+}, cardPropsEqual);
 
 export default CardMega;

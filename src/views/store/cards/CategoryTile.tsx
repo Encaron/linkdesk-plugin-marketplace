@@ -5,10 +5,12 @@
  *   （08 §二·26：曾撞全局空态撑高整行）。本件根类 = `marketplace-store-cat-tile`。
  */
 
+import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../../../ui";
 
-export function CategoryTile({
+/** memo 化（R4-5.3/I2）：props 全原始值——默认浅比较即保守正确 */
+export const CategoryTile = memo(function CategoryTile({
   slug,
   label,
   count,
@@ -52,6 +54,6 @@ export function CategoryTile({
       </span>
     </div>
   );
-}
+});
 
 export default CategoryTile;

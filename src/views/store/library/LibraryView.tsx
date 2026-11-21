@@ -17,6 +17,7 @@ import {
   ActionButton,
   Badge,
   EmptyState,
+  ChunkedReveal,
   Icon,
   licenseBadges,
   MoreMenu,
@@ -127,8 +128,12 @@ export function LibraryView() {
   const stats = libraryStats(rows);
   const authors = libraryAuthorOptions(rows);
   const repos = libraryRepoOptions(rows);
-  const filtered = filterLibraryRows(rows, filters, search);
-  const nodes = orderLibraryRows(filtered, prefs.libSort as LibSort, filters.status === "all");
+  // R4-5.3/I2：筛选/排序链 memo 化——nodes 身份稳定 ⇒ 分块渐进不误重置
+  const filtered = useMemo(() => filterLibraryRows(rows, filters, search), [rows, filters, search]);
+  const nodes = useMemo(
+    () => orderLibraryRows(filtered, prefs.libSort as LibSort, filters.status === "all"),
+    [filtered, prefs.libSort, filters.status],
+  );
   const allSelected = filtered.length > 0 && filtered.every((r) => selected.has(r.entry.id));
   const purchased = purchasedNotInstalled(data.catalog.entries, licenses, rows);
 
@@ -355,49 +360,56 @@ export function LibraryView() {
         <EmptyState icon="funnel" title={t("没有符合条件的插件")} sub={t("试试放宽筛选或清空搜索")} />
       ) : prefs.libView === "grid" ? (
         <div className={`marketplace-store-grid ${editing ? "is-editing" : ""}`.trim()}>
-          {nodes.map((node, i) =>
-            node.kind === "group" ? (
-              <div key={`g:${node.label}:${i}`} className="marketplace-store-group-h">
-                <span className="marketplace-store-group-name">{node.label}</span>
-                <span className="marketplace-store-group-n">{t("{{count}} 个插件", { count: node.count })}</span>
-              </div>
-            ) : (
-              <div
-                key={node.row.entry.id}
-                className={`marketplace-store-lib-grid-wrap ${editing ? "is-editing" : ""}`.trim()}
-                onClickCapture={(e) => {
-                  if (!editing) return;
-                  e.stopPropagation();
-                  toggleSelect(node.row.entry.id);
-                }}
-              >
-                {editing && (
-                  <input
-                    type="checkbox"
-                    className="marketplace-store-lib-check is-corner"
-                    checked={selected.has(node.row.entry.id)}
-                    aria-label={t("选择 {{name}}", { name: node.row.entry.name })}
-                    onChange={() => toggleSelect(node.row.entry.id)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                )}
-                <CardGrid entry={node.row.entry} ctx={data.ctxOf(node.row.entry)} handlers={actions} />
-              </div>
-            ),
-          )}
+          {/* R4-5.3/I2：分块渐进（原语件唯一来源 = ui/ChunkedReveal）——大库不整挂 */}
+          <ChunkedReveal
+            items={nodes}
+            renderItem={(node, i) =>
+              node.kind === "group" ? (
+                <div key={`g:${node.label}:${i}`} className="marketplace-store-group-h">
+                  <span className="marketplace-store-group-name">{node.label}</span>
+                  <span className="marketplace-store-group-n">{t("{{count}} 个插件", { count: node.count })}</span>
+                </div>
+              ) : (
+                <div
+                  key={node.row.entry.id}
+                  className={`marketplace-store-lib-grid-wrap ${editing ? "is-editing" : ""}`.trim()}
+                  onClickCapture={(e) => {
+                    if (!editing) return;
+                    e.stopPropagation();
+                    toggleSelect(node.row.entry.id);
+                  }}
+                >
+                  {editing && (
+                    <input
+                      type="checkbox"
+                      className="marketplace-store-lib-check is-corner"
+                      checked={selected.has(node.row.entry.id)}
+                      aria-label={t("选择 {{name}}", { name: node.row.entry.name })}
+                      onChange={() => toggleSelect(node.row.entry.id)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  )}
+                  <CardGrid entry={node.row.entry} ctx={data.ctxOf(node.row.entry)} handlers={actions} />
+                </div>
+              )
+            }
+          />
         </div>
       ) : (
         <div className={`marketplace-store-lib-list ${editing ? "is-editing" : ""}`.trim()}>
-          {nodes.map((node, i) =>
-            node.kind === "group" ? (
-              <div key={`g:${node.label}:${i}`} className="marketplace-store-lib-group-h">
-                <span className="marketplace-store-lib-group-t">{node.label}</span>
-                <span className="marketplace-store-lib-group-n">{t("{{count}} 个插件", { count: node.count })}</span>
-              </div>
-            ) : (
-              renderRow(node.row)
-            ),
-          )}
+          <ChunkedReveal
+            items={nodes}
+            renderItem={(node, i) =>
+              node.kind === "group" ? (
+                <div key={`g:${node.label}:${i}`} className="marketplace-store-lib-group-h">
+                  <span className="marketplace-store-lib-group-t">{node.label}</span>
+                  <span className="marketplace-store-lib-group-n">{t("{{count}} 个插件", { count: node.count })}</span>
+                </div>
+              ) : (
+                renderRow(node.row)
+              )
+            }
+          />
         </div>
       )}
 

@@ -3,6 +3,7 @@
  * 蓝图 v3.65：grid 主面全家徽标区**拆掉**——只留唯一状态角标；全量徽标在 hover 层。
  */
 
+import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { ActionButton, BadgeRow, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
@@ -10,6 +11,7 @@ import {
   actionOfCard,
   badgesOfCard,
   cardKeyDown,
+  cardPropsEqual,
   dlText,
   jobLabelOf,
   menuOfCard,
@@ -21,7 +23,8 @@ import {
   type StoreCardHandlers,
 } from "./cardParts";
 
-export function CardGrid({
+/** memo 化（R4-5.3/I2）：卡片 props 全量判等——500 条目分块挂载后，状态 tick 只重渲真实变化的那几张 */
+export const CardGrid = memo(function CardGrid({
   entry,
   ctx,
   handlers,
@@ -79,6 +82,6 @@ export function CardGrid({
       </div>
     </div>
   );
-}
+}, cardPropsEqual);
 
 export default CardGrid;

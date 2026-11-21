@@ -51,6 +51,25 @@ export interface StoreCardHandlers {
   onAct: (entry: CatalogEntry, id: ActionId) => void;
 }
 
+/** 卡片 memo 比较器（R4-5.3/I2）——props 全量判等：entry/handlers 引用 ＋ ctx 逐字段 ===。
+ *  保守正确无漏判面：底层数据全部快照整表替换（jobs/licenses/counts 换代＝引用换代；IPC 广播
+ *  结构化克隆 ⇒ 每个 job 对象每次都是新引用）——任何真实变化至少一个字段换引用，变化必重渲。 */
+export function cardPropsEqual(
+  a: { entry: CatalogEntry; ctx: StoreCardContext; handlers: StoreCardHandlers },
+  b: { entry: CatalogEntry; ctx: StoreCardContext; handlers: StoreCardHandlers },
+): boolean {
+  if (a.entry !== b.entry || a.handlers !== b.handlers) return false;
+  return (
+    a.ctx.state === b.ctx.state &&
+    a.ctx.core === b.ctx.core &&
+    a.ctx.license === b.ctx.license &&
+    a.ctx.job === b.ctx.job &&
+    a.ctx.online === b.ctx.online &&
+    a.ctx.dl === b.ctx.dl &&
+    a.ctx.installedIdentity === b.ctx.installedIdentity
+  );
+}
+
 export function tCategory(t: (key: string) => string, entry: CatalogEntry): string {
   return localizeCategory(t, primaryCategoryOf(entry));
 }

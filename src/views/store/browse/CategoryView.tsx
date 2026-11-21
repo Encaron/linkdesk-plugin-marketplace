@@ -8,6 +8,7 @@
  *   - 排序/视图跨分类记忆（uiPrefs）；筛选可叠加（install filters）。
  */
 
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { EmptyState } from "../../../ui";
 import { useAuthorDomain } from "../../../services/authors";
@@ -37,17 +38,43 @@ export function CategoryView({ slug }: { slug: string }) {
     authorId ?? "",
     data.catalog.entries.length,
   );
-  const allOfCategory = data.catalog.entries.filter((e) => primaryCategoryOf(e) === slug);
-  const authorEntries = authorDomain
-    ? [...new Map(authorDomain.repos.flatMap((r) => r.plugins).map((e) => [e.id, e])).values()]
-    : [];
-  const bucket = authorId
-    ? authorEntries.filter((e) => primaryCategoryOf(e) === slug)
-    : allOfCategory;
+  // R4-5.3/I2：归桶→筛选→排序链 memo 化（500 条目不随无关 tick 重排；nodes 身份稳定 ⇒ ChunkedReveal 不误重置）
+  const allOfCategory = useMemo(
+    () => data.catalog.entries.filter((e) => primaryCategoryOf(e) === slug),
+    [data.catalog.entries, slug],
+  );
+  const authorEntries = useMemo(
+    () =>
+      authorDomain
+        ? [...new Map(authorDomain.repos.flatMap((r) => r.plugins).map((e) => [e.id, e])).values()]
+        : [],
+    [authorDomain],
+  );
+  const bucket = useMemo(
+    () =>
+      authorId
+        ? authorEntries.filter((e) => primaryCategoryOf(e) === slug)
+        : allOfCategory,
+    [authorId, authorEntries, allOfCategory, slug],
+  );
+  const filtered = useMemo(
+    () => applyInstallFilters(bucket, filters, data.statusOf),
+    [bucket, filters, data.statusOf],
+  );
+  const shown = useMemo(
+    () => (subChip ? applySubcategory(filtered, subChip, slug) : filtered),
+    [filtered, subChip, slug],
+  );
+  const dlOf = useCallback(
+    (entry: { downloadUrl?: string }) => (entry.downloadUrl ? data.counts.get(entry.downloadUrl) : undefined),
+    [data.counts],
+  );
+  const nodes = useMemo(
+    () => orderEntries(shown, prefs.catSort as CatSort, dlOf),
+    [shown, prefs.catSort, dlOf],
+  );
   const chips = chipsOf(bucket, slug);
   const untagged = untaggedCountOf(bucket, slug);
-  const dlOf = (entry: { downloadUrl?: string }) =>
-    entry.downloadUrl ? data.counts.get(entry.downloadUrl) : undefined;
 
   if (authorId && authorLoading) {
     return (
@@ -151,9 +178,7 @@ export function CategoryView({ slug }: { slug: string }) {
     );
   }
 
-  const filtered = applyInstallFilters(bucket, filters, data.statusOf);
-  const shown = subChip ? applySubcategory(filtered, subChip, slug) : filtered;
-  const nodes = orderEntries(shown, prefs.catSort as CatSort, dlOf);
+  // filtered/shown/nodes 已在顶部 memo 化（R4-5.3/I2）——此处只取用
   const chipRowVisible = chips.length > 0 || untagged > 0;
 
   return (

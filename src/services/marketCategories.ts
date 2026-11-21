@@ -24,12 +24,16 @@ export function categoryListFromEntry(category?: string, categories?: string[]):
   return out;
 }
 
-/** 单分类翻译——`t("category." + slug)`；译文 ≠ key（未命中）→ 回退原始 slug。
+/** 单分类翻译——先查 `category.*`（主桶/旧值表），未命中再查 `tag.*`（小类封闭名单值表，
+ *  CategoryView chips 同源——R4-5.4/I3：一份名单一张表，⛔ 详情行与 chips 各造第二份），
+ *  都未命中 → 回退原始 slug（未注册第三方分类，显示原文——E6#32b 语义）。
  *  i18next parseMissingKeyHandler 返回 key 本身 → 以「返回值 === 传入 key」判未命中。 */
 export function localizeCategory(t: (key: string) => string, slug: string): string {
-  const key = `category.${slug}`;
-  const translated = t(key);
-  return translated === key ? slug : translated;
+  for (const key of [`category.${slug}`, `tag.${slug}`]) {
+    const translated = t(key);
+    if (translated !== key) return translated;
+  }
+  return slug;
 }
 
 /** 「分类」行显示文本——全部 slug 逐项翻译后「 · 」连接（mockup 01 定稿多值样式）；空 → undefined（行隐藏） */

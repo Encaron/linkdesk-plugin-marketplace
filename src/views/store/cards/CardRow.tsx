@@ -3,12 +3,14 @@
  * 图标 48＋名＋来源徽标＋分类＋简介 1 行＋下载量＋动作钮；hover 1.02 origin left（行不横跳）。
  */
 
+import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { ActionButton, Badge, entryHue, MoreMenu, sourceBadge } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import {
   actionOfCard,
   cardKeyDown,
+  cardPropsEqual,
   dlText,
   jobLabelOf,
   menuOfCard,
@@ -18,7 +20,8 @@ import {
   type StoreCardHandlers,
 } from "./cardParts";
 
-export function CardRow({
+/** memo 化（R4-5.3/I2）：卡片 props 全量判等——状态 tick 只重渲真实变化的那几行 */
+export const CardRow = memo(function CardRow({
   entry,
   ctx,
   handlers,
@@ -61,6 +64,6 @@ export function CardRow({
       <MoreMenu items={items} onSelect={(id) => (id === "open" ? open() : handlers.onAct(entry, id))} />
     </div>
   );
-}
+}, cardPropsEqual);
 
 export default CardRow;

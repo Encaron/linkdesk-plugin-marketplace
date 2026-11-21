@@ -3,6 +3,7 @@
  * 主面＝图标＋名＋分类＋唯一状态角标；hover 层＝动作＋简介＋全徽标＋⋯（五卡同构，08 §二·v3.65）。
  */
 
+import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { ActionButton, BadgeRow, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
@@ -10,6 +11,7 @@ import {
   actionOfCard,
   badgesOfCard,
   cardKeyDown,
+  cardPropsEqual,
   jobLabelOf,
   menuOfCard,
   statusOfCard,
@@ -19,7 +21,8 @@ import {
   type StoreCardHandlers,
 } from "./cardParts";
 
-export function CardSmall({
+/** memo 化（R4-5.3/I2）：卡片 props 全量判等——状态 tick 只重渲真实变化的那几张 */
+export const CardSmall = memo(function CardSmall({
   entry,
   ctx,
   handlers,
@@ -70,6 +73,6 @@ export function CardSmall({
       </div>
     </div>
   );
-}
+}, cardPropsEqual);
 
 export default CardSmall;

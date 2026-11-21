@@ -175,6 +175,22 @@ describe("R4-0.5 兼容矩阵——v2 目录双向（R4-2.1 起根级字段进�
     expect(categoryListFromEntry(undefined, undefined)).toEqual([]);
     expect(categoryListFromEntry(r.catalog.plugins[0]!.category, r.catalog.plugins[0]!.categories)).toEqual([]);
   });
+
+  it("I4 兼容矩阵（R4-5.5）：未知根键零警告不炸——「旧读者读新目录」的机械锚", () => {
+    // 旧 1.2.0 读者只取 version/updatedAt/plugins ⇒ 对 sources/collections/categoryRail 及一切
+    // 未来新键 = 忽略即兼容。读者代码共享 ⇒ 本仓 parse 的「未知根键容忍」就是那条路径的机械证人：
+    // 未来目录再加新键（如 B3 服务端字段），旧读者与新读者都不炸。
+    const withFutureKey = {
+      ...V2_CATALOG,
+      futureField: { anything: true }, // 目录未来演进键（虚构）——在册键之外
+    };
+    const r = parseCatalog(JSON.stringify(withFutureKey));
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.warnings).toEqual([]); // 未知根键不是声明警告（unknown-* 只管条目声明值）
+    expect(r.catalog.plugins).toHaveLength(1);
+    expect(r.catalog.sources).toEqual(V2_CATALOG.sources); // 在册键照常交付
+  });
 });
 
 /* ── K2 第三腿（R4-4.2／棒 12 交办）：kit 白名单 ↔ 本仓 parse 白名单 ─────────────────

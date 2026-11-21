@@ -3,12 +3,14 @@
  * hover＝**原位替换**：下载量淡出、动作钮同一位置浮现（几何不动，05 §二）。
  */
 
+import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { ActionButton, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import {
   actionOfCard,
   cardKeyDown,
+  cardPropsEqual,
   dlText,
   jobLabelOf,
   menuOfCard,
@@ -20,7 +22,15 @@ import {
   type StoreCardHandlers,
 } from "./cardParts";
 
-export function RankRow({
+type RankRowProps = {
+  entry: CatalogEntry;
+  index: number;
+  ctx: StoreCardContext;
+  handlers: StoreCardHandlers;
+};
+
+/** memo 化（R4-5.3/I2）：cardPropsEqual ＋ index 判等——名次行 props 全量判等 */
+export const RankRow = memo(function RankRow({
   entry,
   index,
   ctx,
@@ -64,6 +74,6 @@ export function RankRow({
       </span>
     </div>
   );
-}
+}, (a: RankRowProps, b: RankRowProps) => a.index === b.index && cardPropsEqual(a, b));
 
 export default RankRow;
