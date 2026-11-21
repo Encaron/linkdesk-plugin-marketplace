@@ -283,6 +283,52 @@
 .marketplace-store-sticky.is-group::before {
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
+/* 贴合碰撞（只有工具条触顶贴上页头那一下）：两体受力 → 一次落定，约 180ms。
+   参考掌机 UI 的「咔」——工具条上沿受压压缩、页头被撞下沉 2px、接缝瞬时一条亮线衰减。
+   ⛔ 不常驻、不循环、不左右呼吸；只动 transform/opacity；reduced-motion 在文件末尾统一关掉。 */
+@keyframes marketplace-store-dock-impact {
+  0% { transform: translateY(0) scaleY(1); }
+  16% { transform: translateY(1.5px) scaleY(0.982); }
+  52% { transform: translateY(-0.5px) scaleY(1.004); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+@keyframes marketplace-store-dock-hit {
+  0% { transform: translateY(0); }
+  22% { transform: translateY(2px); }
+  100% { transform: translateY(0); }
+}
+@keyframes marketplace-store-dock-seam {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.marketplace-store-sticky.is-docked {
+  transform-origin: 50% 0; /* 从上沿受压 */
+  animation: marketplace-store-dock-impact 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.marketplace-store-head.is-hit {
+  animation: marketplace-store-dock-hit 200ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+.marketplace-store-sticky.is-docked::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-hover) 22%,
+    var(--text-primary) 50%,
+    var(--accent-hover) 78%,
+    transparent
+  );
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent-hover) 55%, transparent);
+  animation: marketplace-store-dock-seam 170ms cubic-bezier(0.3, 0, 0.2, 1);
+}
 .marketplace-store-sticky.is-group > * { margin: 0; }
 
 /* ── 页头 ── */
@@ -617,5 +663,11 @@
   .marketplace-store-content-bar,
   .marketplace-store-top {
     transition-duration: 0.01ms;
+  }
+  /* 碰撞反馈直接关掉动画（状态 class 仍切，副作用为零） */
+  .marketplace-store-sticky.is-docked,
+  .marketplace-store-sticky.is-docked::after,
+  .marketplace-store-head.is-hit {
+    animation: none;
   }
 }

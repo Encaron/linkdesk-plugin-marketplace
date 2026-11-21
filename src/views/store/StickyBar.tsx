@@ -49,6 +49,69 @@ export function StickyBar({
     };
   }, [placement]);
 
+  /* 贴合瞬间的「砰」：工具条从下方贴到页头下沿那一下——两体受力（页头下沉、工具条压缩）
+     ＋接缝一道瞬时亮线，约 180ms 内一次落定。⛔ 不做常驻/循环动画；只动 transform/opacity。
+     首帧已贴着（恢复滚动位）不响；只有「向下滚 + 从未贴到贴上」才算碰撞。
+     reduced-motion 由 CSS 直接关掉动画，这里仍只切 class（状态本身无害）。 */
+  useEffect(() => {
+    if (placement !== "tools") return;
+    const el = ref.current;
+    const host = el?.closest(".marketplace-store") as HTMLElement | null;
+    const scroller = el?.closest(".marketplace-store-content") as HTMLElement | null;
+    if (!el || !host || !scroller) return;
+    const head = host.querySelector<HTMLElement>(".marketplace-store-head");
+
+    let raf = 0;
+    let timer = 0;
+    let prevStuck: boolean | null = null;
+    let lastTop = scroller.scrollTop;
+
+    const stuckNow = () => {
+      const headH = parseFloat(getComputedStyle(host).getPropertyValue("--marketplace-sticky-head")) || 0;
+      const base = scroller.getBoundingClientRect().top + headH;
+      return el.getBoundingClientRect().top <= base + 1;
+    };
+
+    const measure = () => {
+      raf = 0;
+      const top = scroller.scrollTop;
+      const down = top > lastTop;
+      lastTop = top;
+      const stuck = stuckNow();
+      if (prevStuck === null) {
+        prevStuck = stuck;
+        return;
+      }
+      if (!prevStuck && stuck && down) {
+        el.classList.remove("is-docked");
+        head?.classList.remove("is-hit");
+        void el.offsetWidth; // 强制回流：同一 class 在快速反复贴合时也能重播动画
+        el.classList.add("is-docked");
+        head?.classList.add("is-hit");
+        clearTimeout(timer);
+        timer = window.setTimeout(() => {
+          el.classList.remove("is-docked");
+          head?.classList.remove("is-hit");
+        }, 320);
+      }
+      prevStuck = stuck;
+    };
+
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(measure);
+    };
+
+    prevStuck = stuckNow();
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      scroller.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+      clearTimeout(timer);
+      el.classList.remove("is-docked");
+      head?.classList.remove("is-hit");
+    };
+  }, [placement]);
+
   return (
     <div
       ref={ref}
