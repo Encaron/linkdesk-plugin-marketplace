@@ -31,6 +31,13 @@
    ⛔ 只在个别页面补丁＝未归一化；新组件落码前先过这四条。 */
 
 .marketplace-store :is(h1, h2, h3, p, b, span, button) { min-width: 0; }
+/* 短标签（2–4 字）一律单行：竖排比截断更难看（300px 容器普查唯一剩下的 6 处就是这类） */
+.marketplace-store-tb-label,
+.marketplace-ui-corner,
+.marketplace-store-cg-dl,
+.marketplace-store-cr-dl,
+.marketplace-store-rr-dl,
+.marketplace-store-hero-meta > span { white-space: nowrap; }
 .marketplace-store .marketplace-ui-btn { flex: none; }
 
 .marketplace-store .marketplace-ui-corner {
