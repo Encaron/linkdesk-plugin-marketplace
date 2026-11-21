@@ -49,17 +49,16 @@ export function StickyBar({
     };
   }, [placement]);
 
-  /* 贴合瞬间的「砰」：工具条从下方贴到页头下沿那一下——两体受力（页头下沉、工具条压缩）
-     ＋接缝一道瞬时亮线，约 180ms 内一次落定。⛔ 不做常驻/循环动画；只动 transform/opacity。
-     首帧已贴着（恢复滚动位）不响；只有「向下滚 + 从未贴到贴上」才算碰撞。
-     reduced-motion 由 CSS 直接关掉动画，这里仍只切 class（状态本身无害）。 */
+  /* 贴合瞬间的「咔」：工具条从下方贴到页头下沿那一下——只压缩自己的上沿（top 边钉死，
+     ⛔ 不移动页头，否则接缝会张开漏光），＋接缝一条瞬时亮线快速熄灭。约 120ms 一次落定。
+     ⛔ 无回弹/无循环；首帧已贴着不响；只有「向下滚 + 从未贴到贴上」才算碰撞。
+     reduced-motion 由 CSS 直接关掉动画。 */
   useEffect(() => {
     if (placement !== "tools") return;
     const el = ref.current;
     const host = el?.closest(".marketplace-store") as HTMLElement | null;
     const scroller = el?.closest(".marketplace-store-content") as HTMLElement | null;
     if (!el || !host || !scroller) return;
-    const head = host.querySelector<HTMLElement>(".marketplace-store-head");
 
     let raf = 0;
     let timer = 0;
@@ -84,15 +83,10 @@ export function StickyBar({
       }
       if (!prevStuck && stuck && down) {
         el.classList.remove("is-docked");
-        head?.classList.remove("is-hit");
         void el.offsetWidth; // 强制回流：同一 class 在快速反复贴合时也能重播动画
         el.classList.add("is-docked");
-        head?.classList.add("is-hit");
         clearTimeout(timer);
-        timer = window.setTimeout(() => {
-          el.classList.remove("is-docked");
-          head?.classList.remove("is-hit");
-        }, 320);
+        timer = window.setTimeout(() => el.classList.remove("is-docked"), 140);
       }
       prevStuck = stuck;
     };
@@ -108,7 +102,6 @@ export function StickyBar({
       if (raf) cancelAnimationFrame(raf);
       clearTimeout(timer);
       el.classList.remove("is-docked");
-      head?.classList.remove("is-hit");
     };
   }, [placement]);
 
