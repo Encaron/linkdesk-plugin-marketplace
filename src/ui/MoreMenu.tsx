@@ -1,15 +1,19 @@
 /**
- * MoreMenu — 卡片「⋯」菜单的**唯一实现**（蓝图 `moreMenu` 的 R4 落位；五卡同构）。
+ * MoreMenu — 卡片「⋯」菜单的**唯一实现**（五卡同构）。
  *
- * 纪律：
- *   - 项由纯函数 `moreMenuItems()` 推导（随装态；未装不出现禁用；core 卸载置灰带原因）；
- *   - 菜单是**卡片内的绝对定位层**（不 portal、不脱体——蓝图同款），开合只动 opacity/transform/display，
- *     不影响任何文档流几何（机械守则）；
- *   - 点外部 / Esc 关闭；按钮与菜单项都 `stopPropagation`（整卡＝开详情，菜单动作不能误触）。
+ * 🔴 F21（2026-11-21 用户定稿「橱窗判据」）：菜单本体＝**共享 `<ContextMenu>`**（@linkdesk/ui）
+ *    ——此前卡内绝对定位自绘版被横滚容器裁剪（「查看详情/禁用」下半截被切的真机实拍）＋玻璃下
+ *    半透透底；共享件浮层根内永不裁剪＋玻璃皮现成＋外点/Esc/子菜单/快捷键标注全白得。
+ *    ⛔ 回退卡内自绘面板（同型裁剪必复发）。
+ * 项仍由纯函数 `moreMenuItems()` 推导（随装态）；**disabled 项不渲染**（ContextMenu 无置灰形态——
+ *    core 的卸载项直接隐藏＝诚实；置灰原因留在卡面动作钮上）。
+ * 整卡＝开详情，菜单动作不能误触：按钮/菜单动作 `stopPropagation`。
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { ContextMenu } from "@linkdesk/ui";
 import { useTranslation } from "react-i18next";
+import type { MenuItemDescriptor } from "@linkdesk/contracts";
 import { Icon } from "./icons";
 import type { ActionId, MoreItem } from "./ActionButton";
 
@@ -24,28 +28,32 @@ export function MoreMenu({
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement | null>(null);
+  const [anchor, setAnchor] = useState({ x: 0, y: 0 });
+  const btnRef = useRef<HTMLButtonElement | null>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const onDoc = (ev: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(ev.target as Node)) setOpen(false);
-    };
-    const onKey = (ev: KeyboardEvent) => {
-      if (ev.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("mousedown", onDoc, true);
-    // eslint-disable-next-line linkdesk/no-global-key-listener -- 浮层 Esc 关闭是全局交互（只读 Esc、不 preventDefault、不吞其它键），菜单无独立焦点分区可挂
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDoc, true);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
+  const openMenu = () => {
+    const r = btnRef.current?.getBoundingClientRect();
+    if (r) setAnchor({ x: r.right, y: r.bottom + 4 });
+    setOpen(true);
+  };
+
+  /** MoreItem → 注入描述符：onSelect 池侧回调（关菜单→派发动作）；disabled 项不渲染 */
+  const descriptors: MenuItemDescriptor[] = items
+    .filter((m) => !m.disabled)
+    .map((m) => ({
+      command: "", // 仅作 id 载体；动作走 onSelect（不注册壳命令）
+      label: t(m.labelKey),
+      group: t("更多动作"),
+      onSelect: () => {
+        setOpen(false);
+        onSelect(m.id);
+      },
+    }));
 
   return (
-    <div ref={rootRef} className={`marketplace-ui-more ${className ?? ""}`.trim()} onClick={(e) => e.stopPropagation()}>
+    <div className={`marketplace-ui-more ${className ?? ""}`.trim()} onClick={(e) => e.stopPropagation()}>
       <button
+        ref={btnRef}
         type="button"
         className="marketplace-ui-icon-btn"
         aria-label={t("更多动作")}
@@ -54,34 +62,20 @@ export function MoreMenu({
         aria-expanded={open}
         onClick={(e) => {
           e.stopPropagation();
-          setOpen((v) => !v);
+          if (open) setOpen(false);
+          else openMenu();
         }}
       >
         <Icon name="dots" size="sm" />
       </button>
       {open && (
-        <div className="marketplace-ui-more-menu is-open" role="menu">
-          {items.map((item, i) => (
-          <div key={`${item.id}:${i}`}>
-            {item.sepBefore && <div className="marketplace-ui-more-sep" />}
-            <button
-              type="button"
-              role="menuitem"
-              className={`marketplace-ui-more-item ${item.danger ? "is-danger" : ""}`}
-              disabled={item.disabled}
-              data-hint={item.titleKey ? t(item.titleKey) : undefined}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (item.disabled) return;
-                setOpen(false);
-                onSelect(item.id);
-              }}
-            >
-              {t(item.labelKey)}
-            </button>
-            </div>
-          ))}
-        </div>
+        <ContextMenu
+          menuId="marketplace-more"
+          anchor={anchor}
+          variant="non-modal"
+          onClose={() => setOpen(false)}
+          items={descriptors}
+        />
       )}
     </div>
   );

@@ -12,6 +12,7 @@ import {
   startContentWatch,
   stopContentWatch,
   __setContentWatchDeps,
+  __resetNotifyDedupe,
   onContentWatchSettled,
   type ContentWatchDeps,
   type ContentWatchOutcome,
@@ -58,6 +59,7 @@ beforeEach(() => {
   outcomes = [];
   fetchMock = vi.fn(async () => result({ entries: entriesA }));
   __setContentWatchDeps(mkDeps());
+  __resetNotifyDedupe();
   unsubscribe = onContentWatchSettled((o) => outcomes.push(o));
 });
 
@@ -89,6 +91,19 @@ describe("contentWatch（R4-5.6 重校验层）", () => {
     fetchMock.mockResolvedValue(result({ entries: entriesA }));
     const o2 = await checkContentNow("manual"); // 手动绕过 60s 开店节流
     expect(o2.changed).toBe(false);
+  });
+
+  it("F9：同一新内容重复轮询只报一次 changed；应用后再变更仍能通知（用户报障「连弹两次」根因）", async () => {
+    fetchMock.mockResolvedValue(result({ entries: entriesB }));
+    expect((await checkContentNow("store-open")).changed).toBe(true); // 首次发现新内容
+    expect((await checkContentNow("manual")).changed).toBe(false); // 同签名重复轮询——不再打扰
+    expect((await checkContentNow("manual")).changed).toBe(false);
+    // 用户点「刷新」后 store 已应用 B ⇒ 印记清空（远端签名 == 现挂签名）
+    __setContentWatchDeps(mkDeps({ currentSignature: () => catalogSignature(entriesB) }));
+    expect((await checkContentNow("manual")).changed).toBe(false);
+    // 之后再出新内容 ⇒ 仍能通知（不是一次性的哑火）
+    fetchMock.mockResolvedValue(result({ entries: entriesA }));
+    expect((await checkContentNow("manual")).changed).toBe(true);
   });
 
   it("首开未到（现挂目录为空）→ 只暖缓存不报变更", async () => {

@@ -200,10 +200,13 @@
 /* ── 作者页：平铺网格（auto-fill 340）＋详细行 ── */
 .marketplace-store-author-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  /* F19（用户拍板：两页同卡同尺寸）：固定 340px 列——⛔ 1fr 吸附拉伸（随分屏变宽变窄） */
+  grid-template-columns: repeat(auto-fill, 340px);
+  justify-content: start;
   gap: 16px;
 }
-.marketplace-store-author-grid .marketplace-store-author-card { width: auto; }
+/* F23：作者卡 hover 扇出/光环完整可见——栅格纵向余量（卡自身 overflow: hidden 只裁扇出内的溢出） */
+.marketplace-store-author-grid .marketplace-store-author-card { margin: 0; }
 .marketplace-store-author-list { display: flex; flex-direction: column; gap: 10px; }
 
 .marketplace-store-author-row {

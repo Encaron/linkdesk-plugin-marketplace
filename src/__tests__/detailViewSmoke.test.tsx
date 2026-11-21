@@ -275,7 +275,8 @@ describe("R4-3.18 右栏四类字段", () => {
 
     const install = screen.getByRole("button", { name: /安装/ }) as HTMLButtonElement;
     expect(install.disabled).toBe(true);
-    expect(install.getAttribute("title")).toBe("需升级 LinkDesk 至 9.9.9 才能安装");
+    // 共享 Button 的 title prop = data-hint（写法规约 §13：不落原生 title=，不跟主题/字号）
+    expect(install.getAttribute("data-hint")).toBe("需升级 LinkDesk 至 9.9.9 才能安装");
   });
 
   it("已装：本机事实出现「安装位置」，值可点开安装目录", async () => {

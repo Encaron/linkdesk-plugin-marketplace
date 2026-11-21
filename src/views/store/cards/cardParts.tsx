@@ -75,7 +75,9 @@ export function tCategory(t: (key: string) => string, entry: CatalogEntry): stri
 }
 
 export function tAuthor(entry: CatalogEntry): string {
-  return authorLabel(entry.author) ?? "官方";
+  // F1（2026-11-21 用户抓漏）：无作者回落**按来源语义**——官方件才落「官方」；
+  // 第三方无作者件此前错落「官方」（作者行与来源徽标两把尺），改落来源名（如 "encaron-fx/fx-bulk"）。
+  return authorLabel(entry.author) ?? (entry.official ? "官方" : (entry.sourceName ?? "社区"));
 }
 
 export function dlText(n?: number): string | undefined {

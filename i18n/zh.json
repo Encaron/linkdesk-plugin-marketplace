@@ -453,5 +453,6 @@
   "折叠本地插件": "折叠本地插件",
   "未找到 marketplace.json 或 plugin.json——仓库根需有其一": "未找到 marketplace.json 或 plugin.json——仓库根需有其一",
   "打开插件模板（npx create-linkdesk-plugin@latest）": "打开插件模板（npx create-linkdesk-plugin@latest）",
-  "模板": "模板"
+  "模板": "模板",
+  "操作": "操作"
 }

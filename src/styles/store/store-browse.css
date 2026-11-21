@@ -3,9 +3,10 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── 页头 ── */
-.marketplace-store-cat-head { margin: 4px 2px 16px; }
-.marketplace-store-cat-title { font-size: 22px; font-weight: 700; letter-spacing: 0.2px; }
-.marketplace-store-cat-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 5px; }
+.marketplace-store-cat-head { margin: 4px 2px 16px; min-width: 0; }
+/* F16（2026-11-21 用户抓漏——I13 扫漏的一类）：窄容器一字一行禁绝——标题单行省略、说明 2 行截断 */
+.marketplace-store-cat-title { font-size: 22px; font-weight: 700; letter-spacing: 0.2px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.marketplace-store-cat-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 5px; min-width: 0; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
 /* ── 工具行（排序 chips ＋ 筛选 ＋ 视图） ── */
 .marketplace-store-toolbar {
@@ -19,7 +20,6 @@
 .marketplace-store-toolbar .marketplace-ui-seg { margin-left: auto; }
 
 /* ── 筛选下拉（通用 Select 同形态：触发器＋勾选菜单） ── */
-.marketplace-store-sel-wrap { position: relative; flex: none; }
 .marketplace-store-sel {
   display: flex;
   align-items: center;
@@ -37,63 +37,8 @@
 .marketplace-store-sel:hover { color: var(--text-primary); border-color: var(--separator); }
 .marketplace-store-sel .marketplace-ui-ic { width: 13px; height: 13px; }
 .marketplace-store-sel-caret { margin-left: 2px; opacity: 0.7; }
-.marketplace-store-sel-menu {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 6px);
-  z-index: 40;
-  width: 208px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  box-shadow: var(--shadow-pop);
-  padding: 6px;
-}
-.marketplace-store-sel-sec {
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--text-muted);
-  padding: 7px 8px 3px;
-  letter-spacing: 0.04em;
-}
-.marketplace-store-sel-item {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  width: 100%;
-  padding: 7px 8px;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 12.5px;
-  text-align: left;
-  border-radius: 7px;
-  cursor: pointer;
-}
-.marketplace-store-sel-item:hover { background: var(--tab-hover-bg); color: var(--text-primary); }
-.marketplace-store-sel-check {
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-  border: 1.5px solid var(--separator);
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.marketplace-store-sel-item.is-on .marketplace-store-sel-check {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-.marketplace-store-sel-item.is-on .marketplace-store-sel-check::after {
-  content: "";
-  width: 8px;
-  height: 5px;
-  border-left: 1.6px solid var(--text-on-accent);
-  border-bottom: 1.6px solid var(--text-on-accent);
-  transform: rotate(-45deg) translateY(-1px);
-}
-.marketplace-store-sel-sep { height: 1px; background: var(--separator); margin: 6px 4px; }
+/* F17（2026-11-21）：自绘筛选弹层样式整删——弹层已换共享 ContextMenu（打勾式），
+   触发钮 .marketplace-store-sel 保留。死样式不留（10 §五）。 */
 
 /* ── 小类 chips 行 ── */
 .marketplace-store-chiprow {

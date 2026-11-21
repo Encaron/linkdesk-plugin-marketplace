@@ -627,5 +627,6 @@
   "折叠本地插件": "Collapse local plugins",
   "未找到 marketplace.json 或 plugin.json——仓库根需有其一": "Neither marketplace.json nor plugin.json was found — the repo root needs one of them",
   "打开插件模板（npx create-linkdesk-plugin@latest）": "Open the plugin template (npx create-linkdesk-plugin@latest)",
-  "模板": "Template"
+  "模板": "Template",
+  "操作": "Actions"
 }

@@ -3,11 +3,14 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── 英雄轮播 ── */
+.marketplace-store-hero-wrap {
+  position: relative; /* F10：箭头的定位锚（画面外两侧） */
+  margin-bottom: 4px;
+}
 .marketplace-store-hero {
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  margin-bottom: 4px;
   border: 1px solid var(--separator);
   background: var(--bg-card);
   box-shadow: 0 10px 44px -10px color-mix(in srgb, var(--marketplace-hue, transparent) 45%, transparent);
@@ -106,8 +109,10 @@
   transition: background 0.15s, color 0.15s;
 }
 .marketplace-store-hero-arrow:hover { color: var(--text-primary); background: var(--bg-input); }
-.marketplace-store-hero-arrow.is-l { left: 10px; }
-.marketplace-store-hero-arrow.is-r { right: 10px; }
+/* F10（2026-11-21 拍板）：箭头移出画面两侧外（wrap 定位，页边距 36px 装得下）；层级压过 hover 放大 */
+.marketplace-store-hero-arrow.is-l { left: -13px; }
+.marketplace-store-hero-arrow.is-r { right: -13px; }
+.marketplace-store-hero-arrow { z-index: 31; }
 .marketplace-store-hero-nav {
   display: flex;
   gap: 6px;

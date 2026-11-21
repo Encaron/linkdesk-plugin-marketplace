@@ -44,56 +44,59 @@ export function Hero() {
 
   return (
     <section className="marketplace-store-sec" data-spec="04-6">
-      <div
-        ref={heroRef}
-        className="marketplace-store-hero"
-        style={{ ["--marketplace-hue" as string]: entryHue(current) }}
-        data-hint={t("鼠标滚轮 / 左右箭头 / 圆点 翻页（共 {{count}} 张轮播）", { count: slides.length })}
-      >
-        <div className="marketplace-store-hero-track" style={{ transform: `translateX(-${idx * 100}%)` }}>
-          {slides.map((entry) => {
-            const ctx = data.ctxOf(entry);
-            const action = actionOfCard(entry, ctx, jobLabelOf(t, ctx.job));
-            const dl = dlText(ctx.dl);
-            const label = t("{{name}}——查看详情", { name: entry.name });
-            return (
-              <div
-                key={entry.id}
-                className="marketplace-store-hero-slide"
-                role="button"
-                tabIndex={0}
-                aria-label={label}
-                onClick={() => actions.onOpen(entry)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    actions.onOpen(entry);
-                  }
-                }}
-              >
-                <div className="marketplace-store-hero-copy">
-                  <span className="marketplace-store-hero-tag">{banner.title}</span>
-                  <h2>{entry.name}</h2>
-                  {entry.description && <p>{entry.description}</p>}
-                  <div className="marketplace-store-hero-meta">
-                    <span>
-                      {t("作者")} <b>{tAuthor(entry)}</b>
-                    </span>
-                    {dl && (
+      {/* F10（2026-11-21 拍板）：箭头移出缩放画面——wrap 包裹，箭头为画面兄弟（两侧外，不随 hover 1.02 放大）；
+          轮播操作说明 data-hint 删（演示说明≠UI 文案，08「实现说明不进 UI」） */}
+      <div className="marketplace-store-hero-wrap">
+        <div
+          ref={heroRef}
+          className="marketplace-store-hero"
+          style={{ ["--marketplace-hue" as string]: entryHue(current) }}
+        >
+          <div className="marketplace-store-hero-track" style={{ transform: `translateX(-${idx * 100}%)` }}>
+            {slides.map((entry) => {
+              const ctx = data.ctxOf(entry);
+              const action = actionOfCard(entry, ctx, jobLabelOf(t, ctx.job));
+              const dl = dlText(ctx.dl);
+              const label = t("{{name}}——查看详情", { name: entry.name });
+              return (
+                <div
+                  key={entry.id}
+                  className="marketplace-store-hero-slide"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={label}
+                  onClick={() => actions.onOpen(entry)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      actions.onOpen(entry);
+                    }
+                  }}
+                >
+                  <div className="marketplace-store-hero-copy">
+                    <span className="marketplace-store-hero-tag">{banner.title}</span>
+                    <h2>{entry.name}</h2>
+                    {entry.description && <p>{entry.description}</p>}
+                    <div className="marketplace-store-hero-meta">
                       <span>
-                        ▾ <b>{dl}</b> {t("下载")}
+                        {t("作者")} <b>{tAuthor(entry)}</b>
                       </span>
-                    )}
-                    <span>v{entry.version}</span>
+                      {dl && (
+                        <span>
+                          ▾ <b>{dl}</b> {t("下载")}
+                        </span>
+                      )}
+                      <span>v{entry.version}</span>
+                    </div>
+                    <div className="marketplace-store-hero-cta">
+                      <ActionButton action={action} onAct={(id) => actions.onAct(entry, id)} />
+                    </div>
                   </div>
-                  <div className="marketplace-store-hero-cta">
-                    <ActionButton action={action} onAct={(id) => actions.onAct(entry, id)} />
-                  </div>
+                  <Art entry={entry} identity={ctx.installedIdentity} className="is-hero" />
                 </div>
-                <Art entry={entry} identity={ctx.installedIdentity} className="is-hero" />
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
         {slides.length > 1 && (
           <>

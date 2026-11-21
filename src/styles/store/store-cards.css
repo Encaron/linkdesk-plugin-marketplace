@@ -136,7 +136,9 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  /* F14（用户口径：要 toast 那种磨砂，⛔ 不是压成实心/黑色）：半透底不变，加浮层地板同款磨砂 */
   background: var(--bg-card);
+  backdrop-filter: blur(16px) saturate(1.15);
   border: 1px solid var(--separator);
   border-radius: 12px;
   box-shadow: var(--shadow-pop);
@@ -197,6 +199,7 @@
   bottom: 60px;
   height: 108px;
   background: var(--bg-card);
+  backdrop-filter: blur(16px) saturate(1.15); /* F24：同 toast 磨砂（不压色） */
   padding: 12px 16px;
   display: flex;
   flex-direction: column;
@@ -305,6 +308,7 @@
 }
 .marketplace-store-rank-row:hover {
   background: var(--bg-card);
+  backdrop-filter: blur(16px) saturate(1.15); /* F14：同 toast 磨砂（不压色） */
   border-color: var(--border);
   transform: scale(1.03);
   box-shadow: var(--shadow-pop);
@@ -370,13 +374,18 @@
 .marketplace-store-group-n { font-size: var(--font-size-2xs); color: var(--text-muted); }
 
 /* ═══ 横排容器（所有横排板块同一套左右切换能力） ═══ */
-.marketplace-store-strip { position: relative; }
+.marketplace-store-strip {
+  position: relative;
+  /* F11（2026-11-21 拍板⑦负 margin 补偿）：row 加深的上下余量在此回抽——视觉节奏不变、
+     技术层放行 hover 展开层（overflow-x:auto 的派生 y 裁剪只切 padding 盒内的越界） */
+  margin: -14px 0 -18px;
+}
 .marketplace-store-strip-row {
   display: flex;
   gap: 14px;
   overflow-x: auto;
   scroll-behavior: smooth;
-  padding: 22px 30px 18px; /* 放大余量：首/末卡 scale＋展开层不切边 */
+  padding: 36px 30px 36px; /* 放大余量加深（F11）：展开层 ±16px 竖向不再被派生 y 裁剪吃掉 */
   scrollbar-width: none;
   overscroll-behavior-x: contain;
 }
@@ -392,7 +401,7 @@
 }
 .marketplace-store-strip-row.is-mega,
 .marketplace-store-strip-row.is-duo {
-  padding: 26px 30px 56px;
+  padding: 36px 30px 56px;
   margin-bottom: -32px;
 }
 .marketplace-store-strip-row.is-duo .marketplace-store-card.is-duo { flex: 0 0 calc(50% - 7px); min-width: 0; }

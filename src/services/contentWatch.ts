@@ -101,6 +101,11 @@ let blockedUntil = 0;
 let tickTimer: ReturnType<typeof setTimeout> | null = null;
 let retryTimer: ReturnType<typeof setTimeout> | null = null;
 let missedTick = false;
+/** F9（2026-11-21 用户报障）：**同一新内容只通知一次**的判据——用户没点「刷新」前，store 内容
+ *  不变 ⇒ 每轮轮询都会重新算出 changed=true。此前每轮各弹一条 Toast＋面板记录（用户看到
+ *  「连弹两次」）。记最后已通知的远端内容签名：同签名不再报 changed；内容被应用到 store
+ *  （远端签名 == 现挂签名）后清空，同内容再次变更仍能通知。 */
+let lastNotifiedSignature: string | null = null;
 
 function now(): number {
   return Date.now();
@@ -192,6 +197,7 @@ function cleanup(): void {
   lastFocusAt = 0;
   backoffFailures = 0;
   blockedUntil = 0;
+  // lastNotifiedSignature **不清**——StoreView 卸载重挂不重弹同一条内容提醒（用户报障 F9 的根因面）
 }
 
 // ── 启停（StoreView keep-alive 挂载即启动；StrictMode 双挂载安全） ────────
@@ -205,6 +211,14 @@ export function startContentWatch(): void {
   scheduleTick();
   // 应用启动一次（06 §六 §2 首行）——startupDone 钉死进程生命周期单趟
   void checkContentNow("startup");
+}
+
+/**
+ * 测试专用：清 F9 通知去重印记。生产路径 ⛔ 不清（StoreView 卸载重挂不应重弹同一条内容提醒）。
+ * 单测各例要独立断言 changed，需在 beforeEach 清。
+ */
+export function __resetNotifyDedupe(): void {
+  lastNotifiedSignature = null;
 }
 
 export function stopContentWatch(): void {
@@ -237,7 +251,13 @@ export async function checkContentNow(reason: ContentWatchReason): Promise<Conte
       const next = await deps().fetchFresh();
       const rateLimited = (next.errors ?? []).some((e) => e.reason === "rate-limited");
       const failed = next.state !== "ok";
-      const changed = !failed && before !== "" && catalogSignature(next.entries, next.collections, next.railOrder) !== before;
+      const remoteSig = catalogSignature(next.entries, next.collections, next.railOrder);
+      // F9：changedRaw = 远端与现挂不同；changed = 还要「这次变更没通知过」（同签名重复轮询不再打扰）。
+      const changedRaw = !failed && before !== "" && remoteSig !== before;
+      const changed = changedRaw && remoteSig !== lastNotifiedSignature;
+      if (changed) lastNotifiedSignature = remoteSig;
+      // 内容已应用到 store（用户点了刷新）⇒ 清通知印记，下一轮同内容真变更可再通知
+      if (!failed && remoteSig === before) lastNotifiedSignature = null;
       outcome = { ran: true, changed, failed };
       if (failed) {
         armBackoff(rateLimited);
