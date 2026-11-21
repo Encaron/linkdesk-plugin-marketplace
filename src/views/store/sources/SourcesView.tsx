@@ -72,6 +72,16 @@ function useLocalInstalls(installedIds: ReadonlySet<string>): [LocalInstallRecor
   return [records, useCallback(() => setTick((t) => t + 1), [])];
 }
 
+/** hint 明细上限（F5，2026-11-21 用户报：1500 条全塞进 hint = 一整屏字）。
+ *  前 8 条 + 一行「…还有 N 条」；完整清单不塞 tooltip（要全量请看目录源本身）。 */
+const HINT_MAX_LINES = 8;
+/** 换行分隔（用 fromCharCode 避开转义歧义） */
+const HINT_SEP = String.fromCharCode(10);
+function hintOf(t: (key: string, opts?: Record<string, unknown>) => string, lines: readonly string[]): string {
+  if (lines.length <= HINT_MAX_LINES) return lines.join(HINT_SEP);
+  return [...lines.slice(0, HINT_MAX_LINES), t("…还有 {{count}} 条", { count: lines.length - HINT_MAX_LINES })].join(HINT_SEP);
+}
+
 export function SourcesView() {
   const { t } = useTranslation();
   const { data, navigate, openAddSource } = useStore();
@@ -256,7 +266,7 @@ export function SourcesView() {
           </div>
           <span className="marketplace-store-src-meta">{t("{{count}} 个插件 · 恒内置", { count: officialCount })}</span>
           {officialWarningLines.length > 0 && (
-            <span className="marketplace-store-src-warn" data-hint={officialWarningLines.join("\n")}>
+            <span className="marketplace-store-src-warn" data-hint={hintOf(t, officialWarningLines)}>
               {officialWarnSummary.label}
             </span>
           )}
@@ -319,7 +329,7 @@ export function SourcesView() {
                   </div>
                 </div>
                 {lines.length > 0 && (
-                  <span className="marketplace-store-src-warn" data-hint={lines.join("\n")}>
+                  <span className="marketplace-store-src-warn" data-hint={hintOf(t, lines)}>
                     {warnSummary.label}
                   </span>
                 )}

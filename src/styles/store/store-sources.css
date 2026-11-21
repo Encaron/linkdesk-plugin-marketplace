@@ -19,6 +19,8 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  flex-wrap: wrap;
+  row-gap: 8px;
   padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -38,7 +40,7 @@
   font-size: 15px;
 }
 .marketplace-store-src-ico.is-muted { background: var(--bg-input); color: var(--text-secondary); }
-.marketplace-store-src-main { min-width: 0; flex: 1; }
+.marketplace-store-src-main { min-width: 180px; flex: 1 1 180px; }
 .marketplace-store-src-name {
   font-size: 13.5px;
   font-weight: 600;
@@ -107,6 +109,10 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  /* 窄容器文字地板（2026-11-21 用户第三次抓同一类）：组头**允许换行**——窄时 pill/按钮换行，
+     绝不把主列压到一字宽（此前主列 43px ⇒ 竖排「1 个市场源…」）。 */
+  flex-wrap: wrap;
+  row-gap: 8px;
   padding: 12px 14px;
   background: color-mix(in srgb, var(--text-primary) 4%, transparent);
 }
@@ -153,6 +159,13 @@
   gap: 3px;
 }
 .marketplace-store-src-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+.marketplace-store-src-sub {
+  /* 单行省略：窄时截断而不是一字一行（范式第 2 条） */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
 .marketplace-store-src-warn {
   font-size: 11px;
   color: var(--warn);
