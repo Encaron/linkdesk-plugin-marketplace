@@ -41,23 +41,37 @@ export function CatalogErrorState() {
   );
 }
 
-/** 有条目但存在降级/失败 —— 顶部一条诚实注记 */
+/** 有条目但存在降级/失败 —— 页头一枚小警告位（⛔ 不再单独占一整行）：
+ *  点它 → 有失败源就进「来源」逐源看（行内已标「加载失败 · 用缓存」），只有离线缓存就刷新目录。 */
 export function CatalogNote() {
   const { t } = useTranslation();
-  const { data } = useStore();
+  const { data, navigate } = useStore();
   const { usedStale, errors } = data.catalog;
   if (!usedStale && errors.length === 0) return null;
-  const failed = errors.map((e) => e.sourceName).join("、");
+  const failed = errors.map((e) => e.sourceName).filter(Boolean).join("、");
+  const hint = [
+    usedStale ? t("目录为离线缓存，可能不是最新") : "",
+    failed ? t("部分来源加载失败：{{names}}", { names: failed }) : "",
+  ]
+    .filter(Boolean)
+    .join("；");
   return (
-    <div className="marketplace-store-cat-note" role="status">
+    <button
+      type="button"
+      className="marketplace-store-cat-note"
+      data-hint={hint}
+      aria-label={hint}
+      onClick={() => {
+        if (errors.length > 0) {
+          navigate({ page: "sources" });
+          return;
+        }
+        void data.catalog.refresh();
+      }}
+    >
       <Icon name="alert" size="sm" />
-      {usedStale && <span>{t("目录为离线缓存，可能不是最新")}</span>}
-      {failed && (
-        <span data-hint={failed}>
-          {t("部分来源加载失败，已显示可用目录")}
-        </span>
-      )}
-    </div>
+      {errors.length > 0 && <span className="marketplace-store-cat-note-n">{errors.length}</span>}
+    </button>
   );
 }
 

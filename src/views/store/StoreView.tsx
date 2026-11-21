@@ -47,7 +47,7 @@ import { HOME_ROUTE, readScroll, routeFromNav, routeKey, routeToNavTarget, sameR
 import { Rail } from "./Rail";
 import { StoreHeader } from "./StoreHeader";
 import { ContentBar } from "./home/ContentBar";
-import { CatalogGate, CatalogNote } from "./home/CatalogState";
+import { CatalogGate } from "./home/CatalogState";
 import { HomeView } from "./home/HomeView";
 import { CategoryView } from "./browse/CategoryView";
 import { SearchResultsView } from "./browse/SearchResultsView";
@@ -437,7 +437,6 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
           <div className="marketplace-store-page">
             <StoreHeader searchRef={searchRef} />
             <ContentBar />
-            <CatalogNote />
             <CatalogGate>
               {route.page === "home" && <HomeView />}
               {route.page === "category" && <CategoryView slug={category} />}

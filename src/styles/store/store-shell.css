@@ -327,18 +327,30 @@
   gap: 14px;
   margin-bottom: 22px;
 }
+.marketplace-store-head-title { min-width: 0; }
 .marketplace-store-head-title h1 {
   font-size: 23px;
   font-weight: 600;
   letter-spacing: -0.01em;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.marketplace-store-head-sub { color: var(--text-muted); font-size: var(--font-size-xs); margin-top: 2px; }
+.marketplace-store-head-sub {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .marketplace-store-head-acts {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-left: auto;
+  min-width: 0;
   flex-wrap: wrap;
 }
 .marketplace-store-search {
@@ -346,6 +358,8 @@
   align-items: center;
   gap: 8px;
   width: 360px;
+  flex: 0 1 360px;
+  min-width: 150px;
   padding: 7px 12px;
   background: var(--bg-input);
   border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
@@ -505,20 +519,25 @@
 .marketplace-store-state-card span { font-size: var(--font-size-2xs); line-height: 1.5; }
 .marketplace-store-state-icon.is-danger { color: var(--danger); }
 
-/* ── 目录注记（降级/单源失败） ── */
+/* ── 目录健康位（页头小警告钉；⛔ 不再单独占一整行） ── */
 .marketplace-store-cat-note {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 12px;
-  margin-bottom: 18px;
-  border: 1px solid var(--separator);
-  border-radius: var(--radius-md);
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  font-size: var(--font-size-xs);
+  justify-content: center;
+  gap: 4px;
+  height: 34px;
+  min-width: 34px;
+  padding: 0 8px;
+  flex: none;
+  cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--warning) 55%, var(--border));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--warning) 12%, var(--bg-input));
+  color: var(--text-primary);
 }
+.marketplace-store-cat-note:hover { border-color: var(--warning); }
 .marketplace-store-cat-note .marketplace-ui-ic { color: var(--warning); flex: none; }
+.marketplace-store-cat-note-n { font-size: var(--font-size-xs); font-weight: 700; color: var(--warning); }
 
 /* ═══ 卡面语言（唯一出处 · 2026-11-21 用户裁决：统一磨砂玻璃＋单份内容＋声明式抬升）═══
    1) 面 = 半透底（--bg-card）；**hover/focus = 磨砂玻璃＋抬升**——磨砂是「凸出来」的语言。
@@ -589,10 +608,10 @@
 }
 @container (max-width: 900px) {
   .marketplace-store { flex-direction: column; }
-  .marketplace-store-head { flex-wrap: wrap; gap: 10px; }
+  .marketplace-store-head { flex-wrap: wrap; gap: 8px 10px; }
   .marketplace-store-head-title h1 { font-size: 20px; }
-  .marketplace-store-head-acts { margin-left: 0; width: 100%; }
-  .marketplace-store-search { width: 100%; max-width: 420px; }
+  .marketplace-store-head-acts { margin-left: 0; width: auto; flex: 1 1 100%; gap: 8px; flex-wrap: nowrap; }
+  .marketplace-store-search { width: auto; flex: 1 1 220px; min-width: 150px; max-width: none; }
   .marketplace-store-rail {
     width: 100%;
     flex-direction: row;
@@ -641,7 +660,43 @@
   .marketplace-store-sticky { --marketplace-sticky-bleed: 16px; }
   .marketplace-store-page { padding: 18px 16px 48px; }
   .marketplace-store-head-title h1 { font-size: 18px; }
-  .marketplace-store-search { max-width: 100%; }
+  .marketplace-store-head-sub { display: none; }
+  .marketplace-store-head-check { padding: 0 9px; }
+  .marketplace-store-head-check-t { display: none; }
+  .marketplace-store-search { flex-basis: 160px; min-width: 120px; }
+}
+
+@container (max-width: 420px) {
+  .marketplace-store-head-acts { gap: 6px; }
+  .marketplace-store-head-check,
+  .marketplace-store-head-add,
+  .marketplace-store-cat-note {
+    height: 30px;
+  }
+  .marketplace-store-head-check { padding: 0 7px; }
+  .marketplace-store-head-add { width: 30px; }
+  .marketplace-store-cat-note { min-width: 32px; padding: 0 6px; }
+  .marketplace-store-search { min-width: 100px; }
+  /* 极窄面板：工具行/小类行保持单行横滚（⛔ 折成两三行把吸顶区撑高） */
+  .marketplace-store .marketplace-store-toolbar,
+  .marketplace-store .marketplace-store-chiprow {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 3px;
+  }
+  .marketplace-store .marketplace-store-toolbar > *,
+  .marketplace-store .marketplace-store-chiprow > * { flex: none; }
+  .marketplace-store .marketplace-store-toolbar .marketplace-store-tb-label,
+  .marketplace-store .marketplace-store-chip-hint { display: none; }
+  .marketplace-store .marketplace-store-toolbar::-webkit-scrollbar,
+  .marketplace-store .marketplace-store-chiprow::-webkit-scrollbar { height: 4px; }
+  .marketplace-store .marketplace-store-toolbar::-webkit-scrollbar-track,
+  .marketplace-store .marketplace-store-chiprow::-webkit-scrollbar-track { background: transparent; }
+  .marketplace-store .marketplace-store-toolbar::-webkit-scrollbar-thumb,
+  .marketplace-store .marketplace-store-chiprow::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--text-muted) 45%, transparent);
+    border-radius: var(--radius-pill);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

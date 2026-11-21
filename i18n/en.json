@@ -229,6 +229,7 @@
   "{{count}} 个可更新": "{{count}} updatable",
   "有新插件": "New plugins",
   "有源加载失败": "A source failed to load",
+  "部分来源加载失败：{{names}}": "Some sources failed to load: {{names}}",
   "搜索名称、ID 或标签…": "Search name, ID, or tags…",
   "搜索插件": "Search plugins",
   "清除搜索": "Clear search",

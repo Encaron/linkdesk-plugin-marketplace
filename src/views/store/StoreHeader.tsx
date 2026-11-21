@@ -11,6 +11,7 @@ import { Icon } from "../../ui";
 import { useAuthorDomain } from "../../services/authors";
 import { useStore } from "./StoreContext";
 import { StickyBar } from "./StickyBar";
+import { CatalogNote } from "./home/CatalogState";
 
 export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputElement> }) {
   const { t } = useTranslation();
@@ -71,6 +72,7 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
             </button>
           )}
         </div>
+        <CatalogNote />
         <button
           type="button"
           className="marketplace-store-head-check"
@@ -78,7 +80,7 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
           onClick={checkUpdates}
         >
           <Icon name="refresh" size="sm" />
-          {t("检查更新")}
+          <span className="marketplace-store-head-check-t">{t("检查更新")}</span>
           {updateCount > 0 && <span className="marketplace-store-head-count">{updateCount}</span>}
         </button>
         <button
@@ -88,7 +90,7 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
           onClick={refreshContent}
         >
           <Icon name="refresh" size="sm" />
-          {t("刷新内容")}
+          <span className="marketplace-store-head-check-t">{t("刷新内容")}</span>
         </button>
         {canAdd && (
           <button
