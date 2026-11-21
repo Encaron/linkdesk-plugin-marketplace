@@ -214,9 +214,9 @@
   padding: 15px 16px;
   cursor: pointer;
 }
-.marketplace-store-cat-tile:hover {
-  /* 抬升幅度 = store-shell 声明表（--surface-scale: 1.08）；这里只补分类瓷片的强调阴影 */
-  box-shadow: 0 12px 44px -8px color-mix(in srgb, var(--accent) 55%, transparent);
+/* 分类瓷片强调光环＝声明式（同 F40） */
+.marketplace-store-cat-tile {
+  --surface-glow: 0 12px 44px -8px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 .marketplace-store-ct-icon {
   width: 40px;

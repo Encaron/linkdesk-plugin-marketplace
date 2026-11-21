@@ -450,7 +450,7 @@
   background: var(--bg-card);
   backdrop-filter: var(--surface-blur);
   -webkit-backdrop-filter: var(--surface-blur);
-  box-shadow: var(--shadow-pop);
+  box-shadow: var(--surface-glow, 0 0 transparent), var(--shadow-pop);
   z-index: 30;
 }
 :where(.marketplace-store-card,

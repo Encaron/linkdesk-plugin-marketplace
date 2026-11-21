@@ -160,10 +160,11 @@
   gap: 4px;
 }
 /* hover 语言：1.08＋作者色光环/晕染＋斜向高光（全部 transform/opacity） */
+/* 作者色光环＝声明式（同 F40）：只声明 --surface-glow，应用归统一 hover */
+.marketplace-store-author-card {
+  --surface-glow: 0 18px 52px -12px color-mix(in srgb, var(--marketplace-hue, var(--accent)) 62%, transparent);
+}
 .marketplace-store-author-card:hover {
-  /* 抬升/磨砂走 store-shell 唯一出处（--surface-scale: 1.08）；这里只补作者色光环 */
-  box-shadow: 0 18px 52px -12px color-mix(in srgb, var(--marketplace-hue, var(--accent)) 62%, transparent),
-    var(--shadow-pop);
   border-color: color-mix(in srgb, var(--marketplace-hue, var(--accent)) 30%, var(--border));
 }
 /* 斜向高光扫描（与本体放大同一拍） */

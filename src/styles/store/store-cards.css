@@ -120,15 +120,10 @@
 }
 .marketplace-store-cg-corner { max-width: 50%; }
 
-/* 主题卡/双大卡：统一阴影只做底座；变体保留自己的**主题色辉光**（F40 · 用户报「光辉没了」） */
-.marketplace-store-card.is-mega:hover {
-  box-shadow: 0 14px 50px -8px color-mix(in srgb, var(--marketplace-hue, transparent) 65%, transparent),
-    var(--shadow-pop);
-}
-.marketplace-store-card.is-duo:hover {
-  box-shadow: 0 12px 44px -8px color-mix(in srgb, var(--marketplace-hue, transparent) 60%, transparent),
-    var(--shadow-pop);
-}
+/* 辉光＝**声明式**（F40 · 2026-11-21）：卡型只声明 `--surface-glow`，统一 hover 规则负责应用；
+   ⛔ 不再为某类卡单独写 hover box-shadow。任何卡型想要辉光＝加一行变量（值里可用 --marketplace-hue）。 */
+.marketplace-store-card.is-mega { --surface-glow: 0 14px 50px -8px color-mix(in srgb, var(--marketplace-hue, transparent) 65%, transparent); }
+.marketplace-store-card.is-duo { --surface-glow: 0 12px 44px -8px color-mix(in srgb, var(--marketplace-hue, transparent) 60%, transparent); }
 
 /* ── 原位放大展开面（small/grid · F39 单面＝唯一出处） ──
    🔴 一个面、一份内容、一个 backdrop root：
@@ -166,7 +161,7 @@
   right: -16px;
   pointer-events: auto;
   border-color: var(--separator);
-  box-shadow: var(--shadow-pop);
+  box-shadow: var(--surface-glow, 0 0 transparent), var(--shadow-pop);
   backdrop-filter: var(--surface-blur);
   -webkit-backdrop-filter: var(--surface-blur);
 }
