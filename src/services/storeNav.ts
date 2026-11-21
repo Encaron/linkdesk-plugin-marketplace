@@ -102,10 +102,10 @@ function notify(): void {
   state.listeners.forEach((fn) => fn());
 }
 
-function apply(raw: unknown): void {
+function apply(raw: unknown, force = false): void {
   const target = normalizeStoreNavTarget(raw);
   if (!target) return;
-  if (JSON.stringify(target) === JSON.stringify(state.target)) return;
+  if (!force && JSON.stringify(target) === JSON.stringify(state.target)) return;
   state.target = target;
   state.loaded = true;
   notify();
@@ -173,10 +173,11 @@ export async function readStoreNavTarget(): Promise<StoreNavTarget> {
   return state.target;
 }
 
-/** 发布意图：内存 → 持久 → 广播（顺序保证「先写盘再开标签页」的调用方拿到一致结果） */
-export async function publishStoreNav(target: StoreNavTarget): Promise<void> {
+/** 发布意图：内存 → 持久 → 广播（顺序保证「先写盘再开标签页」的调用方拿到一致结果）。
+ *  `force=true` 供**命令面显式导航**：同一目标重入也要再广播（防 state 已 stale 时 home 被吞）。 */
+export async function publishStoreNav(target: StoreNavTarget, force = false): Promise<void> {
   ensureBridge();
-  apply(target);
+  apply(target, force);
   const ps = window.linkdesk?.pluginState;
   if (ps) {
     try {

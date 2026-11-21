@@ -112,6 +112,16 @@ describe("publish / read", () => {
     await publishStoreNav({ page: "library" });
     expect(calls).toBe(1);
   });
+
+  it("force 发布同一值会再通知（命令面显式导航重入）", async () => {
+    makeWorld();
+    let calls = 0;
+    onStoreNavChange(() => calls++);
+    await publishStoreNav({ page: "library" });
+    await publishStoreNav({ page: "home" });
+    await publishStoreNav({ page: "home" }, true);
+    expect(calls).toBe(3);
+  });
 });
 
 describe("consumeStoreNavTarget —— 一次性消费（棒 6 商店壳取读口）", () => {

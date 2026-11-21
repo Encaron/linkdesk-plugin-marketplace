@@ -34,7 +34,7 @@ import { rankEntries } from "../storeData";
 import { SectionHead } from "../home/SectionHead";
 import { Strip } from "../Strip";
 import { useStore } from "../StoreContext";
-import { AuthorHero, type AuthorHeroSlideView } from "./AuthorHero";
+import { HeroCarousel, type HeroCarouselSlide } from "../HeroCarousel";
 import { AuthorSwitchCard } from "./AuthorCard";
 
 /** 跳转字 target 的封闭集合判定（⛔ 任意 URL；非法 target = 不渲染该字） */
@@ -63,13 +63,13 @@ function resolveMore(
   return null;
 }
 
-function resolveSlides(section: AuthorSectionDecl, repo: AuthorRepoView): AuthorHeroSlideView[] {
+function resolveSlides(section: AuthorSectionDecl, repo: AuthorRepoView): HeroCarouselSlide[] {
   const raw = section.slides?.length
     ? section.slides
     : section.plugin || section.tag
       ? [{ plugin: section.plugin, tag: section.tag }]
       : [];
-  const out: AuthorHeroSlideView[] = [];
+  const out: HeroCarouselSlide[] = [];
   for (const slide of raw) {
     const entry = slide.plugin
       ? repo.plugins.find((p) => p.id === slide.plugin)
@@ -227,7 +227,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
       return (
         <section key={`hero:${idx}`} className={`marketplace-store-sec ${noGlow ? "is-no-glow" : ""}`.trim()}>
           <SectionHead title={section.title ?? t("大屏推荐")} hint={section.hint} />
-          <AuthorHero slides={slides} />
+          <HeroCarousel slides={slides} />
         </section>
       );
     }
@@ -271,7 +271,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
 
       {heroIndex >= 0 && heroSlides.length > 0 ? (
         <section className="marketplace-store-sec" data-spec="04-6-authors">
-          <AuthorHero slides={heroSlides} />
+          <HeroCarousel slides={heroSlides} />
         </section>
       ) : null}
 

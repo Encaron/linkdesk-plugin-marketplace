@@ -168,7 +168,7 @@ async function labelOf(pluginId: string): Promise<string> {
 /* ═══ 导航命令（先落意图、再开标签页） ═══ */
 
 export async function runOpenStore(): Promise<OpenTabResult> {
-  await publishStoreNav({ page: "home" });
+  await publishStoreNav({ page: "home" }, true);
   return openStoreTab();
 }
 
@@ -179,22 +179,22 @@ export async function runOpenCategory(args?: unknown): Promise<OpenTabResult> {
   const target: StoreNavTarget = authorId
     ? { page: "category", category, authorId }
     : { page: "category", category };
-  await publishStoreNav(target);
+  await publishStoreNav(target, true);
   return openStoreTab();
 }
 
 export async function runOpenRank(): Promise<OpenTabResult> {
-  await publishStoreNav({ page: "rank" });
+  await publishStoreNav({ page: "rank" }, true);
   return openStoreTab();
 }
 
 export async function runOpenAuthors(): Promise<OpenTabResult> {
-  await publishStoreNav({ page: "authors" });
+  await publishStoreNav({ page: "authors" }, true);
   return openStoreTab();
 }
 
 export async function runOpenLibrary(): Promise<OpenTabResult> {
-  await publishStoreNav({ page: "library" });
+  await publishStoreNav({ page: "library" }, true);
   return openStoreTab();
 }
 
@@ -205,12 +205,12 @@ export async function runOpenAuthor(args?: unknown): Promise<OpenTabResult> {
   const target: StoreNavTarget = repoId
     ? { page: "author", authorId, repoId }
     : { page: "author", authorId };
-  await publishStoreNav(target);
+  await publishStoreNav(target, true);
   return openStoreTab();
 }
 
 export async function runOpenSources(): Promise<OpenTabResult> {
-  await publishStoreNav({ page: "sources" });
+  await publishStoreNav({ page: "sources" }, true);
   return openStoreTab();
 }
 
@@ -223,7 +223,7 @@ export async function runSearch(args?: unknown): Promise<OpenTabResult> {
   } catch {
     /* 事件面缺失（预览）——池内本地状态已设 */
   }
-  await publishStoreNav({ page: "search", query });
+  await publishStoreNav({ page: "search", query }, true);
   return openStoreTab();
 }
 

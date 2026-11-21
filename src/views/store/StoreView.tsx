@@ -218,7 +218,7 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
     });
     const un = onStoreNavChange(() => {
       const target = getStoreNavTarget();
-      if (target.page === "home") return; // 复位信号，不是导航
+      // home 也是真导航（`openStore` 的「回到首页」）；`consumeStoreNavTarget` 的复位不广播，不会误触发
       apply(target);
       void consumeStoreNavTarget(); // 消费后复位信箱，防冷启动回旧页
     });
