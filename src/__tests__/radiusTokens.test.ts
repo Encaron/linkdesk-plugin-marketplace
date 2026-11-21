@@ -39,7 +39,10 @@ describe("圆角吃主题 token（不写死 px）", () => {
       for (const m of css.matchAll(/border-radius\s*:\s*([^;}]+)/g)) {
         const value = m[1].trim();
         const literal = /(^|[\s(])\d*\.?\d+(px|%)/.test(value);
-        const allowed = value === "0" || value === "inherit" || /^[0\s]*(var\(--radius-[a-z0-9-]+\)\s*)+$/.test(value);
+        const allowed =
+          value === "0" ||
+          value === "inherit" ||
+          /^(0|var\(--radius-[a-z0-9-]+\))(\s+(0|var\(--radius-[a-z0-9-]+\))){0,3}$/.test(value);
         if (literal && !allowed) offenders.push(`${rel(file)} → ${value}`);
       }
     }

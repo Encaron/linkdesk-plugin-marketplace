@@ -260,7 +260,7 @@
   background: var(--bg-window-solid, var(--bg-window));
   -webkit-backdrop-filter: var(--surface-blur);
   backdrop-filter: var(--surface-blur);
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  border-radius: var(--radius-lg);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--border) 65%, transparent);
 }
 .marketplace-store-sticky.is-head {
@@ -269,9 +269,9 @@
   margin: 0;
   padding: 8px 0 12px;
 }
-/* 页头下还接着工具组：两组拼成一块连续玻璃，只有最底一组圆下角 */
+/* 页头下还接着工具组：两组拼成一块连续玻璃——页头圆上角、工具组圆下角，中缝保持直角 */
 .marketplace-store:has(.marketplace-store-sticky.is-group) .marketplace-store-sticky.is-head::before {
-  border-radius: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 .marketplace-store-sticky.is-group {
   display: flex;
@@ -279,6 +279,9 @@
   gap: 8px;
   margin-bottom: 6px;
   padding: 8px 0;
+}
+.marketplace-store-sticky.is-group::before {
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 .marketplace-store-sticky.is-group > * { margin: 0; }
 
