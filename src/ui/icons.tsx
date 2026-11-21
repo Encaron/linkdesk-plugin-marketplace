@@ -22,6 +22,7 @@ export type IconName =
   | "chevron-down"
   | "chevron-right"
   | "chevron-left"
+  | "arrow-up"
   | "check"
   | "folder"
   | "refresh"
@@ -92,6 +93,12 @@ const SHAPES: Record<IconName, JSX.Element> = {
   "chevron-down": <polyline points="6 9 12 15 18 9" />,
   "chevron-right": <path d="m9 18 6-6-6-6" />,
   "chevron-left": <path d="m15 18-6-6 6-6" />,
+  "arrow-up": (
+    <>
+      <path d="M12 19V5" />
+      <path d="m5 12 7-7 7 7" />
+    </>
+  ),
   check: <polyline points="20 6 9 17 4 12" />,
   folder: <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />,
   refresh: (

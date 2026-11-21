@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../../ui";
 import { localizeCategory } from "../../services/marketCategories";
 import { useStore } from "./StoreContext";
+import { sameRoute, type StoreRoute } from "./navigation";
 
 const CATEGORY_ICON: Record<string, IconName> = {
   development: "code",
@@ -32,7 +33,7 @@ function iconOf(slug: string): IconName {
 
 export function Rail() {
   const { t } = useTranslation();
-  const { data, route, navigate, unreadCats, unreadAuthors } = useStore();
+  const { data, route, navigate, scrollTop, unreadCats, unreadAuthors } = useStore();
   const { railOrder, errors } = data.catalog;
   const counts = data.railOrderCounts;
   const active = route.page;
@@ -70,13 +71,54 @@ export function Rail() {
     ev.preventDefault();
   }, []);
 
+  /* 跳哪聚焦哪：路由落到某个 rail 项时，把那一项滚进可视区（竖排滚 `.rail-scroll`，
+     窄窗横条滚 rail 本体）——否则「全部榜单」等落点排在 rail 底部，用户看不到自己跳到了哪。
+     ⛔ 只滚 rail 自己的容器，不动主内容滚动位；尊重 reduced-motion。 */
+  useEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const key = active === "category" ? activeCategory : active;
+    if (!key) return;
+    const item = rail.querySelector<HTMLElement>(`[data-rail-item="${key}"]`);
+    if (!item) return;
+    const behavior: ScrollBehavior = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+      ? "auto"
+      : "smooth";
+    const pad = 8;
+    if (getComputedStyle(rail).flexDirection === "row") {
+      // 窄窗：整条 rail 横向滚动，所有项同在一行
+      const r = item.getBoundingClientRect();
+      const c = rail.getBoundingClientRect();
+      if (r.left < c.left) rail.scrollBy({ left: r.left - c.left - pad, behavior });
+      else if (r.right > c.right) rail.scrollBy({ left: r.right - c.right + pad, behavior });
+      return;
+    }
+    // 竖排：只有中段「浏览」区自己的滚动容器会裁内容；品牌块/底栏始终可见
+    const scroller = rail.querySelector<HTMLElement>(".marketplace-store-rail-scroll");
+    if (!scroller || !scroller.contains(item)) return;
+    const r = item.getBoundingClientRect();
+    const c = scroller.getBoundingClientRect();
+    if (r.top < c.top) scroller.scrollBy({ top: r.top - c.top - pad, behavior });
+    else if (r.bottom > c.bottom) scroller.scrollBy({ top: r.bottom - c.bottom + pad, behavior });
+  }, [active, activeCategory]);
+
+  /* 点已定位的 rail 项 = 回顶；否则正常导航（`sameRoute` 精确比对，带 authorId/official 的
+     分类页点 rail 会落回全量分类，⛔ 不被误判成「已在该页」） */
+  const go = (target: StoreRoute) => {
+    if (sameRoute(route, target)) {
+      scrollTop();
+      return;
+    }
+    navigate(target);
+  };
+
   return (
     <nav ref={railRef} className="marketplace-store-rail" aria-label={t("商店分类导航")} onKeyDown={onKeyDown}>
       <div className="marketplace-store-rail-top">
         <button
           type="button"
           className={`marketplace-store-rail-home ${active === "home" ? "is-active" : ""}`}
-          onClick={() => navigate({ page: "home" })}
+          onClick={() => go({ page: "home" })}
           aria-current={active === "home" ? "page" : undefined}
           data-rail-item="home"
         >
@@ -102,7 +144,7 @@ export function Rail() {
               className={`marketplace-store-rail-item ${activeCategory === slug ? "is-active" : ""} ${empty ? "is-empty" : ""}`}
               data-hint={empty ? t("暂无插件") : undefined}
               aria-current={activeCategory === slug ? "page" : undefined}
-              onClick={() => navigate({ page: "category", category: slug })}
+              onClick={() => go({ page: "category", category: slug })}
               data-rail-item={slug}
             >
               <Icon name={iconOf(slug)} />
@@ -116,7 +158,7 @@ export function Rail() {
         <button
           type="button"
           className={`marketplace-store-rail-item ${active === "rank" ? "is-active" : ""}`}
-          onClick={() => navigate({ page: "rank" })}
+          onClick={() => go({ page: "rank" })}
           aria-current={active === "rank" ? "page" : undefined}
           data-rail-item="rank"
         >
@@ -129,7 +171,7 @@ export function Rail() {
         <button
           type="button"
           className={`marketplace-store-rail-item is-compact ${active === "library" ? "is-active" : ""}`}
-          onClick={() => navigate({ page: "library" })}
+          onClick={() => go({ page: "library" })}
           aria-current={active === "library" ? "page" : undefined}
           data-rail-item="library"
         >
@@ -149,7 +191,7 @@ export function Rail() {
         <button
           type="button"
           className={`marketplace-store-rail-item is-compact ${active === "authors" ? "is-active" : ""}`}
-          onClick={() => navigate({ page: "authors" })}
+          onClick={() => go({ page: "authors" })}
           aria-current={active === "authors" ? "page" : undefined}
           data-rail-item="authors"
         >
@@ -168,7 +210,7 @@ export function Rail() {
         <button
           type="button"
           className={`marketplace-store-rail-item is-compact ${active === "sources" ? "is-active" : ""}`}
-          onClick={() => navigate({ page: "sources" })}
+          onClick={() => go({ page: "sources" })}
           aria-current={active === "sources" ? "page" : undefined}
           data-rail-item="sources"
         >

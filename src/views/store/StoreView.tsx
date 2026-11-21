@@ -60,7 +60,7 @@ import { requestLicenseDialog } from "../../services/licenseActions";
 import { AuthorsView } from "./authors/AuthorsView";
 import { AuthorStoreView } from "./authors/AuthorStoreView";
 import type { CatalogEntry } from "../../services/marketCatalog";
-import type { ViewMode } from "../../ui";
+import { Icon, type ViewMode } from "../../ui";
 
 import "../../styles/ui/primitives.css";
 import "../../styles/store/store-shell.css";
@@ -97,6 +97,8 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
   const [contentAppliedAt, setContentAppliedAt] = useState<string | null>(null);
   const [discoverReads, setDiscoverReads] = useState<DiscoverReads>(EMPTY_DISCOVER_READS);
   const [addSourceMode, setAddSourceMode] = useState<AddSourceMode | null>(null);
+  /** 内容区滚过一屏后浮出「回到顶部」钮 */
+  const [showTop, setShowTop] = useState(false);
 
   const contentRef = useRef<HTMLDivElement | null>(null);
   const searchRef = useRef<HTMLInputElement | null>(null);
@@ -158,6 +160,18 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
     requestAnimationFrame(() => {
       if (contentRef.current) contentRef.current.scrollTop = top;
     });
+  }, []);
+
+  /* 回顶（rail 二次点击 / 悬浮钮共用唯一出口）：只滚内容区，⛔ 不重载不清筛选 */
+  const scrollTop = useCallback(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    el.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+  }, []);
+
+  const onContentScroll = useCallback(() => {
+    setShowTop((contentRef.current?.scrollTop ?? 0) > 280);
   }, []);
 
   const navigate = useCallback((next: StoreRoute) => {
@@ -379,6 +393,7 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
       addSource,
       openAddSource,
       keepScroll,
+      scrollTop,
     }),
     [
       data,
@@ -408,6 +423,7 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
       addSource,
       openAddSource,
       keepScroll,
+      scrollTop,
     ],
   );
 
@@ -417,7 +433,7 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
     <StoreProvider value={value}>
       <div className="marketplace-store">
         <Rail />
-        <div className="marketplace-store-content" ref={contentRef} role="main" tabIndex={-1}>
+        <div className="marketplace-store-content" ref={contentRef} role="main" tabIndex={-1} onScroll={onContentScroll}>
           <div className="marketplace-store-page">
             <StoreHeader searchRef={searchRef} />
             <ContentBar />
@@ -442,6 +458,17 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
             </CatalogGate>
           </div>
         </div>
+        {showTop && (
+          <button
+            type="button"
+            className="marketplace-store-top"
+            onClick={scrollTop}
+            aria-label={t("回到顶部")}
+            data-hint={t("回到顶部")}
+          >
+            <Icon name="arrow-up" />
+          </button>
+        )}
         <AddSourceModal open={addSourceMode !== null} initialMode={addSourceMode ?? "remote"} onClose={closeAddSource} />
         {/* R4-3.21：许可弹窗（卡片「我有密钥/输入新密钥」的落点；公钥取条目 authorId 的作者块） */}
         <LicenseModal

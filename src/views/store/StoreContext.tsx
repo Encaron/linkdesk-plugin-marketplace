@@ -52,6 +52,8 @@ export interface StoreContextValue {
   openAddSource: (mode?: "remote" | "local") => void;
   /** 状态变化（排序/筛选/视图/chip）时保滚动位——机械守则：页面不跳 */
   keepScroll: (fn: () => void) => void;
+  /** 回顶（rail 二次点击 / 悬浮钮共用）：只滚内容区，不重载、不清筛选 */
+  scrollTop: () => void;
 }
 
 const Ctx = createContext<StoreContextValue | null>(null);

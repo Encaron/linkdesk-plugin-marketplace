@@ -9,6 +9,7 @@
   min-width: 0;
   min-height: 0;
   display: flex;
+  position: relative;
   background: var(--bg-window);
   color: var(--text-primary);
   user-select: text;
@@ -203,6 +204,34 @@
   min-width: 0;
   overflow-y: auto;
 }
+/* 回到顶部（内容滚过一屏才出现；rail 二次点击是同一出口） */
+.marketplace-store-top {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 40;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  -webkit-backdrop-filter: var(--surface-blur);
+  backdrop-filter: var(--surface-blur);
+  box-shadow: var(--shadow-pop);
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s, transform 0.15s;
+}
+.marketplace-store-top:hover {
+  color: var(--text-primary);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  transform: translateY(-1px);
+}
+.marketplace-store-top .marketplace-ui-ic { width: 16px; height: 16px; }
 .marketplace-store-page {
   width: 100%;
   max-width: 1280px;
@@ -539,7 +568,8 @@
   .marketplace-store-rail-item,
   .marketplace-store-head-check,
   .marketplace-store-head-add,
-  .marketplace-store-content-bar {
+  .marketplace-store-content-bar,
+  .marketplace-store-top {
     transition-duration: 0.01ms;
   }
 }
