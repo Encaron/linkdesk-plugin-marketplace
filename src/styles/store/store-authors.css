@@ -127,9 +127,26 @@
   text-overflow: ellipsis;
 }
 .marketplace-store-ac-repo i { font-style: normal; font-size: 10.5px; color: var(--text-muted); }
-.marketplace-store-author-card:hover .marketplace-store-ac-repo {
+/* 多仓叠放：静止只露**最上面一张**的文字，下面几张只露边（否则半透底会让三行字互压）；
+   hover / 键盘聚焦时随扇开逐张淡入——与 fan 同拍，仍只做 transform/opacity。 */
+.marketplace-store-ac-repo b,
+.marketplace-store-ac-repo i {
+  transition: opacity 0.18s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.marketplace-store-ac-repo:not(:last-child) b,
+.marketplace-store-ac-repo:not(:last-child) i {
+  opacity: 0;
+}
+.marketplace-store-author-card:hover .marketplace-store-ac-repo,
+.marketplace-store-author-card:focus-visible .marketplace-store-ac-repo {
   transform: translate(calc(var(--i) * 104px), 0);
   border-color: color-mix(in srgb, var(--marketplace-hue, transparent) 45%, var(--border));
+}
+.marketplace-store-author-card:hover .marketplace-store-ac-repo b,
+.marketplace-store-author-card:hover .marketplace-store-ac-repo i,
+.marketplace-store-author-card:focus-visible .marketplace-store-ac-repo b,
+.marketplace-store-author-card:focus-visible .marketplace-store-ac-repo i {
+  opacity: 1;
 }
 /* 边界 ① 单仓：一张满宽卡＋「唯一仓库」，不假装扇出 */
 .marketplace-store-author-card.is-solo .marketplace-store-ac-deck { height: 38px; }
