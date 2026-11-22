@@ -55,14 +55,6 @@ export function hueBG(hue: string): CSSProperties {
   return { backgroundImage: `linear-gradient(135deg, ${hue}, ${hue}C8)`, backgroundOrigin: "border-box" };
 }
 
-/** 封面/大图底：128° 三段渐变（蓝图 `artBG` 同形）——长手＋border-box，理由同上（F25/F13 根因）。 */
-export function artBG(hue: string): CSSProperties {
-  return {
-    backgroundImage: `linear-gradient(128deg, ${hue} 0%, ${hue}B8 55%, ${hue}70 100%)`,
-    backgroundOrigin: "border-box",
-  };
-}
-
 /** 条目种子——优先 pluginId（同一插件各卡同色），没有则退名字 */
 export function entryHue(entry: { id?: string; name?: string }): string {
   return hueOf(entry.id || entry.name || "plugin");

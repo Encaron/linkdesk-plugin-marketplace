@@ -8,8 +8,11 @@
 
 import { useEffect, useState } from "react";
 import { readInstalledPackageFile } from "../../../services/packageFiles";
-import type { CatalogScreenshot } from "../../../services/marketCatalog";
+import { mediaOf, type MediaModel } from "../../store/cards/mediaModel";
 import type { DetailIdentity } from "./useDetailIdentity";
+
+/** 无目录条目时的空媒体模型（详情仍会渲染「加载中/未安装」空态，不画假图） */
+const EMPTY_MEDIA: MediaModel = { kind: "generated", frames: [], video: null, issues: [] };
 
 /** 远端 README 的相对媒体基址——readmeUrl（https 裸文件 URL）剥去最后一段 = 同目录基址。
  *  相对图解析成同目录 https 直链（MarkdownView 协议白名单只放 https/linkdesk，解析结果仍在闸内）。
@@ -70,11 +73,9 @@ export function useDetailPackage(id: DetailIdentity) {
   }, [pluginId, installed, pkgReadme, remoteReadmeUrl]);
 
   /* ── 30.6 展示派生 ──
-   *  R4-3.22（I12 · 06 §二·2 媒体契约）：screenshots[] = 图片串 ＋ 至多 1 段视频对象（parse 期已裁口）——
-   *  原样透传给画廊（图 img / 视频 video 两分支在展示件）；⛔ 这里不再过滤掉视频项（棒 9 前只留 string）。 */
-  const shots = (entry?.screenshots ?? []).filter(
-    (s): s is CatalogScreenshot => typeof s === "string" ? !!s : typeof s?.url === "string" && !!s.url,
-  );
+   *  R4 媒体丰富度（C5）：详情画廊与卡片/hero **同一份选帧**（mediaOf）——海报→cover→静帧、
+   *  去重、上限 3；视频对象解析期已裁口。⛔ 详情再写一份 screenshots 读取/第二套画廊。 */
+  const media = entry ? mediaOf(entry) : EMPTY_MEDIA;
   /* E6#70a（15 档案）：已装读包 README 的相对媒体引用解析到「被查看插件包内」→ 注入
    *  linkdesk://{pluginId}/ 基址（linkdesk:// 与读包 resolvePath 同根，README 引用的随包资产即此可达）。
    *  远端 readmeUrl 来源（未装态/包内无 README 兜底）：readmeUrl 是裸文件 URL（raw.githubusercontent
@@ -101,8 +102,5 @@ export function useDetailPackage(id: DetailIdentity) {
     return { mode: "none" };
   })();
 
-  return { pkgChangelog, shots, readme };
+  return { pkgChangelog, media, readme };
 }
-
-/** 画廊媒体项形状（展示件 props 契约；CatalogScreenshot 的再出口免得视图摸 services 内部） */
-export type { CatalogScreenshot };

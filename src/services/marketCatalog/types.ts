@@ -39,6 +39,9 @@ export interface CatalogEntry {
    *  在来源页记声明提示（⛔ 不静默降级成图）；播放语义照 README 视频（controls 强制/preload=metadata/
    *  剥 autoplay/poster 优先；⛔ 不托管）。渲染器分支消费属棒 10（I12）。 */
   screenshots?: CatalogScreenshot[];
+  /** 目录卡封面（绝对 HTTPS URL；缺省按「视频海报 → cover → 首张静帧 → 生成式封面」选帧）。
+   *  R4 媒体丰富度（17 §3.1）：与 screenshots 同一套媒体契约，⛔ 不是第二套字段。 */
+  cover?: string;
   license?: string;
   /** 合并注入：厂商注册表命中键（vendors.json 的 vendorId ↔ 条目 authorId）——命中即「官方 ✓」。
    *  判定链唯一在合并期（09 §一·补2）：UI 读本字段即可，⛔ 不许拿作者名再判一次。 */
@@ -92,8 +95,9 @@ export interface CollectionDecl {
   /** 合集级跳转字（09 §二：板块 more 与合集 more 两处都认） */
   more?: { label?: string; target?: string };
   cover?: string;
-  /** 卡片原型映射：banner→hero · strip→sm 横排 · duo→lg×2 · grid→md 网格（05 §四） */
-  layout?: "banner" | "strip" | "duo" | "grid";
+  /** 卡片原型映射：banner→hero · strip→sm 横排 · duo→lg×2 · grid→md 网格 ·
+   *  mega→主题横滚 · small→小卡 · split→整行分栏 · wall→封面图墙（05 §四 / 17 §四） */
+  layout?: "banner" | "strip" | "duo" | "grid" | "mega" | "small" | "split" | "wall";
   /** 成员 pluginId 引用——缺失条目静默跳过（照目录 merge 防御语义） */
   items: string[];
   order?: number;
@@ -127,6 +131,8 @@ export interface CatalogWarning {
     | "unknown-subcategory"
     | "unknown-rail-category"
     | "screenshot-video-restricted"
+    /** 媒体 URL 不是 https 绝对地址（相对路径未装必 404 / 明文不安全）——值保留，渲染层丢帧并告警 */
+    | "screenshot-url-invalid"
     | "invalid-source-link"
     | "invalid-collection"
     /** R4-4.5（批4b）：同一合集 id 在主文件与 collections/ 文件夹两处声明——**inline 主文件正典胜**，

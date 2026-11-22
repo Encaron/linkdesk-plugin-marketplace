@@ -6,7 +6,7 @@
  */
 
 export { Icon, type IconName } from "./icons";
-export { hueOf, hueBG, artBG, entryHue } from "./avatarHue";
+export { hueOf, hueBG, entryHue } from "./avatarHue";
 export {
   statusTag,
   allBadges,

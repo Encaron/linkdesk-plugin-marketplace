@@ -26,6 +26,10 @@ export function catalogWarningText(t: T, w: CatalogWarning): string {
       return `${entry}${t("截图里的视频项越位（{{at}}）——最多 1 段且必须排第一，多余项已丢弃", {
         at: w.detail ?? "",
       })}`;
+    case "screenshot-url-invalid":
+      return `${entry}${t("截图/封面地址不是 https 绝对 URL（{{at}}）——未装用户看不到，卡上已跳过该帧", {
+        at: w.detail ?? "",
+      })}`;
     case "invalid-source-link":
       return t("已审核源声明不合形——该行已跳过");
     case "invalid-collection":

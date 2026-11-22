@@ -38,7 +38,12 @@ const SDK_SCHEMA = JSON.parse(readFileSync(SDK_SCHEMA_PATH, "utf8")) as {
 const MERGE_INJECTED = new Set(["sourceName", "official", "sourceUrl"]);
 
 /** 白名单超前于已装 schema 的 v2 键（SDK R4-0.2 已落 schema、未发版；发版后本组自然消融） */
-const V2_PENDING = new Set(["categories", "screenshots", "license", "repository", "pricing", "authorId"]);
+const V2_PENDING = new Set(["categories", "screenshots", "license", "repository", "pricing", "authorId", "cover"]);
+
+/** 🔴 本轮（媒体丰富度 A2）新增、已进本仓白名单但**尚未随 SDK 发版**的字段：
+ *  发版前允许超前（否则运行时先丢字段 = 越早越坏）；SDK schema 带上后本集合自动空转，
+ *  严格等恢复成「逐键相等」——⛔ 不是永久豁免，加字段必须写明来由。 */
+const FORWARD_FIELDS = new Set(["cover"]);
 
 /** 白名单文件键集合——喂一条全字段探针，collect 输出的键 = 白名单本身（normalizeEntry 恒产出全部键） */
 function whitelistFileKeys(): string[] {
@@ -67,6 +72,7 @@ function whitelistFileKeys(): string[] {
           { type: "video", url: "https://example.invalid/clip.mp4", poster: "https://example.invalid/poster.jpg" },
           "https://example.invalid/shot.png",
         ],
+        cover: "https://example.invalid/cover.png",
         license: "MIT",
         repository: "https://example.invalid/demo",
         versions: [{ version: "1.0.0", downloadUrl: "https://example.invalid/demo.linkdesk-plugin", publishedAt: "2026-11-20T00:00:00.000Z" }],
@@ -88,8 +94,13 @@ describe("R4-0.4 腿②——parse 白名单 ↔ SDK schema（按 node_modules �
   });
 
   if (hasV2) {
-    it("v2 schema 在场 ⇒ 严格等：白名单文件键 === schema pluginEntry keys（多字段/少字段即红）", () => {
-      expect(fileKeys.slice().sort()).toEqual(schemaKeys);
+    it("v2 schema 在场 ⇒ 双向：schema 键必须全在本仓白名单；白名单超前只许已报备字段", () => {
+      // 方向一（不静默丢）：schema 有的字段，白名单必须接得住
+      expect(schemaKeys.filter((k) => !fileKeys.includes(k))).toEqual([]);
+      // 方向二（不漫无边际）：白名单超出已装 schema 的键 ⊆ FORWARD_FIELDS（SDK 发版后自然空）
+      const ahead = fileKeys.filter((k) => !schemaKeys.includes(k));
+      expect(ahead.filter((k) => !FORWARD_FIELDS.has(k))).toEqual([]);
+      expect(ahead.every((k) => FORWARD_FIELDS.has(k))).toBe(true);
     });
   } else {
     it("v1 schema 在场 ⇒ 不静默丢方向：schema 键 ⊆ 白名单键（E6#106 类坑的方向钉）", () => {

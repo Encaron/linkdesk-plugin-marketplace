@@ -13,5 +13,8 @@ describe("collectionLayoutOf", () => {
     expect(collectionLayoutOf({})).toBe("strip");
     expect(collectionLayoutOf({ layout: "duo" }, { layout: "small" })).toBe("small");
     expect(collectionLayoutOf({ layout: "banner" })).toBe("banner");
+    expect(collectionLayoutOf({ layout: "split" })).toBe("split");
+    expect(collectionLayoutOf({ layout: "wall" })).toBe("wall");
+    expect(collectionLayoutOf({ layout: "grid" }, { layout: "wall" })).toBe("wall");
   });
 });

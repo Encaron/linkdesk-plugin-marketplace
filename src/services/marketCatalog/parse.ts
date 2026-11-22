@@ -90,6 +90,7 @@ function normalizeEntry(raw: unknown, warnings: CatalogWarning[]): CatalogEntry 
     versions: Array.isArray(r.versions) ? r.versions : undefined,
     readmeUrl: r.readmeUrl,
     screenshots: normalizeScreenshots(r.screenshots, r.id, warnings),
+    cover: normalizeMediaUrl(r.cover, "cover", r.id, warnings),
     license: r.license,
     repository: r.repository, // E6#77 乙：作者声明的插件主页（本 whitelist 漏字段 = 静默丢，务必同步）
     sourceName: undefined, // 合并注入——parse 阶段不填
@@ -120,7 +121,8 @@ function missingFetchedFieldWarnings(e: CatalogEntry): CatalogWarning[] {
 }
 
 /** 画廊媒体归一（06 §二·2 契约）：string = 图片；视频对象**至多 1 段且必须排第一**（封面视频）。
- *  多段/越位的视频项**丢弃并记警告**（⛔ 不静默降级成图）；字符串原样留（旧数据可读）。 */
+ *  多段/越位的视频项**丢弃并记警告**（⛔ 不静默降级成图）；字符串原样留（旧数据可读）。
+ *  R4 媒体丰富度（A6）：非 https 绝对 URL 原样保留但记声明警告——旧目录可读、渲染层丢帧兜底。 */
 function normalizeScreenshots(
   raw: unknown,
   entryId: string,
@@ -131,6 +133,7 @@ function normalizeScreenshots(
   for (let i = 0; i < raw.length; i++) {
     const item = raw[i];
     if (typeof item === "string") {
+      warnInvalidMediaUrl(item, `screenshots[${i}]`, entryId, warnings);
       out.push(item);
       continue;
     }
@@ -141,6 +144,10 @@ function normalizeScreenshots(
       warnings.push({ code: "screenshot-video-restricted", entryId, detail: `video@${i}` });
       continue;
     }
+    warnInvalidMediaUrl(video.url as string, `screenshots[0].url`, entryId, warnings);
+    if (typeof video.poster === "string") {
+      warnInvalidMediaUrl(video.poster, `screenshots[0].poster`, entryId, warnings);
+    }
     out.push({
       type: "video",
       url: video.url as string,
@@ -148,6 +155,32 @@ function normalizeScreenshots(
     });
   }
   return out;
+}
+
+/** 媒体 URL 必须是 https 绝对地址（与 publish 校验同一期望；相对路径未装用户必 404） */
+const HTTPS_MEDIA_URL = /^https:\/\/[^\s]+$/i;
+
+function warnInvalidMediaUrl(
+  value: string,
+  field: string,
+  entryId: string,
+  warnings: CatalogWarning[],
+): void {
+  const v = value.trim();
+  if (!v || HTTPS_MEDIA_URL.test(v)) return;
+  warnings.push({ code: "screenshot-url-invalid", entryId, detail: `${field} = ${value}` });
+}
+
+/** 条目级封面（cover）——同一媒体 URL 纪律；非字符串直接丢（schema 在作者侧拦） */
+function normalizeMediaUrl(
+  raw: unknown,
+  field: string,
+  entryId: string,
+  warnings: CatalogWarning[],
+): string | undefined {
+  if (typeof raw !== "string") return undefined;
+  warnInvalidMediaUrl(raw, field, entryId, warnings);
+  return raw;
 }
 
 /** 根级已审核源清单（schema 要求 url/authorId/addedAt；不合形的一行跳过并记警告） */
@@ -171,7 +204,7 @@ export function parseCollectionDecl(raw: unknown): CollectionDecl | null {
   if (typeof raw !== "object" || raw === null) return null;
   const r = raw as Partial<CollectionDecl> | null;
   if (!r || typeof r.id !== "string" || typeof r.title !== "string" || !Array.isArray(r.items)) return null;
-  const layouts = new Set(["banner", "strip", "duo", "grid"]);
+  const layouts = new Set(["banner", "strip", "duo", "grid", "mega", "small", "split", "wall"]);
   return {
     id: r.id,
     title: r.title,

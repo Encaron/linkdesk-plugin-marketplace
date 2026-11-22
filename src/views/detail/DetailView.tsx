@@ -77,6 +77,9 @@ import "../../styles/detail/detail-actions.css";
 import "../../styles/detail/detail-body.css";
 import "../../styles/detail/detail-features.css";
 import "../../styles/detail/detail-changelog.css";
+/* 详情「无图」用卡片同一个 Art stage（C5）——CSS 只此一份，⛔ 详情另写一套媒体样式。
+   类名全部 marketplace-*，在详情上下文里不命中其它元素。 */
+import "../../styles/store/store-cards.css";
 
 export default function DetailView({ pluginId }: DetailContributedProps) {
   const { t } = useTranslation();
@@ -277,7 +280,8 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
                 localVer={ver.localVer}
                 missingDeps={data.missingDeps}
                 depLabel={data.depLabel}
-                shots={pkg.shots}
+                media={pkg.media}
+                entry={entry}
                 readme={pkg.readme}
                 showDesc={showDesc}
                 descText={descText}

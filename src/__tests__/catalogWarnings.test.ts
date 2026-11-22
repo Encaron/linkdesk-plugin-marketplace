@@ -15,6 +15,7 @@ const CODES: CatalogWarning["code"][] = [
   "unknown-subcategory",
   "unknown-rail-category",
   "screenshot-video-restricted",
+  "screenshot-url-invalid",
   "invalid-source-link",
   "invalid-collection",
   "missing-entry-field",

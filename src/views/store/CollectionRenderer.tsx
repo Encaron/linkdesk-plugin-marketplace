@@ -17,6 +17,7 @@ import { CardDuo } from "./cards/CardDuo";
 import { CardGrid } from "./cards/CardGrid";
 import { CardMega } from "./cards/CardMega";
 import { CardSmall } from "./cards/CardSmall";
+import { CardWall } from "./cards/variants/CardWall";
 import { collectionLayoutOf } from "./collectionLayout";
 import { SectionHead } from "./home/SectionHead";
 import { Strip } from "./Strip";
@@ -56,6 +57,25 @@ export function CollectionRenderer({ collection, items, section, more }: Collect
             <CardDuo key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} tag={collection.title} />
           ))}
         </Strip>
+      ) : layout === "split" ? (
+        <div className="marketplace-store-split-list">
+          {items.map((entry) => (
+            <CardDuo
+              key={entry.id}
+              entry={entry}
+              ctx={data.ctxOf(entry)}
+              handlers={actions}
+              tag={collection.title}
+              split
+            />
+          ))}
+        </div>
+      ) : layout === "wall" ? (
+        <div className="marketplace-store-wall">
+          {items.map((entry) => (
+            <CardWall key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} />
+          ))}
+        </div>
       ) : layout === "grid" ? (
         <div className="marketplace-store-grid">
           {items.map((entry) => (

@@ -1,5 +1,6 @@
 /**
- * CardDuo — 编辑精选双大卡（左文案/右大图；无图态＝纯色渐变＋图标，水印占位 ⛔ 已删 B15）。
+ * CardDuo — 双大卡（两枚一排；左文案/右大图）。`split` = 同一组件的整行分栏修饰
+ * （「编辑精选」：与 hero 同尺寸、左文右图、媒体内嵌、无满幅/无 scrim）。
  * `tag` 为板块标签（作者/官方声明标题），由调用方传入——⛔ 卡内自造。
  */
 
@@ -22,11 +23,13 @@ export function CardDuo({
   ctx,
   handlers,
   tag,
+  split,
 }: {
   entry: CatalogEntry;
   ctx: StoreCardContext;
   handlers: StoreCardHandlers;
   tag?: string;
+  split?: boolean;
 }) {
   const { t } = useTranslation();
   const open = () => handlers.onOpen(entry);
@@ -35,7 +38,7 @@ export function CardDuo({
   const items = menuOfCard(entry, ctx);
   return (
     <div
-      className="marketplace-store-card is-duo"
+      className={`marketplace-store-card is-duo ${split ? "is-split" : ""}`.trim()}
       role="button"
       tabIndex={0}
       aria-label={t("{{name}}——查看详情", { name: entry.name })}
@@ -61,7 +64,7 @@ export function CardDuo({
           />
         </div>
       </div>
-      <Art entry={entry} identity={ctx.installedIdentity} className="is-duo" />
+      <Art entry={entry} identity={ctx.installedIdentity} variant={split ? "split" : "duo"} />
     </div>
   );
 }

@@ -47,7 +47,7 @@ export const CardMega = memo(function CardMega({
       onClick={open}
       onKeyDown={(e) => cardKeyDown(e, open)}
     >
-      <Art entry={entry} identity={ctx.installedIdentity} className="is-mega" />
+      <Art entry={entry} identity={ctx.installedIdentity} variant="mega" />
       <div className="marketplace-store-cm-foot">
         <div className="marketplace-store-mn0">
           <div className="marketplace-store-cm-name">{entry.name}</div>

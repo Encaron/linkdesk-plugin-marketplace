@@ -561,6 +561,7 @@
 .marketplace-store-card.is-grid { --surface-scale: 1.06; }
 .marketplace-store-card.is-mega { --surface-scale: 1.14; }
 .marketplace-store-card.is-duo { --surface-scale: 1.06; }
+.marketplace-store-card.is-wall { --surface-scale: 1.05; }
 .marketplace-store-card.is-row { --surface-scale: 1.02; }
 .marketplace-store-rank-row { --surface-scale: 1.03; }
 .marketplace-store-lib-row { --surface-scale: 1.02; }

@@ -6,9 +6,8 @@
 .marketplace-store-hero-wrap {
   position: relative; /* F10：箭头的定位锚（画面外两侧） */
   margin-bottom: 4px;
-  /* 窄容器文字地板（2026-11-21 用户报「分屏/缩窄后 hero 标题一行一个字」）：fr 的最小值 =
-     min-content，CJK 的 min-content 就是 1 个字 ⇒ 窄下来必一字一行。正解 = 按**容器实宽**
-     切单列（容器查询，分屏组同样生效）＋网格给显式地板。 */
+  /* 窄容器文字地板（2026-11-21 用户报「分屏/缩窄后 hero 标题一行一个字」）：
+     容器查询按**面板实宽**降档（分屏组同样生效），网格/媒体都给显式地板。 */
   container-type: inline-size;
 }
 .marketplace-store-hero {
@@ -32,44 +31,45 @@
   display: flex;
   transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
+/* 满幅媒体（C1）：媒体铺满整幅＋左侧 scrim＋文案压图——不再是「渐变底＋一枚小图标」。
+   比例走 --media-hero；max-height 是版面上限（宽屏时允许比 2:1 更扁，避免首屏过高）。 */
 .marketplace-store-hero-slide {
   min-width: 100%;
-  display: grid;
-  /* 地板 240px：文案列不再被压成一字一行 */
-  grid-template-columns: minmax(240px, 1.1fr) minmax(0, 0.9fr);
-  min-height: 270px;
+  position: relative;
+  display: block;
+  min-height: 340px;
+  max-height: 460px;
+  aspect-ratio: var(--media-hero);
   cursor: pointer;
 }
-/* 容器 < 620px：切单列（文案在上、图在下）——分屏组/窄面板与窗口缩放同规 */
-@container (max-width: 620px) {
-  .marketplace-store-hero-slide { grid-template-columns: 1fr; }
-  .marketplace-store-hero-copy { padding: 24px 22px 20px; }
-  .marketplace-store-art.is-hero { min-height: 120px; }
+.marketplace-store-hero-slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--bg-window) 96%, transparent) 0%,
+      color-mix(in srgb, var(--bg-window) 88%, transparent) 30%,
+      color-mix(in srgb, var(--bg-window) 55%, transparent) 55%,
+      color-mix(in srgb, var(--bg-window) 10%, transparent) 82%,
+      transparent 100%),
+    linear-gradient(0deg, color-mix(in srgb, var(--bg-window) 55%, transparent), transparent 42%);
 }
-/* 容器 < 420px：字号降档＋内边距收紧（仍在可读区间） */
-@container (max-width: 420px) {
-  .marketplace-store-hero-copy { padding: 18px 16px 16px; }
-  .marketplace-store-hero-copy h2 { font-size: 21px; }
-  .marketplace-store-art.is-hero { min-height: 96px; }
+.marketplace-store-hero-slide > .marketplace-store-art {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  border-radius: 0;
 }
-/* 容器 < 320px：**禁止竖排**——标题/说明改单行省略（宁可截断也不一字一行）；
-   图区收成一条色带（保留视觉标识，不占高度） */
-@container (max-width: 320px) {
-  .marketplace-store-hero-copy h2,
-  .marketplace-store-hero-copy p {
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    -webkit-line-clamp: unset;
-    max-width: 100%;
-  }
-  .marketplace-store-hero-copy h2 { font-size: 19px; }
-  .marketplace-store-art.is-hero { min-height: 64px; }
-  .marketplace-store-art.is-hero .marketplace-store-art-icon { width: 48px; height: 48px; }
-}
+/* 文案列只占左半（视频 controls 在右侧可点）；底部为窄窗留出压暗空间 */
 .marketplace-store-hero-copy {
-  padding: 30px 8px 26px 34px;
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 2;
+  width: min(56%, 620px);
+  padding: 34px 44px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -118,14 +118,45 @@
 }
 .marketplace-store-hero-meta b { color: var(--text-primary); font-weight: 600; }
 .marketplace-store-hero-cta { display: flex; gap: 10px; }
-.marketplace-store-art.is-hero { min-height: 100%; }
-.marketplace-store-art.is-hero .marketplace-store-art-icon {
-  width: 126px;
-  height: 126px;
-  stroke-width: 1;
-  opacity: 0.9;
+.marketplace-store-art.is-hero { min-height: 0; }
+
+/* 窄容器降档：文案改为整宽压底、scrim 改自下而上；媒体比例退到 3:2 */
+@container (max-width: 900px) {
+  .marketplace-store-hero-copy { width: min(64%, 620px); padding: 28px 32px; }
 }
-.marketplace-store-hero:hover .marketplace-store-art.is-hero .marketplace-store-art-icon { transform: scale(1.06); }
+@container (max-width: 620px) {
+  .marketplace-store-hero-slide { aspect-ratio: var(--media-card); min-height: 240px; max-height: 340px; }
+  .marketplace-store-hero-copy { width: 100%; padding: 22px; justify-content: flex-end; }
+  .marketplace-store-hero-slide::after {
+    background: linear-gradient(0deg,
+      color-mix(in srgb, var(--bg-window) 94%, transparent) 0%,
+      color-mix(in srgb, var(--bg-window) 72%, transparent) 42%,
+      transparent 82%);
+  }
+  .marketplace-store-hero-copy p { -webkit-line-clamp: 2; }
+}
+@container (max-width: 420px) {
+  .marketplace-store-hero-slide { min-height: 220px; }
+  .marketplace-store-hero-copy { padding: 16px; }
+  .marketplace-store-hero-copy h2 { font-size: 21px; }
+  .marketplace-store-hero-meta { gap: 8px; margin-bottom: 12px; }
+  .marketplace-store-art.is-hero { --media-watermark: 56px; }
+  .marketplace-store-art.is-hero .marketplace-store-art-genico { --gen-ico: 84px; }
+}
+/* 容器 < 320px：禁止竖排——标题/说明改单行省略（宁可截断也不一字一行） */
+@container (max-width: 320px) {
+  .marketplace-store-hero-copy h2,
+  .marketplace-store-hero-copy p {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: unset;
+    max-width: 100%;
+  }
+  .marketplace-store-hero-copy h2 { font-size: 19px; }
+  .marketplace-store-hero-slide { min-height: 190px; max-height: 240px; }
+}
 .marketplace-store-hero-arrow {
   position: absolute;
   top: 50%;
@@ -254,12 +285,3 @@
   color: var(--accent-hover);
 }
 
-@container (max-width: 900px) {
-  .marketplace-store-hero-slide { grid-template-columns: 1fr; }
-  .marketplace-store-art.is-hero { min-height: 150px; }
-}
-@container (max-width: 700px) {
-  .marketplace-store-hero-copy { padding: 20px; }
-  .marketplace-store-hero-copy h2 { font-size: 21px; }
-  .marketplace-store-hero-meta { gap: 8px; }
-}

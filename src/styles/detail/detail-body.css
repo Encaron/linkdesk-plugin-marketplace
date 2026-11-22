@@ -154,6 +154,19 @@
   object-fit: contain;
 }
 
+/* C5：无图 → 与卡片同一个 Art 生成式 stage（不是线框占位，也不是第二套画廊） */
+.marketplace-mpd-gallery.is-empty {
+  display: block;
+  padding: 0;
+  margin-bottom: 12px;
+}
+.marketplace-mpd-gallery.is-empty .marketplace-store-art {
+  aspect-ratio: var(--media-card);
+  max-width: 560px;
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-md);
+}
+
 .marketplace-mpd-readme-note {
   margin: 4px 0;
   color: var(--text-muted);

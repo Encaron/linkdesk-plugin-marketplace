@@ -55,8 +55,20 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 14px;
+  /* A7：网格本身是尺寸容器——新卡型（wall/split）按**自己所在栅格的实际宽度**降档，
+     ⛔ 只靠窗口宽（分屏/侧栏/作者店里窗口宽 ≠ 卡片宽）。 */
+  container-type: inline-size;
 }
+.marketplace-store-grid > * { min-width: 0; }
 .marketplace-store-rows { display: flex; flex-direction: column; gap: 10px; }
+/* 主题图墙（THEMES 默认）：封面卡更密（212px 起）——与通用 grid 分容器类，不混用 */
+.marketplace-store-wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(212px, 100%), 1fr));
+  gap: 16px;
+  container-type: inline-size;
+}
+.marketplace-store-wall > * { min-width: 0; }
 .marketplace-store-cat-empty { grid-column: 1 / -1; }
 
 /* ── 完整榜单页 ── */

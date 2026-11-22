@@ -5,6 +5,19 @@
    ⛔ hover 不动任何其他元素的文档流（机械守则）。
    ═══════════════════════════════════════════════════════════════════════ */
 
+/* ── 媒体 token（17 §3.3 定稿；批次 A3）──
+   比例/帧间淡入/轮播周期只在这里定义：卡型与 hero 一律引用变量，
+   ⛔ 再写魔法比例/时长（grep 判据 = 本文件之外不出现 `aspect-ratio:` 的裸比例与轮播秒数）。 */
+/* 媒体 token 的作用域＝两个视图根：商店（卡片/hero）＋详情（无图生成式 stage）。
+   ⛔ :root（插件不得定义文档级变量）；两处共用同一份定义。 */
+:is(.marketplace-store, .marketplace-mpd-detail) {
+  --media-hero: 2 / 1;   /* 首屏 hero 媒体框（用户口径 3:2 或 2:1，取 2:1） */
+  --media-card: 3 / 2;   /* 主题图墙 / mega / duo / 详情默认媒体框 */
+  --media-fade: 0.45s;   /* 卡内轮播帧间淡入 */
+  --media-cycle: 12s;    /* 卡内 hover 轮播一轮 */
+}
+
+
 /* ── 卡基类 ── */
 .marketplace-store-card {
   position: relative;
@@ -19,7 +32,7 @@
   border-radius: var(--radius-lg);
 }
 
-/* ── 图标块 / 大图区（身份图裁决在 cardParts；底色 = id 稳定 hue） ── */
+/* ── 图标块 / 媒体舞台（唯一媒体入口 = cardParts.Art；17 §3.3） ── */
 .marketplace-store-tile {
   width: 40px;
   height: 40px;
@@ -40,35 +53,195 @@
   object-fit: contain;
   border-radius: inherit;
 }
+
+/* 舞台：生成式底纹永远垫底；帧/视频绝对定位 ⇒ 换帧不跳布局 */
 .marketplace-store-art {
   position: relative;
+  overflow: hidden;
+  color: var(--text-on-accent);
+  background: var(--bg-window);
+  /* F25（同型先例 壳 16b05ec57）：渐变铺贴几何必须按边框盒算——否则半透明边框下露 1px 白边 */
+  background-origin: border-box;
+  isolation: isolate;
+  /* 水印字号 per-variant（设计稿 104/56/34）；⛔ 在组件里写死 */
+  --media-watermark: 34px;
+}
+.marketplace-store-art.is-hero { --media-watermark: 104px; }
+.marketplace-store-art.is-split { --media-watermark: 56px; }
+
+/* 生成式封面（B2）：色场 + 细网格 + 图标砖 + 名字水印 + 分类字。
+   不是「空渐变」：无图/坏图/加载中都有设计过的底；小卡不用 Art（只图标）。 */
+.marketplace-store-art-gen {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(120% 92% at 16% 6%,
+      color-mix(in srgb, var(--marketplace-hue, var(--accent)) 76%, var(--text-on-accent) 6%) 0%, transparent 56%),
+    radial-gradient(96% 84% at 88% 98%,
+      color-mix(in srgb, var(--marketplace-hue, var(--accent)) 38%, var(--bg-window)) 0%, transparent 64%),
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--marketplace-hue, var(--accent)) 44%, var(--bg-window)) 0%, var(--bg-window) 92%);
+}
+.marketplace-store-art-gen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--text-on-accent) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--text-on-accent) 6%, transparent) 1px, transparent 1px);
+  background-size: 30px 30px;
+  -webkit-mask-image: radial-gradient(78% 78% at 50% 46%, var(--text-primary) 14%, transparent 78%);
+  mask-image: radial-gradient(78% 78% at 50% 46%, var(--text-primary) 14%, transparent 78%);
+}
+.marketplace-store-art-gen::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background: linear-gradient(104deg, transparent 36%,
+    color-mix(in srgb, var(--text-on-accent) 14%, transparent) 47%, transparent 58%);
+  transform: translateX(-16%);
+}
+.marketplace-store-art-genico {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--gen-ico, 84px);
+  height: var(--gen-ico, 84px);
+  border-radius: var(--radius-2xl);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  color: var(--text-on-accent);
-  /* F25（同型先例 壳 16b05ec57）：渐变铺贴几何必须按边框盒算——否则半透明边框下露 1px 白边 */
-  background-origin: border-box;
+  background: color-mix(in srgb, var(--bg-window) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-on-accent) 22%, transparent);
+  /* 内层阴影只用既有抬升 token——⛔ 新辉光字面量（辉光归 --surface-glow/hover） */
+  box-shadow: var(--shadow-pop);
 }
-.marketplace-store-art-icon {
-  width: 66px;
-  height: 66px;
-  stroke-width: 1.1;
-  opacity: 0.92;
-  transition: transform 0.24s cubic-bezier(0.2, 0.7, 0.3, 1);
-}
-.marketplace-store-art .plugin-icon--img {
+.marketplace-store-art.is-hero .marketplace-store-art-genico { --gen-ico: 148px; }
+.marketplace-store-art-genico .plugin-icon { width: 50%; height: 50%; }
+.marketplace-store-art-genico .plugin-icon--img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: 22px;
-  transition: transform 0.24s cubic-bezier(0.2, 0.7, 0.3, 1);
+  border-radius: inherit;
 }
-.marketplace-store-art-cover {
+.marketplace-store-art-watermark {
+  position: absolute;
+  right: 4%;
+  bottom: 4%;
+  max-width: 92%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-size: var(--media-watermark);
+  color: color-mix(in srgb, var(--text-on-accent) 8%, transparent);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+.marketplace-store-art-tag {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  font-size: var(--font-size-2xs);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text-on-accent) 62%, transparent);
+}
+.marketplace-store-art.is-hero .marketplace-store-art-tag { left: 44px; bottom: 30px; }
+
+/* 静帧层（1~3）：第一帧常显；hover 时按 data-frames 跑同一段 keyframes（2/3 帧差异） */
+.marketplace-store-art-frame {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+  border: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity var(--media-fade) cubic-bezier(0.2, 0.7, 0.3, 1),
+    transform 1.1s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
+.marketplace-store-art-frame.is-on { opacity: 1; }
+
+/* 封面视频：只有 hero 输出；controls 强制、preload=metadata、⛔ autoplay/loop */
+.marketplace-store-art-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 1;
+  background: var(--bg-window);
+}
+.marketplace-store-art-vbadge {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--bg-window) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-on-accent) 24%, transparent);
+  color: var(--text-on-accent);
+  font-size: var(--font-size-2xs);
+  font-weight: 600;
+  pointer-events: none;
+}
+.marketplace-store-art-vbadge::before {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 6px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+}
+/* 底部压暗：媒体与脚区自然衔接（纯遮罩，不写死图） */
+.marketplace-store-art.is-mega::after,
+.marketplace-store-art.is-duo::after,
+.marketplace-store-art.is-wall::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(0deg, color-mix(in srgb, var(--bg-window) 38%, transparent), transparent 40%);
+}
+
+/* 卡内 hover 轮播：只轮静帧（⛔ 视频不自动播）；移出即复位封面帧 */
+@keyframes marketplace-store-media2a { 0%, 46% { opacity: 1; } 52%, 100% { opacity: 0; } }
+@keyframes marketplace-store-media2b { 0%, 46% { opacity: 0; } 52%, 100% { opacity: 1; } }
+@keyframes marketplace-store-media3a { 0%, 28% { opacity: 1; } 34%, 100% { opacity: 0; } }
+@keyframes marketplace-store-media3b { 0%, 28% { opacity: 0; } 33%, 62% { opacity: 1; } 68%, 100% { opacity: 0; } }
+@keyframes marketplace-store-media3c { 0%, 62% { opacity: 0; } 68%, 95% { opacity: 1; } 100% { opacity: 0; } }
+.marketplace-store-card:hover .marketplace-store-art[data-frames="2"] .marketplace-store-art-frame:nth-of-type(1) {
+  animation: marketplace-store-media2a var(--media-cycle) linear infinite;
+}
+.marketplace-store-card:hover .marketplace-store-art[data-frames="2"] .marketplace-store-art-frame:nth-of-type(2) {
+  animation: marketplace-store-media2b var(--media-cycle) linear infinite;
+}
+.marketplace-store-card:hover .marketplace-store-art[data-frames="3"] .marketplace-store-art-frame:nth-of-type(1) {
+  animation: marketplace-store-media3a var(--media-cycle) linear infinite;
+}
+.marketplace-store-card:hover .marketplace-store-art[data-frames="3"] .marketplace-store-art-frame:nth-of-type(2) {
+  animation: marketplace-store-media3b var(--media-cycle) linear infinite;
+}
+.marketplace-store-card:hover .marketplace-store-art[data-frames="3"] .marketplace-store-art-frame:nth-of-type(3) {
+  animation: marketplace-store-media3c var(--media-cycle) linear infinite;
+}
+.marketplace-store-card:hover .marketplace-store-art-frame { transform: scale(1.04); }
+
 
 /* ── small（装机必备：236×84 · 10:3.6） ──
    🔴 卡体只是**占位**：面（背景/边框/磨砂）与内容全部由 `.x-over` 一处拥有（F39 单面）。 */
@@ -223,9 +396,7 @@
   flex: none;
   cursor: pointer;
   overflow: hidden;
-}
-.marketplace-store-art.is-mega { height: 200px; }
-.marketplace-store-card.is-mega:hover .marketplace-store-art-icon { transform: translateY(-32px) scale(0.72); }
+}.marketplace-store-art.is-mega { height: 200px; }
 .marketplace-store-cm-foot {
   height: 60px;
   padding: 0 16px;
@@ -242,8 +413,11 @@
   right: 0;
   bottom: 60px;
   height: 108px;
-  background: var(--bg-card);
-  /* 磨砂由卡面统一提供（store-shell「卡面语言」）——⛔ 这里不再单写 backdrop-filter */
+  background: color-mix(in srgb, var(--bg-card) 72%, transparent);
+  /* D5：hover 条是压在封面上的玻璃——必须模糊它**下面的图**；用的仍是卡面同一 token
+     `--surface-blur`（⛔ 新 blur 数值）。卡面的 backdrop-filter 只采样卡外背景，管不到卡内媒体。 */
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
   padding: 12px 16px;
   display: flex;
   flex-direction: column;
@@ -306,7 +480,93 @@
 .marketplace-store-cd-corner { margin: 0 0 8px; align-self: flex-start; max-width: 100%; }
 .marketplace-store-cd-acts { display: flex; gap: 8px; align-items: center; }
 .marketplace-store-art.is-duo { min-height: 100%; }
-.marketplace-store-art.is-duo .marketplace-store-art-icon { width: 78px; height: 78px; }
+
+/* ── split（分栏大卡：整行 270、1fr/1fr、媒体内嵌、无满幅/无 scrim） ── */
+.marketplace-store-card.is-duo.is-split {
+  grid-template-columns: 1fr 1fr;
+  min-height: 270px;
+  padding: 12px;
+  gap: 12px;
+}
+.marketplace-store-card.is-duo.is-split .marketplace-store-cd-copy { padding: 12px 10px 12px 18px; }
+.marketplace-store-art.is-split { min-height: 246px; border-radius: var(--radius-lg); }
+.marketplace-store-split-list { display: flex; flex-direction: column; gap: 16px; }
+
+/* ── wall（主题图墙：封面在上 3:2 / 信息在下 / hover 快捷层） ── */
+.marketplace-store-card.is-wall {
+  overflow: hidden;
+  cursor: pointer;
+  --surface-glow: 0 14px 44px -10px color-mix(in srgb, var(--marketplace-hue, transparent) 60%, transparent);
+}
+.marketplace-store-cw-media {
+  position: relative;
+  aspect-ratio: var(--media-card);
+  overflow: hidden;
+}
+.marketplace-store-cw-media > .marketplace-store-art { position: absolute; inset: 0; }
+.marketplace-store-cw-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  min-height: 46px;
+  transition: opacity 0.12s;
+}
+.marketplace-store-cw-name {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.marketplace-store-cw-sub {
+  font-size: var(--font-size-2xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.marketplace-store-cw-corner { margin-left: auto; flex: none; max-width: 48%; }
+.marketplace-store-card.is-wall:hover .marketplace-store-cw-foot,
+.marketplace-store-card.is-wall:focus-within .marketplace-store-cw-foot { opacity: 0; }
+.marketplace-store-cw-hover {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 12px;
+  background: linear-gradient(0deg,
+    color-mix(in srgb, var(--bg-window) 97%, transparent) 0%,
+    color-mix(in srgb, var(--bg-window) 90%, transparent) 70%,
+    transparent 100%);
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 0.16s, transform 0.2s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.marketplace-store-card.is-wall:hover .marketplace-store-cw-hover,
+.marketplace-store-card.is-wall:focus-within .marketplace-store-cw-hover {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.marketplace-store-cw-h-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.marketplace-store-cw-h-name {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.marketplace-store-cw-h-author { font-size: var(--font-size-2xs); color: var(--text-secondary); }
+.marketplace-store-cw-h-acts { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
 
 /* ── row（详细行：分类页/搜索·list 视图） ── */
 .marketplace-store-card.is-row {
@@ -482,6 +742,8 @@
 @container (max-width: 700px) {
   .marketplace-store-card.is-duo { grid-template-columns: 1fr; }
   .marketplace-store-art.is-duo { min-height: 140px; }
+  .marketplace-store-card.is-duo.is-split { min-height: 0; }
+  .marketplace-store-art.is-split { min-height: 180px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -489,10 +751,12 @@
   .marketplace-store-rank-row,
   .marketplace-store-x-over,
   .marketplace-store-cm-band,
-  .marketplace-store-art-icon,
+  .marketplace-store-art-frame,
   .marketplace-store-rr-act,
   .marketplace-store-strip-row {
     transition-duration: 0.01ms;
     scroll-behavior: auto;
   }
+  /* 轮播静止＝始终封面帧（A/B5：prefers-reduced-motion 停用） */
+  .marketplace-store-art-frame { animation: none !important; transform: none !important; }
 }

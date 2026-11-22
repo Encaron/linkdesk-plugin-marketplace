@@ -96,7 +96,7 @@ export function HeroCarousel({ slides }: { slides: HeroCarouselSlide[] }) {
                       <ActionButton action={action} onAct={(id) => actions.onAct(entry, id)} />
                     </div>
                   </div>
-                  <Art entry={entry} identity={ctx.installedIdentity} className="is-hero" />
+                  <Art entry={entry} identity={ctx.installedIdentity} variant="hero" />
                 </div>
               );
             })}

@@ -194,6 +194,55 @@ describe("parseCatalog — v2 根级字段与声明警告", () => {
       { code: "screenshot-video-restricted", entryId: "demo-b", detail: "video@1" },
     ]);
   });
+
+  it("cover 进白名单（R4 媒体丰富度 A2/A6——漏了 = 目录带着封面进来被静默丢）", () => {
+    const r = parseCatalog(JSON.stringify({ plugins: [entry({ id: "demo-a", cover: "https://example.invalid/cover.png" })] }));
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.catalog.plugins[0].cover).toBe("https://example.invalid/cover.png");
+    expect(r.warnings).toEqual([]);
+  });
+
+  it("非 https 绝对 URL：原值保留 + 声明警告（旧目录可读；渲染层 mediaOf 丢帧兜底）", () => {
+    const r = parseCatalog(
+      JSON.stringify({
+        plugins: [
+          entry({
+            id: "demo-a",
+            cover: "resources/cover.png",
+            screenshots: [
+              { type: "video", url: "resources/intro.mp4", poster: "http://example.invalid/p.jpg" },
+              "/shots/2.png",
+              "https://example.invalid/ok.png",
+            ],
+          }),
+        ],
+      }),
+    );
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.catalog.plugins[0].cover).toBe("resources/cover.png");
+    expect(r.catalog.plugins[0].screenshots).toEqual([
+      { type: "video", url: "resources/intro.mp4", poster: "http://example.invalid/p.jpg" },
+      "/shots/2.png",
+      "https://example.invalid/ok.png",
+    ]);
+    expect(r.warnings).toEqual([
+      { code: "screenshot-url-invalid", entryId: "demo-a", detail: "screenshots[0].url = resources/intro.mp4" },
+      { code: "screenshot-url-invalid", entryId: "demo-a", detail: "screenshots[0].poster = http://example.invalid/p.jpg" },
+      { code: "screenshot-url-invalid", entryId: "demo-a", detail: "screenshots[1] = /shots/2.png" },
+      { code: "screenshot-url-invalid", entryId: "demo-a", detail: "cover = resources/cover.png" },
+    ]);
+  });
+
+  it("旧目录零媒体字段：原样可读、零警告（v1 兼容回归）", () => {
+    const r = parseCatalog(JSON.stringify({ plugins: [entry({ id: "demo-a" })] }));
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.catalog.plugins[0].screenshots).toBeUndefined();
+    expect(r.catalog.plugins[0].cover).toBeUndefined();
+    expect(r.warnings).toEqual([]);
+  });
 });
 
 /* ── 厂商注册表（09 §一·补2） ── */

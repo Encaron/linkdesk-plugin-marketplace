@@ -267,7 +267,7 @@ export function CategoryView({ slug }: { slug: string }) {
           className="marketplace-store-cat-empty"
         />
       ) : (
-        <OrderedCards nodes={nodes} view={prefs.catView} />
+        <OrderedCards nodes={nodes} view={prefs.catView} cardVariant={slug === "themes" ? "wall" : "grid"} />
       )}
     </>
   );

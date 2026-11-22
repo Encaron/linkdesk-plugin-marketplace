@@ -6,6 +6,7 @@
  * 合成到卡片需要的形状。
  */
 
+import { useTranslation } from "react-i18next";
 import type { CSSProperties } from "react";
 import { PluginIcon, pickIdentityArt } from "@linkdesk/ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
@@ -17,7 +18,6 @@ import { installJobLabel } from "../../../services/installJobs";
 import { authorLabel } from "../../../services/catalogText";
 import {
   allBadges,
-  artBG,
   entryHue,
   hueBG,
   moreMenuItems,
@@ -30,6 +30,7 @@ import {
   type ResolvedAction,
   type StatusTag,
 } from "../../../ui";
+import { mediaOf } from "./mediaModel";
 
 /** 卡片渲染上下文（由商店数据层一次性算好，逐卡传入——⛔ 卡内再订阅 store） */
 export interface StoreCardContext {
@@ -142,26 +143,78 @@ export function Tile({
   );
 }
 
-/** 封面/大图区（渐变底＋大图标；封面优先级：目录 cover → screenshots[0] → 无图态纯色渐变） */
+/** 媒体舞台变体——一个 `Art`，五处排版（17 §3.3；⛔ 第二套 stage/画廊） */
+export type ArtVariant = "hero" | "mega" | "duo" | "split" | "wall" | "detail";
+
+/**
+ * 封面/大图区——**唯一媒体入口**（17 §3.3 五态）。
+ *
+ * 一个 stage：生成式底纹（永远垫在帧下）＋ 1~3 静帧（`data-frames` 驱动 CSS 轮播）
+ * ＋ 可选的封面视频（只有 `hero` 输出 `<video>`，controls/preload=metadata，⛔ autoplay）。
+ * 帧 404 只移除该帧，底纹露出——不白块、不跳布局。
+ */
 export function Art({
   entry,
   identity,
+  variant,
   className,
 }: {
   entry: CatalogEntry;
   identity?: LocalIdentity;
+  variant: ArtVariant;
   className?: string;
 }) {
+  const { t } = useTranslation();
   const hue = entryHue(entry);
-  const style: CSSProperties = { ...artBG(hue), ["--marketplace-hue" as string]: hue };
-  const shot = entry.screenshots?.[0];
-  const cover = typeof shot === "string" ? shot : undefined;
+  const model = mediaOf(entry);
+  // 视频只喂 hero：卡内永远只轮静帧（⛔ 卡内 <video>）
+  const playVideo = variant === "hero" && model.video;
+  const frames = playVideo ? [] : model.frames;
+  const cls = `marketplace-store-art is-${variant} ${className ?? ""}`.trim();
   return (
-    <div className={`marketplace-store-art ${className ?? ""}`.trim()} style={style}>
-      {cover ? (
-        <img className="marketplace-store-art-cover" src={cover} alt="" loading="lazy" draggable={false} />
-      ) : (
-        <PluginIcon pluginId={entry.id} manifest={pickIdentityArt(identity, entry)} className="marketplace-store-art-icon" alt="" />
+    <div
+      className={cls}
+      style={{ ["--marketplace-hue" as string]: hue }}
+      data-media={model.kind}
+      data-frames={frames.length}
+    >
+      {/* 生成式底纹（同一件，不是第二套）：有图时被盖住；图 404/未加载时自动露出 */}
+      <div className="marketplace-store-art-gen" aria-hidden="true">
+        <span className="marketplace-store-art-watermark">{entry.name}</span>
+        <span className="marketplace-store-art-genico">
+          <PluginIcon pluginId={entry.id} manifest={pickIdentityArt(identity, entry)} alt="" />
+        </span>
+        <span className="marketplace-store-art-tag">{tCategory(t, entry)} · LinkDesk</span>
+      </div>
+      {playVideo && model.video && (
+        <video
+          className="marketplace-store-art-video"
+          src={model.video.url}
+          poster={model.video.poster}
+          controls
+          preload="metadata"
+          onClick={(e) => e.stopPropagation()}
+          aria-label={t("{{name}} 介绍视频——作者直链，点击播放（不自动播放）", { name: entry.name })}
+        />
+      )}
+      {frames.map((src, i) => (
+        <img
+          key={src}
+          className={`marketplace-store-art-frame ${i === 0 ? "is-on" : ""}`.trim()}
+          src={src}
+          alt=""
+          loading="lazy"
+          draggable={false}
+          onError={(e) => {
+            // 坏图只拆这一帧，底纹会露出来（⛔ 白块/布局跳）
+            e.currentTarget.remove();
+          }}
+        />
+      ))}
+      {model.video && (
+        <span className="marketplace-store-art-vbadge">
+          {variant === "hero" ? t("作者视频 · 直链") : t("含视频")}
+        </span>
       )}
     </div>
   );

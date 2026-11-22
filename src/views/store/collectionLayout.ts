@@ -6,7 +6,7 @@
 import type { CollectionDecl } from "../../services/marketCatalog";
 import type { AuthorSectionDecl } from "../../services/authors";
 
-export type CollectionLayout = "banner" | "strip" | "duo" | "grid" | "mega" | "small";
+export type CollectionLayout = "banner" | "strip" | "duo" | "grid" | "mega" | "small" | "split" | "wall";
 
 export function collectionLayoutOf(
   collection: Pick<CollectionDecl, "layout">,

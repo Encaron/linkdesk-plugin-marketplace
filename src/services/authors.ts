@@ -62,8 +62,8 @@ export interface AuthorSectionDecl {
   plugin?: string;
   tag?: string;
   collection?: string;
-  /** 板块级卡片原型（09 schema homepageSection.layout：small/mega/duo——整块统一，⛔ 卡级混排） */
-  layout?: "small" | "mega" | "duo";
+  /** 板块级卡片原型（09 schema homepageSection.layout：small/mega/duo/split/wall——整块统一，⛔ 卡级混排） */
+  layout?: "small" | "mega" | "duo" | "split" | "wall";
   more?: AuthorMoreDecl;
   top?: number;
   /** 榜单作用域：缺省全源合并，"self" = 只算店主自己的插件 */
@@ -175,7 +175,7 @@ function parseSections(
       }
       section.collection = collection;
     }
-    if (r.layout === "small" || r.layout === "mega" || r.layout === "duo") {
+    if (r.layout === "small" || r.layout === "mega" || r.layout === "duo" || r.layout === "split" || r.layout === "wall") {
       section.layout = r.layout;
     }
     if (type === "rank") {

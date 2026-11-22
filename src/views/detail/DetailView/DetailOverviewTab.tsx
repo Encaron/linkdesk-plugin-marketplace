@@ -9,7 +9,9 @@
 
 import { useTranslation } from "react-i18next";
 import { MarkdownView } from "@linkdesk/ui";
-import type { CatalogScreenshot } from "../../../services/marketCatalog";
+import type { CatalogEntry } from "../../../services/marketCatalog";
+import { Art } from "../../store/cards/cardParts";
+import type { MediaModel } from "../../store/cards/mediaModel";
 
 export default function DetailOverviewTab({
   hasUpdate,
@@ -17,7 +19,8 @@ export default function DetailOverviewTab({
   localVer,
   missingDeps,
   depLabel,
-  shots,
+  media,
+  entry,
   readme,
   showDesc,
   descText,
@@ -30,7 +33,9 @@ export default function DetailOverviewTab({
   localVer?: string;
   missingDeps: string[];
   depLabel: (dep: string) => string;
-  shots: CatalogScreenshot[];
+  media: MediaModel;
+  /** 目录条目（无图时生成式封面的色场/图标/名字来源） */
+  entry?: CatalogEntry;
   readme: { mode: "loading" | "content" | "none"; content?: string; assetBase?: string };
   showDesc: boolean;
   descText: string;
@@ -85,18 +90,36 @@ export default function DetailOverviewTab({
         </div>
       )}
 
-      {/* 30.6c1：截图画廊（screenshots[] 横向滚动）——作者自制媒体以 img/video 直载（同 downloadUrl 信任级）。
-       *  R4-3.22（I12）：视频项 = 封面视频（至多 1 段且必须第一项，parse 期已裁）——
-       *  播放语义照主仓 MarkdownView video override（E6#70d）：controls 强制、preload=metadata、
-       *  ⛔ autoplay（作者写也不透传）、poster 优先；⛔ 不托管——只播作者给的直链。 */}
-      {shots.length > 0 && (
-        <div className="marketplace-mpd-gallery" role="region" aria-label={t("截图")}>
-          {shots.map((s, i) =>
-            typeof s === "string" ? (
+      {/* 30.6c1：截图画廊（与卡片/hero 同一份选帧 mediaOf——C5）。视频项 = 封面视频
+       *  （controls 强制、preload=metadata、⛔ autoplay；海报优先）；无图时用**同一个** Art 生成式 stage，
+       *  ⛔ 第二套画廊/线框占位。 */}
+      {media.kind === "generated" ? (
+        entry ? (
+          <div className="marketplace-mpd-gallery is-empty" data-media={media.kind}>
+            <Art entry={entry} variant="detail" />
+          </div>
+        ) : null
+      ) : (
+        <div className="marketplace-mpd-gallery" role="region" aria-label={t("截图")} data-media={media.kind}>
+          {media.video && (
+            <video
+              className="marketplace-mpd-gallery-shot marketplace-mpd-gallery-video"
+              src={media.video.url}
+              poster={media.video.poster}
+              controls
+              preload="metadata"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          )}
+          {media.frames
+            .filter((src) => src !== media.video?.poster)
+            .map((src) => (
               <img
-                key={i}
+                key={src}
                 className="marketplace-mpd-gallery-shot"
-                src={s}
+                src={src}
                 alt={nameText}
                 loading="lazy"
                 referrerPolicy="no-referrer"
@@ -105,20 +128,7 @@ export default function DetailOverviewTab({
                   e.currentTarget.style.display = "none";
                 }}
               />
-            ) : (
-              <video
-                key={i}
-                className="marketplace-mpd-gallery-shot marketplace-mpd-gallery-video"
-                src={s.url}
-                poster={s.poster}
-                controls
-                preload="metadata"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
-            ),
-          )}
+            ))}
         </div>
       )}
 

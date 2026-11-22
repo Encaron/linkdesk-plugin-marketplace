@@ -1,5 +1,15 @@
 # 更新日志
 
+## v1.3.0（2026-11-22）
+
+- **插件市场长出「媒体丰富度」（首屏/大卡/主题墙/详情）**：作者的 `marketplace.json` 里的 `screenshots` / `cover` 现在是整站唯一的媒体来源——首屏 hero 满幅铺图（左文案压 scrim，视频带原生 controls、永不自动播），mega/duo/wall 卡 hover 在卡内轮播最多 3 帧，THEMES 默认变成封面图墙，编辑精选改用整行分栏卡（左文右图、媒体内嵌、无满幅）；详情画廊与卡片同一份选帧。
+- **没图的插件不再是一块空渐变**：新增生成式封面（身份色场＋细网格＋图标砖＋名字水印＋分类字）永远垫在帧下——无图/坏图/加载中都有设计过的底，图 404 只拆该帧、不白块不跳布局。
+- **换槽位/换图/换价只改 JSON**：官方目录补 `collections[]`（hero／主题 mega／装机必备／编辑精选），换谁上大屏＝改 `items`；`cover` 与 `screenshots` 支持封面视频（至多 1 段且必须第一、poster 优先）；这些目录元数据**不发版**，商店刷新即生效。
+- **作者自检两条命令**：`marketplace-kit validate` 对媒体给「文件:字段 → 期望 → 示例」四类可执行报错；新增 `marketplace-kit media:resolve` dry-run，打印实际会用的 kind/frames/video，坏输入非零退出。
+- **发版不再抹作者手改的目录元数据**：`publish` 的 upsert 会保留 `screenshots` / `cover` / `pricing` / `license` / `repository` / `authorId`（此前下一次发版会把作者补的图和价格静默抹掉）。
+- **详情无图时用同一个媒体 stage**，删掉旧的空档；小卡/行卡/榜行仍只显示图标（用户口径）。
+- 要求 LinkDesk **0.2.20 或更高**（未变）。
+
 ## v1.2.1（2026-11-20）
 
 - **目录解析层 v2（R4-2.1–2.3）**：根级 `sources[]`/`collections[]`/`categoryRail` 进解析面；三源合并序＝官方 → 收录（官方目录根 `sources[]`）→ 用户，同 id 高版本胜；`vendors.json` 判定链（authorId 命中 ⇒ 条目带 `vendorId`「官方 ✓」，UI 零再判）；K5 回落链（用户源仓库根无 `marketplace.json` ⇒ 同目录 `plugin.json` 合成 1 条）；分类封闭名单体检（名单外记声明警告、归「其他」桶不丢）；源记录新形态（`string` / `{url}` / 全记录）读兼容。
