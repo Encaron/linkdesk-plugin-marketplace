@@ -1,26 +1,32 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-22T19:13:07.614Z",
+  "updatedAt": "2026-11-22T19:15:10.224Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.2",
+      "version": "1.4.3",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.2/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.3/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.2/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.3/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.2/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.2/marketplace.linkdesk-plugin",
-      "size": 180477,
-      "publishedAt": "2026-11-22T19:13:07.614Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.3/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.3/marketplace.linkdesk-plugin",
+      "size": 180333,
+      "publishedAt": "2026-11-22T19:15:10.224Z",
       "versions": [
+        {
+          "version": "1.4.3",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.3/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-22T19:15:10.224Z",
+          "changelog": "- **头像缓存按真实类型落盘**：GitHub 头像实际是 JPEG，缓存文件现在按响应类型命名（`.jpg` / `.png` / `.webp`），不会出现「`.png` 里装 JPEG」；类型变了会清掉同作者的旧扩展名文件。"
+        },
         {
           "version": "1.4.2",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.2/marketplace.linkdesk-plugin",
@@ -48,8 +54,7 @@
         {
           "version": "1.2.1",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.2.1/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-20T11:59:49.495Z",
-          "changelog": "- **目录解析层 v2（R4-2.1–2.3）**：根级 `sources[]`/`collections[]`/`categoryRail` 进解析面；三源合并序＝官方 → 收录（官方目录根 `sources[]`）→ 用户，同 id 高版本胜；`vendors.json` 判定链（authorId 命中 ⇒ 条目带 `vendorId`「官方 ✓」，UI 零再判）；K5 回落链（用户源仓库根无 `marketplace.json` ⇒ 同目录 `plugin.json` 合成 1 条）；分类封闭名单体检（名单外记声明警告、归「其他」桶不丢）；源记录新形态（`string` / `{url}` / 全记录）读兼容。\n- **服务面（R4-2.4–2.7）**：视图偏好 `ui.prefs` 六键持久化（库/作者/分类的视图与排序，重启后保持）；命令面新增 13 条（偏好/浏览/来源/安装类，安装复用壳 `pluginManager`）；探索列表补双击固定；删除 `tabBehavior.singleton` 死声明。\n- **分类声明**：`category: \"productivity\"`（内置件小类可空）——商店分类抽屉归位，随本次发版进入官方目录条目（R4-2.8/2.9）。"
+          "publishedAt": "2026-11-20T11:59:49.495Z"
         },
         {
           "version": "1.2.0",
