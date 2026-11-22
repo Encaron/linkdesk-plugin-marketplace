@@ -15,6 +15,7 @@ import {
   swapReposRaw,
 } from "../services/sourceOrder";
 import { orderedReposOf } from "../services/sourceOrderStore";
+import { declaredRepoMapOf } from "../services/sourceOrder";
 
 const GEEK_FX = "https://github.com/geek/fx-shop";
 const GEEK_HW = "https://github.com/geek/hw-shop";
@@ -149,5 +150,18 @@ describe("orderedReposOf —— 槽 2/全部插件页读同一份顺序（19 §4
   it("顺序里没有该作者 ⇒ 作者块原序（不丢仓）", () => {
     const model = buildSourceOrder([]);
     expect(orderedReposOf(model, domain).map((r) => r.id)).toEqual(["hw", "fx", "extra"]);
+  });
+});
+
+describe("declaredRepoBySourceUrl —— 顺序认作者声明的 repos[].id（19 §4.1）", () => {
+  it("源记录 repoId 与作者声明 id 不同时，顺序/交换用声明 id", () => {
+    const declared = declaredRepoMapOf([
+      { repos: [{ id: "hw", sourceUrl: GEEK_HW }, { id: "fx", sourceUrl: GEEK_FX }] },
+    ]);
+    const m = buildSourceOrder([GEEK_HW, GEEK_FX], { declaredRepoBySourceUrl: declared });
+    expect(m.repoOrder.geek).toEqual(["hw", "fx"]);
+    const r = swapReposRaw([GEEK_HW, GEEK_FX], "geek", "hw", "fx", { declaredRepoBySourceUrl: declared });
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.order.repoOrder.geek).toEqual(["fx", "hw"]);
   });
 });

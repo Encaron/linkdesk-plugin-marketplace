@@ -23,7 +23,7 @@ import { readCachedDownloadCount } from "./downloadCounts";
 import { readSourceRecords, type SourceRecord } from "./marketSources";
 import { ensureAuthorDomains, getLoadedAuthorDomains, knownAuthorIds } from "./authors";
 import { readCurrentRepoRef, resolveRepoRef } from "./repoContext";
-import { buildSourceOrder, declaredAuthorMapOf, orderSnapshot } from "./sourceOrder";
+import { buildSourceOrder, declaredAuthorMapOf, declaredRepoMapOf, orderSnapshot } from "./sourceOrder";
 import { readRawSourceConfig } from "./sourceAdmin";
 import { NAV_COMMANDS, readCurrentStoreRoute, type StoreNavTarget } from "./storeNav";
 
@@ -207,6 +207,7 @@ export async function readStoreState(): Promise<StoreReadState> {
   const repoEntryIds = new Set(repo.entries.map((e) => e.id));
   const order = buildSourceOrder(rawSources, {
     declaredAuthorBySource: declaredAuthorMapOf(catalog.entries),
+    declaredRepoBySourceUrl: declaredRepoMapOf(domains),
   });
   const orderSnap = orderSnapshot(order);
 

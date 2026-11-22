@@ -27,7 +27,7 @@ import { useSwapDrag } from "../drag/useSwapDrag";
 export function RepoSlot() {
   const { t } = useTranslation();
   const { data, navigate, contentRef } = useStore();
-  const order = useSourceOrder(data.catalog.entries);
+  const order = useSourceOrder(data.catalog.entries, data.authorDomains);
   const { domain, repo, authorId } = data.repo;
   const repos = domain ? orderedReposOf(order, domain) : repo ? [repo] : [];
 

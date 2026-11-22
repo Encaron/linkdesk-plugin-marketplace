@@ -24,7 +24,7 @@ export function AuthorDock() {
   const { t } = useTranslation();
   const { data, navigate, prefs } = useStore();
   const { domains } = useAuthorDomains(data.catalog.entries.length);
-  const order = useSourceOrder(data.catalog.entries);
+  const order = useSourceOrder(data.catalog.entries, domains);
   const authors = orderedAuthorsOf(order, domains);
   const [pinned, setPinned] = useState(false);
   const [hovered, setHovered] = useState(false);

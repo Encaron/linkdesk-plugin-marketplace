@@ -74,8 +74,27 @@ export interface SourceOrder {
 export interface BuildOrderOptions {
   /** 条目声明的 authorId（sourceName → authorId）；缺省 = 记录自身的 GitHub owner */
   declaredAuthorBySource?: ReadonlyMap<string, string>;
+  /** 作者声明的仓库 id（sourceUrl 身份 → repos[].id）；缺省 = 记录自身的 GitHub repo 名。
+   *  19 §4.1：作者块 `repos[].id` 是仓卡/交换的唯一 id，源记录的 repoId 只是拉取身份。 */
+  declaredRepoBySourceUrl?: ReadonlyMap<string, string>;
   /** 是否把官方作者身份计入顺序（默认 true；官方目录没有条目时也可显式关掉） */
   includeOfficial?: boolean;
+}
+
+/** 作者域 → `sourceUrl 身份 → repos[].id` 映射（供顺序模型把源记录对到作者声明的仓 id） */
+export function declaredRepoMapOf(
+  domains: ReadonlyArray<{ repos: ReadonlyArray<{ id: string; sourceUrl?: string }> }>,
+): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const domain of domains) {
+    for (const repo of domain.repos) {
+      if (!repo.sourceUrl) continue;
+      const norm = normalizeSourceUrl(repo.sourceUrl) ?? repo.sourceUrl;
+      const key = urlSourceKey(norm);
+      if (key) out.set(key, repo.id);
+    }
+  }
+  return out;
 }
 
 function canonicalAuthorIdOf(
@@ -92,14 +111,17 @@ function canonicalAuthorIdOf(
 function toOrderedRecord(
   item: unknown,
   index: number,
-  declared: ReadonlyMap<string, string> | undefined,
+  opts: BuildOrderOptions,
 ): OrderedRecord | null {
   const rec = normalizeSourceRecord(item);
   if (!rec) return null;
-  const authorId = canonicalAuthorIdOf(rec, declared);
+  const authorId = canonicalAuthorIdOf(rec, opts.declaredAuthorBySource);
   if (!authorId) return null;
   const core = rec.kind === "remote" && isOfficialSourceUrl(rec.url);
-  const repoId = core ? OFFICIAL_CORE_REPO_ID : rec.repoId;
+  const normUrl = rec.url ? normalizeSourceUrl(rec.url) ?? rec.url : undefined;
+  const urlKey = normUrl ? urlSourceKey(normUrl) : null;
+  const declaredRepoId = urlKey ? opts.declaredRepoBySourceUrl?.get(urlKey) : undefined;
+  const repoId = core ? OFFICIAL_CORE_REPO_ID : declaredRepoId ?? rec.repoId;
   return {
     index,
     authorId: core ? OFFICIAL_AUTHOR_ID : authorId,
@@ -117,11 +139,10 @@ export function buildSourceOrder(
   items: readonly unknown[],
   opts: BuildOrderOptions = {},
 ): SourceOrder {
-  const declared = opts.declaredAuthorBySource;
   const records: OrderedRecord[] = [];
   const seenRemote = new Set<string>();
   for (let i = 0; i < items.length; i++) {
-    const rec = toOrderedRecord(items[i], i, declared);
+    const rec = toOrderedRecord(items[i], i, opts);
     if (!rec) continue;
     if (rec.kind === "remote") {
       const key = urlSourceKey(rec.url ?? "") ?? `${rec.authorId.toLowerCase()}:${rec.repoId}`;
@@ -225,7 +246,7 @@ export function swapAuthorsRaw(
   const byAuthor = new Map<string, number[]>();
   const unknown: number[] = [];
   for (let i = 0; i < items.length; i++) {
-    const rec = toOrderedRecord(items[i], i, opts.declaredAuthorBySource);
+    const rec = toOrderedRecord(items[i], i, opts);
     if (!rec) {
       unknown.push(i);
       continue;
@@ -249,7 +270,7 @@ export function swapAuthorsRaw(
   }
   for (const i of unknown) next.push(items[i]);
   for (let i = 0; i < items.length; i++) {
-    const rec = toOrderedRecord(items[i], i, opts.declaredAuthorBySource);
+    const rec = toOrderedRecord(items[i], i, opts);
     if (rec?.kind === "local") next.push(items[i]);
   }
 
@@ -284,7 +305,7 @@ export function swapReposRaw(
   const slots: number[] = [];
   const byRepo = new Map<string, number[]>();
   for (let i = 0; i < items.length; i++) {
-    const rec = toOrderedRecord(items[i], i, opts.declaredAuthorBySource);
+    const rec = toOrderedRecord(items[i], i, opts);
     if (!rec || rec.kind === "local" || rec.authorId.toLowerCase() !== author.toLowerCase()) continue;
     slots.push(i);
     const list = byRepo.get(rec.repoId);

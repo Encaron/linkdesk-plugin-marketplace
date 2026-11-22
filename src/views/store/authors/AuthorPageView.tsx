@@ -189,7 +189,7 @@ export function AuthorPageView({ mode }: { mode: AuthorPageMode }) {
   const { all, disabledRaw } = useMarketplacePlugins();
   const [records, reloadRecords] = useSourceRecords();
   const { domains } = useAuthorDomains(data.catalog.entries.length);
-  const order = useSourceOrder(data.catalog.entries);
+  const order = useSourceOrder(data.catalog.entries, domains);
   const installedIds = useMemo(
     () => new Set([...all.map((p) => p.pluginId), ...disabledRaw.map((p) => p.pluginId)]),
     [all, disabledRaw],

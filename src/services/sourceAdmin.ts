@@ -30,10 +30,12 @@ import { fetchSidecar } from "./marketSources/fetch";
 import { removeCache } from "./marketSources/io";
 import type { CatalogEntry } from "./marketCatalog";
 import { getCatalogResult, reprojectCatalog } from "./marketplaceShared/catalogStore";
+import { ensureAuthorDomains, getLoadedAuthorDomains } from "./authors";
 import { scheduleDataRefresh } from "./marketplaceShared/pluginsStore";
 import {
   buildSourceOrder,
   declaredAuthorMapOf,
+  declaredRepoMapOf,
   orderSnapshot,
   swapAuthorsRaw,
   swapReposRaw,
@@ -254,7 +256,19 @@ export async function refreshSourceDetailed(url: string): Promise<SourceRefreshO
  * 目录声明映射来自当前目录投影（条目 authorId 是身份正典；GitHub owner 只是兜底）。 */
 
 function orderOptions(): BuildOrderOptions {
-  return { declaredAuthorBySource: declaredAuthorMapOf(getCatalogResult().entries) };
+  return {
+    declaredAuthorBySource: declaredAuthorMapOf(getCatalogResult().entries),
+    declaredRepoBySourceUrl: declaredRepoMapOf(getLoadedAuthorDomains()),
+  };
+}
+
+/** 命令面可能不在已加载作者域的 realm 里——先确保域到位（仓 id 才能对到作者声明） */
+async function ensureOrderContext(): Promise<void> {
+  try {
+    await ensureAuthorDomains();
+  } catch {
+    /* 拉不到作者域 ⇒ 顺序回落到源记录的 repoId（仍可交换，只是 id 以源为准） */
+  }
 }
 
 /** 读当前作者/仓顺序（`marketplace.getOrder` 的落点；不写盘） */
@@ -262,12 +276,14 @@ export async function readSourceOrder(): Promise<{
   authorOrder: string[];
   repoOrder: Record<string, string[]>;
 }> {
+  await ensureOrderContext();
   const items = await readRawSourceConfig();
   return orderSnapshot(buildSourceOrder(items, orderOptions()));
 }
 
 /** 交换两个作者容器（D4；本地组不参与） */
 export async function swapAuthors(authorIdA: string, authorIdB: string): Promise<SwapDecision> {
+  await ensureOrderContext();
   const items = await readRawSourceConfig();
   const decision = swapAuthorsRaw(items, authorIdA, authorIdB, orderOptions());
   if (!decision.ok) return decision;
@@ -281,6 +297,7 @@ export async function swapRepos(
   repoIdA: string,
   repoIdB: string,
 ): Promise<SwapDecision> {
+  await ensureOrderContext();
   const items = await readRawSourceConfig();
   const decision = swapReposRaw(items, authorId, repoIdA, repoIdB, orderOptions());
   if (!decision.ok) return decision;

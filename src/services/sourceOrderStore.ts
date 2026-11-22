@@ -14,6 +14,7 @@ import { realmSlot } from "./realmSlot";
 import {
   buildSourceOrder,
   declaredAuthorMapOf,
+  declaredRepoMapOf,
   orderSnapshot,
   type SourceOrder,
 } from "./sourceOrder";
@@ -66,20 +67,28 @@ function ensureBridge(): void {
 }
 
 /** 同步快照（命令面/非 React 读取） */
-export function getSourceOrderModel(entries: readonly CatalogEntry[]): SourceOrder {
+export function getSourceOrderModel(
+  entries: readonly CatalogEntry[],
+  domains: readonly AuthorDomain[] = [],
+): SourceOrder {
   return buildSourceOrder(state.items, {
     declaredAuthorBySource: declaredAuthorMapOf(entries),
+    declaredRepoBySourceUrl: declaredRepoMapOf(domains),
   });
 }
 
 export function getCachedOrderSnapshot(
   entries: readonly CatalogEntry[],
+  domains: readonly AuthorDomain[] = [],
 ): { authorOrder: string[]; repoOrder: Record<string, string[]> } {
-  return orderSnapshot(getSourceOrderModel(entries));
+  return orderSnapshot(getSourceOrderModel(entries, domains));
 }
 
 /** 订阅顺序（作者页/槽 2/作者坞共用；配置一变即重排） */
-export function useSourceOrder(entries: readonly CatalogEntry[]): SourceOrder {
+export function useSourceOrder(
+  entries: readonly CatalogEntry[],
+  domains: readonly AuthorDomain[] = [],
+): SourceOrder {
   const [tick, setTick] = useState(0);
   const rerender = useCallback(() => setTick((t) => t + 1), []);
   useEffect(() => {
@@ -97,8 +106,8 @@ export function useSourceOrder(entries: readonly CatalogEntry[]): SourceOrder {
   // tick 是「配置重读/跨表面变更」的重新建序触发器（数组引用可能相同）
   return useMemo(() => {
     void tick;
-    return getSourceOrderModel(entries);
-  }, [entries, tick]);
+    return getSourceOrderModel(entries, domains);
+  }, [entries, domains, tick]);
 }
 
 /** 作者某仓顺序 → 作者域仓对象（顺序模型优先；作者块里有、配置里没有的仓按原序补末尾） */
