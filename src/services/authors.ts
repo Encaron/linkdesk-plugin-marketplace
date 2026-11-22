@@ -374,6 +374,13 @@ function pluginsForRepo(
   return mine.filter((e) => (e.sourceName ?? "").toLowerCase().endsWith(`/${repo.id.toLowerCase()}`));
 }
 
+/** 作者没声明头像时的 GitHub 头像直链（github.com/<owner>.png 会 302 到头像 CDN）。
+ *  ⛔ 不走 api.github.com——匿名额度 60 次/时、国内常被墙；这里只要一张静态图。
+ *  authorId 默认为来源 GitHub owner；自定义 id 会 404 ⇒ AuthorCard 的 onError 回落首字母。 */
+export function githubAvatarOf(authorId: string): string {
+  return `https://github.com/${encodeURIComponent(authorId)}.png?size=128`;
+}
+
 /**
  * 多块聚合 → 单作者域（纯函数）。
  * @param blocks 同一 authorId 从各候选源拉到的块（顺序 = 官方 → 用户源，先到者字段优先）
@@ -437,7 +444,10 @@ export function aggregateAuthorDomain(
   return {
     authorId,
     name,
-    ...(first.avatar ? { avatar: first.avatar } : {}),
+    /* 2026-11-23 用户口径：作者块没声明头像 ⇒ 用 GitHub 头像静态直链（owner=authorId）；
+       自定义 id / 断网 / 被墙 ⇒ `<img onError>` 回落首字母色块（AuthorCard 侧兜）。
+       ⛔ 不走 api.github.com（匿名 60 次/时、国内常被墙），只吃 github.com/<owner>.png 的 302。 */
+    avatar: first.avatar ?? githubAvatarOf(authorId),
     ...(first.intro ? { intro: first.intro } : {}),
     ...(first.introImage ? { introImage: first.introImage } : {}),
     ...(blockStoreTitle ? { storeTitle: blockStoreTitle } : {}),
@@ -528,9 +538,10 @@ export function officialDomainOf(all: readonly CatalogEntry[]): AuthorDomain | n
   });
   return {
     authorId: OFFICIAL_AUTHOR_ID,
-    // 19 §1：作者域显示名 = Encaron（「官方」只是发布者/认证徽标，⛔ 第二个作者身份）
+    // 19 §1：作者域显示名 = Encaron（「官方」只是发布者/认证徽标，⛔ 第二个作者身份）；
+    // 头像 = Encaron 的 GitHub 头像（2026-11-23 用户口径：作者的脸不跟市场品牌图标混用）。
     name: "Encaron",
-    avatar: "linkdesk://marketplace/resources/icon-brand.svg",
+    avatar: githubAvatarOf("Encaron"),
     intro: "官方运营的插件与主题精选",
     storeTitle: "官方 Plugin Store",
     repos,

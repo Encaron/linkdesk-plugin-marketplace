@@ -12,6 +12,8 @@
  */
 
 import type { KeyboardEvent, PointerEvent } from "react";
+import { useEffect, useState } from "react";
+import { resolveAvatar } from "../../../services/avatarCache";
 import { useTranslation } from "react-i18next";
 import { hueBG, hueOf, Icon, type IconName } from "../../../ui";
 import { OFFICIAL_AUTHOR_ID, type AuthorDomain } from "../../../services/authors";
@@ -34,6 +36,25 @@ export function AuthorCard({
   className?: string;
 }) {
   const { t } = useTranslation();
+  /** GitHub 头像直链 404 / 断网 / 被墙 ⇒ 记下坏掉的 src，回落首字母色块（同 src 不重复试）。 */
+  const [brokenAvatar, setBrokenAvatar] = useState<string | null>(null);
+  /** 头像真源：先给远端 URL，本地缓存解析完再换成 Blob URL（见 avatarCache.ts）。 */
+  const [avatarSrc, setAvatarSrc] = useState<string | null>(domain.avatar ?? null);
+  useEffect(() => {
+    let alive = true;
+    if (!domain.avatar) {
+      setAvatarSrc(null);
+      return;
+    }
+    setAvatarSrc(domain.avatar);
+    void resolveAvatar(domain.authorId, domain.avatar).then((src) => {
+      if (alive) setAvatarSrc(src);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [domain.authorId, domain.avatar]);
+  const showAvatar = !!avatarSrc && brokenAvatar !== avatarSrc;
   const hue = hueOf(domain.authorId);
   const solo = domain.repos.length === 1;
   const deckRest = authorDeckRestCount(domain.repos);
@@ -60,8 +81,17 @@ export function AuthorCard({
     >
       <div className="marketplace-store-ac-top">
         <span className="marketplace-store-ac-avatar" style={hueBG(hue)}>
-          {domain.avatar ? (
-            <img className="marketplace-store-ac-avatar-img" src={domain.avatar} alt="" loading="lazy" draggable={false} />
+          {showAvatar ? (
+            <img
+              className="marketplace-store-ac-avatar-img"
+              src={avatarSrc ?? undefined}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              referrerPolicy="no-referrer"
+              draggable={false}
+              onError={() => setBrokenAvatar(avatarSrc ?? null)}
+            />
           ) : (
             <span className="marketplace-store-ac-avatar-letter" aria-hidden="true">
               {domain.name.slice(0, 1)}
