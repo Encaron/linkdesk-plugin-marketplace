@@ -1,26 +1,32 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-22T19:41:23.471Z",
+  "updatedAt": "2026-11-22T19:57:46.288Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.6",
+      "version": "1.4.7",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.6/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.7/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.6/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.7/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.6/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.6/marketplace.linkdesk-plugin",
-      "size": 179733,
-      "publishedAt": "2026-11-22T19:41:23.471Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.7/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.7/marketplace.linkdesk-plugin",
+      "size": 179335,
+      "publishedAt": "2026-11-22T19:57:46.288Z",
       "versions": [
+        {
+          "version": "1.4.7",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.7/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-22T19:57:46.288Z",
+          "changelog": "- **侧栏「作者」的数字不再被小圆点压住**：compact 模式下数字被顶到最右，而「有新内容」的点是绝对定位在右侧 8px，正好叠在数字上；现在点改为普通 flex 项、跟在数字后面并排显示。\n- **两个点不再叠成一个**：作者项此前「有新内容」与「有源加载失败」两个点都绝对定位在同一处；现在只画一个（失败优先）。"
+        },
         {
           "version": "1.4.6",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.6/marketplace.linkdesk-plugin",
@@ -47,8 +53,7 @@
         {
           "version": "1.4.2",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.2/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-22T19:13:07.614Z",
-          "changelog": "- **作者头像从 GitHub 来**：官方作者显示 **Encaron 的 GitHub 头像**（不再跟市场自己的品牌图标混用）；第三方作者没声明头像时，自动用 `github.com/<owner>.png`（静态直链，⛔ 不走 api.github.com——匿名额度 60 次/时、国内常被墙）。\n- **加载失败不留白**：头像 404 / 断网 / 被墙时回落首字母色块（同一 src 不重复重试），作者名与简介照常显示。\n- **头像缓存在本地**：下载一次存进插件自己的数据目录 `avatars/<authorId>.png`（插件详情页右侧「数据位置」可见），**7 天**才自动更新一次；更新失败本次登录不再重试、下次启动再试（过期时先用旧图）。⛔ 不为头像单独做刷新按钮。"
+          "publishedAt": "2026-11-22T19:13:07.614Z"
         },
         {
           "version": "1.4.1",
