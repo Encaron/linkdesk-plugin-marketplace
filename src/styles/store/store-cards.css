@@ -114,7 +114,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--bg-window) 72%, transparent);
+  background: var(--surface-reading-strong);
   border: 1px solid color-mix(in srgb, var(--text-on-accent) 22%, transparent);
   /* 内层阴影只用既有抬升 token——⛔ 新辉光字面量（辉光归 --surface-glow/hover） */
   box-shadow: var(--shadow-pop);
@@ -192,7 +192,7 @@
   gap: 6px;
   padding: 4px 10px;
   border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--bg-window) 78%, transparent);
+  background: var(--surface-reading-strong);
   border: 1px solid color-mix(in srgb, var(--text-on-accent) 24%, transparent);
   color: var(--text-on-accent);
   font-size: var(--font-size-2xs);
@@ -336,7 +336,12 @@
   opacity: 1;
   visibility: visible;
   pointer-events: none;
+  /* 小卡/网格卡的整面不是「文字条」：保持主题玻璃，只在文字侧压局部 scrim，⛔ 不整面深色。 */
   background: var(--bg-card);
+  color: var(--surface-ink, var(--text-primary));
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--surface-media-scrim) 80%, transparent);
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   transition: left 0.18s cubic-bezier(0.2, 0.7, 0.3, 1), right 0.18s cubic-bezier(0.2, 0.7, 0.3, 1),
@@ -413,7 +418,9 @@
   right: 0;
   bottom: 60px;
   height: 108px;
-  background: color-mix(in srgb, var(--bg-card) 72%, transparent);
+  background: var(--surface-reading-strong);
+  color: var(--surface-ink, var(--text-primary));
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--surface-media-scrim) 80%, transparent);
   /* D5：hover 条是压在封面上的玻璃——必须模糊它**下面的图**；用的仍是卡面同一 token
      `--surface-blur`（⛔ 新 blur 数值）。卡面的 backdrop-filter 只采样卡外背景，管不到卡内媒体。 */
   backdrop-filter: var(--surface-blur);
@@ -541,9 +548,10 @@
   gap: 5px;
   padding: 10px 12px;
   background: linear-gradient(0deg,
-    color-mix(in srgb, var(--bg-window) 97%, transparent) 0%,
-    color-mix(in srgb, var(--bg-window) 90%, transparent) 70%,
+    var(--surface-media-scrim) 0%,
+    color-mix(in srgb, var(--surface-media-scrim) 78%, transparent) 70%,
     transparent 100%);
+  color: var(--surface-ink, var(--text-primary));
   opacity: 0;
   transform: translateY(6px);
   pointer-events: none;
@@ -726,8 +734,8 @@
 }
 .marketplace-store-strip-arrow:hover { color: var(--text-primary); background: var(--tab-hover-bg); }
 /* 桌面：落在页边距（36px）里的沟槽——28px 钮占 −35…−7px，与卡片之间留 7px 空档，永不压内容 */
-.marketplace-store-strip-arrow.is-l { left: -35px; }
-.marketplace-store-strip-arrow.is-r { right: -35px; }
+.marketplace-store-strip-arrow.is-l { left: -10px; }
+.marketplace-store-strip-arrow.is-r { right: -10px; }
 .marketplace-store-strip.is-no-overflow .marketplace-store-strip-arrow { display: none; }
 
 /* 窄屏：页边距只剩 16px，装不下外置钮 ⇒ 轨道自身左右缩进 42px，钮回到缩进区（仍不压内容、左右对称） */
@@ -735,7 +743,7 @@
   .marketplace-store-strip-row.is-duo .marketplace-store-card.is-duo { flex-basis: 100%; }
   .marketplace-store-card.is-mega { width: 262px; }
   .marketplace-store-strip { padding: 0 42px; }
-  .marketplace-store-strip-row { padding-left: 16px; padding-right: 16px; }
+  .marketplace-store-strip-row { padding-left: 40px; padding-right: 40px; }
   .marketplace-store-strip-arrow.is-l { left: 6px; }
   .marketplace-store-strip-arrow.is-r { right: 6px; }
 }

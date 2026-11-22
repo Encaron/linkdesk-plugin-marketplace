@@ -1,7 +1,7 @@
 /**
- * RankView — 完整榜单页（**当前仓** top 50；19 §5.3；04 §六 / 08 §三·127）。
+ * RankView — 完整榜单页（**全部来源合并** top 50；04 §六 / 08 §三·127）。
  *
- * D1（2026-11-22）：只算 `currentRepo`——`scope` 全源缺省作废，不再提供全源模式。
+ * 2026-11-22 用户实机反转：排行榜恢复全源合并语义，不按当前仓过滤。
  * 计算位：排序键 = 下载数（`downloadCounts` 同源表）；来源随行；将来接服务器换真实统计（槽位不动）。
  * 无计数条目排后且不显示下载量——诚实不造位。
  */
@@ -17,16 +17,15 @@ export function RankView() {
   const { data, actions } = useStore();
   const dlOf = (entry: { downloadUrl?: string }) =>
     entry.downloadUrl ? data.counts.get(entry.downloadUrl) : undefined;
-  const repoName = data.repo.repo?.name ?? data.repo.name;
-  const rows = rankEntries(data.repo.entries, dlOf, 50);
+  const rows = rankEntries(data.catalog.entries, dlOf, 50);
   return (
     <>
       <div className="marketplace-store-crumb">
-        {t("完整榜单")} · <b>{t("热门下载 Top 50")}</b> · {repoName}
+        {t("完整榜单")} · <b>{t("热门下载 Top 50")}</b>
       </div>
       <div className="marketplace-store-cat-note">
         <Icon name="alert" size="sm" />
-        {t("按下载量排序，只统计「{{repo}}」里的插件", { repo: repoName })}
+        {t("按下载量排序，来自你添加的所有来源")}
       </div>
       <div>
         {rows.map((entry, i) => (

@@ -48,4 +48,19 @@ describe("圆角吃主题 token（不写死 px）", () => {
     }
     expect(offenders, "改用 var(--radius-xs/sm/md/lg/2xl/pill/full)——主题『组件圆角』才会生效").toEqual([]);
   });
+
+  it("作者页模式钮/徽标不得用 --radius-full（否则组件圆角关闭后仍是椭圆）", () => {
+    const css = stripComments(readFileSync(join(ROOT, "src/styles/store/store-authors.css"), "utf8"));
+    for (const sel of [
+      ".marketplace-store-author-modes",
+      ".marketplace-store-author-mode",
+      ".marketplace-store-author-badge",
+      ".marketplace-store-author-current",
+    ]) {
+      const at = css.indexOf(`${sel} {`);
+      expect(at, `缺少选择器 ${sel}`).toBeGreaterThanOrEqual(0);
+      const block = css.slice(at, css.indexOf("}", at));
+      expect(block, `${sel} 用 --radius-full 会绕过组件圆角设置`).not.toContain("--radius-full");
+    }
+  });
 });

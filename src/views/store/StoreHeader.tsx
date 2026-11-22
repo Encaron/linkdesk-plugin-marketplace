@@ -58,7 +58,7 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
             ref={searchRef}
             type="text"
             value={searchInput}
-            placeholder={t("搜索「{{repo}}」中的插件…", { repo: repoName })}
+            placeholder={t("搜索所有来源中的插件…")}
             aria-label={t("搜索插件")}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => {

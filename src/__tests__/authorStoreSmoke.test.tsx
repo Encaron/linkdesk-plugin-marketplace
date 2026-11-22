@@ -209,7 +209,7 @@ describe("作者页浏览 → 仓首页（批 C：一页两模式 + D1 全链路
     await waitFor(() => expect(screen.getAllByText("Official One").length).toBeGreaterThan(0));
   });
 
-  it("作者跳转字落页：进作者仓即切 currentRepo（分类页只算该仓；⛔ 全源/逃生门已作废）", async () => {
+  it("作者跳转字落页：进作者仓即切 currentRepo（分类页按页主预过滤）", async () => {
     const { container } = render(<StoreView isActive />);
     fireEvent.click(container.querySelector('[data-rail-item="authors"]') as HTMLElement);
     await waitFor(() => expect(screen.getAllByText("Demo Author").length).toBeGreaterThan(0));
@@ -217,12 +217,12 @@ describe("作者页浏览 → 仓首页（批 C：一页两模式 + D1 全链路
     await waitFor(() => expect(screen.getByText("All hardware")).toBeTruthy());
 
     fireEvent.click(screen.getByText("All hardware"));
-    // D1（19 §一/§五）：分类页 = 当前仓（进作者仓时已切到 demo-author/hw）
+    // 页主预过滤：作者店「更多」落页只显示该作者；✕ / rail 重入才全量
     await waitFor(() => expect(screen.getAllByText("Demo One").length).toBeGreaterThan(0));
     expect(screen.queryByText("Official One")).toBeNull();
-    // 「显示全部」全源逃生门随全源合并池一起作废
-    expect(screen.queryByText("已过滤")).toBeNull();
-    expect(screen.queryByText("显示全部")).toBeNull();
+    // 页主预过滤标识常驻：✕ 清除 / 「显示全部」回到全量
+    expect(screen.queryByText("已过滤")).toBeTruthy();
+    expect(screen.queryByText("显示全部")).toBeTruthy();
   });
 
   it("作者坞：胶囊展开 → 点作者进首位仓；提示 × 关闭并记忆、? 重开", async () => {
@@ -235,12 +235,12 @@ describe("作者页浏览 → 仓首页（批 C：一页两模式 + D1 全链路
     const panel = container.querySelector(".marketplace-store-dock-panel") as HTMLElement;
     expect(panel).toBeTruthy();
     // 作者顺序同源：官方（Encaron）在前、第三方在后
-    const names = [...panel.querySelectorAll(".marketplace-store-dock-name")].map((n) => n.textContent);
+    const names = [...panel.querySelectorAll(".marketplace-store-ac-name")].map((n) => n.textContent);
     expect(names[0]).toBe("Encaron");
     expect(names).toContain("Demo Author");
 
     // D2：点作者 → 该作者首位仓（hw）→ 回仓首页
-    const authorBtn = [...panel.querySelectorAll(".marketplace-store-dock-author")].find((b) =>
+    const authorBtn = [...panel.querySelectorAll(".marketplace-store-dock-card")].find((b) =>
       b.textContent?.includes("Demo Author"),
     ) as HTMLElement;
     fireEvent.click(authorBtn);

@@ -40,6 +40,7 @@ import { AuthorSwitchCard } from "./AuthorCard";
 function resolveMore(
   more: AuthorMoreDecl | undefined,
   domain: AuthorDomain,
+  repoId: string,
   navigate: ReturnType<typeof useStore>["navigate"],
 ): { label: string; onClick: () => void } | null {
   const label = more?.label;
@@ -51,7 +52,7 @@ function resolveMore(
     if (!slug) return null;
     return {
       label,
-      onClick: () => navigate({ page: "category", category: slug, authorId: domain.authorId }),
+      onClick: () => navigate({ page: "category", category: slug, authorId: domain.authorId, repoId }),
     };
   }
   if (target.startsWith("repo:")) {
@@ -94,7 +95,7 @@ function CollectionBlock({
   const items = collection.items
     .map((id) => repo.plugins.find((p) => p.id === id))
     .filter((e): e is CatalogEntry => !!e);
-  const more = resolveMore(section.more ?? collection.more, domain, navigate);
+  const more = resolveMore(section.more ?? collection.more, domain, repo.id, navigate);
   return <CollectionRenderer collection={collection} items={items} section={section} more={more} />;
 }
 
@@ -205,7 +206,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
       const pool = section.scope === "self" ? repo.plugins : data.catalog.entries;
       const rows = rankEntries(pool, dlOf, section.top ?? 6);
       if (rows.length === 0) return null;
-      const more = resolveMore(section.more, domain, navigate);
+      const more = resolveMore(section.more, domain, repo.id, navigate);
       return (
         <section key={`rank:${idx}`} className={`marketplace-store-sec ${noGlow ? "is-no-glow" : ""}`.trim()}>
           <SectionHead title={section.title ?? t("排行榜")} hint={section.hint} more={more ?? undefined} />

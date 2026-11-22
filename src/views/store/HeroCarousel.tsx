@@ -9,6 +9,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useStickyClearance } from "./cards/useStickyClearance";
 import { ActionButton, entryHue, Icon } from "../../ui";
 import type { CatalogEntry } from "../../services/marketCatalog";
 import { actionOfCard, Art, dlText, jobLabelOf, tAuthor } from "./cards/cardParts";
@@ -21,6 +22,7 @@ export interface HeroCarouselSlide {
 
 export function HeroCarousel({ slides }: { slides: HeroCarouselSlide[] }) {
   const { t } = useTranslation();
+  const clearance = useStickyClearance<HTMLDivElement>({ mode: "lift" });
   const { data, actions } = useStore();
   const [idx, setIdx] = useState(0);
   const heroRef = useRef<HTMLDivElement | null>(null);
@@ -52,7 +54,14 @@ export function HeroCarousel({ slides }: { slides: HeroCarouselSlide[] }) {
     <>
       <div className="marketplace-store-hero-wrap">
         <div
-          ref={heroRef}
+          ref={(el) => {
+            heroRef.current = el;
+            clearance.ref.current = el;
+          }}
+          onPointerEnter={clearance.onPointerEnter}
+          onPointerLeave={clearance.onPointerLeave}
+          onFocus={clearance.onFocus}
+          onBlur={clearance.onBlur}
           className="marketplace-store-hero"
           style={{ ["--marketplace-hue" as string]: hud }}
         >

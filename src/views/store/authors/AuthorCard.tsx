@@ -18,10 +18,10 @@ import { OFFICIAL_AUTHOR_ID, type AuthorDomain } from "../../../services/authors
 import { authorDeckOf, authorDeckRestCount, authorPluginCount } from "./authorsData";
 
 function authorBadgeText(t: (k: string, o?: Record<string, unknown>) => string, domain: AuthorDomain): string {
-  const identity = domain.authorId === OFFICIAL_AUTHOR_ID ? t("内置") : t("身份：GitHub");
-  return `${domain.official ? t("官方 ✓") : t("社区源")} · ${t("{{count}} 个仓库", {
+  const base = `${domain.official ? t("官方 ✓") : t("社区源")} · ${t("{{count}} 个仓库", {
     count: domain.repos.length,
-  })} · ${identity}`;
+  })}`;
+  return domain.authorId === OFFICIAL_AUTHOR_ID ? base : `${base} · ${t("身份：GitHub")}`;
 }
 
 export function AuthorCard({
@@ -38,7 +38,7 @@ export function AuthorCard({
   const solo = domain.repos.length === 1;
   const deckRest = authorDeckRestCount(domain.repos);
   const items = authorDeckOf(domain.repos);
-  const label = t("{{name}}——进入作者主页，名下 {{count}} 个仓库", {
+  const label = t("{{name}}——进入该作者首位仓库，名下 {{count}} 个仓库", {
     name: domain.name,
     count: domain.repos.length,
   });
@@ -93,7 +93,7 @@ export function AuthorCard({
       <div className="marketplace-store-ac-meta">
         <span>{t("{{count}} 个插件", { count: authorPluginCount(domain) })}</span>
         <span className="marketplace-store-ac-go">
-          {t("进入作者主页")}
+          {t("进入首位仓库")}
           <Icon name="chevron-right" size="sm" />
         </span>
       </div>

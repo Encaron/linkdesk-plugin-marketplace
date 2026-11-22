@@ -47,7 +47,6 @@ import { writeUIPrefs } from "../../../services/marketplaceShared/uiPrefs";
 import { PLUGIN_TEMPLATE_URL } from "../sources/AddSourceModal";
 import { authorWarningLines } from "./authorWarnings";
 import { catalogWarningLines } from "../sources/catalogWarnings";
-import { summarizeWarnings } from "../sources/warningSummary";
 import { agoText, groupRemoteSources, type SourceRowView } from "../sources/sourcesData";
 import { AuthorSwitchCard } from "./AuthorCard";
 import { StickyBar } from "../StickyBar";
@@ -681,7 +680,6 @@ export function AuthorPageView({ mode }: { mode: AuthorPageMode }) {
             ...authorWarningLines(t, group.warnings),
             ...catalogWarningLines(t, group.catalogWarnings),
           ];
-          const warnSummary = summarizeWarnings(t, [...group.warnings, ...group.catalogWarnings]);
           const binding = authorBinding(group.authorId);
           return (
             <AuthorContainer
@@ -694,10 +692,10 @@ export function AuthorPageView({ mode }: { mode: AuthorPageMode }) {
               onPointerDown={binding.onPointerDown}
               onKeyDown={(e) => onAuthorKeyDown(e, group.authorId)}
             >
-              {lines.length > 0 && (
+              {mode === "manage" && lines.length > 0 && (
                 <div className="marketplace-store-author-warn" data-hint={hintOf(t, lines)}>
                   <Icon name="alert" size="sm" />
-                  {warnSummary.label}
+                  {t("来源数据有 {{count}} 处异常", { count: lines.length })}
                 </div>
               )}
               {mode === "browse" ? (

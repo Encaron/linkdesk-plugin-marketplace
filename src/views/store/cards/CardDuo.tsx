@@ -5,6 +5,7 @@
  */
 
 import { useTranslation } from "react-i18next";
+import { useStickyClearance } from "./useStickyClearance";
 import { ActionButton, restatesState, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import {
@@ -32,12 +33,18 @@ export function CardDuo({
   split?: boolean;
 }) {
   const { t } = useTranslation();
+  const clearance = useStickyClearance<HTMLDivElement>({ mode: "lift" });
   const open = () => handlers.onOpen(entry);
   const status = statusOfCard(entry, ctx);
   const action = actionOfCard(entry, ctx, jobLabelOf(t, ctx.job));
   const items = menuOfCard(entry, ctx);
   return (
     <div
+      ref={clearance.ref}
+      onPointerEnter={clearance.onPointerEnter}
+      onPointerLeave={clearance.onPointerLeave}
+      onFocus={clearance.onFocus}
+      onBlur={clearance.onBlur}
       className={`marketplace-store-card is-duo ${split ? "is-split" : ""}`.trim()}
       role="button"
       tabIndex={0}

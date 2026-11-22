@@ -55,25 +55,8 @@ export function topGroupOf(o: {
       />,
     );
   }
-  /* R4-3.18 安装位置（05 §02 本机事实）——已装才有；值 = 磁盘真路径（mono，可点开安装目录）。
-   *  与「大小」链接同一落点（E6#78 install），但这里回答的是「装在哪」而不是「多大」。 */
-  if (diskLoc?.installDir) {
-    top.push(
-      <InfoItem
-        key="loc"
-        label={t("安装位置")}
-        mono
-        value={
-          <DirLink
-            title={t("在资源管理器里打开 {{path}}", { path: diskLoc.installDir })}
-            onClick={() => onOpenDir("install")}
-          >
-            {diskLoc.installDir}
-          </DirLink>
-        }
-      />,
-    );
-  }
+  /* 2026-11-23 用户实机：删「安装位置」行——与上面「大小」链接**同一落点**（都开安装目录），
+   *  信息全等但多占一行；「大小」值可点已足够回答「装在哪 + 多大」。 */
   /* E6#78 数据位置行——插件真写过数据才有主进程给的 dataDir，空/无 = 整行不画（同 VS Code「缓存」行）；
    *  值 = 动作链接（与「资源」组「仓库 → 打开仓库」同一手感：label 说是什么、value 说做什么）。 */
   if (diskLoc?.dataDir) {

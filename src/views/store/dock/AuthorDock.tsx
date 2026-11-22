@@ -12,13 +12,14 @@
  * ⛔ 作者/仓顺序只读 `sourceOrderStore`（与作者页/槽 2 同一份）；本地组不出现。
  */
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { hueBG, hueOf, Icon } from "../../../ui";
 import { useAuthorDomains } from "../../../services/authors";
 import { orderedAuthorsOf, orderedReposOf, useSourceOrder } from "../../../services/sourceOrderStore";
 import { writeUIPrefs } from "../../../services/marketplaceShared/uiPrefs";
 import { useStore } from "../StoreContext";
+import { AuthorCard } from "../authors/AuthorCard";
 
 export function AuthorDock() {
   const { t } = useTranslation();
@@ -28,11 +29,20 @@ export function AuthorDock() {
   const authors = orderedAuthorsOf(order, domains);
   const [pinned, setPinned] = useState(false);
   const [hovered, setHovered] = useState(false);
+  /** 指针离开后延迟收起：标签与面板之间有 10px 缝，斜着划过去不应丢面板（用户实机反馈）。 */
+  const hoverTimer = useRef<number | undefined>(undefined);
   const expanded = pinned || hovered;
 
+  const cancelHoverClose = useCallback(() => {
+    if (hoverTimer.current !== undefined) {
+      window.clearTimeout(hoverTimer.current);
+      hoverTimer.current = undefined;
+    }
+  }, []);
+
+  useEffect(() => cancelHoverClose, [cancelHoverClose]);
+
   const currentAuthorId = data.repo.authorId.toLowerCase();
-  const selected = authors.find((a) => a.authorId.toLowerCase() === currentAuthorId);
-  const selectedRepos = selected ? orderedReposOf(order, selected) : [];
 
   const close = useCallback(() => {
     setPinned(false);
@@ -67,9 +77,16 @@ export function AuthorDock() {
   return (
     <div
       className={`marketplace-store-dock ${expanded ? "is-open" : ""} ${pinned ? "is-pinned" : ""}`.trim()}
-      onPointerEnter={() => setHovered(true)}
+      onPointerEnter={() => {
+        cancelHoverClose();
+        setHovered(true);
+      }}
       onPointerLeave={() => {
-        if (!pinned) setHovered(false);
+        cancelHoverClose();
+        hoverTimer.current = window.setTimeout(() => {
+          hoverTimer.current = undefined;
+          if (!pinned) setHovered(false);
+        }, 500);
       }}
     >
       <button
@@ -86,56 +103,34 @@ export function AuthorDock() {
               {a.name.slice(0, 1)}
             </span>
           ))}
+          {authors.length > capsuleFaces.length && (
+            <span className="marketplace-store-dock-face is-more">+{authors.length - capsuleFaces.length}</span>
+          )}
         </span>
-        {authors.length > capsuleFaces.length && (
-          <span className="marketplace-store-dock-more">+{authors.length - capsuleFaces.length}</span>
-        )}
         <span className="marketplace-store-dock-capsule-label">{t("作者")}</span>
+        <span className="marketplace-store-dock-count">{authors.length}</span>
+        <span className="marketplace-store-dock-tab-dot" aria-hidden="true" />
       </button>
 
       {expanded && (
         <div className="marketplace-store-dock-panel" role="region" aria-label={t("作者列表")}>
           <div className="marketplace-store-dock-head">
             <b>{t("作者")}</b>
-            <span className="marketplace-store-dock-count">{t("{{count}} 位", { count: authors.length })}</span>
+            <span>{t("选择作者查看其仓库")}</span>
           </div>
           <div className="marketplace-store-dock-list">
             {authors.map((a) => {
               const active = a.authorId.toLowerCase() === currentAuthorId;
-              const repoCount = orderedReposOf(order, a).length;
               return (
-                <button
+                <AuthorCard
                   key={a.authorId}
-                  type="button"
-                  className={`marketplace-store-dock-author ${active ? "is-active" : ""}`.trim()}
-                  aria-current={active ? "true" : undefined}
-                  onClick={() => openAuthor(a.authorId)}
-                >
-                  <span className="marketplace-store-dock-av" style={hueBG(hueOf(a.authorId))}>
-                    {a.name.slice(0, 1)}
-                  </span>
-                  <span className="marketplace-store-dock-main">
-                    <span className="marketplace-store-dock-name">{a.name}</span>
-                    <span className="marketplace-store-dock-sub">
-                      {t("{{count}} 个仓库", { count: repoCount })}
-                    </span>
-                  </span>
-                  {active && <span className="marketplace-store-dock-dot" aria-hidden="true" />}
-                </button>
+                  domain={a}
+                  className={`marketplace-store-dock-card ${active ? "is-current" : ""}`.trim()}
+                  onOpen={() => openAuthor(a.authorId)}
+                />
               );
             })}
           </div>
-
-          {selected && selectedRepos.length > 1 && (
-            <div className="marketplace-store-dock-fan" aria-label={t("{{name}} 的仓库", { name: selected.name })}>
-              {selectedRepos.map((r) => (
-                <span key={r.id} className="marketplace-store-dock-repo">
-                  <b>{r.name}</b>
-                  <i>{t("{{count}} 个插件", { count: r.plugins.length })}</i>
-                </span>
-              ))}
-            </div>
-          )}
 
           <div className="marketplace-store-dock-foot">
             <button
@@ -160,7 +155,7 @@ export function AuthorDock() {
             </button>
             {!prefs.dockTipDismissed && (
               <span className="marketplace-store-dock-tip">
-                <span>{t("进入「作者页」或「管理来源」可调整顺序")}</span>
+                <span>{t("进作者页/管理来源可调整顺序")}</span>
                 <button
                   type="button"
                   className="marketplace-store-dock-tip-x"

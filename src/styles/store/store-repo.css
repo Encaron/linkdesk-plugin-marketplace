@@ -23,7 +23,7 @@
   flex: none;
   white-space: nowrap;
   /* 让出横排右箭头的沟槽（箭头落在 strip 外 −35px） */
-  margin-left: 44px;
+  margin-left: 20px;
 }
 
 /* ═══ 全部插件页返回条 ═══ */
@@ -90,6 +90,7 @@ body.is-swap-dragging {
   filter: saturate(0.6);
 }
 .marketplace-store-card.is-swap-target {
+  overflow: visible;
   outline: 2px solid var(--accent-hover);
   outline-offset: 2px;
   border-color: var(--accent-hover);
@@ -98,8 +99,9 @@ body.is-swap-dragging {
 .marketplace-store-card.is-swap-target::after {
   content: "⇄";
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 61;
   min-width: 18px;
   padding: 1px 4px;
@@ -113,6 +115,15 @@ body.is-swap-dragging {
 }
 .marketplace-store-card.is-just-swapped {
   animation: marketplace-swap-flash 0.6s ease;
+}
+/* 松手后的落位期：指针仍停在卡上时，不要立刻恢复 hover 的抬起/磨砂；
+   指针一移动（>8px）或点下就由 useSwapDrag 摘掉 body 类。 */
+body.is-swap-settling .marketplace-store-card:hover,
+.marketplace-store-card.is-post-drag:hover {
+  transform: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
 }
 @keyframes marketplace-swap-flash {
   0% {

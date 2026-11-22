@@ -87,7 +87,11 @@ function resolveMore(
   if (target.startsWith("category:")) {
     const slug = target.slice("category:".length);
     if (!slug) return null;
-    return { label, onClick: () => navigate({ page: "category", category: slug }) };
+    return {
+      label,
+      onClick: () =>
+        navigate({ page: "category", category: slug, authorId: repo.authorId, repoId: repo.id }),
+    };
   }
   if (target.startsWith("repo:")) {
     const repoId = target.slice("repo:".length);

@@ -685,7 +685,6 @@
   "作者还没往这个仓库上架插件——过阵子再来看看，或换一个仓库": "The author has not published anything in this repository yet — check back later or switch repositories",
   "查看本仓全部插件": "View all plugins in this repository",
   "作者页模式": "Author page mode",
-  "浏览": "Browse",
   "管理来源": "Manage sources",
   "查看排序提示": "Show ordering tip",
   "关闭提示": "Dismiss tip",
@@ -708,12 +707,17 @@
   "{{count}} 位": "{{count}}",
   "{{name}} 的仓库": "Repositories of {{name}}",
   "作者页": "Authors page",
-  "进入「作者页」或「管理来源」可调整顺序": "Open “Authors page” or “Manage sources” to reorder",
+  "进作者页/管理来源可调整顺序": "Reorder on the Authors page or Manage sources",
   "「{{repo}}」已刷新 · 发现 {{count}} 个更新": "“{{repo}}” refreshed · {{count}} updates found",
   "「{{repo}}」已是最新": "“{{repo}}” is up to date",
   "「{{repo}}」刷新失败 · 已用缓存": "“{{repo}}” refresh failed · using cache",
   "全部来源已刷新 · 发现 {{count}} 个更新": "All sources refreshed · {{count}} updates found",
   "全部来源已刷新 · 已是最新": "All sources refreshed · everything is up to date",
   "查看全部插件": "View all plugins",
-  "打开作者页": "Open Authors page"
+  "打开作者页": "Open Authors page",
+  "{{name}}——进入该作者首位仓库，名下 {{count}} 个仓库": "{{name}} — open their first repository ({{count}} repos)",
+  "进入首位仓库": "Open first repository",
+  "选择作者查看其仓库": "Choose an author to view their repositories",
+  "来源数据有 {{count}} 处异常": "This source has {{count}} data issue(s)",
+  "搜索所有来源中的插件…": "Search plugins from all sources…"
 }

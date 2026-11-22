@@ -133,6 +133,16 @@ export function useSwapDrag(options: SwapDragOptions): {
 
   const updateTarget = useCallback((drag: ActiveDrag, clientX: number, clientY: number) => {
     const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
+    if (drag.spec.kind === "repo") {
+      // 仓卡拖到**别的作者容器任意空白处**也算跨作者（不要求正好压在仓卡上）——
+      // 用户实机反馈：只压在仓卡上才提示，拖到组内空白没有任何反馈。
+      const authorHost = el?.closest<HTMLElement>('[data-swap-kind="author"]');
+      if (authorHost && authorHost.dataset.swapAuthor && authorHost.dataset.swapAuthor !== drag.spec.authorId) {
+        drag.crossAuthor = true;
+        clearTarget(drag);
+        return;
+      }
+    }
     const target = el?.closest<HTMLElement>(targetSelector(drag.spec.kind));
     if (!target || target === drag.src || target.hasAttribute("data-swap-locked")) {
       clearTarget(drag);
@@ -225,13 +235,37 @@ export function useSwapDrag(options: SwapDragOptions): {
           updateTarget(drag, ev.clientX, ev.clientY);
         };
 
-        const onUp = () => {
+        const onUp = (ev: PointerEvent) => {
           if (dragRef.current !== drag) return;
           if (!drag.active) {
             cleanup(drag);
             return;
           }
           suppressNextClick();
+          // 松手瞬间指针通常还停在卡上；先压住 hover 的抬起/磨砂，指针移动 >8px 或点下再恢复。
+          document.body.classList.add("is-swap-settling");
+          for (const el of [drag.src, drag.targetEl].filter(Boolean) as HTMLElement[]) {
+            el.classList.add("is-post-drag");
+            const release = () => {
+              el.classList.remove("is-post-drag");
+              el.removeEventListener("pointerleave", release);
+            };
+            el.addEventListener("pointerleave", release);
+            window.setTimeout(release, 4000);
+          }
+          let settled = false;
+          const clearSettling = () => {
+            if (settled) return;
+            settled = true;
+            document.body.classList.remove("is-swap-settling");
+            window.removeEventListener("pointermove", onSettleMove);
+            window.removeEventListener("pointerdown", clearSettling);
+          };
+          const onSettleMove = (moveEv: PointerEvent) => {
+            if (Math.hypot(moveEv.clientX - ev.clientX, moveEv.clientY - ev.clientY) > 8) clearSettling();
+          };
+          window.addEventListener("pointermove", onSettleMove);
+          window.addEventListener("pointerdown", clearSettling);
           const target = drag.targetEl;
           const crossAuthor = drag.crossAuthor;
           const ghost = drag.ghost;
@@ -266,21 +300,11 @@ export function useSwapDrag(options: SwapDragOptions): {
               }, 600);
             }
             if (ghost) {
-              const dest = ok ? findEl(specNow)?.getBoundingClientRect() : undefined;
-              if (dest) {
-                ghost.style.transition =
-                  "left .22s var(--ease, ease), top .22s var(--ease, ease), width .22s var(--ease, ease), height .22s var(--ease, ease), opacity .22s var(--ease, ease)";
-                ghost.style.left = `${dest.left}px`;
-                ghost.style.top = `${dest.top}px`;
-                ghost.style.width = `${dest.width}px`;
-                ghost.style.height = `${dest.height}px`;
-                ghost.style.opacity = "0";
-                window.setTimeout(() => ghost.remove(), 260);
-              } else {
-                ghost.style.transition = "opacity .15s";
-                ghost.style.opacity = "0";
-                window.setTimeout(() => ghost.remove(), 180);
-              }
+              // ⛔ 不让 ghost 飞向目标（用户实机：交换后有一道很小的影子往左/上散去，像残留动画）。
+              // 交换结果由目标卡短暂高亮表达；ghost 原地淡出即可。
+              ghost.style.transition = "opacity .15s";
+              ghost.style.opacity = "0";
+              window.setTimeout(() => ghost.remove(), 180);
             }
           };
           Promise.resolve(optsRef.current.onSwap(specNow, targetSpec))

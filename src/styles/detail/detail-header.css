@@ -248,7 +248,12 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  min-width: 0;
+  /* 2026-11-23 用户实机（旧壳 0.2.57）：本块带 role=status，宿主文本地板是 v0.2.59 才加的；
+   *  旧壳里没有地板 ⇒ body 作为 flex item 被压到 min-content（CJK＝1 字）⇒ 一字一行、块被撑高。
+   *  插件侧自保：吃掉剩余宽（1 1 auto）＋留 8em 可读地板（与宿主同口径），任何壳都塌不了。 */
+  flex: 1 1 auto;
+  min-width: 8em;
+  overflow-wrap: anywhere;
 }
 
 .marketplace-mpd-update-block-title {

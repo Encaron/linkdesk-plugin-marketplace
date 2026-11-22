@@ -28,3 +28,20 @@ export function hoverShift(
   const shift = clearanceBottom + HOVER_GAP - desiredTop;
   return Math.min(HOVER_MAX_SHIFT, Math.max(0, shift));
 }
+
+/**
+ * 只放大/抬升的卡（Mega/Duo）：按 scale + lift 算放大后的上沿是否越过吸顶条。
+ * transform 以卡片中心为原点，所以上沿 = 中心 - 放大后高度/2。
+ */
+export function liftShift(
+  cardTop: number,
+  cardHeight: number,
+  scale: number,
+  lift: number,
+  clearanceBottom: number,
+): number {
+  const center = cardTop + cardHeight / 2 + lift;
+  const scaledTop = center - (cardHeight * scale) / 2;
+  const shift = clearanceBottom + HOVER_GAP - scaledTop;
+  return Math.min(HOVER_MAX_SHIFT, Math.max(0, shift));
+}

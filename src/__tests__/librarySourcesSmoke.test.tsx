@@ -177,8 +177,8 @@ describe("来源管理（R4-3.14/3.15）", () => {
     const container = await goto("sources");
     await waitFor(() => expect(screen.getByText("Encaron")).toBeTruthy());
     await waitFor(() => expect(screen.getAllByText("Demo Author").length).toBeGreaterThan(0));
-    // 声明提示：block 里两个 hero → 聚合短标「重复大屏 ×1」（F5）；明细仍在 data-hint
-    const warn = screen.getByText("重复大屏 ×1");
+    // 声明提示：block 里两个 hero → 用户面短句（技术明细只进 data-hint）
+    const warn = screen.getByText("来源数据有 1 处异常");
     expect(warn).toBeTruthy();
     expect(warn.getAttribute("data-hint") ?? "").toContain("只有第 1 个占据置顶首视觉");
 

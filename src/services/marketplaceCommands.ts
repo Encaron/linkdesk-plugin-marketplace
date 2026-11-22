@@ -47,7 +47,7 @@ const OWNER = "marketplace";
 /** 作者源配置键——真相源 = 本仓 `plugin.json` 的 `contributes.configuration` 同名键 */
 const CONFIG_KEY = "marketplace.marketplaceSources";
 
-const STORE_TAB_TYPE = "marketplace-store"; // 棒 6：主区商店专用视图（入口别名 `marketplace` 同渲染 StoreView）
+const STORE_TAB_TYPE = "marketplace"; // 与图标入口共用同一 tab type（单实例；入口别名同渲染 StoreView）
 const DETAIL_TAB_TYPE = "plugin-detail";
 
 export interface OpenTabResult {

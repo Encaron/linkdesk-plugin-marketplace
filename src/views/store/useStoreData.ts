@@ -59,8 +59,8 @@ export function useStoreData(): StoreData {
   const { map: licenses, refresh: refreshLicenses } = useLicenseEntitlements();
   const urls = catalog.entries.map((e) => e.downloadUrl).filter((u): u is string => !!u);
   const counts = useDownloadCounts(urls);
-  // 19 §5.2：左栏分类计数 = **当前仓**计数（切仓即刷新；不再是全源合并）
-  const railOrderCounts = countByBucket(repo.entries, catalog.railOrder);
+  // 2026-11-22 用户实机反转：左栏分类计数 = **全部来源合并**（与分类页同一口径）
+  const railOrderCounts = countByBucket(catalog.entries, catalog.railOrder);
 
   const updateCount = catalog.entries.reduce((n, e) => n + (statusOf(e) === "update" ? 1 : 0), 0);
 

@@ -40,7 +40,9 @@ export function routeKey(route: StoreRoute): string {
   switch (route.page) {
     case "category":
       // 页主范围（作者 / 官方）与全量分类页是三条浏览条件——滚动位分开记忆
-      return route.authorId
+      return route.repoId
+        ? `cat:${route.category ?? ""}:repo:${route.repoId}`
+        : route.authorId
         ? `cat:${route.category ?? ""}:${route.authorId}`
         : route.official
           ? `cat:${route.category ?? ""}:official`
@@ -76,7 +78,9 @@ export function __resetScrollMemory(): void {
 export function routeFromNav(t: StoreNavTarget): StoreRoute {
   switch (t.page) {
     case "category":
-      return t.authorId
+      return t.repoId
+        ? { page: "category", category: t.category, authorId: t.authorId, repoId: t.repoId }
+        : t.authorId
         ? { page: "category", category: t.category, authorId: t.authorId }
         : t.official
           ? { page: "category", category: t.category, official: true }
@@ -104,7 +108,9 @@ export function routeFromNav(t: StoreNavTarget): StoreRoute {
 export function routeToNavTarget(route: StoreRoute): StoreNavTarget {
   switch (route.page) {
     case "category":
-      return route.authorId
+      return route.repoId
+        ? { page: "category", category: route.category ?? "", authorId: route.authorId, repoId: route.repoId }
+        : route.authorId
         ? { page: "category", category: route.category ?? "", authorId: route.authorId }
         : route.official
           ? { page: "category", category: route.category ?? "", official: true }

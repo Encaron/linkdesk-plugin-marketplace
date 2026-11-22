@@ -35,7 +35,14 @@ export function CategoryTiles() {
               count={entries.length}
               desc={desc ? t(desc) : undefined}
               icon={categoryIcon(slug)}
-              onOpen={(s) => navigate({ page: "category", category: s })}
+              onOpen={(s) =>
+                navigate({
+                  page: "category",
+                  category: s,
+                  authorId: data.repo.authorId,
+                  repoId: data.repo.repoId,
+                })
+              }
             />
           );
         })}

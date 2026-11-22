@@ -588,7 +588,7 @@
        .marketplace-store-rank-row,
        .marketplace-store-lib-row,
        .marketplace-store-src-row):hover {
-  transform: translateY(var(--surface-lift)) scale(var(--surface-scale));
+  transform: translateY(calc(var(--surface-lift) + var(--clearance-y, 0px))) scale(var(--surface-scale));
 }
 .marketplace-store-card.is-row:hover { transform-origin: left center; }
 /* 带展开面的卡（small/grid）：面与磨砂由 `.x-over` 独占——卡体再挂 backdrop-filter 会形成

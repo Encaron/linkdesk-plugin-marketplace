@@ -232,8 +232,8 @@ describe("导航命令 —— 意图信箱 + 标签页", () => {
   it("openStore：意图 home 落盘/广播 + openOrFocus 带 {pluginId}（真机壳按 opts 归属面板）+ tabId 取自 tab:activated", async () => {
     const w = makeWorld();
 
-    expect(await runOpenStore()).toEqual({ ok: true, tabId: "tab-marketplace-store" });
-    expect(w.tabs.openOrFocus).toHaveBeenCalledWith("marketplace-store", { pluginId: "marketplace", label: "插件商店" });
+    expect(await runOpenStore()).toEqual({ ok: true, tabId: "tab-marketplace" });
+    expect(w.tabs.openOrFocus).toHaveBeenCalledWith("marketplace", { pluginId: "marketplace", label: "插件商店" });
     expect(w.pluginState.set).toHaveBeenCalledWith("marketplace", "storeNav", { page: "home" });
     expect(w.events.emit).toHaveBeenCalledWith("marketplace:storeNav", { page: "home" });
   });
@@ -264,7 +264,7 @@ describe("导航命令 —— 意图信箱 + 标签页", () => {
   ] as const)("%s：意图载荷正确", async (_name, run, expected) => {
     const w = makeWorld();
     const r = await run();
-    expect(r).toEqual({ ok: true, tabId: "tab-marketplace-store" });
+    expect(r).toEqual({ ok: true, tabId: "tab-marketplace" });
     expect(w.pluginState.set).toHaveBeenCalledWith("marketplace", "storeNav", expected);
   });
 

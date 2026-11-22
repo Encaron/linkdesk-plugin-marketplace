@@ -5,76 +5,131 @@
  * 全部颜色/圆角/阴影/字号走主题变量；⛔ 硬编码 hex。
  */
 
+/* 收起态＝右缘竖向标签（HTML7 `.dock-tab`）：头像列＋作者＋数量＋状态点。 */
 .marketplace-store-dock {
   position: absolute;
-  top: 74px;
-  right: 14px;
-  z-index: 45;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-}
-.marketplace-store-dock-capsule {
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  z-index: 80;
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 5px 10px 5px 6px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
+  gap: 10px;
+}
+/* 标签与面板之间的 10px 缝：透明桥属于坞本身，斜着划过去不会触发 pointerleave。 */
+.marketplace-store-dock::before {
+  content: "";
+  position: absolute;
+  right: 100%;
+  top: -20px;
+  bottom: -20px;
+  width: 12px;
+  pointer-events: auto;
+}
+.marketplace-store-dock-capsule {
+  width: 52px;
+  min-height: 172px;
+  padding: 10px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
+  border-radius: var(--radius-lg);
   background: var(--bg-card);
-  color: var(--text-primary);
+  color: var(--text-secondary);
   box-shadow: var(--shadow-pop);
+  backdrop-filter: blur(16px) saturate(1.15);
   cursor: pointer;
   font: inherit;
   font-size: var(--font-size-2xs);
-  transition: border-color 0.15s, transform 0.15s;
+  transition: border-color 0.18s, background 0.18s, transform 0.18s;
 }
-.marketplace-store-dock-capsule:hover { border-color: var(--accent); }
+.marketplace-store-dock-capsule:hover,
+.marketplace-store-dock.is-open .marketplace-store-dock-capsule {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+  color: var(--text-primary);
+  transform: translateX(-2px);
+}
 .marketplace-store-dock.is-pinned .marketplace-store-dock-capsule {
-  border-color: var(--accent);
   background: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
 }
-.marketplace-store-dock-faces { display: flex; align-items: center; }
+.marketplace-store-dock-faces { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .marketplace-store-dock-face {
-  width: 22px;
-  height: 22px;
-  border-radius: var(--radius-full);
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-on-accent);
-  font-weight: 600;
-  font-size: var(--font-size-2xs);
-  border: 1px solid var(--bg-card);
+  font-weight: 700;
+  font-size: var(--font-size-xs);
+  border: 1px solid color-mix(in srgb, var(--bg-card) 55%, transparent);
 }
-.marketplace-store-dock-face + .marketplace-store-dock-face { margin-left: -7px; }
-.marketplace-store-dock-more { color: var(--text-muted); font-size: var(--font-size-2xs); }
-.marketplace-store-dock-capsule-label { color: var(--text-secondary); }
+.marketplace-store-dock-face.is-more {
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+.marketplace-store-dock-capsule-label {
+  color: var(--text-secondary);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.marketplace-store-dock-count { color: var(--accent); font-size: var(--font-size-sm); font-weight: 700; }
+.marketplace-store-dock-tab-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent) 70%, transparent);
+}
 
+/* 展开面板：在标签左侧、留 10px 空隙；头/脚固定，只有作者列表滚动（HTML7 `.dock-panel`）。 */
 .marketplace-store-dock-panel {
   position: absolute;
-  top: 0;
-  right: 54px;
-  width: 282px;
-  max-height: min(70vh, 560px);
-  overflow: auto;
-  padding: 10px;
-  border: 1px solid var(--border);
+  top: 50%;
+  right: calc(100% + 10px);
+  transform: translateY(-50%);
+  width: 386px;
+  max-height: min(72vh, 640px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 26%, var(--border));
   border-radius: var(--radius-lg);
-  background: var(--bg-card);
+  background: var(--bg-window);
   box-shadow: var(--shadow-pop);
+  backdrop-filter: var(--surface-blur, blur(18px)) saturate(1.25);
+  -webkit-backdrop-filter: var(--surface-blur, blur(18px)) saturate(1.25);
 }
 .marketplace-store-dock-head {
+  flex: none;
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  padding: 2px 4px 8px;
+  gap: 8px;
+  padding: 14px 16px 10px;
   border-bottom: 1px solid var(--border);
   font-size: var(--font-size-sm);
 }
-.marketplace-store-dock-count { color: var(--text-muted); font-size: var(--font-size-2xs); }
-.marketplace-store-dock-list { display: flex; flex-direction: column; gap: 2px; padding: 6px 0; }
+.marketplace-store-dock-head > span { color: var(--text-muted); font-size: var(--font-size-2xs); }
+.marketplace-store-dock-list .marketplace-store-author-card { width: 100% !important; }
+.marketplace-store-dock-list .marketplace-store-author-card.is-current {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent), var(--shadow-pop);
+}
+.marketplace-store-dock-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
 .marketplace-store-dock-author {
   display: flex;
   align-items: center;
@@ -137,11 +192,11 @@
 .marketplace-store-dock-repo b { font-weight: 500; }
 .marketplace-store-dock-repo i { color: var(--text-muted); font-style: normal; flex: none; }
 .marketplace-store-dock-foot {
+  flex: none;
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
-  padding: 8px 4px 2px;
+  padding: 10px 14px;
   border-top: 1px solid var(--border);
 }
 .marketplace-store-dock-link {
@@ -186,19 +241,40 @@
   margin-left: auto;
 }
 
-/* 窄容器：胶囊 → 右下按钮；面板 → 底部抽屉（不依赖 hover） */
+/* 桌面宽度：给右缘作者坞留出车道，页面内容不钻到标签下面（HTML7 `.store-page` 同规则）。 */
+@container (min-width: 761px) {
+  .marketplace-store-page { padding-right: 88px; }
+}
+
+/* 窄容器：竖向标签 → 右下按钮；面板 → 底部抽屉（不依赖 hover） */
 @container (max-width: 760px) {
   .marketplace-store-dock {
     top: auto;
     right: 12px;
     bottom: 58px;
+    transform: none;
   }
-  .marketplace-store-dock-capsule-label { display: none; }
+  .marketplace-store-dock-capsule {
+    width: 46px;
+    min-height: 46px;
+    height: 46px;
+    padding: 6px;
+    flex-direction: row;
+    gap: 6px;
+    border-radius: var(--radius-lg);
+  }
+  .marketplace-store-dock-faces { flex-direction: row; gap: 2px; }
+  .marketplace-store-dock-face { width: 24px; height: 24px; border-radius: var(--radius-sm); font-size: 10px; }
+  .marketplace-store-dock-faces .marketplace-store-dock-face:nth-child(n + 3) { display: none; }
+  .marketplace-store-dock-capsule-label,
+  .marketplace-store-dock-count,
+  .marketplace-store-dock-tab-dot { display: none; }
   .marketplace-store-dock-panel {
     top: auto;
-    bottom: 54px;
+    bottom: 58px;
     right: 0;
-    width: min(300px, calc(100vw - 24px));
-    max-height: min(58vh, 420px);
+    width: min(340px, calc(100vw - 24px));
+    max-height: min(62vh, 480px);
+    transform: none;
   }
 }

@@ -18,7 +18,7 @@ import { realmSlot } from "./realmSlot";
 export type StoreNavTarget =
   | { page: "home" }
   | { page: "repo-all" }
-  | { page: "category"; category: string; authorId?: string; official?: boolean }
+  | { page: "category"; category: string; authorId?: string; repoId?: string; official?: boolean }
   | { page: "rank" }
   | { page: "authors"; mode?: "browse" | "manage" }
   | { page: "library" }

@@ -279,17 +279,21 @@ describe("R4-3.18 右栏四类字段", () => {
     expect(install.getAttribute("data-hint")).toBe("需升级 LinkDesk 至 9.9.9 才能安装");
   });
 
-  it("已装：本机事实出现「安装位置」，值可点开安装目录", async () => {
+  it("已装：本机事实只有「大小」链接（值可点开安装目录），⛔ 不再重复画「安装位置」行", async () => {
     api = stubLinkdesk({
       installed: [{ pluginId: "demo-net", manifest: { name: "Demo Net", version: "1.0.0" } }],
       pluginLocation: { installDir: "C:/plugins/demo-net", dataDir: "C:/data/demo-net" },
     });
     render(<DetailView pluginId="demo-net" isActive />);
     await syncPlugins();
-    await waitFor(() => expect(screen.getByText("安装位置")).toBeTruthy());
-    expect(screen.getByText("C:/plugins/demo-net")).toBeTruthy();
+    // 2026-11-23 用户实机：安装位置与「大小」同一落点（都开安装目录）⇒ 删重复行
+    await waitFor(() => expect(screen.getByText("大小")).toBeTruthy());
+    expect(screen.queryByText("安装位置")).toBeNull();
     expect(screen.getByText("数据位置")).toBeTruthy();
-    fireEvent.click(screen.getByText("C:/plugins/demo-net"));
+    // 「大小」的值 = 链接（DirLink 走 data-hint，⛔ 原生 title=），点开安装目录（E6#78）
+    const sizeLink = document.querySelector('[data-hint="在资源管理器里打开 C:/plugins/demo-net"]');
+    expect(sizeLink).toBeTruthy();
+    fireEvent.click(sizeLink as HTMLElement);
     expect(api.shell.openPluginFolder).toHaveBeenCalledWith("demo-net", "install");
   });
 

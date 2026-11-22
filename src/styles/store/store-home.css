@@ -5,6 +5,8 @@
 /* ── 英雄轮播 ── */
 .marketplace-store-hero-wrap {
   position: relative; /* F10：箭头的定位锚（画面外两侧） */
+  /* 2026-11-22 用户实机：窗口化 hero 放大后顶部仍贴/切页头——整块往下让 12px，简单直接。 */
+  margin-top: 20px;
   margin-bottom: 4px;
   /* 窄容器文字地板（2026-11-21 用户报「分屏/缩窄后 hero 标题一行一个字」）：
      容器查询按**面板实宽**降档（分屏组同样生效），网格/媒体都给显式地板。 */
@@ -20,7 +22,7 @@
   transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.2s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 .marketplace-store-hero:hover {
-  transform: scale(1.02);
+  transform: translateY(var(--clearance-y, 0px)) scale(1.02);
   box-shadow: 0 14px 60px -8px color-mix(in srgb, var(--marketplace-hue, transparent) 75%, transparent), var(--shadow-pop);
   /* 卡面语言唯一出处（store-shell）：hero 与卡/行同一套磨砂——⛔ 不再只有它没有玻璃 */
   backdrop-filter: var(--surface-blur);
@@ -37,8 +39,9 @@
   min-width: 100%;
   position: relative;
   display: block;
-  min-height: 340px;
-  max-height: 460px;
+  /* 2026-11-22 用户实机：hero 从上到下太长；压高度上限，不让 2:1 比例把它撑回 460。 */
+  min-height: 240px;
+  max-height: 300px;
   aspect-ratio: var(--media-hero);
   cursor: pointer;
 }
@@ -49,19 +52,26 @@
   z-index: 1;
   pointer-events: none;
   background:
+    /* 右侧收边：素材自带暗边/黑边时用语义遮罩把它并进画面，不靠移动图片。 */
+    linear-gradient(270deg,
+      color-mix(in srgb, var(--surface-media-scrim) 72%, transparent) 0%,
+      transparent 20%),
     linear-gradient(90deg,
-      color-mix(in srgb, var(--bg-window) 96%, transparent) 0%,
-      color-mix(in srgb, var(--bg-window) 88%, transparent) 30%,
-      color-mix(in srgb, var(--bg-window) 55%, transparent) 55%,
-      color-mix(in srgb, var(--bg-window) 10%, transparent) 82%,
+      var(--surface-media-scrim) 0%,
+      color-mix(in srgb, var(--surface-media-scrim) 88%, transparent) 30%,
+      color-mix(in srgb, var(--surface-media-scrim) 55%, transparent) 55%,
+      color-mix(in srgb, var(--surface-media-scrim) 10%, transparent) 82%,
       transparent 100%),
-    linear-gradient(0deg, color-mix(in srgb, var(--bg-window) 55%, transparent), transparent 42%);
+    linear-gradient(0deg, color-mix(in srgb, var(--surface-media-scrim) 55%, transparent), transparent 42%);
 }
 .marketplace-store-hero-slide > .marketplace-store-art {
   position: absolute;
   inset: 0;
   min-height: 0;
   border-radius: 0;
+  /* 素材自带右侧暗边/黑边时，不做全局裁图：右缘渐隐到 Hero 底，暗边自然消失。 */
+  -webkit-mask-image: linear-gradient(90deg, black 82%, transparent 100%);
+  mask-image: linear-gradient(90deg, black 82%, transparent 100%);
 }
 /* 文案列只占左半（视频 controls 在右侧可点）；底部为窄窗留出压暗空间 */
 .marketplace-store-hero-copy {
@@ -125,12 +135,12 @@
   .marketplace-store-hero-copy { width: min(64%, 620px); padding: 28px 32px; }
 }
 @container (max-width: 620px) {
-  .marketplace-store-hero-slide { aspect-ratio: var(--media-card); min-height: 240px; max-height: 340px; }
+  .marketplace-store-hero-slide { aspect-ratio: var(--media-card); min-height: 210px; max-height: 280px; }
   .marketplace-store-hero-copy { width: 100%; padding: 22px; justify-content: flex-end; }
   .marketplace-store-hero-slide::after {
     background: linear-gradient(0deg,
-      color-mix(in srgb, var(--bg-window) 94%, transparent) 0%,
-      color-mix(in srgb, var(--bg-window) 72%, transparent) 42%,
+      var(--surface-media-scrim) 0%,
+      color-mix(in srgb, var(--surface-media-scrim) 72%, transparent) 42%,
       transparent 82%);
   }
   .marketplace-store-hero-copy p { -webkit-line-clamp: 2; }
