@@ -104,6 +104,9 @@ export function RepoSlot() {
                 goLabel={current ? t("当前仓库") : t("进入仓库")}
                 current={current}
                 icon={data.repo.official ? "bag" : "folder"}
+                authorId={authorId}
+                repoId={r.id}
+                image={r.image ?? (core ? "linkdesk://marketplace/resources/repo-official.svg" : undefined)}
                 hue={authorHueOf(authorId)}
                 onOpen={() => data.repo.setRepo({ authorId, repoId: r.id })}
                 ariaLabel={t("{{name}}——切换到该仓库", { name: r.name })}

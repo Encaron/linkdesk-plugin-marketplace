@@ -29,6 +29,8 @@ import { publishStoreNav, type StoreNavTarget } from "./storeNav";
 import { OFFICIAL_AUTHOR_ID } from "./authors";
 import { readSourceOrder, swapAuthors, swapRepos } from "./sourceAdmin";
 import { getCatalogResult, refreshCatalogNow } from "./marketplaceShared/catalogStore";
+import { githubOwnerRepoOf, normalizeSourceUrl } from "./marketCatalog";
+import { sweepAvatarCache } from "./avatarCache";
 import { readStoreState } from "./storeRead";
 import {
   listenMarketplaceSearchBroadcast,
@@ -46,6 +48,23 @@ const OWNER = "marketplace";
 
 /** 作者源配置键——真相源 = 本仓 `plugin.json` 的 `contributes.configuration` 同名键 */
 const CONFIG_KEY = "marketplace.marketplaceSources";
+
+/** 来源清单 → 仍存在的作者 id 集合（官方恒在）。用于清扫头像缓存：删源后缓存跟着删。 */
+function validAuthorIdsOf(sources: readonly unknown[]): Set<string> {
+  const out = new Set<string>([OFFICIAL_AUTHOR_ID]);
+  for (const rec of sources) {
+    const url =
+      typeof rec === "string"
+        ? rec
+        : rec && typeof rec === "object" && typeof (rec as { url?: unknown }).url === "string"
+          ? (rec as { url: string }).url
+          : "";
+    if (!url) continue;
+    const parsed = githubOwnerRepoOf(normalizeSourceUrl(url) ?? url);
+    if (parsed) out.add(parsed.owner.toLowerCase());
+  }
+  return out;
+}
 
 const STORE_TAB_TYPE = "marketplace"; // 与图标入口共用同一 tab type（单实例；入口别名同渲染 StoreView）
 const DETAIL_TAB_TYPE = "plugin-detail";
@@ -320,6 +339,12 @@ export async function runRemoveSource(args?: unknown): Promise<{ ok: boolean; re
   const decision = decideRemoveSource(Array.isArray(raw) ? raw : [], removeArg(args));
   if (!decision.ok) return { ok: false, reason: decision.reason };
   await cfg.set(CONFIG_KEY, decision.next);
+  // 2026-11-23 用户口径：删源 ⇒ 该作者的作者头像 + 仓库头像缓存一起删
+  try {
+    await sweepAvatarCache(validAuthorIdsOf(decision.next));
+  } catch {
+    /* 清扫失败不影响移源结果 */
+  }
   return { ok: true };
 }
 
@@ -331,7 +356,21 @@ export async function runCheckUpdates(): Promise<{ ok: boolean; count: number }>
 
 /** 刷新目录内容（唯一属主 = catalogStore；`changed` = 内容签名变化） */
 export async function runRefreshCatalog(): Promise<{ ok: boolean; changed: boolean }> {
-  return refreshCatalogNow();
+  const r = await refreshCatalogNow();
+  // 2026-11-23 用户口径：刷新时清扫头像缓存——已不存在的作者/源，其缓存文件一起删
+  try {
+    const cfg = lk()?.configuration;
+    const raw = cfg?.get ? await cfg.get(CONFIG_KEY) : [];
+    const valid = validAuthorIdsOf(Array.isArray(raw) ? raw : []);
+    for (const e of getCatalogResult().entries) {
+      if (e.authorId) valid.add(e.authorId.toLowerCase());
+      if (e.sourceName && e.sourceName.includes("/")) valid.add(e.sourceName.split("/")[0].toLowerCase());
+    }
+    await sweepAvatarCache(valid);
+  } catch {
+    /* 清扫失败不影响刷新结果 */
+  }
+  return r;
 }
 
 /** 记号「全部已读」参数：`"all"` / `{kind:"all"}` / 位置形 */

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <!-- 官方目录仓的「仓库头像」（2026-11-23）：品牌橙底 + 2×2 瓷片＝目录/合集；
+       与插件本体的购物袋图标区分：袋＝「买」，瓷片墙＝「有哪些货」。 -->
+  <defs>
+    <linearGradient id="rpBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FB923C"/>
+      <stop offset="1" stop-color="#C2410C"/>
+    </linearGradient>
+    <linearGradient id="rpGlass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.02"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="40" height="40" rx="10" fill="url(#rpBg)"/>
+  <rect x="4" y="4" width="40" height="40" rx="10" fill="url(#rpGlass)"/>
+  <rect x="4.5" y="4.5" width="39" height="39" rx="9.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.22"/>
+  <g fill="#FFF7ED">
+    <rect x="13.5" y="13.5" width="9" height="9" rx="2.2"/>
+    <rect x="25.5" y="13.5" width="9" height="9" rx="2.2"/>
+    <rect x="13.5" y="25.5" width="9" height="9" rx="2.2"/>
+    <rect x="25.5" y="25.5" width="9" height="9" rx="2.2" opacity="0.55"/>
+  </g>
+</svg>

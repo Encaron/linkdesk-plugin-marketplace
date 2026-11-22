@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next";
 import { hueBG, Icon, type IconName } from "../../../ui";
 import { OFFICIAL_AUTHOR_ID, type AuthorDomain } from "../../../services/authors";
 import { authorDeckOf, authorDeckRestCount, authorPluginCount } from "./authorsData";
-import { useAvatarSrc } from "./useAvatarSrc";
+import { useAvatarSrc, useRepoAvatarSrc } from "./useAvatarSrc";
 import { authorHueOf } from "./authorHue";
 
 function authorBadgeText(t: (k: string, o?: Record<string, unknown>) => string, domain: AuthorDomain): string {
@@ -132,6 +132,9 @@ export function AuthorSwitchCard({
   current,
   hue,
   icon,
+  authorId,
+  repoId,
+  image,
   onOpen,
   ariaLabel,
   drag,
@@ -144,6 +147,10 @@ export function AuthorSwitchCard({
   current?: boolean;
   hue?: string;
   icon?: IconName;
+  /** 仓库头像（`repos[].image`）：有图先画图，无图回落 icon 字形。 */
+  authorId?: string;
+  repoId?: string;
+  image?: string;
   onOpen: () => void;
   ariaLabel: string;
   /** 拖动控制器注入（data-* 属性 + pointerdown；本件不关心 swap 语义） */
@@ -153,6 +160,12 @@ export function AuthorSwitchCard({
     onKeyDown?: (e: KeyboardEvent<HTMLElement>) => void;
   };
 }) {
+  /** 仓库头像：有 image 就画图（缓存/主色同作者头像一套），无图回落 icon 字形。 */
+  const { src: repoImage, hue: repoHue, onError: onRepoImageError } = useRepoAvatarSrc(
+    authorId ?? "",
+    repoId ?? "",
+    image,
+  );
   return (
     <div
       className={`marketplace-store-card marketplace-store-author-card is-switch ${current ? "is-on" : ""}`.trim()}
@@ -160,7 +173,7 @@ export function AuthorSwitchCard({
       tabIndex={0}
       aria-label={ariaLabel}
       aria-current={current ? "true" : undefined}
-      style={hue ? ({ ["--marketplace-hue" as string]: hue }) : undefined}
+      style={(repoHue ?? hue) ? ({ ["--marketplace-hue" as string]: repoHue ?? hue }) : undefined}
       {...drag?.attrs}
       onPointerDown={drag?.onPointerDown}
       onClick={onOpen}
@@ -175,10 +188,22 @@ export function AuthorSwitchCard({
     >
       <div className="marketplace-store-ac-top">
         <span
-          className={`marketplace-store-ac-avatar ${hue ? "" : "is-muted"}`.trim()}
-          style={hue ? hueBG(hue) : undefined}
+          className={`marketplace-store-ac-avatar ${repoImage || hue ? "" : "is-muted"}`.trim()}
+          style={(repoHue ?? hue) ? hueBG(repoHue ?? hue!) : undefined}
         >
-          <Icon name={icon ?? "folder"} />
+          {repoImage ? (
+            <img
+              className="marketplace-store-ac-avatar-img"
+              src={repoImage}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              referrerPolicy="no-referrer"
+              onError={onRepoImageError}
+            />
+          ) : (
+            <Icon name={icon ?? "folder"} />
+          )}
         </span>
         <div className="marketplace-store-fx1">
           <div className="marketplace-store-ac-name">{title}</div>

@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { resolveAvatar } from "../../../services/avatarCache";
+import { resolveAvatar, resolveRepoAvatar } from "../../../services/avatarCache";
 
 export interface AvatarSrc {
   /** 可直接给 <img src> 的地址（Blob 或远端）；null = 画首字母 */
@@ -42,6 +42,35 @@ export function useAvatarSrc(authorId: string, avatar: string | undefined): Avat
       alive = false;
     };
   }, [authorId, avatar]);
+
+  const visible = src && broken !== src ? src : null;
+  return { src: visible, hue: visible ? hue : undefined, onError: () => setBroken(src ?? null) };
+}
+
+/** 仓库头像（`repos[].image`）——与作者头像同一套取源/缓存，目录另起 `repo-avatars/<authorId>/`。 */
+export function useRepoAvatarSrc(authorId: string, repoId: string, image: string | undefined): AvatarSrc {
+  const [src, setSrc] = useState<string | null>(image ?? null);
+  const [hue, setHue] = useState<string | undefined>(undefined);
+  const [broken, setBroken] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    if (!image) {
+      setSrc(null);
+      setHue(undefined);
+      return;
+    }
+    setSrc(image);
+    setHue(undefined);
+    void resolveRepoAvatar(authorId, repoId, image).then((resolved) => {
+      if (!alive) return;
+      setSrc(resolved.src);
+      setHue(resolved.hue);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [authorId, repoId, image]);
 
   const visible = src && broken !== src ? src : null;
   return { src: visible, hue: visible ? hue : undefined, onError: () => setBroken(src ?? null) };

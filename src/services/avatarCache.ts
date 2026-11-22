@@ -1,20 +1,22 @@
 /**
- * avatarCache —— 作者头像 + 主色的本地缓存（2026-11-23 用户实机：颜色不能再按 authorId 哈希，
- * 换头像后光环仍旧是蓝色；同一个作者的头像/颜色/名字必须同源）。
+ * avatarCache —— 作者头像 / 仓库头像 + 主色的本地缓存（2026-11-23 用户口径）。
  *
- * 存储：`{pluginDataDir}/avatars/<authorId>.<真实扩展名>`
- *   - `pluginDataDir` = 壳按插件给的数据目录（`window.linkdesk.env.get("marketplace")`）；
- *     目录一旦存在，插件详情页右侧会自动出现「数据位置」。
- *   - 扩展名跟响应 Content-Type 走（GitHub 头像实际是 image/jpeg）。
- *   - ⛔ 不写插件安装目录（升级会整个替换）。
+ * 两种资源、两个目录（⛔ 不平铺；以后添别的缓存也各有子目录）：
+ *   `{pluginDataDir}/avatars/<authorId>.<ext>`              作者头像
+ *   `{pluginDataDir}/repo-avatars/<authorId>/<repoId>.<ext>` 仓库头像
  *
- * 主色：图片落盘/读回后，缩到 24×24 取「加权平均色」（权重＝饱和度，跳过过暗/过亮/半透明像素），
- *   再把饱和度拉回 1.35 倍——这样光环/底纹/边框取的是**图里的颜色**，灰扑扑的图也不会脏。
+ * `pluginDataDir` = 壳按插件给的数据目录（`window.linkdesk.env.get("marketplace")`）；
+ * 目录一旦存在，插件详情页右侧会自动出现「数据位置」。
+ * 扩展名跟响应 Content-Type 走（GitHub 头像实际是 image/jpeg）；⛔ 不写插件安装目录。
+ *
+ * 主色：图片落盘/读回后缩到 24×24 取「饱和度加权平均色」，再把饱和度拉回 1.35 倍——
+ * 光环/底纹/边框取的是图里的颜色，灰图也不会脏。
  *
  * 策略（用户拍板）：
  *   - 7 天 TTL，自动更新；⛔ 不挂刷新按钮/刷新动作；成功失败都不提示；
  *   - 失败本次登录不再试（进程内记 failed），过期时先用旧图；下次启动再试；
- *   - ⛔ 不走 `api.github.com`（REST 匿名额度），头像走 `github.com/<owner>.png` 静态 CDN。
+ *   - 源被删 ⇒ 该作者的两种缓存一起删（`pruneAuthorCache` / `sweepAvatarCache`）；
+ *   - ⛔ 不走 `api.github.com`（REST 匿名额度），头像走静态 CDN。
  */
 
 const TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -26,7 +28,7 @@ export interface ResolvedAvatar {
   hue?: string;
 }
 
-/** 同一 authorId+url 的结果复用（作者坞/作者页/多个卡共享一份） */
+/** 结果复用（作者坞/作者页/多个卡共享一份） */
 const memo = new Map<string, ResolvedAvatar>();
 /** 本进程内拉取失败过的 key —— 本次登录不再重试（下次启动进程重启，自然重试） */
 const failed = new Set<string>();
@@ -39,15 +41,16 @@ const EXT_BY_MIME: Record<string, string> = {
   "image/webp": ".webp",
   "image/gif": ".gif",
   "image/svg+xml": ".svg",
+  "image/bmp": ".bmp",
 };
 
 function ld(): Ld | undefined {
   return window.linkdesk;
 }
 
-function safeId(authorId: string): string {
-  const safe = authorId.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 64);
-  return safe || "author";
+function safeId(raw: string): string {
+  const safe = raw.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 64);
+  return safe || "item";
 }
 
 function mimeForFileName(name: string): string {
@@ -56,6 +59,7 @@ function mimeForFileName(name: string): string {
   if (ext === ".webp") return "image/webp";
   if (ext === ".gif") return "image/gif";
   if (ext === ".svg") return "image/svg+xml";
+  if (ext === ".bmp") return "image/bmp";
   return "image/png";
 }
 
@@ -85,7 +89,7 @@ async function dominantHue(bytes: Uint8Array, mime: string): Promise<string | un
       const lum = (R + G + B) / 3;
       if (lum < 30 || lum > 235) continue;
       const sat = max === 0 ? 0 : (max - min) / max;
-      const weight = 0.25 + sat; // 鲜艳像素权重大 ⇒ 不会让白底/黑底主导
+      const weight = 0.25 + sat;
       r += R * weight;
       g += G * weight;
       b += B * weight;
@@ -100,18 +104,26 @@ async function dominantHue(bytes: Uint8Array, mime: string): Promise<string | un
   }
 }
 
-/** 取（必要时创建）插件数据目录下的 avatars 子目录；不可用返回 null */
-async function avatarsDir(api: Ld): Promise<string | null> {
+/** 插件数据目录（不存在则创建） */
+async function dataDir(api: Ld): Promise<string | null> {
   if (!api?.env?.get || !api.filesystem || !api.path?.join) return null;
   try {
     const env = await api.env.get("marketplace");
     const base = env?.pluginDataDir;
     if (!base) return null;
-    const dir = api.path.join(base, "avatars");
-    if (!(await api.filesystem.exists(dir))) await api.filesystem.createDir(dir);
-    return dir;
+    if (!(await api.filesystem.exists(base))) await api.filesystem.createDir(base);
+    return base;
   } catch {
     return null;
+  }
+}
+
+async function ensureDir(api: Ld, dir: string): Promise<boolean> {
+  try {
+    if (!(await api.filesystem.exists(dir))) await api.filesystem.createDir(dir);
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -121,7 +133,6 @@ interface CacheHit {
   modifiedAt: number;
 }
 
-/** 按作者 id 找已缓存文件（扩展名由真实类型决定，按 `<id>.` 前缀匹配） */
 async function findCached(api: Ld, dir: string, id: string): Promise<CacheHit | null> {
   try {
     const list = await api.filesystem.listDir(dir);
@@ -133,23 +144,14 @@ async function findCached(api: Ld, dir: string, id: string): Promise<CacheHit | 
   }
 }
 
-/**
- * 解析一个作者的头像与主色。
- * - 非 http(s)（`linkdesk://` 包内资源等）原样返回、无主色；
- * - 有缓存 ⇒ Blob URL + 主色；无/过期 ⇒ 下载落盘后 Blob URL + 主色；失败 ⇒ 旧图或原 URL。
- */
-export async function resolveAvatar(authorId: string, url: string): Promise<ResolvedAvatar> {
-  if (!/^https?:\/\//i.test(url)) return { src: url };
-  const key = `${authorId}|${url}`;
-  const hit = memo.get(key);
-  if (hit) return hit;
-  if (failed.has(key)) return { src: url };
-
-  const api = ld();
-  const dir = api ? await avatarsDir(api) : null;
-  if (!api || !dir) return { src: url };
-  const id = safeId(authorId);
-
+/** 通用解析：给定目标目录与文件名前缀，返回 Blob URL + 主色 */
+async function resolveInto(
+  key: string,
+  api: Ld,
+  dir: string,
+  id: string,
+  url: string,
+): Promise<ResolvedAvatar> {
   const fromBytes = async (bytes: Uint8Array, mime: string): Promise<ResolvedAvatar> => {
     const src = URL.createObjectURL(new Blob([bytes], { type: mime }));
     const hue = await dominantHue(bytes, mime);
@@ -176,7 +178,6 @@ export async function resolveAvatar(authorId: string, url: string): Promise<Reso
     const ext = EXT_BY_MIME[mime] ?? ".png";
     const full = api.path.join(dir, `${id}${ext}`);
     await api.filesystem.writeBinaryFile(full, buf);
-    // 清掉同作者的其它扩展名旧文件（类型变了：jpg ↔ png）
     try {
       const list = await api.filesystem.listDir(dir);
       for (const e of list) {
@@ -203,6 +204,102 @@ export async function resolveAvatar(authorId: string, url: string): Promise<Reso
       }
     }
     return { src: url };
+  }
+}
+
+/** 作者头像：`avatars/<authorId>.<ext>` */
+export async function resolveAvatar(authorId: string, url: string): Promise<ResolvedAvatar> {
+  if (!/^https?:\/\//i.test(url)) return { src: url };
+  const key = `author|${authorId}|${url}`;
+  const hit = memo.get(key);
+  if (hit) return hit;
+  if (failed.has(key)) return { src: url };
+  const api = ld();
+  const base = api ? await dataDir(api) : null;
+  if (!api || !base) return { src: url };
+  const dir = api.path.join(base, "avatars");
+  if (!(await ensureDir(api, dir))) return { src: url };
+  return resolveInto(key, api, dir, safeId(authorId), url);
+}
+
+/** 仓库头像：`repo-avatars/<authorId>/<repoId>.<ext>` */
+export async function resolveRepoAvatar(
+  authorId: string,
+  repoId: string,
+  url: string,
+): Promise<ResolvedAvatar> {
+  if (!/^https?:\/\//i.test(url)) return { src: url };
+  const key = `repo|${authorId}|${repoId}|${url}`;
+  const hit = memo.get(key);
+  if (hit) return hit;
+  if (failed.has(key)) return { src: url };
+  const api = ld();
+  const base = api ? await dataDir(api) : null;
+  if (!api || !base) return { src: url };
+  const dir = api.path.join(base, "repo-avatars", safeId(authorId));
+  if (!(await ensureDir(api, dir))) return { src: url };
+  return resolveInto(key, api, dir, safeId(repoId), url);
+}
+
+/** 删掉某作者的全部缓存（作者头像 + 仓库头像目录）——删源/删作者时调用 */
+export async function pruneAuthorCache(authorId: string): Promise<void> {
+  const api = ld();
+  const base = api ? await dataDir(api) : null;
+  if (!api || !base) return;
+  const id = safeId(authorId);
+  try {
+    const avatars = api.path.join(base, "avatars");
+    const list = await api.filesystem.listDir(avatars);
+    for (const e of list) {
+      if (e.name.startsWith(`${id}.`)) await api.filesystem.remove(api.path.join(avatars, e.name));
+    }
+  } catch {
+    /* 目录不存在等：忽略 */
+  }
+  try {
+    const repoDir = api.path.join(base, "repo-avatars", id);
+    if (await api.filesystem.exists(repoDir)) {
+      for (const e of await api.filesystem.listDir(repoDir)) {
+        await api.filesystem.remove(api.path.join(repoDir, e.name));
+      }
+      await api.filesystem.remove(repoDir);
+    }
+  } catch {
+    /* 忽略 */
+  }
+}
+
+/**
+ * 清扫：只保留 `validAuthorIds` 里的作者缓存（作者头像 + 仓库头像目录）。
+ * 刷新目录 / 删源后调用——「用户删掉的作者，缓存跟着删」。
+ */
+export async function sweepAvatarCache(validAuthorIds: Iterable<string>): Promise<void> {
+  const api = ld();
+  const base = api ? await dataDir(api) : null;
+  if (!api || !base) return;
+  const valid = new Set([...validAuthorIds].map((id) => safeId(id).toLowerCase()));
+  try {
+    const avatars = api.path.join(base, "avatars");
+    for (const e of await api.filesystem.listDir(avatars)) {
+      const id = e.name.slice(0, e.name.lastIndexOf(".")).toLowerCase();
+      if (!valid.has(id)) await api.filesystem.remove(api.path.join(avatars, e.name));
+    }
+  } catch {
+    /* 忽略 */
+  }
+  try {
+    const repoRoot = api.path.join(base, "repo-avatars");
+    for (const e of await api.filesystem.listDir(repoRoot)) {
+      if (!e.isDirectory) continue;
+      if (!valid.has(e.name.toLowerCase())) {
+        for (const f of await api.filesystem.listDir(api.path.join(repoRoot, e.name))) {
+          await api.filesystem.remove(api.path.join(repoRoot, e.name, f.name));
+        }
+        await api.filesystem.remove(api.path.join(repoRoot, e.name));
+      }
+    }
+  } catch {
+    /* 忽略 */
   }
 }
 

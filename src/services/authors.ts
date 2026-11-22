@@ -533,6 +533,8 @@ export function officialDomainOf(all: readonly CatalogEntry[]): AuthorDomain | n
       id: repo,
       name: repo === OFFICIAL_CORE_REPO_ID ? "官方目录" : repo,
       intro: "官方内置与精选插件",
+      /* 2026-11-23：官方目录仓的「仓库头像」——品牌橙底 + 2×2 瓷片（插件自带资源，离线可用） */
+      ...(repo === OFFICIAL_CORE_REPO_ID ? { image: "linkdesk://marketplace/resources/repo-official.svg" } : {}),
       plugins,
     };
   });
