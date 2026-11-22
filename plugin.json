@@ -42,7 +42,7 @@
       },
       {
         "id": "marketplace.openRepoAll",
-        "title": "查看本仓全部插件",
+        "title": "查看全部插件",
         "category": "插件市场",
         "description": "打开插件市场并导航到「全部插件」页——范围 = 当前仓库（currentRepo；19 §七），含仓库卡横排与全部插件网格。回执 {ok, tabId}",
         "params": []
@@ -80,7 +80,7 @@
       },
       {
         "id": "marketplace.openAuthors",
-        "title": "打开作者列表",
+        "title": "打开作者页",
         "category": "插件市场",
         "description": "打开插件市场并导航到「作者」列表页（全部作者卡）。回执 {ok, tabId}",
         "params": []

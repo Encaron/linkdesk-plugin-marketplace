@@ -713,5 +713,7 @@
   "「{{repo}}」已是最新": "“{{repo}}” is up to date",
   "「{{repo}}」刷新失败 · 已用缓存": "“{{repo}}” refresh failed · using cache",
   "全部来源已刷新 · 发现 {{count}} 个更新": "All sources refreshed · {{count}} updates found",
-  "全部来源已刷新 · 已是最新": "All sources refreshed · everything is up to date"
+  "全部来源已刷新 · 已是最新": "All sources refreshed · everything is up to date",
+  "查看全部插件": "View all plugins",
+  "打开作者页": "Open Authors page"
 }

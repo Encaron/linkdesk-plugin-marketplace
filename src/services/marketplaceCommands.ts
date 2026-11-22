@@ -420,10 +420,10 @@ export async function runGetOrder(): Promise<{
 /** 本组命令的 id → handler → title（title 必须与 plugin.json 逐字一致；其余元数据只在 manifest） */
 const COMMANDS: Array<[string, (args?: unknown) => Promise<unknown>, string]> = [
   ["marketplace.openStore", () => runOpenStore(), "打开插件市场"],
-  ["marketplace.openRepoAll", () => runOpenRepoAll(), "查看本仓全部插件"],
+  ["marketplace.openRepoAll", () => runOpenRepoAll(), "查看全部插件"],
   ["marketplace.openCategory", (a) => runOpenCategory(a), "打开分类"],
   ["marketplace.openRank", () => runOpenRank(), "打开排行榜"],
-  ["marketplace.openAuthors", () => runOpenAuthors(), "打开作者列表"],
+  ["marketplace.openAuthors", () => runOpenAuthors(), "打开作者页"],
   ["marketplace.openLibrary", () => runOpenLibrary(), "打开我的库"],
   ["marketplace.openAuthor", (a) => runOpenAuthor(a), "打开作者主页"],
   ["marketplace.openPlugin", (a) => runOpenPlugin(a), "打开插件详情"],
