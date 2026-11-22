@@ -1,26 +1,32 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-22T18:46:47.072Z",
+  "updatedAt": "2026-11-22T19:13:07.614Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.1",
+      "version": "1.4.2",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.1/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.2/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.1/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.2/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.1/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.1/marketplace.linkdesk-plugin",
-      "size": 179420,
-      "publishedAt": "2026-11-22T18:46:47.072Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.2/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.2/marketplace.linkdesk-plugin",
+      "size": 180477,
+      "publishedAt": "2026-11-22T19:13:07.614Z",
       "versions": [
+        {
+          "version": "1.4.2",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.2/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-22T19:13:07.614Z",
+          "changelog": "- **作者头像从 GitHub 来**：官方作者显示 **Encaron 的 GitHub 头像**（不再跟市场自己的品牌图标混用）；第三方作者没声明头像时，自动用 `github.com/<owner>.png`（静态直链，⛔ 不走 api.github.com——匿名额度 60 次/时、国内常被墙）。\n- **加载失败不留白**：头像 404 / 断网 / 被墙时回落首字母色块（同一 src 不重复重试），作者名与简介照常显示。\n- **头像缓存在本地**：下载一次存进插件自己的数据目录 `avatars/<authorId>.png`（插件详情页右侧「数据位置」可见），**7 天**才自动更新一次；更新失败本次登录不再重试、下次启动再试（过期时先用旧图）。⛔ 不为头像单独做刷新按钮。"
+        },
         {
           "version": "1.4.1",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.1/marketplace.linkdesk-plugin",
@@ -48,8 +54,7 @@
         {
           "version": "1.2.0",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.2.0/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-04T23:48:47.471Z",
-          "changelog": "- **详情页元数据侧栏滚动吸顶**：右侧「标识符／作者／版本／兼容性…」那栏滚动时**钉在原地**，不再跟着正文滚走；「详情／功能／更改日志」三个 tab 都生效（侧栏本就三 tab 常驻，一处生效全吃）。\n- **装前版本门补缝（minAppVersion）**：此前只有详情页「安装」会拦「需要更高版本 LinkDesk」的插件，**侧栏行内安装和手动更新都能装上、装完却用不了**（重启软件后报错跳过）。现在四个入口走**同一道门**——行内安装、手动更新同样先比对并说明原因；降级到旧版不受此门影响（旧版自身的要求由软件加载时核对包内声明）。\n- **自动更新遇「需要更高版本 LinkDesk」的候选 ⇒ 停在旧版**，并发一条通知说明原因（每个版本只提醒一次，不重复打扰），不再自动装上一个用不了的版本。\n- 要求 LinkDesk **0.2.20 或更高**（未变）。"
+          "publishedAt": "2026-11-04T23:48:47.471Z"
         },
         {
           "version": "1.1.10",
