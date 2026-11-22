@@ -203,10 +203,12 @@ export function Rail() {
           >
             {data.authorCount}
           </span>
-          {unreadAuthors.size > 0 && (
+          {/* 2026-11-23 用户实机：只画一个点——两个点叠在同一个位置（绝对定位）⇒ 显示「有源加载失败」优先 */}
+          {errors.length > 0 ? (
+            <span className="marketplace-store-rail-dot" data-hint={t("有源加载失败")} />
+          ) : unreadAuthors.size > 0 ? (
             <span className="marketplace-store-rail-dot is-new" data-hint={t("有新内容")} />
-          )}
-          {errors.length > 0 && <span className="marketplace-store-rail-dot" data-hint={t("有源加载失败")} />}
+          ) : null}
         </button>
       </div>
     </nav>

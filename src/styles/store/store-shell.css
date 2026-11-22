@@ -193,9 +193,12 @@
   box-shadow: 0 0 6px color-mix(in srgb, var(--accent-hover) 60%, transparent);
 }
 .marketplace-store-rail-item.is-compact .marketplace-store-rail-dot {
-  top: 50%;
-  right: 8px;
-  transform: translateY(-50%);
+  /* 2026-11-23 用户实机：compact 下数字被 margin-left:auto 顶到最右，绝对定位的点正好压住数字。
+     改成普通 flex 项跟在数字后面——点与数字并排，永不重叠。 */
+  position: static;
+  transform: none;
+  margin-left: 6px;
+  flex: none;
 }
 
 /* ── 内容滚动区 / 页面 ── */
