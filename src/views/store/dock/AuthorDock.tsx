@@ -15,11 +15,34 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { hueBG, hueOf, Icon } from "../../../ui";
-import { useAuthorDomains } from "../../../services/authors";
+import { useAuthorDomains, type AuthorDomain } from "../../../services/authors";
 import { orderedAuthorsOf, orderedReposOf, useSourceOrder } from "../../../services/sourceOrderStore";
 import { writeUIPrefs } from "../../../services/marketplaceShared/uiPrefs";
 import { useStore } from "../StoreContext";
 import { AuthorCard } from "../authors/AuthorCard";
+import { useAvatarSrc } from "../authors/useAvatarSrc";
+
+/** 坞胶囊上的一枚作者头像——与作者卡/来源行同一取源口（远端 → 本地缓存 → 首字母）。 */
+function DockFace({ author }: { author: AuthorDomain }) {
+  const { src, onError } = useAvatarSrc(author.authorId, author.avatar);
+  return (
+    <span className="marketplace-store-dock-face" style={hueBG(hueOf(author.authorId))}>
+      {src ? (
+        <img
+          className="marketplace-store-dock-face-img"
+          src={src}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={onError}
+        />
+      ) : (
+        author.name.slice(0, 1)
+      )}
+    </span>
+  );
+}
 
 export function AuthorDock() {
   const { t } = useTranslation();
@@ -99,9 +122,7 @@ export function AuthorDock() {
       >
         <span className="marketplace-store-dock-faces" aria-hidden="true">
           {capsuleFaces.map((a) => (
-            <span key={a.authorId} className="marketplace-store-dock-face" style={hueBG(hueOf(a.authorId))}>
-              {a.name.slice(0, 1)}
-            </span>
+            <DockFace key={a.authorId} author={a} />
           ))}
           {authors.length > capsuleFaces.length && (
             <span className="marketplace-store-dock-face is-more">+{authors.length - capsuleFaces.length}</span>

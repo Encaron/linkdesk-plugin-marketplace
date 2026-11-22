@@ -66,6 +66,14 @@
   font-weight: 700;
   font-size: var(--font-size-xs);
   border: 1px solid color-mix(in srgb, var(--bg-card) 55%, transparent);
+  overflow: hidden;
+}
+.marketplace-store-dock-face-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
 }
 .marketplace-store-dock-face.is-more {
   background: var(--bg-input);
@@ -128,9 +136,9 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  /* 2026-11-23 用户实机：hover 的卡放大/光环/多仓 fan 要长，左右留 16px 呼吸；
-     面板同步 386→412（卡宽 +26），放大与阴影不再贴到 overflow:hidden 的裁切边。 */
-  padding: 8px 16px 16px;
+  /* 2026-11-23 用户实机：① hover 的卡放大/光环/多仓 fan 要长；② 第一张卡的顶边老被面板上沿切掉半个圆角。
+     面板同步 386→412；四边留出呼吸：上 14、左右 18、下 18。 */
+  padding: 14px 18px 18px;
 }
 .marketplace-store-dock-author {
   display: flex;

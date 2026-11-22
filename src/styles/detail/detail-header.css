@@ -278,6 +278,9 @@
   border: none;
   padding: 0;
   margin-top: 2px;
+  /* 2026-11-23 用户实机：flex 里的匿名文本项会被挤到 5 字一行，把条撑成 3 行高。
+     实测 nowrap 后 176×19 单行、整条 123→87px。 */
+  white-space: nowrap;
   font-family: inherit;
   font-size: var(--font-size-sm);
   color: var(--accent);

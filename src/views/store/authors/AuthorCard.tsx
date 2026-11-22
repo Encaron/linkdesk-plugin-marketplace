@@ -12,12 +12,11 @@
  */
 
 import type { KeyboardEvent, PointerEvent } from "react";
-import { useEffect, useState } from "react";
-import { resolveAvatar } from "../../../services/avatarCache";
 import { useTranslation } from "react-i18next";
 import { hueBG, hueOf, Icon, type IconName } from "../../../ui";
 import { OFFICIAL_AUTHOR_ID, type AuthorDomain } from "../../../services/authors";
 import { authorDeckOf, authorDeckRestCount, authorPluginCount } from "./authorsData";
+import { useAvatarSrc } from "./useAvatarSrc";
 
 function authorBadgeText(t: (k: string, o?: Record<string, unknown>) => string, domain: AuthorDomain): string {
   const base = `${domain.official ? t("官方 ✓") : t("社区源")} · ${t("{{count}} 个仓库", {
@@ -36,25 +35,9 @@ export function AuthorCard({
   className?: string;
 }) {
   const { t } = useTranslation();
-  /** GitHub 头像直链 404 / 断网 / 被墙 ⇒ 记下坏掉的 src，回落首字母色块（同 src 不重复试）。 */
-  const [brokenAvatar, setBrokenAvatar] = useState<string | null>(null);
-  /** 头像真源：先给远端 URL，本地缓存解析完再换成 Blob URL（见 avatarCache.ts）。 */
-  const [avatarSrc, setAvatarSrc] = useState<string | null>(domain.avatar ?? null);
-  useEffect(() => {
-    let alive = true;
-    if (!domain.avatar) {
-      setAvatarSrc(null);
-      return;
-    }
-    setAvatarSrc(domain.avatar);
-    void resolveAvatar(domain.authorId, domain.avatar).then((src) => {
-      if (alive) setAvatarSrc(src);
-    });
-    return () => {
-      alive = false;
-    };
-  }, [domain.authorId, domain.avatar]);
-  const showAvatar = !!avatarSrc && brokenAvatar !== avatarSrc;
+  /** 头像取源唯一口（远端 → 本地缓存 Blob → 失败回落首字母），与来源行/坞胶囊同源。 */
+  const { src: avatarSrc, onError: onAvatarError } = useAvatarSrc(domain.authorId, domain.avatar);
+  const showAvatar = !!avatarSrc;
   const hue = hueOf(domain.authorId);
   const solo = domain.repos.length === 1;
   const deckRest = authorDeckRestCount(domain.repos);
@@ -90,7 +73,7 @@ export function AuthorCard({
               decoding="async"
               referrerPolicy="no-referrer"
               draggable={false}
-              onError={() => setBrokenAvatar(avatarSrc ?? null)}
+              onError={onAvatarError}
             />
           ) : (
             <span className="marketplace-store-ac-avatar-letter" aria-hidden="true">

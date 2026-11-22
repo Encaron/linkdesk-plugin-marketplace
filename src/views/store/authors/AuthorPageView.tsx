@@ -17,6 +17,7 @@ import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerE
 import { useTranslation } from "react-i18next";
 import { OverlayPortal } from "@linkdesk/ui";
 import { EmptyState, hueBG, hueOf, Icon } from "../../../ui";
+import { useAvatarSrc } from "./useAvatarSrc";
 import {
   OFFICIAL_SOURCE_URL,
   normalizeSourceUrl,
@@ -103,6 +104,8 @@ interface AuthorGroupView {
   authorId: string;
   name: string;
   hue: string;
+  /** 作者域头像（GitHub 直链；与作者卡/坞胶囊同源，见 useAvatarSrc） */
+  avatar?: string;
   official: boolean;
   repos: AuthorRepoView[];
   rows: SourceRowView[];
@@ -133,6 +136,8 @@ function AuthorContainer({
   children: ReactNode;
 }) {
   const { t } = useTranslation();
+  /** 头像与作者卡/坞胶囊同源（远端 → 本地缓存 → 首字母） */
+  const { src: avSrc, onError: onAvError } = useAvatarSrc(group.authorId, group.avatar);
   const headProps = {
     role: "button" as const,
     tabIndex: 0,
@@ -155,7 +160,19 @@ function AuthorContainer({
           ⋮⋮
         </span>
         <span className="marketplace-store-author-av" style={hueBG(group.hue)}>
-          {group.name.slice(0, 1)}
+          {avSrc ? (
+            <img
+              className="marketplace-store-author-av-img"
+              src={avSrc}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              referrerPolicy="no-referrer"
+              onError={onAvError}
+            />
+          ) : (
+            group.name.slice(0, 1)
+          )}
         </span>
         <div className="marketplace-store-author-main">
           <div className="marketplace-store-author-name">
@@ -219,6 +236,7 @@ export function AuthorPageView({ mode }: { mode: AuthorPageMode }) {
       authorId: OFFICIAL_AUTHOR_ID,
       name: officialDomain?.name ?? "Encaron",
       hue: hueOf(OFFICIAL_AUTHOR_ID),
+      avatar: officialDomain?.avatar,
       official: true,
       repos: officialRepos,
       rows: [
@@ -247,6 +265,7 @@ export function AuthorPageView({ mode }: { mode: AuthorPageMode }) {
         authorId: g.authorId,
         name: g.name,
         hue: g.hue,
+        avatar: domain?.avatar,
         official: g.official,
         repos: domain ? orderedReposOf(order, domain) : [],
         rows: g.rows,

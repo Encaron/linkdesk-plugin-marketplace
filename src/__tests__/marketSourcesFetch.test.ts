@@ -60,7 +60,7 @@ afterEach(() => {
 });
 
 describe("fetchOne 的真实 fetch 通路（生产唯一通路——注入分支之外的整段）", () => {
-  it("2xx：以 (url, {signal, cache:'no-store'}) 发真请求，res.text() 交付目录并写缓存", async () => {
+  it("2xx：以 (url, {signal, cache:'reload'}) 发真请求，res.text() 交付目录并写缓存", async () => {
     const fetchMock = vi.fn(async () => res(catalogText()));
     vi.stubGlobal("fetch", fetchMock);
 
@@ -69,7 +69,8 @@ describe("fetchOne 的真实 fetch 通路（生产唯一通路——注入分支
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe(OFFICIAL_SOURCE_URL);
-    expect(init.cache).toBe("no-store");
+    // 2026-11-23：no-store 在本机 Chromium 不生效（发版后仍拿旧内容），改 reload
+    expect(init.cache).toBe("reload");
     expect(init.signal).toBeInstanceOf(AbortSignal); // 10s 超时用的就是它
     expect(r.state).toBe("ok");
     expect(r.entries.map((e) => e.id)).toEqual(["demo-alpha"]);
