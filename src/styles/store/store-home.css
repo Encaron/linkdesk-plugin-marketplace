@@ -285,3 +285,12 @@
   color: var(--accent-hover);
 }
 
+/* 19 §5.1：瓷片展开态——箭头向下（收起向右），再点收起 */
+.marketplace-store-cat-tile.is-on .marketplace-store-ct-go {
+  opacity: 1;
+  color: var(--accent-hover);
+  transform: rotate(90deg);
+}
+.marketplace-store-cat-tile.is-on {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}

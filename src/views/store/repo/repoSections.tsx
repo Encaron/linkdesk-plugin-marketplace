@@ -7,7 +7,7 @@
  *   - `more.target` 封闭集合：`category:` → 本仓分类页；`rank` → 本仓排行；`repo:` → 同作者切仓（D2）。
  */
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { groupByPrimaryCategory } from "../../../services/marketCatalog";
 import type { CatalogEntry, CollectionDecl } from "../../../services/marketCatalog";
@@ -212,17 +212,25 @@ export function RepoSection({ repo, section }: { repo: ResolvedRepo; section: Au
   return <CollectionBlock repo={repo} section={section} collection={collection} />;
 }
 
-/** 底部「按分类浏览」瓷片（商店标准件，作者删不掉；只列本仓有货分类） */
+/** 底部「按分类浏览」瓷片（商店标准件，作者删不掉；只列本仓有货分类）。
+ *  19 §5.1：点瓷片 → **原地在下方展开**该分类的插件网格；再点收起（⛔ 跳分类页）。
+ *  作者页/仓库首页/全部插件页共用这一件（⛔ 各写一套）。 */
 export function RepoCategoryTiles({ repo }: { repo: ResolvedRepo }) {
   const { t } = useTranslation();
-  const { data, navigate } = useStore();
+  const { data, keepScroll, actions } = useStore();
+  const [expanded, setExpanded] = useState<string | null>(null);
+  // 切仓/换作者：展开态清零（一次性浏览条件，⛔ 跨仓记忆）
+  useEffect(() => {
+    setExpanded(null);
+  }, [repo.authorId, repo.repoId]);
   const buckets = groupByPrimaryCategory(repo.entries, data.catalog.railOrder);
   if (buckets.length === 0) return null;
+  const active = buckets.find((b) => b.slug === expanded);
   return (
     <section className="marketplace-store-sec" data-spec="04-7">
       <SectionHead
         title={t("按分类浏览")}
-        hint={t("只列出「{{repo}}」里有的分类——点一下看整类", { repo: repo.name })}
+        hint={t("只列出「{{repo}}」里有的分类——点一下在下方展开，再点收起", { repo: repo.name })}
       />
       <div className="marketplace-store-tiles">
         {buckets.map(({ slug, entries }) => (
@@ -232,10 +240,18 @@ export function RepoCategoryTiles({ repo }: { repo: ResolvedRepo }) {
             label={localizeCategory((key) => t(key), slug)}
             count={entries.length}
             icon={categoryIcon(slug)}
-            onOpen={(s) => navigate({ page: "category", category: s })}
+            expanded={expanded === slug}
+            onOpen={(s) => keepScroll(() => setExpanded((cur) => (cur === s ? null : s)))}
           />
         ))}
       </div>
+      {active && (
+        <div className="marketplace-store-grid marketplace-store-mt10" data-cat-grid={active.slug}>
+          {active.entries.map((entry) => (
+            <CardGrid key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

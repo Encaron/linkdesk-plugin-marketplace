@@ -276,6 +276,23 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [isActive]);
 
+  /* ── Esc：全部插件页无浮层时返回仓首页（19 §七/§8.2；不依赖浏览器后退） ── */
+  useEffect(() => {
+    if (!isActive) return;
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key !== "Escape") return;
+      if (routeRef.current.page !== "repo-all") return;
+      const el = ev.target instanceof HTMLElement ? ev.target : null;
+      if (el?.closest("input,textarea,select,[contenteditable=true]")) return;
+      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      ev.preventDefault();
+      navigate(HOME_ROUTE);
+    };
+    // eslint-disable-next-line linkdesk/no-global-key-listener -- 页面级 Esc 返回（商店激活限定；输入框/浮层已放行）
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isActive, navigate]);
+
   /* ── 发现型已读（数据面，`discoverReads` 唯一属主）：进入即已读（路由 effect 写入）＋
    *    contentHash 增量点集（R4-5.6/#12——键 ∉ 读集 ∪（已读但逐键签名变了，「又上新」重开点，
    *    06 §八·补））。rail 的 6px 点渲染路径棒 6 已就位，这里只供点集。 */

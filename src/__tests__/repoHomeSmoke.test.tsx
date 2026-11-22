@@ -114,5 +114,32 @@ describe("仓库首页（批 B）", () => {
     fireEvent.click(screen.getByText("返回「官方目录」首页"));
     await waitFor(() => expect(screen.queryByText("返回「官方目录」首页")).toBeNull());
     expect(container.querySelector('[data-spec="04-6-repo-slot"]')).toBeTruthy();
+
+    // Esc = 返回仓首页（19 §七/§8.2）
+    fireEvent.click(screen.getByText("查看全部 2 个插件"));
+    await waitFor(() => expect(screen.getByText("返回「官方目录」首页")).toBeTruthy());
+    fireEvent.keyDown(window, { key: "Escape" });
+    await waitFor(() => expect(screen.queryByText("返回「官方目录」首页")).toBeNull());
+  });
+
+  it("分类瓷片：点一下原地展开本仓该分类网格，再点收起（⛔ 跳页）", async () => {
+    const { container } = render(<StoreView isActive />);
+    await waitFor(() => expect(screen.getAllByText("官方目录").length).toBeGreaterThan(0));
+
+    const tiles = [...container.querySelectorAll(".marketplace-store-cat-tile")] as HTMLElement[];
+    expect(tiles.length).toBe(2); // development + hardware
+    const first = tiles[0];
+    expect(first.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(first);
+    await waitFor(() => expect(first.getAttribute("aria-expanded")).toBe("true"));
+    const grid = container.querySelector("[data-cat-grid]") as HTMLElement;
+    expect(grid).toBeTruthy();
+    expect(grid.querySelectorAll(".marketplace-store-card.is-grid").length).toBe(1);
+    // 仍在首页（没有跳到分类页）
+    expect(container.querySelector('[data-spec="04-7-repo-all"]')).toBeNull();
+
+    fireEvent.click(first);
+    await waitFor(() => expect(first.getAttribute("aria-expanded")).toBe("false"));
+    expect(container.querySelector("[data-cat-grid]")).toBeNull();
   });
 });

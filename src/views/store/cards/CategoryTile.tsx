@@ -17,6 +17,7 @@ export const CategoryTile = memo(function CategoryTile({
   desc,
   icon,
   onOpen,
+  expanded,
 }: {
   slug: string;
   label: string;
@@ -24,14 +25,17 @@ export const CategoryTile = memo(function CategoryTile({
   desc?: string;
   icon: IconName;
   onOpen: (slug: string) => void;
+  /** 19 §5.1：原地展开态（箭头向下 + aria-expanded）；缺省 = 非展开场景 */
+  expanded?: boolean;
 }) {
   const { t } = useTranslation();
   return (
     <div
-      className="marketplace-store-card marketplace-store-cat-tile"
+      className={`marketplace-store-card marketplace-store-cat-tile ${expanded ? "is-on" : ""}`.trim()}
       role="button"
       tabIndex={0}
       aria-label={t("{{name}}——查看该分类", { name: label })}
+      aria-expanded={expanded}
       data-category={slug}
       onClick={() => onOpen(slug)}
       onKeyDown={(e) => {
