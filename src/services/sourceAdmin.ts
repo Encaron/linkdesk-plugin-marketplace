@@ -17,6 +17,7 @@ import {
   githubOwnerRepoOf,
   normalizeSourceUrl,
   parseCatalog,
+  sourceNameOfUrl,
   synthesizeEntryFromManifest,
 } from "./marketCatalog";
 import {
@@ -27,6 +28,7 @@ import {
 } from "./marketSources";
 import { fetchSidecar } from "./marketSources/fetch";
 import { removeCache } from "./marketSources/io";
+import type { CatalogEntry } from "./marketCatalog";
 import { getCatalogResult, reprojectCatalog } from "./marketplaceShared/catalogStore";
 import { scheduleDataRefresh } from "./marketplaceShared/pluginsStore";
 import {
@@ -198,6 +200,51 @@ export async function refreshSource(url: string): Promise<{ ok: boolean }> {
     return { ok: true };
   } catch {
     return { ok: false };
+  }
+}
+
+/** 单源目录差异（纯函数）：新增/版本变化的条目数——「发现 N 个更新」的计数依据 */
+export function diffSourceEntries(
+  before: readonly CatalogEntry[],
+  after: readonly CatalogEntry[],
+): number {
+  const prev = new Map(before.map((e) => [e.id, e.version]));
+  let changed = 0;
+  for (const entry of after) {
+    const old = prev.get(entry.id);
+    if (old === undefined || old !== entry.version) changed++;
+  }
+  return changed;
+}
+
+export interface SourceRefreshOutcome {
+  ok: boolean;
+  /** 新增/版本变化的插件数（ok=false 时为 0） */
+  changed: number;
+  reason?: string;
+}
+
+/**
+ * 单仓刷新（含官方核心仓；19 §3.4/§8.5）——**结果化**回执：
+ *   ok + changed>0 = 有更新；ok + 0 = 已是最新；ok=false = 失败（UI 提示「已用缓存」）。
+ * 判失败用本趟 `sourceStatus`（该源彻底失败、无缓存可兜），⛔ 不拿「没抛异常」当成功。
+ */
+export async function refreshSourceDetailed(url: string): Promise<SourceRefreshOutcome> {
+  const norm = normalizeSourceUrl(url) ?? url;
+  const sourceName = sourceNameOfUrl(norm);
+  const before = getCatalogResult().entries.filter((e) => e.sourceName === sourceName);
+  removeCache(norm);
+  try {
+    const r = await reprojectCatalog();
+    const key = urlSourceKey(norm);
+    const status = r.sourceStatus?.find((s) => (urlSourceKey(s.url) ?? s.url) === (key ?? norm));
+    if (status && !status.ok) {
+      return { ok: false, changed: 0, reason: status.reason ?? "network" };
+    }
+    const after = r.entries.filter((e) => e.sourceName === sourceName);
+    return { ok: true, changed: diffSourceEntries(before, after) };
+  } catch {
+    return { ok: false, changed: 0, reason: "io" };
   }
 }
 

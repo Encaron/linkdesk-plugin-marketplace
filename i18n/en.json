@@ -708,5 +708,10 @@
   "{{count}} 位": "{{count}}",
   "{{name}} 的仓库": "Repositories of {{name}}",
   "作者页": "Authors page",
-  "进入「作者页」或「管理来源」可调整顺序": "Open “Authors page” or “Manage sources” to reorder"
+  "进入「作者页」或「管理来源」可调整顺序": "Open “Authors page” or “Manage sources” to reorder",
+  "「{{repo}}」已刷新 · 发现 {{count}} 个更新": "“{{repo}}” refreshed · {{count}} updates found",
+  "「{{repo}}」已是最新": "“{{repo}}” is up to date",
+  "「{{repo}}」刷新失败 · 已用缓存": "“{{repo}}” refresh failed · using cache",
+  "全部来源已刷新 · 发现 {{count}} 个更新": "All sources refreshed · {{count}} updates found",
+  "全部来源已刷新 · 已是最新": "All sources refreshed · everything is up to date"
 }

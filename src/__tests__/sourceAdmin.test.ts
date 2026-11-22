@@ -9,10 +9,12 @@
 
 import { describe, it, expect } from "vitest";
 import {
+  diffSourceEntries,
   localRecordOf,
   moveSourceWithinAuthorRaw,
   setSourceEnabledRaw,
 } from "../services/sourceAdmin";
+import type { CatalogEntry } from "../services/marketCatalog";
 
 const A1 = "https://github.com/author-one/repo-a";
 const A2 = "https://github.com/author-one/repo-b";
@@ -74,5 +76,18 @@ describe("localRecordOf", () => {
       repoId: "demo-plugin",
       enabled: true,
     });
+  });
+});
+
+describe("diffSourceEntries（单仓刷新「发现 N 个更新」的计数依据）", () => {
+  const entry = (id: string, version: string): CatalogEntry =>
+    ({ id, name: id, version }) as CatalogEntry;
+
+  it("新增与版本变化都算更新；同版本不计", () => {
+    const before = [entry("a", "1.0.0"), entry("b", "1.0.0")];
+    const after = [entry("a", "1.1.0"), entry("b", "1.0.0"), entry("c", "0.1.0")];
+    expect(diffSourceEntries(before, after)).toBe(2);
+    expect(diffSourceEntries(before, before)).toBe(0);
+    expect(diffSourceEntries([], after)).toBe(3);
   });
 });

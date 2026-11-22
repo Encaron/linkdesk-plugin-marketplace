@@ -373,8 +373,14 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
       return;
     }
     setContentPending(false);
-    showToast(r.changed ? t("内容已刷新") : t("内容已是最新"), { severity: "success", key: "refresh-content" });
-  }, [t]);
+    // 19 §8.5：全部刷新也要结果化（有更新报数量 / 已是最新）
+    showToast(
+      r.changed && data.updateCount > 0
+        ? t("全部来源已刷新 · 发现 {{count}} 个更新", { count: data.updateCount })
+        : t("全部来源已刷新 · 已是最新"),
+      { severity: "success", key: "refresh-content" },
+    );
+  }, [t, data.updateCount]);
 
   const dismissContent = useCallback(() => setContentPending(false), []);
   const dismissApplied = useCallback(() => setContentAppliedAt(null), []);

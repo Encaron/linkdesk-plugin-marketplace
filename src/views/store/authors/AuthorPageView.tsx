@@ -34,7 +34,7 @@ import { orderedAuthorsOf, orderedReposOf, useSourceOrder } from "../../../servi
 import {
   swapAuthors,
   swapRepos,
-  refreshSource,
+  refreshSourceDetailed,
   setSourceEnabled,
   uninstallPluginIds,
 } from "../../../services/sourceAdmin";
@@ -403,13 +403,27 @@ export function AuthorPageView({ mode }: { mode: AuthorPageMode }) {
     });
   };
 
-  const onRefresh = async (rec: SourceRecord) => {
+  const onRefresh = async (rec: SourceRecord, group: AuthorGroupView) => {
     if (!rec.url) return;
-    const r = await refreshSource(rec.url);
-    showToast(r.ok ? t("已重拉目录") : t("刷新失败——保持缓存"), {
-      severity: r.ok ? "success" : "warning",
-      key: "source-refresh",
-    });
+    const r = await refreshSourceDetailed(rec.url);
+    const repoName = group.repos.find((x) => x.id === rec.repoId)?.name ?? rec.repoId;
+    if (!r.ok) {
+      showToast(t("「{{repo}}」刷新失败 · 已用缓存", { repo: repoName }), {
+        severity: "warning",
+        key: "source-refresh",
+        ttl: 3600,
+      });
+    } else if (r.changed > 0) {
+      showToast(t("「{{repo}}」已刷新 · 发现 {{count}} 个更新", { repo: repoName, count: r.changed }), {
+        severity: "success",
+        key: "source-refresh",
+      });
+    } else {
+      showToast(t("「{{repo}}」已是最新", { repo: repoName }), {
+        severity: "info",
+        key: "source-refresh",
+      });
+    }
     if (r.ok) afterWrite();
   };
 
@@ -552,7 +566,7 @@ export function AuthorPageView({ mode }: { mode: AuthorPageMode }) {
             className="marketplace-store-src-icon"
             aria-label={t("立即重拉该目录")}
             data-hint={t("立即重拉该目录")}
-            onClick={() => void onRefresh(rec)}
+            onClick={() => void onRefresh(rec, group)}
           >
             <Icon name="refresh" size="sm" />
           </button>
