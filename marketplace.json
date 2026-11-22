@@ -1,26 +1,32 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-22T17:35:21.193Z",
+  "updatedAt": "2026-11-22T18:46:47.072Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.0",
+      "version": "1.4.1",
       "description": "浏览、安装和管理插件",
       "author": {
-        "name": "官方"
+        "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.0/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.1/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.0/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.1/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.0/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.0/marketplace.linkdesk-plugin",
-      "size": 179449,
-      "publishedAt": "2026-11-22T17:35:21.193Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.1/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.1/marketplace.linkdesk-plugin",
+      "size": 179420,
+      "publishedAt": "2026-11-22T18:46:47.072Z",
       "versions": [
+        {
+          "version": "1.4.1",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.1/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-22T18:46:47.072Z",
+          "changelog": "- **作者坞不再截边**：展开面板 386→412，列表左右留 16px——卡片悬停的放大、头像光环、多仓 fan 都有地方长，不再贴到面板边缘被裁。\n- **作者页记住上次模式**：浏览/管理来源二选一，下次直接点作者沿用上次；坞的「作者页」「管理来源」按钮与命令面照旧强制切换并写回。存在本插件的 UI 偏好里（壳的 plugin-states.json），不写数据目录。\n- **设置页分组**：插件市场设置拆成「商店行为」「市场源」两节（各带一句说明），两个开关在前、源列表在后；用的是宿主已有的分节能力，不需要设置插件升级。\n- **图标换成购物袋**：图标栏线稿版与市场里彩色版都重画为购物袋（方袋身＋宽提手），彩色版沿用暖橙品牌底。"
+        },
         {
           "version": "1.4.0",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.0/marketplace.linkdesk-plugin",
@@ -48,8 +54,7 @@
         {
           "version": "1.1.10",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.10/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-10-04T15:10:19.877Z",
-          "changelog": "- **详情页「功能」tab 的配置行改显短名**（随「配置项短名」）：上行取配置项声明里的短名（`title`），**没有短名的照旧显示说明**（第三方存量零影响），下行仍保留配置键——「短名 ＋ key」两行式。\n- **英文界面的中文裸奔就此断根**：这一行的文案（短名与说明两种形态）此前**没过翻译**，英文界面里原样显示中文；现在两种都过译名（缺译时回退显中文原文，同 i18next 既有口径）。\n- 本插件自己的「市场源」（`marketplace.marketplaceSources`）配置项补上短名。\n- 要求 LinkDesk **0.2.20 或更高**（未变）。"
+          "publishedAt": "2026-10-04T15:10:19.877Z"
         },
         {
           "version": "1.1.9",
