@@ -5,7 +5,7 @@
  * （06 §八「不记忆搜索词、抽屉筛选」同规）。跨进程/晚挂载的**意图**才走 storeNav 持久信箱。
  *
  * 页面与 rail 的映射：
- *   home / repo-all / category:<slug> / search / rank / library / authors / sources / author:<id>:<repo>
+ *   home / repo-all / category:<slug> / search / rank / library / authors / author:<id>:<repo>
  * 滚动位按 `routeKey` 分键——切分类/搜索/榜单再回来回原位（⛔ 弹回顶部）。
  */
 
@@ -19,7 +19,6 @@ export type StorePage =
   | "rank"
   | "library"
   | "authors"
-  | "sources"
   | "author";
 
 export interface StoreRoute {
@@ -50,8 +49,6 @@ export function routeKey(route: StoreRoute): string {
       return "search";
     case "authors":
       return `authors:${route.authorMode ?? "browse"}`;
-    case "sources":
-      return "sources:manage";
     case "author":
       return `author:${route.authorId ?? ""}:${route.repoId ?? ""}`;
     default:
@@ -96,8 +93,6 @@ export function routeFromNav(t: StoreNavTarget): StoreRoute {
       return { page: "library" };
     case "author":
       return { page: "author", authorId: t.authorId, repoId: t.repoId };
-    case "sources":
-      return { page: "sources" };
     case "search":
       return { page: "search", query: t.query };
     default:
@@ -128,8 +123,6 @@ export function routeToNavTarget(route: StoreRoute): StoreNavTarget {
       return route.repoId
         ? { page: "author", authorId: route.authorId ?? "", repoId: route.repoId }
         : { page: "author", authorId: route.authorId ?? "" };
-    case "sources":
-      return { page: "sources" };
     case "search":
       return { page: "search", query: route.query ?? "" };
     default:

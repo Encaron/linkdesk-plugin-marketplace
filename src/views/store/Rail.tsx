@@ -206,16 +206,6 @@ export function Rail() {
           {unreadAuthors.size > 0 && (
             <span className="marketplace-store-rail-dot is-new" data-hint={t("有新内容")} />
           )}
-        </button>
-        <button
-          type="button"
-          className={`marketplace-store-rail-item is-compact ${active === "sources" ? "is-active" : ""}`}
-          onClick={() => go({ page: "sources" })}
-          aria-current={active === "sources" ? "page" : undefined}
-          data-rail-item="sources"
-        >
-          <Icon name="link" size="sm" />
-          {t("来源")}
           {errors.length > 0 && <span className="marketplace-store-rail-dot" data-hint={t("有源加载失败")} />}
         </button>
       </div>

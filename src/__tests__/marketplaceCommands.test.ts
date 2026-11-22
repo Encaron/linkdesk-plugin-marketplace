@@ -172,7 +172,7 @@ describe("注册面 —— 21 条新命令", () => {
       "打开我的库",
       "打开作者主页",
       "打开插件详情",
-      "打开来源管理",
+      "管理来源",
       "搜索插件市场",
       "读取市场状态",
       "添加本地插件",
@@ -254,7 +254,7 @@ describe("导航命令 —— 意图信箱 + 标签页", () => {
     ["openRank", () => runOpenRank(), { page: "rank" }],
     ["openAuthors", () => runOpenAuthors(), { page: "authors", mode: "browse" }],
     ["openLibrary", () => runOpenLibrary(), { page: "library" }],
-    ["openSources", () => runOpenSources(), { page: "sources" }],
+    ["openSources", () => runOpenSources(), { page: "authors", mode: "manage" }],
     ["openAuthor", () => runOpenAuthor("owner-two"), { page: "author", authorId: "owner-two" }],
     [
       "openAuthor(+repoId 位置形)",

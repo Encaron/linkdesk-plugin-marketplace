@@ -132,9 +132,9 @@
       },
       {
         "id": "marketplace.openSources",
-        "title": "打开来源管理",
+        "title": "管理来源",
         "category": "插件市场",
-        "description": "打开插件市场并导航到「来源管理」页（作者源增删/停用/本地安装分组）。回执 {ok, tabId}",
+        "description": "打开插件市场并导航到作者页的「管理来源」模式（来源页已并入，19 §3.4；⛔ 独立来源页）。回执 {ok, tabId}",
         "params": []
       },
       {

@@ -135,7 +135,14 @@ async function goto(page: "library" | "sources") {
   await waitFor(() => expect(screen.getAllByText("Plugin Store").length).toBeGreaterThan(0));
   // 目录为空时 CatalogGate 会挡住路由——本夹具目录有 3 条，等它渲染完成
   await waitFor(() => expect(container.querySelector('[data-rail-item="library"]')).toBeTruthy());
-  fireEvent.click(container.querySelector(`[data-rail-item="${page}"]`) as HTMLElement);
+  if (page === "sources") {
+    // 19 §3.4：来源页并入作者页「管理来源」模式（⛔ 独立 rail 入口）
+    fireEvent.click(container.querySelector('[data-rail-item="authors"]') as HTMLElement);
+    await waitFor(() => expect(screen.getByText("管理来源")).toBeTruthy());
+    fireEvent.click(screen.getByText("管理来源"));
+  } else {
+    fireEvent.click(container.querySelector(`[data-rail-item="${page}"]`) as HTMLElement);
+  }
   return container;
 }
 

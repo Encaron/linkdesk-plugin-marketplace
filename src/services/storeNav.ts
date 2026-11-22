@@ -23,7 +23,6 @@ export type StoreNavTarget =
   | { page: "authors"; mode?: "browse" | "manage" }
   | { page: "library" }
   | { page: "author"; authorId: string; repoId?: string }
-  | { page: "sources" }
   | { page: "search"; query: string };
 
 /** 每个页面的导航命令（**AI 友好化覆盖门禁**：新增页面 ⇒ `Record` 缺键直接 tsc 红；
@@ -36,7 +35,6 @@ export const NAV_COMMANDS: Record<StoreNavTarget["page"], string> = {
   authors: "marketplace.openAuthors",
   library: "marketplace.openLibrary",
   author: "marketplace.openAuthor",
-  sources: "marketplace.openSources",
   search: "marketplace.search",
 };
 
@@ -94,7 +92,8 @@ export function normalizeStoreNavTarget(raw: unknown): StoreNavTarget | null {
       return repoId ? { page: "author", authorId, repoId } : { page: "author", authorId };
     }
     case "sources":
-      return { page: "sources" };
+      // 旧持久值/旧命令：来源页已并入作者页管理模式（19 §3.4）
+      return { page: "authors", mode: "manage" };
     case "search": {
       const query = typeof r.query === "string" ? r.query : "";
       return { page: "search", query };

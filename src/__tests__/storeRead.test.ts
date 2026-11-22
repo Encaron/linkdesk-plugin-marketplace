@@ -37,7 +37,6 @@ vi.mock("../services/storeNav", () => ({
     authors: "marketplace.openAuthors",
     library: "marketplace.openLibrary",
     author: "marketplace.openAuthor",
-    sources: "marketplace.openSources",
     search: "marketplace.search",
   },
 }));
@@ -133,7 +132,6 @@ describe("readStoreState —— AI 读取面", () => {
       "marketplace.openAuthors",
       "marketplace.openLibrary",
       "marketplace.openAuthor",
-      "marketplace.openSources",
       "marketplace.search",
     ]);
   });

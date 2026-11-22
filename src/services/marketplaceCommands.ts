@@ -228,7 +228,8 @@ export async function runOpenAuthor(args?: unknown): Promise<OpenTabResult> {
 }
 
 export async function runOpenSources(): Promise<OpenTabResult> {
-  await publishStoreNav({ page: "sources" }, true);
+  // 来源页已并入作者页「管理来源」模式（19 §3.4；⛔ 独立页）
+  await publishStoreNav({ page: "authors", mode: "manage" }, true);
   return openStoreTab();
 }
 
@@ -427,7 +428,7 @@ const COMMANDS: Array<[string, (args?: unknown) => Promise<unknown>, string]> = 
   ["marketplace.openLibrary", () => runOpenLibrary(), "打开我的库"],
   ["marketplace.openAuthor", (a) => runOpenAuthor(a), "打开作者主页"],
   ["marketplace.openPlugin", (a) => runOpenPlugin(a), "打开插件详情"],
-  ["marketplace.openSources", () => runOpenSources(), "打开来源管理"],
+  ["marketplace.openSources", () => runOpenSources(), "管理来源"],
   ["marketplace.search", (a) => runSearch(a), "搜索插件市场"],
   ["marketplace.getState", () => runGetState(), "读取市场状态"],
   ["marketplace.addLocalPlugin", (a) => runAddLocalPlugin(a), "添加本地插件"],

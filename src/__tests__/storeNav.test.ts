@@ -83,7 +83,7 @@ describe("normalizeStoreNavTarget", () => {
       authorId: "owner-two",
       repoId: "repo-b",
     });
-    expect(normalizeStoreNavTarget({ page: "sources" })).toEqual({ page: "sources" });
+    expect(normalizeStoreNavTarget({ page: "sources" })).toEqual({ page: "authors", mode: "manage" }); // 旧持久值兼容
     expect(normalizeStoreNavTarget({ page: "search", query: "serial" })).toEqual({
       page: "search",
       query: "serial",

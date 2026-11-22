@@ -487,7 +487,6 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
                 />
               )}
               {route.page === "library" && <LibraryView />}
-              {route.page === "sources" && <AuthorPageView mode="manage" />}
             </CatalogGate>
           </div>
         </div>

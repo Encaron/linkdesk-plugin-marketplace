@@ -60,7 +60,6 @@ describe("routeFromNav / routeToNavTarget / sameRoute", () => {
     expect(routeFromNav({ page: "authors" })).toEqual({ page: "authors", authorMode: "browse" });
     expect(routeFromNav({ page: "library" })).toEqual({ page: "library" });
     expect(routeFromNav({ page: "author", authorId: "a" })).toEqual({ page: "author", authorId: "a" });
-    expect(routeFromNav({ page: "sources" })).toEqual({ page: "sources" });
     expect(routeFromNav({ page: "search", query: "serial" })).toEqual({ page: "search", query: "serial" });
   });
 

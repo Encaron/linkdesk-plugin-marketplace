@@ -63,7 +63,7 @@ export function CatalogNote() {
       aria-label={hint}
       onClick={() => {
         if (errors.length > 0) {
-          navigate({ page: "sources" });
+          navigate({ page: "authors", authorMode: "manage" });
           return;
         }
         void data.catalog.refresh();
