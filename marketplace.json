@@ -1,26 +1,32 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-22T19:15:10.224Z",
+  "updatedAt": "2026-11-22T19:21:32.657Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.3",
+      "version": "1.4.4",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.3/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.4/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.3/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.4/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.3/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.3/marketplace.linkdesk-plugin",
-      "size": 180333,
-      "publishedAt": "2026-11-22T19:15:10.224Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.4/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.4/marketplace.linkdesk-plugin",
+      "size": 179564,
+      "publishedAt": "2026-11-22T19:21:32.657Z",
       "versions": [
+        {
+          "version": "1.4.4",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.4/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-22T19:21:32.657Z",
+          "changelog": "- **发版后「检查更新」立刻能看到新版**：目录请求从 `cache:\"no-store\"` 改 `cache:\"reload\"`——本机实测旧写法会被 Chromium 的 HTTP 缓存挡住（同一地址反复拿回上一版），表现为「插件发了新版、软件里却一直提示已是最新」。"
+        },
         {
           "version": "1.4.3",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.3/marketplace.linkdesk-plugin",
@@ -48,8 +54,7 @@
         {
           "version": "1.3.0",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.3.0/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-22T16:42:52.429Z",
-          "changelog": "- **插件市场长出「媒体丰富度」（首屏/大卡/主题墙/详情）**：作者的 `marketplace.json` 里的 `screenshots` / `cover` 现在是整站唯一的媒体来源——首屏 hero 满幅铺图（左文案压 scrim，视频带原生 controls、永不自动播），mega/duo/wall 卡 hover 在卡内轮播最多 3 帧，THEMES 默认变成封面图墙，编辑精选改用整行分栏卡（左文右图、媒体内嵌、无满幅）；详情画廊与卡片同一份选帧。\n- **没图的插件不再是一块空渐变**：新增生成式封面（身份色场＋细网格＋图标砖＋名字水印＋分类字）永远垫在帧下——无图/坏图/加载中都有设计过的底，图 404 只拆该帧、不白块不跳布局。\n- **换槽位/换图/换价只改 JSON**：官方目录补 `collections[]`（hero／主题 mega／装机必备／编辑精选），换谁上大屏＝改 `items`；`cover` 与 `screenshots` 支持封面视频（至多 1 段且必须第一、poster 优先）；这些目录元数据**不发版**，商店刷新即生效。\n- **作者自检两条命令**：`marketplace-kit validate` 对媒体给「文件:字段 → 期望 → 示例」四类可执行报错；新增 `marketplace-kit media:resolve` dry-run，打印实际会用的 kind/frames/video，坏输入非零退出。\n- **发版不再抹作者手改的目录元数据**：`publish` 的 upsert 会保留 `screenshots` / `cover` / `pricing` / `license` / `repository` / `authorId`（此前下一次发版会把作者补的图和价格静默抹掉）。\n- **详情无图时用同一个媒体 stage**，删掉旧的空档；小卡/行卡/榜行仍只显示图标（用户口径）。\n- 要求 LinkDesk **0.2.20 或更高**（未变）。"
+          "publishedAt": "2026-11-22T16:42:52.429Z"
         },
         {
           "version": "1.2.1",
