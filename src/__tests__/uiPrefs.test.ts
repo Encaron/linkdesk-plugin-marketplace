@@ -45,6 +45,8 @@ describe("normalizeUIPrefs —— 缺省回落", () => {
       authorSort: "name",
       catView: "grid",
       catSort: "dl",
+      authorTipDismissed: false,
+      dockTipDismissed: false,
     });
   });
 
@@ -58,6 +60,8 @@ describe("normalizeUIPrefs —— 缺省回落", () => {
       authorSort: "name",
       catView: "grid",
       catSort: "az",
+      authorTipDismissed: false,
+      dockTipDismissed: false,
     });
   });
 });

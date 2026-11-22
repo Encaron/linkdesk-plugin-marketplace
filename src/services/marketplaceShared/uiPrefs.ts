@@ -30,6 +30,10 @@ export interface UIPrefs {
   authorSort: AuthorSort;
   catView: ViewMode;
   catSort: CatSort;
+  /** 19 §3.2：作者页一次性提示已关闭（× 之后工具栏留小 ?；清 app data/市场缓存才重置） */
+  authorTipDismissed: boolean;
+  /** 19 §六：作者坞底部提示已关闭（同上） */
+  dockTipDismissed: boolean;
 }
 
 export const DEFAULT_UI_PREFS: UIPrefs = {
@@ -39,6 +43,8 @@ export const DEFAULT_UI_PREFS: UIPrefs = {
   authorSort: "name",
   catView: "grid",
   catSort: "dl",
+  authorTipDismissed: false,
+  dockTipDismissed: false,
 };
 
 const VIEW_MODES: readonly ViewMode[] = ["grid", "list"];
@@ -109,6 +115,8 @@ export function normalizeUIPrefs(raw: unknown): UIPrefs {
     authorSort: pick(r.authorSort, AUTHOR_SORTS, DEFAULT_UI_PREFS.authorSort),
     catView: pick(r.catView, VIEW_MODES, DEFAULT_UI_PREFS.catView),
     catSort: pick(r.catSort, CAT_SORTS, DEFAULT_UI_PREFS.catSort),
+    authorTipDismissed: r.authorTipDismissed === true,
+    dockTipDismissed: r.dockTipDismissed === true,
   };
 }
 

@@ -57,7 +57,7 @@ describe("routeFromNav / routeToNavTarget / sameRoute", () => {
       official: true,
     });
     expect(routeFromNav({ page: "rank" })).toEqual({ page: "rank" });
-    expect(routeFromNav({ page: "authors" })).toEqual({ page: "authors" });
+    expect(routeFromNav({ page: "authors" })).toEqual({ page: "authors", authorMode: "browse" });
     expect(routeFromNav({ page: "library" })).toEqual({ page: "library" });
     expect(routeFromNav({ page: "author", authorId: "a" })).toEqual({ page: "author", authorId: "a" });
     expect(routeFromNav({ page: "sources" })).toEqual({ page: "sources" });
@@ -66,7 +66,7 @@ describe("routeFromNav / routeToNavTarget / sameRoute", () => {
 
   it("routeToNavTarget 反向：实际路由回写（供 getState 读当前页）", () => {
     expect(routeToNavTarget({ page: "rank" })).toEqual({ page: "rank" });
-    expect(routeToNavTarget({ page: "authors" })).toEqual({ page: "authors" });
+    expect(routeToNavTarget({ page: "authors" })).toEqual({ page: "authors", mode: "browse" });
     expect(routeToNavTarget({ page: "category", category: "themes", authorId: "a" })).toEqual({
       page: "category",
       category: "themes",

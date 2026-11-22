@@ -28,6 +28,8 @@ export interface StoreRoute {
   query?: string;
   authorId?: string;
   repoId?: string;
+  /** 作者页一页两模式（19 §3）；缺省 = 浏览 */
+  authorMode?: "browse" | "manage";
   /** 官方店主的分类预过滤（与 authorId 互斥；分类落页的页主范围统一参数） */
   official?: boolean;
 }
@@ -46,6 +48,10 @@ export function routeKey(route: StoreRoute): string {
           : `cat:${route.category ?? ""}`;
     case "search":
       return "search";
+    case "authors":
+      return `authors:${route.authorMode ?? "browse"}`;
+    case "sources":
+      return "sources:manage";
     case "author":
       return `author:${route.authorId ?? ""}:${route.repoId ?? ""}`;
     default:
@@ -83,7 +89,9 @@ export function routeFromNav(t: StoreNavTarget): StoreRoute {
     case "rank":
       return { page: "rank" };
     case "authors":
-      return { page: "authors" };
+      return t.mode === "manage"
+        ? { page: "authors", authorMode: "manage" }
+        : { page: "authors", authorMode: "browse" };
     case "library":
       return { page: "library" };
     case "author":
@@ -111,7 +119,9 @@ export function routeToNavTarget(route: StoreRoute): StoreNavTarget {
     case "rank":
       return { page: "rank" };
     case "authors":
-      return { page: "authors" };
+      return route.authorMode === "manage"
+        ? { page: "authors", mode: "manage" }
+        : { page: "authors", mode: "browse" };
     case "library":
       return { page: "library" };
     case "author":
@@ -135,6 +145,7 @@ export function sameRoute(a: StoreRoute, b: StoreRoute): boolean {
     (a.query ?? "") === (b.query ?? "") &&
     (a.authorId ?? "") === (b.authorId ?? "") &&
     (a.official === true) === (b.official === true) &&
-    (a.repoId ?? "") === (b.repoId ?? "")
+    (a.repoId ?? "") === (b.repoId ?? "") &&
+    (a.authorMode ?? "") === (b.authorMode ?? "")
   );
 }

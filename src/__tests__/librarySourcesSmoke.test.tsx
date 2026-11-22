@@ -168,7 +168,7 @@ describe("我的库（R4-3.12/3.13）", () => {
 describe("来源管理（R4-3.14/3.15）", () => {
   it("官方锁定行 / 作者组与声明提示 / 源级停用写配置 / 移除二次确认", async () => {
     const container = await goto("sources");
-    await waitFor(() => expect(screen.getByText("官方 Plugin Store")).toBeTruthy());
+    await waitFor(() => expect(screen.getByText("Encaron")).toBeTruthy());
     await waitFor(() => expect(screen.getAllByText("Demo Author").length).toBeGreaterThan(0));
     // 声明提示：block 里两个 hero → 聚合短标「重复大屏 ×1」（F5）；明细仍在 data-hint
     const warn = screen.getByText("重复大屏 ×1");

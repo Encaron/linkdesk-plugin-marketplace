@@ -20,7 +20,7 @@ export type StoreNavTarget =
   | { page: "repo-all" }
   | { page: "category"; category: string; authorId?: string; official?: boolean }
   | { page: "rank" }
-  | { page: "authors" }
+  | { page: "authors"; mode?: "browse" | "manage" }
   | { page: "library" }
   | { page: "author"; authorId: string; repoId?: string }
   | { page: "sources" }
@@ -84,7 +84,7 @@ export function normalizeStoreNavTarget(raw: unknown): StoreNavTarget | null {
     case "rank":
       return { page: "rank" };
     case "authors":
-      return { page: "authors" };
+      return r.mode === "manage" ? { page: "authors", mode: "manage" } : { page: "authors", mode: "browse" };
     case "library":
       return { page: "library" };
     case "author": {

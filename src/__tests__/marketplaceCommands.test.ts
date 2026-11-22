@@ -252,7 +252,7 @@ describe("导航命令 —— 意图信箱 + 标签页", () => {
       { page: "category", category: "themes", official: true },
     ],
     ["openRank", () => runOpenRank(), { page: "rank" }],
-    ["openAuthors", () => runOpenAuthors(), { page: "authors" }],
+    ["openAuthors", () => runOpenAuthors(), { page: "authors", mode: "browse" }],
     ["openLibrary", () => runOpenLibrary(), { page: "library" }],
     ["openSources", () => runOpenSources(), { page: "sources" }],
     ["openAuthor", () => runOpenAuthor("owner-two"), { page: "author", authorId: "owner-two" }],

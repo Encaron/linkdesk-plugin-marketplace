@@ -165,68 +165,59 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("作者店冒烟（注入目录＋作者块）", () => {
-  it("作者页作者卡 → 作者店：hero/合集只筛当前仓/self 榜单/空仓/官方卡返回", async () => {
+describe("作者页浏览 → 仓首页（批 C：一页两模式 + D1 全链路）", () => {
+  it("作者页分组/仓卡进仓：hero/合集只筛当前仓/分类瓷片/空仓/官方组", async () => {
     const { container } = render(<StoreView isActive />);
-    // D1（19 §一）：首页不再有作者区；跨作者入口 = 作者页（批 D 再加作者坞）
+    // D1：跨作者入口 = 作者页（首页不再有作者区）
     fireEvent.click(container.querySelector('[data-rail-item="authors"]') as HTMLElement);
     await waitFor(() => expect(screen.getAllByText("Demo Author").length).toBeGreaterThan(0));
+    // 官方作者域显示名 = Encaron（19 §1；⛔ 第二个作者身份）
+    expect(screen.getAllByText("Encaron").length).toBeGreaterThan(0);
 
-    const card = container.querySelector('[data-author="demo-author"]') as HTMLElement;
-    expect(card).toBeTruthy();
-    fireEvent.click(card);
-
-    // 作者店：店名/hero/板块
-    await waitFor(() => expect(screen.getAllByText("Demo Store").length).toBeGreaterThan(0));
+    // 浏览模式：作者容器卡里的仓库卡 → 切 currentRepo → 回仓首页
+    fireEvent.click(screen.getByText("Hardware Repo"));
+    await waitFor(() => expect(screen.getByText("HW Rank")).toBeTruthy());
     expect(screen.getAllByText("Demo One").length).toBeGreaterThan(0);
-    // 合集只筛当前仓：official-one 不在店内合集
-    expect(screen.getByText("Must Have")).toBeTruthy();
     expect(screen.queryByText("Official One")).toBeNull();
-    // scope:self 榜单只出本店 2 件
-    expect(screen.getByText("HW Rank")).toBeTruthy();
-    expect(screen.getByText("All hardware")).toBeTruthy();
-    // 按分类浏览硬保留（只列有货）
-    expect(screen.getByText("按分类浏览")).toBeTruthy();
+    expect(screen.getByText("Must Have")).toBeTruthy();
+
+    // 按分类浏览硬保留（只列本仓有货）
     const tiles = [...container.querySelectorAll(".marketplace-store-cat-tile")].map(
       (t) => (t as HTMLElement).dataset.category,
     );
     expect(tiles).toEqual(["hardware"]);
 
-    // 点分类瓷片 → 店内网格过滤（再点收起）
-    fireEvent.click(container.querySelector(".marketplace-store-cat-tile") as HTMLElement);
-    await waitFor(() =>
-      expect(
-        container.querySelectorAll(
-          ".marketplace-store-grid.marketplace-store-mt10 .marketplace-store-card.is-grid",
-        ).length,
-      ).toBe(2),
-    );
-
-    // 切到空仓：诚实空态（不伪造）
-    const switchBtns = [...container.querySelectorAll(".marketplace-store-author-card.is-switch")];
-    const emptyBtn = switchBtns.find((b) => b.textContent?.includes("Empty Repo")) as HTMLElement;
+    // 槽 2 切到空仓：诚实空态（不伪造）
+    const slot = container.querySelector('[data-spec="04-6-repo-slot"]') as HTMLElement;
+    const emptyBtn = [...slot.querySelectorAll(".marketplace-store-author-card.is-switch")].find((b) =>
+      b.textContent?.includes("Empty Repo"),
+    ) as HTMLElement;
     expect(emptyBtn).toBeTruthy();
     fireEvent.click(emptyBtn);
     await waitFor(() =>
       expect(screen.getAllByText("「Empty Repo」暂无插件").length).toBeGreaterThan(0),
     );
 
-    // 官方卡恒排第一且可返回首页
-    const officialBtn = switchBtns[0] as HTMLElement;
-    expect(officialBtn.textContent).toContain("官方 Plugin Store");
-    fireEvent.click(officialBtn);
-    await waitFor(() => expect(screen.queryByText("HW Rank")).toBeNull());
+    // 回作者页 → 官方组的仓卡 → 官方首页
+    fireEvent.click(container.querySelector('[data-rail-item="authors"]') as HTMLElement);
+    await waitFor(() => expect(screen.getAllByText("Encaron").length).toBeGreaterThan(0));
+    const officialCard = [...container.querySelectorAll(".marketplace-store-author-body .marketplace-store-author-card")].find(
+      (b) => b.textContent?.includes("官方目录"),
+    ) as HTMLElement;
+    expect(officialCard).toBeTruthy();
+    fireEvent.click(officialCard);
+    await waitFor(() => expect(screen.getAllByText("Official One").length).toBeGreaterThan(0));
   });
 
   it("作者跳转字落页：进作者仓即切 currentRepo（分类页只算该仓；⛔ 全源/逃生门已作废）", async () => {
     const { container } = render(<StoreView isActive />);
     fireEvent.click(container.querySelector('[data-rail-item="authors"]') as HTMLElement);
     await waitFor(() => expect(screen.getAllByText("Demo Author").length).toBeGreaterThan(0));
-    fireEvent.click(container.querySelector('[data-author="demo-author"]') as HTMLElement);
+    fireEvent.click(screen.getByText("Hardware Repo"));
     await waitFor(() => expect(screen.getByText("All hardware")).toBeTruthy());
 
     fireEvent.click(screen.getByText("All hardware"));
-    // D1（19 §一/§五）：分类页 = 当前仓（进作者店时已切到 demo-author/hw）
+    // D1（19 §一/§五）：分类页 = 当前仓（进作者仓时已切到 demo-author/hw）
     await waitFor(() => expect(screen.getAllByText("Demo One").length).toBeGreaterThan(0));
     expect(screen.queryByText("Official One")).toBeNull();
     // 「显示全部」全源逃生门随全源合并池一起作废

@@ -18,7 +18,7 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
   const { data, route, searchInput, setSearchInput, clearSearch, checkUpdates, refreshContent, addSource } =
     useStore();
   // 作者店不提供「添加源」入口（蓝图 head(..., canAdd=false)：店内不出现第四方/外部动作）
-  const canAdd = route.page !== "author";
+  const canAdd = route.page !== "author" && route.page !== "authors" && route.page !== "sources";
   // 店名作者自定（09 §二 storeTitle；缺省「〈作者名〉的 Plugin Store」）——作者店头随域换
   const { domain } = useAuthorDomain(
     route.page === "author" ? (route.authorId ?? "") : "",
@@ -27,14 +27,17 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
   // D1（19 §2.1）：首页/分类/搜索/排行的头部 = **当前仓库**的 storeTitle（官方市场可显示 Plugin Store）
   const repoName = data.repo.repo?.name ?? data.repo.name;
   const authorName = data.repo.domain?.name ?? data.repo.authorId;
-  const title =
-    route.page === "author"
+  const isAuthorPage = route.page === "authors" || route.page === "sources";
+  const title = isAuthorPage
+    ? t("作者")
+    : route.page === "author"
       ? (domain?.storeTitle ?? (domain ? t("{{name}} 的 Plugin Store", { name: domain.name }) : t("作者主页")))
       : data.repo.core
         ? "Plugin Store"
         : (data.repo.storeTitle ?? repoName);
-  const sub =
-    route.page === "author"
+  const sub = isAuthorPage
+    ? t("按作者分组——点仓库卡进入该仓库；「管理来源」可添加/停用/移除来源")
+    : route.page === "author"
       ? (domain?.intro ?? t("第三方作者店"))
       : t("{{author}} · {{repo}} · {{count}} 个插件", {
           author: authorName,

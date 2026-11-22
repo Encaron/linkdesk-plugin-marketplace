@@ -321,3 +321,208 @@
   .marketplace-store-author-card.has-deck,
   .marketplace-store-author-card.is-switch { width: 300px; }
 }
+
+/* ═══ 作者页（一页两模式，19 §3）——作者容器卡继承基础 card；浏览/管理同一外壳 ═══ */
+.marketplace-store-author-page-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 2px 10px;
+}
+.marketplace-store-author-modes {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--bg-input);
+}
+.marketplace-store-author-mode {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--font-size-2xs);
+  transition: background 0.15s, color 0.15s;
+}
+.marketplace-store-author-mode.is-on { background: var(--accent); color: var(--text-on-accent); }
+.marketplace-store-author-toolbar-gap { flex: 1; }
+.marketplace-store-author-tip-reopen {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font: inherit;
+}
+.marketplace-store-author-tip-reopen:hover { color: var(--text-primary); border-color: var(--accent); }
+.marketplace-store-author-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 2px 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--text-secondary);
+  font-size: var(--font-size-2xs);
+  line-height: 1.6;
+}
+.marketplace-store-author-tip > span { flex: 1; }
+.marketplace-store-author-tip-x {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  flex: none;
+}
+.marketplace-store-author-tip-x:hover { color: var(--text-primary); background: var(--tab-hover-bg); }
+.marketplace-store-author-list { display: flex; flex-direction: column; gap: 12px; }
+.marketplace-store-author-container { overflow: hidden; }
+.marketplace-store-author-container.is-current {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}
+.marketplace-store-author-container-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.marketplace-store-author-container-head:hover { background: var(--tab-hover-bg); }
+.marketplace-store-author-grip {
+  color: var(--text-muted);
+  letter-spacing: -2px;
+  font-size: var(--font-size-xs);
+  cursor: grab;
+  flex: none;
+}
+.marketplace-store-author-grip.is-hidden { visibility: hidden; }
+.marketplace-store-author-av {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--text-on-accent);
+  flex: none;
+}
+.marketplace-store-author-av.is-muted { background: var(--bg-input); color: var(--text-muted); }
+.marketplace-store-author-main { min-width: 0; flex: 1; }
+.marketplace-store-author-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+.marketplace-store-author-badge {
+  font-size: var(--font-size-2xs);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 1px 7px;
+  font-weight: 400;
+}
+.marketplace-store-author-badge.is-official {
+  color: var(--accent-hover);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+.marketplace-store-author-current {
+  font-size: var(--font-size-2xs);
+  color: var(--accent-hover);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-radius: var(--radius-full);
+  padding: 1px 7px;
+  font-weight: 400;
+}
+.marketplace-store-author-sub { margin-top: 2px; color: var(--text-muted); font-size: var(--font-size-2xs); }
+.marketplace-store-author-chev {
+  color: var(--text-muted);
+  transition: transform 0.15s;
+  flex: none;
+}
+.marketplace-store-author-container:not(.is-collapsed) .marketplace-store-author-chev { transform: rotate(90deg); }
+.marketplace-store-author-body { padding: 0 16px 14px; }
+.marketplace-store-author-body.is-browse {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(244px, 1fr));
+  gap: 10px;
+  padding-top: 4px;
+}
+.marketplace-store-author-body.is-browse .marketplace-store-author-card.is-switch {
+  width: auto;
+  min-width: 0;
+}
+.marketplace-store-author-body.is-manage { padding: 0 0 6px; }
+.marketplace-store-author-body.is-manage .marketplace-store-src-line { padding-left: 16px; padding-right: 16px; }
+.marketplace-store-author-warn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+}
+.marketplace-store-author-missing {
+  padding: 10px 16px 2px;
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+  line-height: 1.6;
+}
+.marketplace-store-author-empty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-style: dashed;
+  cursor: pointer;
+}
+.marketplace-store-author-empty:hover { border-color: var(--accent); }
+.marketplace-store-author-empty-cta {
+  color: var(--accent-hover);
+  font-size: var(--font-size-2xs);
+  white-space: nowrap;
+  flex: none;
+}
+.marketplace-store-src-locked {
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+  white-space: nowrap;
+}
+@container (max-width: 700px) {
+  .marketplace-store-author-body.is-browse { grid-template-columns: 1fr; }
+  .marketplace-store-author-page-toolbar { gap: 6px; }
+  .marketplace-store-author-container-head { padding: 10px 12px; }
+  .marketplace-store-author-body { padding: 0 12px 12px; }
+}
+.marketplace-store-src-view {
+  height: 26px;
+  padding: 0 9px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--font-size-2xs);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.marketplace-store-src-view:hover:not(:disabled) { color: var(--text-primary); border-color: var(--accent); }
+.marketplace-store-src-view:disabled { opacity: 0.45; cursor: default; }

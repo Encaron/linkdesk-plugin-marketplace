@@ -528,9 +528,10 @@ export function officialDomainOf(all: readonly CatalogEntry[]): AuthorDomain | n
   });
   return {
     authorId: OFFICIAL_AUTHOR_ID,
-    name: "官方 Plugin Store",
+    // 19 §1：作者域显示名 = Encaron（「官方」只是发布者/认证徽标，⛔ 第二个作者身份）
+    name: "Encaron",
     avatar: "linkdesk://marketplace/resources/icon-brand.svg",
-    intro: "官方内置插件与精选主题",
+    intro: "官方运营的插件与主题精选",
     storeTitle: "官方 Plugin Store",
     repos,
     warnings: [],

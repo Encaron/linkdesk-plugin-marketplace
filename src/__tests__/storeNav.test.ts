@@ -72,7 +72,7 @@ describe("normalizeStoreNavTarget", () => {
       official: true,
     });
     expect(normalizeStoreNavTarget({ page: "rank" })).toEqual({ page: "rank" });
-    expect(normalizeStoreNavTarget({ page: "authors" })).toEqual({ page: "authors" });
+    expect(normalizeStoreNavTarget({ page: "authors" })).toEqual({ page: "authors", mode: "browse" });
     expect(normalizeStoreNavTarget({ page: "library" })).toEqual({ page: "library" });
     expect(normalizeStoreNavTarget({ page: "author", authorId: "owner-two" })).toEqual({
       page: "author",

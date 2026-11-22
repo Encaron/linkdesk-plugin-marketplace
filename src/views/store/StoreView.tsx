@@ -53,11 +53,10 @@ import { CategoryView } from "./browse/CategoryView";
 import { SearchResultsView } from "./browse/SearchResultsView";
 import { RankView } from "./browse/RankView";
 import { LibraryView } from "./library/LibraryView";
-import { SourcesView } from "./sources/SourcesView";
 import { AddSourceModal, type AddSourceMode } from "./sources/AddSourceModal";
 import { LicenseModal } from "./LicenseModal";
 import { requestLicenseDialog } from "../../services/licenseActions";
-import { AuthorsView } from "./authors/AuthorsView";
+import { AuthorPageView } from "./authors/AuthorPageView";
 import { AuthorStoreView } from "./authors/AuthorStoreView";
 import { RepoAllView } from "./repo/RepoAllView";
 import type { CatalogEntry } from "../../services/marketCatalog";
@@ -452,7 +451,7 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
               {route.page === "category" && <CategoryView slug={category} />}
               {route.page === "search" && <SearchResultsView />}
               {route.page === "rank" && <RankView />}
-              {route.page === "authors" && <AuthorsView />}
+              {route.page === "authors" && <AuthorPageView mode={route.authorMode ?? "browse"} />}
               {route.page === "author" && (
                 <AuthorStoreView
                   /* 只按作者 key：切仓（repoId 变）不重挂载，仓库横排保留滚动位；
@@ -463,7 +462,7 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
                 />
               )}
               {route.page === "library" && <LibraryView />}
-              {route.page === "sources" && <SourcesView />}
+              {route.page === "sources" && <AuthorPageView mode="manage" />}
             </CatalogGate>
           </div>
         </div>

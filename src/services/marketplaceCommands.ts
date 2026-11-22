@@ -200,8 +200,9 @@ export async function runOpenRank(): Promise<OpenTabResult> {
   return openStoreTab();
 }
 
-export async function runOpenAuthors(): Promise<OpenTabResult> {
-  await publishStoreNav({ page: "authors" }, true);
+export async function runOpenAuthors(args?: unknown): Promise<OpenTabResult> {
+  const mode = stringArg(args, "mode", 0) === "manage" ? "manage" : "browse";
+  await publishStoreNav({ page: "authors", mode }, true);
   return openStoreTab();
 }
 
