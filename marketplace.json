@@ -1,26 +1,32 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-22T19:57:46.288Z",
+  "updatedAt": "2026-11-22T20:17:01.128Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.7",
+      "version": "1.4.8",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.7/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.8/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.7/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.8/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.7/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.7/marketplace.linkdesk-plugin",
-      "size": 179335,
-      "publishedAt": "2026-11-22T19:57:46.288Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.8/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.8/marketplace.linkdesk-plugin",
+      "size": 180298,
+      "publishedAt": "2026-11-22T20:17:01.128Z",
       "versions": [
+        {
+          "version": "1.4.8",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.8/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-22T20:17:01.128Z",
+          "changelog": "- **仓库头像（新）**：作者块 `repos[].image` 现在会画在仓库切换卡上——有图显示图，没图回落原字形；官方目录仓用内置的「目录瓷片」图（品牌橙 + 2×2 瓷片，与购物袋图标区分）。\n- **缓存独立分层**：作者头像在 `avatars/<authorId>.<ext>`，仓库头像在 `repo-avatars/<authorId>/<repoId>.<ext>`，互不平铺；7 天自动更新，失败下次启动再试，不弹提示。\n- **删除联动**：移除来源时该作者的两类头像缓存一起删；刷新目录时清扫已不存在的作者缓存。"
+        },
         {
           "version": "1.4.7",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.7/marketplace.linkdesk-plugin",
@@ -47,8 +53,7 @@
         {
           "version": "1.4.3",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.3/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-22T19:15:10.224Z",
-          "changelog": "- **头像缓存按真实类型落盘**：GitHub 头像实际是 JPEG，缓存文件现在按响应类型命名（`.jpg` / `.png` / `.webp`），不会出现「`.png` 里装 JPEG」；类型变了会清掉同作者的旧扩展名文件。"
+          "publishedAt": "2026-11-22T19:15:10.224Z"
         },
         {
           "version": "1.4.2",
