@@ -1,26 +1,32 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-22T20:17:01.128Z",
+  "updatedAt": "2026-11-22T20:46:34.002Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.8",
+      "version": "1.4.9",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.8/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.9/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.8/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.9/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.8/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.8/marketplace.linkdesk-plugin",
-      "size": 180298,
-      "publishedAt": "2026-11-22T20:17:01.128Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.9/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.9/marketplace.linkdesk-plugin",
+      "size": 180625,
+      "publishedAt": "2026-11-22T20:46:34.002Z",
       "versions": [
+        {
+          "version": "1.4.9",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.9/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-22T20:46:34.002Z",
+          "changelog": "- **点市场图标 = 一条命令（入口归一化）**：`viewsContainers.marketplace.iconCommand = \"marketplace.openStore\"`——点图标 = 切到市场侧栏**且**打开/复位商店首页，与侧栏「进入插件市场」按钮、AI 调 `marketplace.openStore` 走**同一条命令**。需要壳 0.2.60+（旧壳忽略该字段，行为不变）。\n- **侧栏「进入插件市场」改成实体主按钮**：实色底 + 描边 + 悬停提亮 + 按下缩放/压暗/内阴影 + 键盘焦点环——它是进市场的唯一正门，不再是一颗没有点击欲的透明描边钮。\n- **中文界面不再露出 `Plugin Store`**：按钮文案走 i18n（`进入 Plugin Store` → 中文「进入插件市场」）。"
+        },
         {
           "version": "1.4.8",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.8/marketplace.linkdesk-plugin",
