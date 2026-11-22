@@ -17,6 +17,7 @@ import { realmSlot } from "./realmSlot";
 
 export type StoreNavTarget =
   | { page: "home" }
+  | { page: "repo-all" }
   | { page: "category"; category: string; authorId?: string; official?: boolean }
   | { page: "rank" }
   | { page: "authors" }
@@ -29,6 +30,7 @@ export type StoreNavTarget =
  *  测试再对账「命令已注册」＋「plugin.json 已声明」两件事）。 */
 export const NAV_COMMANDS: Record<StoreNavTarget["page"], string> = {
   home: "marketplace.openStore",
+  "repo-all": "marketplace.openRepoAll",
   category: "marketplace.openCategory",
   rank: "marketplace.openRank",
   authors: "marketplace.openAuthors",
@@ -69,6 +71,8 @@ export function normalizeStoreNavTarget(raw: unknown): StoreNavTarget | null {
   switch (r.page) {
     case "home":
       return { page: "home" };
+    case "repo-all":
+      return { page: "repo-all" };
     case "category": {
       const category = typeof r.category === "string" ? r.category.trim() : "";
       if (!category) return null;

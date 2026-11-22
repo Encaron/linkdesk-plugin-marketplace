@@ -22,6 +22,7 @@ import type { CatalogEntry, CollectionDecl } from "../../../services/marketCatal
 import { groupByPrimaryCategory, primaryCategoryOf } from "../../../services/marketCatalog";
 import type { AuthorDomain, AuthorMoreDecl, AuthorRepoView, AuthorSectionDecl } from "../../../services/authors";
 import { OFFICIAL_AUTHOR_ID, useAuthorDomain } from "../../../services/authors";
+import { OFFICIAL_REPO_REF } from "../../../services/repoContext";
 import { localizeCategory } from "../../../services/marketCategories";
 import { CardGrid } from "../cards/CardGrid";
 import { CategoryTile } from "../cards/CategoryTile";
@@ -262,7 +263,11 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
               goLabel={t("返回官方")}
               icon="bag"
               hue={undefined}
-              onOpen={() => navigate({ page: "home" })}
+              onOpen={() => {
+                // D1：回官方 = 切回官方核心仓（作者店内的 currentRepo 是该作者）
+                data.repo.setRepo(OFFICIAL_REPO_REF);
+                navigate({ page: "home" });
+              }}
               ariaLabel={t("返回官方 Plugin Store")}
             />
           )}

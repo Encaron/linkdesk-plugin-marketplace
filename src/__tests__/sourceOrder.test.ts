@@ -14,6 +14,7 @@ import {
   swapAuthorsRaw,
   swapReposRaw,
 } from "../services/sourceOrder";
+import { orderedReposOf } from "../services/sourceOrderStore";
 
 const GEEK_FX = "https://github.com/geek/fx-shop";
 const GEEK_HW = "https://github.com/geek/hw-shop";
@@ -121,5 +122,32 @@ describe("swapReposRaw —— 只在本作者内交换（D4）", () => {
       ok: false,
       reason: "not-found",
     });
+  });
+});
+
+describe("orderedReposOf —— 槽 2/全部插件页读同一份顺序（19 §4.1）", () => {
+  const domain = {
+    authorId: "geek",
+    name: "Geek",
+    repos: [
+      { id: "hw", name: "HW", plugins: [] },
+      { id: "fx", name: "FX", plugins: [] },
+      { id: "extra", name: "Extra", plugins: [] },
+    ],
+    warnings: [],
+    official: false,
+  } as unknown as import("../services/authors").AuthorDomain;
+
+  it("配置顺序优先；作者块里有、配置里没有的仓按原序补末尾", () => {
+    const model = buildSourceOrder([
+      { kind: "remote", url: "https://github.com/geek/fx-shop", authorId: "geek", repoId: "fx", enabled: true, status: "ok" },
+      { kind: "remote", url: "https://github.com/geek/hw-shop", authorId: "geek", repoId: "hw", enabled: true, status: "ok" },
+    ]);
+    expect(orderedReposOf(model, domain).map((r) => r.id)).toEqual(["fx", "hw", "extra"]);
+  });
+
+  it("顺序里没有该作者 ⇒ 作者块原序（不丢仓）", () => {
+    const model = buildSourceOrder([]);
+    expect(orderedReposOf(model, domain).map((r) => r.id)).toEqual(["hw", "fx", "extra"]);
   });
 });

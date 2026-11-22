@@ -6,7 +6,7 @@
  * provider 的值由 StoreView 一处组装（唯一属主），子视图只读。
  */
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode, type RefObject } from "react";
 import type { StoreData } from "./useStoreData";
 import type { StoreCardHandlers } from "./cards/cardParts";
 import type { StoreRoute } from "./navigation";
@@ -54,6 +54,8 @@ export interface StoreContextValue {
   keepScroll: (fn: () => void) => void;
   /** 回顶（rail 二次点击 / 悬浮钮共用）：只滚内容区，不重载、不清筛选 */
   scrollTop: () => void;
+  /** 内容区滚动容器（拖动自动滚边用；⛔ 复制第二份 DOM 引用） */
+  contentRef: RefObject<HTMLDivElement | null>;
 }
 
 const Ctx = createContext<StoreContextValue | null>(null);

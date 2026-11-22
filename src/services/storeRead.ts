@@ -238,6 +238,9 @@ export async function readStoreState(): Promise<StoreReadState> {
       case "home":
         // D1：首页 = 当前仓首页（批 B 接槽位后这里再按声明板块展开）
         return repo.entries.map((e) => e.id);
+      case "repo-all":
+        // 全部插件页（19 §七）：范围 = currentRepo，⛔ 跨仓混合
+        return repo.entries.map((e) => e.id);
       case "rank":
         return topByDownloads(50, repoEntriesRead);
       case "library": {

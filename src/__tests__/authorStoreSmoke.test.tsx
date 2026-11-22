@@ -166,11 +166,12 @@ afterEach(() => {
 });
 
 describe("作者店冒烟（注入目录＋作者块）", () => {
-  it("首页作者卡 → 作者店：hero/合集只筛当前仓/self 榜单/空仓/官方卡返回", async () => {
+  it("作者页作者卡 → 作者店：hero/合集只筛当前仓/self 榜单/空仓/官方卡返回", async () => {
     const { container } = render(<StoreView isActive />);
+    // D1（19 §一）：首页不再有作者区；跨作者入口 = 作者页（批 D 再加作者坞）
+    fireEvent.click(container.querySelector('[data-rail-item="authors"]') as HTMLElement);
     await waitFor(() => expect(screen.getAllByText("Demo Author").length).toBeGreaterThan(0));
 
-    // 首页作者卡（作者块解析成功才出现）
     const card = container.querySelector('[data-author="demo-author"]') as HTMLElement;
     expect(card).toBeTruthy();
     fireEvent.click(card);
@@ -219,6 +220,7 @@ describe("作者店冒烟（注入目录＋作者块）", () => {
 
   it("作者跳转字落页：进作者仓即切 currentRepo（分类页只算该仓；⛔ 全源/逃生门已作废）", async () => {
     const { container } = render(<StoreView isActive />);
+    fireEvent.click(container.querySelector('[data-rail-item="authors"]') as HTMLElement);
     await waitFor(() => expect(screen.getAllByText("Demo Author").length).toBeGreaterThan(0));
     fireEvent.click(container.querySelector('[data-author="demo-author"]') as HTMLElement);
     await waitFor(() => expect(screen.getByText("All hardware")).toBeTruthy());

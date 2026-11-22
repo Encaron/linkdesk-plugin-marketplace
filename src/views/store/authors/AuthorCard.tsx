@@ -11,6 +11,7 @@
  * 动效全部长在卡片自身表面（transform/opacity/颜色；⛔ 无实体凸起层/portal——08 §二）。
  */
 
+import type { KeyboardEvent, PointerEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { hueBG, hueOf, Icon, type IconName } from "../../../ui";
 import { OFFICIAL_AUTHOR_ID, type AuthorDomain } from "../../../services/authors";
@@ -104,6 +105,9 @@ export function AuthorCard({
 /**
  * AuthorSwitchCard — 作者店内的**门店切换卡**（09 §二：门店卡＝作者卡同款组件；
  * 官方卡恒排第一位＝返回官方；自有仓随后，当前仓 ring；⛔ 第四方）。
+ *
+ * 2026-11-22（19 §4.2）：同一张卡在首页槽 2 / 全部插件页顶部也用来切仓；长按拖动能力经
+ * `drag` 注入（同一套 pointer 控制器），⛔ 另造一张卡。
  */
 export function AuthorSwitchCard({
   title,
@@ -116,6 +120,7 @@ export function AuthorSwitchCard({
   icon,
   onOpen,
   ariaLabel,
+  drag,
 }: {
   title: string;
   badge: string;
@@ -127,6 +132,12 @@ export function AuthorSwitchCard({
   icon?: IconName;
   onOpen: () => void;
   ariaLabel: string;
+  /** 拖动控制器注入（data-* 属性 + pointerdown；本件不关心 swap 语义） */
+  drag?: {
+    attrs: Record<string, string | undefined>;
+    onPointerDown: (e: PointerEvent<HTMLElement>) => void;
+    onKeyDown?: (e: KeyboardEvent<HTMLElement>) => void;
+  };
 }) {
   return (
     <div
@@ -136,8 +147,12 @@ export function AuthorSwitchCard({
       aria-label={ariaLabel}
       aria-current={current ? "true" : undefined}
       style={hue ? ({ ["--marketplace-hue" as string]: hue }) : undefined}
+      {...drag?.attrs}
+      onPointerDown={drag?.onPointerDown}
       onClick={onOpen}
       onKeyDown={(e) => {
+        drag?.onKeyDown?.(e);
+        if (e.defaultPrevented) return;
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           onOpen();

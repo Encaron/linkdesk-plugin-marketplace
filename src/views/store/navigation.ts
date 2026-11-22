@@ -5,13 +5,22 @@
  * （06 §八「不记忆搜索词、抽屉筛选」同规）。跨进程/晚挂载的**意图**才走 storeNav 持久信箱。
  *
  * 页面与 rail 的映射：
- *   home / category:<slug> / search / rank / library / authors / sources / author:<id>:<repo>
+ *   home / repo-all / category:<slug> / search / rank / library / authors / sources / author:<id>:<repo>
  * 滚动位按 `routeKey` 分键——切分类/搜索/榜单再回来回原位（⛔ 弹回顶部）。
  */
 
 import type { StoreNavTarget } from "../../services/storeNav";
 
-export type StorePage = "home" | "category" | "search" | "rank" | "library" | "authors" | "sources" | "author";
+export type StorePage =
+  | "home"
+  | "repo-all"
+  | "category"
+  | "search"
+  | "rank"
+  | "library"
+  | "authors"
+  | "sources"
+  | "author";
 
 export interface StoreRoute {
   page: StorePage;
@@ -69,6 +78,8 @@ export function routeFromNav(t: StoreNavTarget): StoreRoute {
         : t.official
           ? { page: "category", category: t.category, official: true }
           : { page: "category", category: t.category };
+    case "repo-all":
+      return { page: "repo-all" };
     case "rank":
       return { page: "rank" };
     case "authors":
@@ -95,6 +106,8 @@ export function routeToNavTarget(route: StoreRoute): StoreNavTarget {
         : route.official
           ? { page: "category", category: route.category ?? "", official: true }
           : { page: "category", category: route.category ?? "" };
+    case "repo-all":
+      return { page: "repo-all" };
     case "rank":
       return { page: "rank" };
     case "authors":

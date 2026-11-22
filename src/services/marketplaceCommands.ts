@@ -189,6 +189,12 @@ export async function runOpenCategory(args?: unknown): Promise<OpenTabResult> {
   return openStoreTab();
 }
 
+/** 全部插件页（19 §七；入口 = 仓库首页槽 2 的「查看全部」） */
+export async function runOpenRepoAll(): Promise<OpenTabResult> {
+  await publishStoreNav({ page: "repo-all" }, true);
+  return openStoreTab();
+}
+
 export async function runOpenRank(): Promise<OpenTabResult> {
   await publishStoreNav({ page: "rank" }, true);
   return openStoreTab();
@@ -413,6 +419,7 @@ export async function runGetOrder(): Promise<{
 /** 本组命令的 id → handler → title（title 必须与 plugin.json 逐字一致；其余元数据只在 manifest） */
 const COMMANDS: Array<[string, (args?: unknown) => Promise<unknown>, string]> = [
   ["marketplace.openStore", () => runOpenStore(), "打开插件市场"],
+  ["marketplace.openRepoAll", () => runOpenRepoAll(), "查看本仓全部插件"],
   ["marketplace.openCategory", (a) => runOpenCategory(a), "打开分类"],
   ["marketplace.openRank", () => runOpenRank(), "打开排行榜"],
   ["marketplace.openAuthors", () => runOpenAuthors(), "打开作者列表"],

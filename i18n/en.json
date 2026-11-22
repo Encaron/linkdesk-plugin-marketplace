@@ -673,5 +673,15 @@
   "按下载量排序，只统计「{{repo}}」里的插件": "Sorted by downloads, counting only plugins in “{{repo}}”",
   "交换作者顺序": "Swap author order",
   "交换仓库顺序": "Swap repository order",
-  "读取市场顺序": "Read market order"
+  "读取市场顺序": "Read market order",
+  "仓库切换": "Switch repositories",
+  "进入仓库": "Enter repository",
+  "查看全部 {{count}} 个插件": "View all {{count}} plugins",
+  "仓库只能在同一个作者内交换": "Repositories can only be swapped within the same author",
+  "这个仓库固定在最前，不能换位置": "This repository is pinned first and cannot be moved",
+  "返回「{{repo}}」首页": "Back to “{{repo}}” home",
+  "「{{repo}}」里的全部插件": "All plugins in “{{repo}}”",
+  "只列出「{{repo}}」里有的分类——点一下看整类": "Only categories with plugins in “{{repo}}” — click to see the whole category",
+  "作者还没往这个仓库上架插件——过阵子再来看看，或换一个仓库": "The author has not published anything in this repository yet — check back later or switch repositories",
+  "查看本仓全部插件": "View all plugins in this repository"
 }

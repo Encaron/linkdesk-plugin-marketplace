@@ -1,0 +1,136 @@
+/**
+ * store-repo.css — 仓库首页槽 2（仓库卡横排 + 查看全部 CTA）、全部插件页返回条、
+ * 以及**作者容器/仓卡/来源行共用的拖动交换状态**（19 §2.1/§4.2/§七）。
+ *
+ * 纪律：颜色/圆角/阴影/字号一律走主题变量（⛔ 硬编码 hex）；响应式按容器（@container）。
+ * 拖动状态类：`.is-drag-source`（源条变暗）/`.is-swap-target`（目标高亮 + ⇄）/
+ * `.is-just-swapped`（松手后短暂高亮）/`.marketplace-swap-ghost`（跟随指针的整卡 ghost）。
+ */
+
+/* ═══ 槽 2：仓库卡横排 + 查看全部 ═══ */
+.marketplace-store-repo-slot { margin-bottom: 18px; }
+.marketplace-store-repo-slot-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.marketplace-store-repo-slot-row > .marketplace-store-strip {
+  flex: 1;
+  min-width: 0;
+}
+.marketplace-store-repo-all {
+  flex: none;
+  white-space: nowrap;
+  /* 让出横排右箭头的沟槽（箭头落在 strip 外 −35px） */
+  margin-left: 44px;
+}
+
+/* ═══ 全部插件页返回条 ═══ */
+.marketplace-store-repo-all-crumb {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.marketplace-store-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 4px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.marketplace-store-back:hover {
+  color: var(--text-primary);
+  background: var(--tab-hover-bg);
+}
+.marketplace-store-repo-all-count {
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 窄容器：CTA 落到横排下方右对齐（横排全宽保留箭头沟槽） */
+@container (max-width: 900px) {
+  .marketplace-store-repo-slot-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .marketplace-store-repo-all {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+}
+
+/* ═══ 拖动交换状态（一套实现，浏览/管理共用） ═══ */
+body.is-swap-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+.marketplace-swap-ghost {
+  position: fixed;
+  z-index: 9999;
+  margin: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+  opacity: 0.92;
+  filter: blur(0.4px);
+  box-shadow: var(--shadow-pop);
+  transform-origin: center;
+  will-change: transform, left, top, width, height;
+}
+.marketplace-store-card.is-drag-source {
+  opacity: 0.35;
+  filter: saturate(0.6);
+}
+.marketplace-store-card.is-swap-target {
+  outline: 2px solid var(--accent-hover);
+  outline-offset: 2px;
+  border-color: var(--accent-hover);
+  box-shadow: var(--shadow-pop);
+}
+.marketplace-store-card.is-swap-target::after {
+  content: "⇄";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 61;
+  min-width: 18px;
+  padding: 1px 4px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-size: var(--font-size-2xs);
+  line-height: 1.4;
+  text-align: center;
+  pointer-events: none;
+}
+.marketplace-store-card.is-just-swapped {
+  animation: marketplace-swap-flash 0.6s ease;
+}
+@keyframes marketplace-swap-flash {
+  0% {
+    box-shadow: 0 0 0 2px var(--accent-hover);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marketplace-swap-ghost,
+  .marketplace-store-card.is-drag-source,
+  .marketplace-store-card.is-swap-target {
+    transition: none;
+  }
+  .marketplace-store-card.is-just-swapped {
+    animation: none;
+    outline: 2px solid var(--accent-hover);
+    outline-offset: 2px;
+  }
+}

@@ -133,15 +133,16 @@ afterEach(() => {
   Reflect.deleteProperty(window, "linkdesk");
 });
 
-describe("注册面 —— 20 条新命令", () => {
-  it("id/title 逐条对得上 manifest；返回注册条数 20", () => {
+describe("注册面 —— 21 条新命令", () => {
+  it("id/title 逐条对得上 manifest；返回注册条数 21", () => {
     const registerCommand = vi.fn();
     Object.defineProperty(window, "linkdesk", { value: { commands: { registerCommand } }, configurable: true });
 
-    expect(registerMarketplaceStoreCommands()).toBe(20);
+    expect(registerMarketplaceStoreCommands()).toBe(21);
     const calls = registerCommand.mock.calls as Array<[string, unknown, { title: string }]>;
     expect(calls.map(([id]) => id)).toEqual([
       "marketplace.openStore",
+      "marketplace.openRepoAll",
       "marketplace.openCategory",
       "marketplace.openRank",
       "marketplace.openAuthors",
@@ -164,6 +165,7 @@ describe("注册面 —— 20 条新命令", () => {
     ]);
     expect(calls.map(([, , meta]) => meta.title)).toEqual([
       "打开插件市场",
+      "查看本仓全部插件",
       "打开分类",
       "打开排行榜",
       "打开作者列表",
