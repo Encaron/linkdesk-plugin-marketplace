@@ -1,26 +1,32 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-22T16:42:52.429Z",
+  "updatedAt": "2026-11-22T17:35:21.193Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.3.0",
+      "version": "1.4.0",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "官方"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.3.0/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.0/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.3.0/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.0/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.3.0/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.3.0/marketplace.linkdesk-plugin",
-      "size": 164273,
-      "publishedAt": "2026-11-22T16:42:52.429Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.0/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.0/marketplace.linkdesk-plugin",
+      "size": 179449,
+      "publishedAt": "2026-11-22T17:35:21.193Z",
       "versions": [
+        {
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.0/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-22T17:35:21.193Z",
+          "changelog": "- **作者与多仓呈现（A→F 全批）**：新增 `currentRepo` 唯一浏览上下文——首页锁当前仓库，左栏直点分类/搜索/排行则是全源，仓库页的「全部主题」等「更多」落当前仓预过滤（带「已过滤 · 仓库名 · ✕ · 显示全部」逃生门）；作者容器卡＋一页两模式（浏览/管理来源），来源页彻底并入作者页、删掉 rail 独立入口；作者坞改为右缘竖向标签（52px，展开 386px 面板）；首页槽位重排、槽 2 仓库卡可 swap；分类瓷片原地展开；全部插件页补返回/滚动位/Esc；单仓刷新给出结果化三态。\n- **分段钮不再是药丸**：作者页「浏览 / 管理来源」与官方/社区源徽标、当前徽标改用 `--radius-sm` / `--radius-md`（此前误用 `--radius-full`，组件圆角设置关闭时也不会变方）；头像保持圆形。\n- **「有新版本可用」块不再塌成一字一行**：插件侧给文本体 8em 可读地板＋吃掉剩余宽（旧壳没有宿主文本地板时也不会被压成单字列），块高度随内容收。\n- **详情侧栏删掉重复的「安装位置」**：「大小」的值本来就是链接（点开安装目录），同一落点不再画第二行。\n- **拖动与吸顶修正**：`⇄` 交换标记回到顶部居中且目标容器 `overflow:visible` 不再裁掉；hover 上抬接 `useStickyClearance({mode:\"lift\"})`，压到吸顶条才下移；松手残影原地淡出。\n- **玻璃/可读性**：压在媒体上的文字层改吃内容面 token（`--surface-reading` / `-strong` / `--surface-media-scrim` / `--surface-ink`），基础卡与面板仍走主题玻璃。"
+        },
         {
           "version": "1.3.0",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.3.0/marketplace.linkdesk-plugin",
@@ -48,8 +54,7 @@
         {
           "version": "1.1.9",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.1.9/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-09-30T21:47:18.515Z",
-          "changelog": "- **「已安装」那块标题改口径**：原「全部更新记录」→「**更新记录（最近 5 版）**」——包里只剩最近 5 版，标题与内容对上（更早的记录仍在插件仓库里）。\n- **安装包瘦身**：包内更新日志只带最近 5 版——由 SDK 自动施加，用户无需任何操作。"
+          "publishedAt": "2026-09-30T21:47:18.515Z"
         },
         {
           "version": "1.1.8",
