@@ -15,7 +15,10 @@ async function fetchText(url: string): Promise<string> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 10_000);
   try {
-    const res = await fetch(url, { signal: ctrl.signal, cache: "no-store" });
+    /* 2026-11-23 用户实机：`cache:"no-store"` 在本机 Chromium **不生效**——发版后同一个 raw 地址
+     *  仍拿回旧内容（实测：默认/no-store 拿到 1.4.1，`reload` 立刻拿到 1.4.3）⇒ 用户点「检查更新」
+     *  看不到新版。改 `reload`：绕过本地 HTTP 缓存并回写，发版后刷新即见。 */
+    const res = await fetch(url, { signal: ctrl.signal, cache: "reload" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.text();
   } finally {
