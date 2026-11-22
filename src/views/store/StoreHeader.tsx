@@ -24,14 +24,23 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
     route.page === "author" ? (route.authorId ?? "") : "",
     data.catalog.entries.length,
   );
+  // D1（19 §2.1）：首页/分类/搜索/排行的头部 = **当前仓库**的 storeTitle（官方市场可显示 Plugin Store）
+  const repoName = data.repo.repo?.name ?? data.repo.name;
+  const authorName = data.repo.domain?.name ?? data.repo.authorId;
   const title =
     route.page === "author"
       ? (domain?.storeTitle ?? (domain ? t("{{name}} 的 Plugin Store", { name: domain.name }) : t("作者主页")))
-      : "Plugin Store";
+      : data.repo.core
+        ? "Plugin Store"
+        : (data.repo.storeTitle ?? repoName);
   const sub =
     route.page === "author"
       ? (domain?.intro ?? t("第三方作者店"))
-      : t("发现、安装和管理插件");
+      : t("{{author}} · {{repo}} · {{count}} 个插件", {
+          author: authorName,
+          repo: repoName,
+          count: data.repo.entries.length,
+        });
   const updateCount = data.updateCount;
   return (
     <StickyBar placement="head" className="marketplace-store-head">
@@ -46,7 +55,7 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
             ref={searchRef}
             type="text"
             value={searchInput}
-            placeholder={t("搜索名称、ID 或标签…")}
+            placeholder={t("搜索「{{repo}}」中的插件…", { repo: repoName })}
             aria-label={t("搜索插件")}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => {

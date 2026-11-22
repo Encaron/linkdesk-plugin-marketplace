@@ -233,6 +233,59 @@
             "description": "true = 默认收起；false = 默认展开"
           }
         ]
+      },
+      {
+        "id": "marketplace.swapAuthors",
+        "title": "交换作者顺序",
+        "category": "插件市场",
+        "description": "交换两个作者容器的顺序（唯一真相源 marketplace.marketplaceSources 数组序；GUI 长按拖动与命令调用同一份 swap 函数）。回执 {ok:true, authorOrder, repoOrder}；失败 {ok:false, reason: bad-arg|not-found|same}。本地插件组不参与作者排序",
+        "params": [
+          {
+            "name": "authorIdA",
+            "type": "string",
+            "required": true,
+            "description": "作者聚合键（目录条目 authorId；官方 = official）"
+          },
+          {
+            "name": "authorIdB",
+            "type": "string",
+            "required": true,
+            "description": "另一个作者聚合键（与 A 不同）"
+          }
+        ]
+      },
+      {
+        "id": "marketplace.swapRepos",
+        "title": "交换仓库顺序",
+        "category": "插件市场",
+        "description": "在同一个作者内交换两个仓库的顺序（跨作者拒绝；官方核心仓锁官方组第一、不参与交换）。回执 {ok:true, authorOrder, repoOrder}；失败 {ok:false, reason: bad-arg|not-found|same|locked|cross-author}",
+        "params": [
+          {
+            "name": "authorId",
+            "type": "string",
+            "required": true,
+            "description": "作者聚合键（两个仓必须属于该作者）"
+          },
+          {
+            "name": "repoIdA",
+            "type": "string",
+            "required": true,
+            "description": "仓库 id（作者声明 repos[].id / 源记录的 repoId）"
+          },
+          {
+            "name": "repoIdB",
+            "type": "string",
+            "required": true,
+            "description": "另一个仓库 id（同一作者内）"
+          }
+        ]
+      },
+      {
+        "id": "marketplace.getOrder",
+        "title": "读取市场顺序",
+        "category": "插件市场",
+        "description": "读取作者容器顺序与各作者组内仓库顺序（唯一真相源 marketplace.marketplaceSources 数组序；官方核心仓恒在官方组第一；本地组不参与）。回执 {ok:true, authorOrder, repoOrder}",
+        "params": []
       }
     ],
     "i18n": {

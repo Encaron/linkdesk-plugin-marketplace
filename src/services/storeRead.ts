@@ -22,6 +22,9 @@ import { derivePackageState, type LocalEntryInfo, type PackageState } from "./ca
 import { readCachedDownloadCount } from "./downloadCounts";
 import { readSourceRecords, type SourceRecord } from "./marketSources";
 import { ensureAuthorDomains, getLoadedAuthorDomains, knownAuthorIds } from "./authors";
+import { readCurrentRepoRef, resolveRepoRef } from "./repoContext";
+import { buildSourceOrder, declaredAuthorMapOf, orderSnapshot } from "./sourceOrder";
+import { readRawSourceConfig } from "./sourceAdmin";
 import { NAV_COMMANDS, readCurrentStoreRoute, type StoreNavTarget } from "./storeNav";
 
 export interface StoreReadEntry {
@@ -88,7 +91,18 @@ export interface StoreReadState {
   ok: true;
   /** 当前实际页面（不是最后一条命令意图） */
   route: StoreNavTarget;
-  /** 当前路由下实际可见的条目 id（分类页按 category+authorId、作者店按仓、首页/榜单/库按各自可见集） */
+  /** 唯一浏览上下文（D1）：首页/分类/搜索/排行/全部插件都只算它 */
+  currentRepo: { authorId: string; repoId: string };
+  currentRepoName: string;
+  /** 作者容器顺序（`marketplaceSources` 数组序；本地组不在列） */
+  authorOrder: string[];
+  /** 作者 → 仓顺序（官方核心仓恒第一） */
+  repoOrder: Record<string, string[]>;
+  /** 作者顺序里的可见作者（有已启用源；官方恒可见） */
+  visibleAuthors: string[];
+  /** 可见仓（按作者/仓顺序展开） */
+  visibleRepos: Array<{ authorId: string; repoId: string }>;
+  /** 当前路由下实际可见的条目 id（分类页按 category、作者店按仓、首页/榜单/库按各自可见集） */
   visibleEntryIds: string[];
   /** 当前页可见作者（首页/作者列表按名排序；作者店只有当前作者；其它页空） */
   visibleAuthorIds: string[];
@@ -134,11 +148,13 @@ export async function readStoreState(): Promise<StoreReadState> {
   const route = await readCurrentStoreRoute();
   const catalog = getCatalogResult();
   const pm = window.linkdesk?.pluginManager;
-  const [list, disabled, licenses, sources] = await Promise.all([
+  const [list, disabled, licenses, sources, rawSources, storedRepo] = await Promise.all([
     pm?.list?.() ?? Promise.resolve([] as PluginListEntry[]),
     pm?.getDisabled?.() ?? Promise.resolve([] as PluginInfoEntry[]),
     window.linkdesk?.licenses?.list?.() ?? Promise.resolve([]),
     readSourceRecords(),
+    readRawSourceConfig(),
+    readCurrentRepoRef(),
   ]);
   const { localById, disabledIds } = localMaps(list, disabled);
   const licenseById = new Map(
@@ -179,16 +195,24 @@ export async function readStoreState(): Promise<StoreReadState> {
 
   const ids = await knownAuthorIds();
   await ensureAuthorDomains(ids);
-  const authors: StoreReadAuthor[] = getLoadedAuthorDomains().map((a) => ({
+  const domains = getLoadedAuthorDomains();
+  const authors: StoreReadAuthor[] = domains.map((a) => ({
     authorId: a.authorId,
     name: a.name,
     storeTitle: a.storeTitle,
     repos: a.repos.map((r) => ({ id: r.id, name: r.name, pluginIds: r.plugins.map((p) => p.id) })),
   }));
+  // D1（19 §一）：currentRepo 是唯一浏览上下文；磁盘 ref 不可用 ⇒ 回落官方核心仓（fallback 如实）
+  const repo = resolveRepoRef(storedRepo, domains, catalog.entries);
+  const repoEntryIds = new Set(repo.entries.map((e) => e.id));
+  const order = buildSourceOrder(rawSources, {
+    declaredAuthorBySource: declaredAuthorMapOf(catalog.entries),
+  });
+  const orderSnap = orderSnapshot(order);
 
   const unique = (ids: string[]) => [...new Set(ids)];
-  const topByDownloads = (n: number) =>
-    [...entries]
+  const topByDownloads = (n: number, pool: StoreReadEntry[] = entries) =>
+    [...pool]
       .sort((a, b) => {
         const da = readCachedDownloadCount(a.downloadUrl) ?? -1;
         const db = readCachedDownloadCount(b.downloadUrl) ?? -1;
@@ -196,44 +220,26 @@ export async function readStoreState(): Promise<StoreReadState> {
       })
       .slice(0, n)
       .map((e) => e.id);
+  const repoEntriesRead = entries.filter((e) => repoEntryIds.has(e.id));
 
   const visibleEntryIds = (() => {
     switch (route.page) {
       case "category":
-        if (route.official) {
-          return entries
-            .filter((e) => e.official === true && primaryCategoryOf(e) === route.category)
-            .map((e) => e.id);
-        }
-        return entries
-          .filter(
-            (e) =>
-              primaryCategoryOf(e) === route.category &&
-              (!route.authorId || (e.authorId ?? "").toLowerCase() === route.authorId.toLowerCase()),
-          )
+        // D1：分类页只算 currentRepo（⛔ 不再吃 route.authorId/official 的全源预过滤）
+        return repoEntriesRead
+          .filter((e) => primaryCategoryOf(e) === route.category)
           .map((e) => e.id);
       case "author": {
         const domain = authors.find((a) => a.authorId.toLowerCase() === route.authorId.toLowerCase());
-        if (!domain) return entries.map((e) => e.id);
+        if (!domain) return repoEntriesRead.map((e) => e.id);
         const inStore = new Set(domain.repos.flatMap((r) => r.pluginIds));
         return entries.filter((e) => inStore.has(e.id)).map((e) => e.id);
       }
-      case "home": {
-        const banner = catalog.collections.find((c) => c.official === true && c.layout === "banner");
-        const sections = [...catalog.collections]
-          .filter((c) => c.official === true && c.layout !== "banner")
-          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-        return unique([
-          ...(banner?.items ?? []).slice(0, 5),
-          ...sections.flatMap((c) => c.items),
-          ...entries
-            .filter((e) => e.official === true && primaryCategoryOf(e) === "themes")
-            .map((e) => e.id),
-          ...topByDownloads(8),
-        ]);
-      }
+      case "home":
+        // D1：首页 = 当前仓首页（批 B 接槽位后这里再按声明板块展开）
+        return repo.entries.map((e) => e.id);
       case "rank":
-        return topByDownloads(50);
+        return topByDownloads(50, repoEntriesRead);
       case "library": {
         const installed = new Set(list.map((p) => p.pluginId));
         const disabledSet = new Set(disabled.map((p) => p.pluginId));
@@ -247,8 +253,8 @@ export async function readStoreState(): Promise<StoreReadState> {
       }
       case "search": {
         const q = route.query.trim().toLowerCase();
-        if (!q) return entries.map((e) => e.id);
-        return entries
+        if (!q) return repoEntriesRead.map((e) => e.id);
+        return repoEntriesRead
           .filter((e) => [e.name, e.id, e.description ?? ""].some((s) => s.toLowerCase().includes(q)))
           .map((e) => e.id);
       }
@@ -257,16 +263,38 @@ export async function readStoreState(): Promise<StoreReadState> {
     }
   })();
 
+  // 作者列表 = 顺序模型里的作者 ∪ 已加载作者域（厂商整店可能没有用户源；官方恒在）
+  const visibleAuthors = [...order.authorOrder];
+  for (const d of domains) {
+    if (!visibleAuthors.some((id) => id.toLowerCase() === d.authorId.toLowerCase())) {
+      visibleAuthors.push(d.authorId);
+    }
+  }
   const visibleAuthorIds =
-    route.page === "home" || route.page === "authors"
-      ? [...authors].sort((a, b) => a.name.localeCompare(b.name, "zh")).map((a) => a.authorId)
-      : route.page === "author"
-        ? [route.authorId]
-        : [];
+    route.page === "authors"
+      ? [...visibleAuthors]
+      : route.page === "home"
+        ? [repo.authorId]
+        : route.page === "author"
+          ? [route.authorId]
+          : [];
+  const visibleRepos = visibleAuthors.flatMap((authorId) => {
+    const key = Object.keys(order.repoOrder).find((k) => k.toLowerCase() === authorId.toLowerCase());
+    const ordered = key ? order.repoOrder[key] : [];
+    const domain = domains.find((d) => d.authorId.toLowerCase() === authorId.toLowerCase());
+    const extra = (domain?.repos ?? []).map((r) => r.id).filter((id) => !ordered.includes(id));
+    return [...ordered, ...extra].map((repoId) => ({ authorId, repoId }));
+  });
 
   return {
     ok: true,
     route,
+    currentRepo: { authorId: repo.authorId, repoId: repo.repoId },
+    currentRepoName: repo.name,
+    authorOrder: orderSnap.authorOrder,
+    repoOrder: orderSnap.repoOrder,
+    visibleAuthors,
+    visibleRepos,
     visibleEntryIds,
     visibleAuthorIds,
     navCommands: Object.values(NAV_COMMANDS),

@@ -108,6 +108,12 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
   }, [repoForReset?.id]);
 
   const repo = domain?.repos.find((r) => r.id === repoId) ?? domain?.repos[0];
+  /* D1（19 §一）：进入作者仓 = 切 currentRepo——首页/分类/搜索/排行/全部插件全链路跟着切。
+     ⛔ 各页各自记住「我上次在哪个作者店」；唯一浏览上下文只有 currentRepo。 */
+  const setRepo = data.repo.setRepo;
+  useEffect(() => {
+    if (domain && repo) setRepo({ authorId: domain.authorId, repoId: repo.id });
+  }, [domain, repo, setRepo]);
   const dlOf = (entry: CatalogEntry) =>
     entry.downloadUrl ? data.counts.get(entry.downloadUrl) : undefined;
 

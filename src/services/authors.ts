@@ -31,10 +31,11 @@ import {
 import { fetchSidecar } from "./marketSources/fetch";
 import { readSourceRecords, type SourceRecord } from "./marketSources";
 import { getCatalogResult } from "./marketplaceShared/catalogStore";
+import { OFFICIAL_AUTHOR_ID, OFFICIAL_CORE_REPO_ID } from "./officialRepo";
 import { realmSlot } from "./realmSlot";
 
 /** 官方作者域（合成身份）：官方目录条目没有 authorId，但官方也按「一个作者多个仓库」展示 */
-export const OFFICIAL_AUTHOR_ID = "official";
+export { OFFICIAL_AUTHOR_ID } from "./officialRepo";
 
 /* ═══ 作者块 schema（09 §二；键名与 09 逐字一致） ═══ */
 
@@ -516,10 +517,11 @@ export function officialDomainOf(all: readonly CatalogEntry[]): AuthorDomain | n
     else bySource.set(key, [e]);
   }
   const repos: AuthorRepoView[] = [...bySource.entries()].map(([sourceName, plugins]) => {
-    const repo = sourceName.includes("/") ? sourceName.split("/")[1] : sourceName;
+    // 官方条目全部来自官方源；sourceName 缺失（旧目录/测试夹具）= 官方核心仓
+    const repo = sourceName.includes("/") ? sourceName.split("/")[1] : OFFICIAL_CORE_REPO_ID;
     return {
       id: repo,
-      name: repo === "linkdesk-marketplace" ? "官方目录" : repo,
+      name: repo === OFFICIAL_CORE_REPO_ID ? "官方目录" : repo,
       intro: "官方内置与精选插件",
       plugins,
     };

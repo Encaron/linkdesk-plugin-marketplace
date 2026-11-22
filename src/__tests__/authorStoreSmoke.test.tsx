@@ -217,21 +217,18 @@ describe("作者店冒烟（注入目录＋作者块）", () => {
     await waitFor(() => expect(screen.queryByText("HW Rank")).toBeNull());
   });
 
-  it("作者跳转字落页：分类页 authorId 预过滤＋「显示全部」逃生门", async () => {
+  it("作者跳转字落页：进作者仓即切 currentRepo（分类页只算该仓；⛔ 全源/逃生门已作废）", async () => {
     const { container } = render(<StoreView isActive />);
     await waitFor(() => expect(screen.getAllByText("Demo Author").length).toBeGreaterThan(0));
     fireEvent.click(container.querySelector('[data-author="demo-author"]') as HTMLElement);
     await waitFor(() => expect(screen.getByText("All hardware")).toBeTruthy());
 
     fireEvent.click(screen.getByText("All hardware"));
-    await waitFor(() => expect(screen.getByText("已过滤")).toBeTruthy());
-    // 预过滤：只剩作者的 2 件，官方件不在
-    expect(screen.getAllByText("Demo One").length).toBeGreaterThan(0);
+    // D1（19 §一/§五）：分类页 = 当前仓（进作者店时已切到 demo-author/hw）
+    await waitFor(() => expect(screen.getAllByText("Demo One").length).toBeGreaterThan(0));
     expect(screen.queryByText("Official One")).toBeNull();
-
-    fireEvent.click(screen.getByText("显示全部"));
-    await waitFor(() => expect(screen.queryByText("已过滤")).toBeNull());
-    // 全量分类页：官方件回来了
-    expect(screen.getAllByText("Official One").length).toBeGreaterThan(0);
+    // 「显示全部」全源逃生门随全源合并池一起作废
+    expect(screen.queryByText("已过滤")).toBeNull();
+    expect(screen.queryByText("显示全部")).toBeNull();
   });
 });

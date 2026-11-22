@@ -15,11 +15,15 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("../services/marketplaceShared/catalogStore", () => ({
   getCatalogResult: () => mocks.catalog,
+  reprojectCatalog: async () => mocks.catalog,
+  refreshCatalogNow: async () => ({ ok: true, changed: false }),
 }));
-vi.mock("../services/marketSources", () => ({
+vi.mock("../services/marketSources", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../services/marketSources")>()),
   readSourceRecords: async () => mocks.sources,
 }));
-vi.mock("../services/authors", () => ({
+vi.mock("../services/authors", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../services/authors")>()),
   knownAuthorIds: async () => ["linkdesk-fixture-alice"],
   ensureAuthorDomains: async () => {},
   getLoadedAuthorDomains: () => mocks.authors,
@@ -118,7 +122,9 @@ describe("readStoreState —— AI 读取面", () => {
   it("当前路由 + 当前页可见条目 + 每页导航命令", async () => {
     const s = await readStoreState();
     expect(s.route).toEqual({ page: "category", category: "themes", authorId: "linkdesk-fixture-alice" });
-    expect(s.visibleEntryIds).toEqual(["demo-alice-theme"]);
+    // D1（19 §一/§五）：分类页只算 currentRepo（默认官方核心仓）——route 上的旧 authorId 预过滤已作废
+    expect(s.visibleEntryIds).toEqual([]);
+    expect(s.currentRepo).toEqual({ authorId: "official", repoId: "linkdesk-marketplace" });
     expect(s.visibleAuthorIds).toEqual([]);
     expect(s.navCommands).toEqual([
       "marketplace.openStore",
@@ -173,6 +179,9 @@ describe("readStoreState —— AI 读取面", () => {
     ]);
     expect(s.sources).toHaveLength(2);
     expect(s.counts).toEqual({ entries: 7, installed: 2, updates: 0, authors: 1, remoteSources: 1 });
+    expect(s.authorOrder).toEqual(["official"]);
+    expect(s.repoOrder).toEqual({ official: ["linkdesk-marketplace"] });
+    expect(s.authorOrder).toContain("official");
   });
 });
 
@@ -180,17 +189,15 @@ describe("visibleEntryIds —— 各页可见切片", () => {
   it("首页：hero/合集/主题专区/热门下载并集", async () => {
     mocks.route = { page: "home" };
     const s = await readStoreState();
-    expect(s.visibleEntryIds).toEqual(
-      expect.arrayContaining(["demo-bundle", "demo-sub", "demo-alice-theme", "demo-installed"]),
-    );
-    expect(s.visibleEntryIds).toHaveLength(7);
-    expect(s.visibleAuthorIds).toEqual(["linkdesk-fixture-alice"]);
+    // D1：首页 = 当前仓首页（官方核心仓），⛔ 不再是全源并集
+    expect(s.visibleEntryIds).toEqual(["demo-official-dev"]);
+    expect(s.visibleAuthorIds).toEqual(["official"]);
   });
 
-  it("排行榜：全源 Top（无缓存计数时按名稳定排序，最多 50）", async () => {
+  it("排行榜：只算 currentRepo Top（无缓存计数时按名稳定排序，最多 50）", async () => {
     mocks.route = { page: "rank" };
     const s = await readStoreState();
-    expect(s.visibleEntryIds).toHaveLength(7);
+    expect(s.visibleEntryIds).toEqual(["demo-official-dev"]);
   });
 
   it("官方分类：只留 official 源（官方店「更多」落页）", async () => {
@@ -213,6 +220,6 @@ describe("visibleEntryIds —— 各页可见切片", () => {
     mocks.route = { page: "authors" };
     const s = await readStoreState();
     expect(s.visibleEntryIds).toEqual([]);
-    expect(s.visibleAuthorIds).toEqual(["linkdesk-fixture-alice"]);
+    expect(s.visibleAuthorIds).toEqual(["official", "linkdesk-fixture-alice"]);
   });
 });

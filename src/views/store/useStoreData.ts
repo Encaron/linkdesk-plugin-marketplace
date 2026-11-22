@@ -16,7 +16,8 @@ import { pickInstallJob, useInstallJobsSubscription } from "../../services/insta
 import { useLicenseEntitlements } from "../../services/licensesView";
 import { useDownloadCounts } from "../../services/downloadCounts";
 import { readSourceRecords } from "../../services/marketSources";
-import { useAuthorDomains } from "../../services/authors";
+import { useAuthorDomains, type AuthorDomain } from "../../services/authors";
+import { useCurrentRepo, type CurrentRepo } from "../../services/repoContext";
 import type { StoreCardContext } from "./cards/cardParts";
 import { countByBucket } from "./storeData";
 
@@ -33,8 +34,12 @@ export interface StoreData {
   authorSourceCount: number;
   /** 作者卡数量（作者域聚合后的作者数；rail「作者」徽标——⛔ 不是源数） */
   authorCount: number;
+  /** 已加载作者域（顺序模型/仓解析的输入；视图 ⛔ 各自再拉一份） */
+  authorDomains: AuthorDomain[];
+  /** 唯一浏览上下文（D1）：首页/分类/搜索/排行/全部插件都只算它（19 §一） */
+  repo: CurrentRepo;
   counts: ReadonlyMap<string, number>;
-  /** rail 逐分类计数（空桶 0；rail 灰显与「其他」桶同源） */
+  /** rail 逐分类计数（**当前仓**口径；19 §5.2——切仓即刷新） */
   railOrderCounts: ReadonlyMap<string, number>;
   /** R4-3.21：权益投影收敛（验签入库后调）——卡/库/详情同源刷新 */
   refreshLicenses: () => void;
@@ -45,6 +50,7 @@ export interface StoreData {
 export function useStoreData(): StoreData {
   const catalog = useMarketplaceCatalog();
   const { domains: authorDomains } = useAuthorDomains(catalog.entries.length);
+  const repo = useCurrentRepo(authorDomains, catalog.entries);
   // 订阅一次 job 表（壳广播全量快照）——卡片内用纯函数 pickInstallJob 现查，⛔ 每卡一个订阅
   useInstallJobsSubscription();
   const online = useOnlineStatus();
@@ -53,7 +59,8 @@ export function useStoreData(): StoreData {
   const { map: licenses, refresh: refreshLicenses } = useLicenseEntitlements();
   const urls = catalog.entries.map((e) => e.downloadUrl).filter((u): u is string => !!u);
   const counts = useDownloadCounts(urls);
-  const railOrderCounts = countByBucket(catalog.entries, catalog.railOrder);
+  // 19 §5.2：左栏分类计数 = **当前仓**计数（切仓即刷新；不再是全源合并）
+  const railOrderCounts = countByBucket(repo.entries, catalog.railOrder);
 
   const updateCount = catalog.entries.reduce((n, e) => n + (statusOf(e) === "update" ? 1 : 0), 0);
 
@@ -93,6 +100,8 @@ export function useStoreData(): StoreData {
     updateCount,
     authorSourceCount,
     authorCount: authorDomains.length,
+    authorDomains,
+    repo,
     counts,
     railOrderCounts,
     refreshLicenses,

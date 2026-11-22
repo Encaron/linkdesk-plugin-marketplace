@@ -22,6 +22,9 @@ const mocks = vi.hoisted(() => ({
   getCatalogResult: vi.fn(),
   recordLocalInstall: vi.fn(),
   readStoreState: vi.fn(),
+  swapAuthors: vi.fn(),
+  swapRepos: vi.fn(),
+  readSourceOrder: vi.fn(),
 }));
 
 vi.mock("../services/updateCheck", () => ({
@@ -43,6 +46,11 @@ vi.mock("../services/localInstalls", () => ({
 vi.mock("../services/storeRead", () => ({
   readStoreState: mocks.readStoreState,
 }));
+vi.mock("../services/sourceAdmin", () => ({
+  swapAuthors: mocks.swapAuthors,
+  swapRepos: mocks.swapRepos,
+  readSourceOrder: mocks.readSourceOrder,
+}));
 /** 测试环境不初始化插件 i18next（t() 恒 undefined）——命令面只透传 label，钉键原文即可 */
 vi.mock("i18next", () => ({ default: { t: (k: string) => k } }));
 
@@ -51,11 +59,14 @@ import {
   runAddLocalPlugin,
   runCheckUpdates,
   runGetState,
+  runGetOrder,
   runMarkAllRead,
   runOpenAuthor,
   runOpenAuthors,
   runOpenCategory,
   runOpenLibrary,
+  runSwapAuthors,
+  runSwapRepos,
   runOpenPlugin,
   runOpenRank,
   runOpenSources,
@@ -122,12 +133,12 @@ afterEach(() => {
   Reflect.deleteProperty(window, "linkdesk");
 });
 
-describe("注册面 —— 17 条新命令", () => {
-  it("id/title 逐条对得上 manifest；返回注册条数 17", () => {
+describe("注册面 —— 20 条新命令", () => {
+  it("id/title 逐条对得上 manifest；返回注册条数 20", () => {
     const registerCommand = vi.fn();
     Object.defineProperty(window, "linkdesk", { value: { commands: { registerCommand } }, configurable: true });
 
-    expect(registerMarketplaceStoreCommands()).toBe(17);
+    expect(registerMarketplaceStoreCommands()).toBe(20);
     const calls = registerCommand.mock.calls as Array<[string, unknown, { title: string }]>;
     expect(calls.map(([id]) => id)).toEqual([
       "marketplace.openStore",
@@ -147,6 +158,9 @@ describe("注册面 —— 17 条新命令", () => {
       "marketplace.markAllRead",
       "marketplace.setViewPrefs",
       "marketplace.setSourcesDefaultCollapsed",
+      "marketplace.swapAuthors",
+      "marketplace.swapRepos",
+      "marketplace.getOrder",
     ]);
     expect(calls.map(([, , meta]) => meta.title)).toEqual([
       "打开插件市场",
@@ -166,6 +180,9 @@ describe("注册面 —— 17 条新命令", () => {
       "全部标为已读",
       "设置视图偏好",
       "设置来源分组默认收起",
+      "交换作者顺序",
+      "交换仓库顺序",
+      "读取市场顺序",
     ]);
   });
 
@@ -401,5 +418,56 @@ describe("数据动作命令 —— 各自唯一入口", () => {
 
     mocks.setViewPrefs.mockRejectedValueOnce(new Error("IPC 断了"));
     expect(await runSetViewPrefs({ page: "lib", view: "grid" })).toEqual({ ok: false, reason: "io" });
+  });
+});
+
+describe("顺序面（19 §4.3）—— GUI 与命令共用同一份 swap", () => {
+  it("swapAuthors：三形态参数 + 结构化回执（失败原因不吞）", async () => {
+    makeWorld();
+    mocks.swapAuthors.mockResolvedValueOnce({
+      ok: true,
+      next: [],
+      order: { authorOrder: ["geek", "official"], repoOrder: { geek: ["hw", "fx"] } },
+    });
+    expect(await runSwapAuthors({ authorIdA: "geek", authorIdB: "official" })).toEqual({
+      ok: true,
+      authorOrder: ["geek", "official"],
+      repoOrder: { geek: ["hw", "fx"] },
+    });
+    expect(mocks.swapAuthors).toHaveBeenCalledWith("geek", "official");
+
+    expect(await runSwapAuthors(["geek"])).toEqual({ ok: false, reason: "bad-arg" });
+    mocks.swapAuthors.mockResolvedValueOnce({ ok: false, reason: "not-found" });
+    expect(await runSwapAuthors(["geek", "nobody"])).toEqual({ ok: false, reason: "not-found" });
+    expect(mocks.swapAuthors).toHaveBeenCalledTimes(2);
+  });
+
+  it("swapRepos：作者/双仓参数校验 + 回执透传", async () => {
+    makeWorld();
+    mocks.swapRepos.mockResolvedValueOnce({
+      ok: true,
+      next: [],
+      order: { authorOrder: ["official"], repoOrder: { official: ["linkdesk-marketplace"] } },
+    });
+    expect(await runSwapRepos({ authorId: "official", repoIdA: "a", repoIdB: "b" })).toEqual({
+      ok: true,
+      authorOrder: ["official"],
+      repoOrder: { official: ["linkdesk-marketplace"] },
+    });
+    expect(mocks.swapRepos).toHaveBeenCalledWith("official", "a", "b");
+    expect(await runSwapRepos({ authorId: "official", repoIdA: "a" })).toEqual({ ok: false, reason: "bad-arg" });
+  });
+
+  it("getOrder：直接返回唯一真相源的顺序快照", async () => {
+    makeWorld();
+    mocks.readSourceOrder.mockResolvedValueOnce({
+      authorOrder: ["official", "geek"],
+      repoOrder: { official: ["linkdesk-marketplace"], geek: ["hw", "fx"] },
+    });
+    expect(await runGetOrder()).toEqual({
+      ok: true,
+      authorOrder: ["official", "geek"],
+      repoOrder: { official: ["linkdesk-marketplace"], geek: ["hw", "fx"] },
+    });
   });
 });

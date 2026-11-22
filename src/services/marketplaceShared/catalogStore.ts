@@ -14,9 +14,9 @@
  */
 
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { loadCatalog, forceRefreshCatalog } from "../marketSources";
+import { loadCatalog, forceRefreshCatalog, getSourceUrls } from "../marketSources";
 import type { CatalogLoadResult } from "../marketSources";
-import { catalogSignature } from "../marketCatalog";
+import { catalogSignature, sourceNameOfUrl } from "../marketCatalog";
 import type { CatalogEntry } from "../marketCatalog";
 import { realmSlot } from "../realmSlot";
 
@@ -85,15 +85,26 @@ function ensureCatalogConfigWatch(): void {
   state.configWatchStarted = true;
   const cfg = lk()?.configuration;
   const sub = cfg?.onChange?.("marketplace.marketplaceSources", () => {
-    forceRefreshCatalog()
-      .then((r) => {
-        state.gen++; // 新结果入库 = 代数推进，作废任何在途旧首趟的回写权
-        state.result = r;
-        notifyCatalogListeners();
-      })
-      .catch(() => {
-        /* 刷新失败保持旧结果——目录防御已降级 */
-      });
+    /* 🔴 2026-11-22（作者身份批 A）：顺序拖动也写同一个键——但顺序变化**不需要重拉网络**。
+     * 判据 = 源集合（sourceName）是否变化：集合没变 ⇒ 非强拉重投影（5min fresh 缓存命中，零网络）；
+     * 集合变了（加/删/停用源）⇒ 仍走强刷（既有行为）。⛔ 每次拖动都清缓存重拉全部源。 */
+    const run = async () => {
+      const urls = await getSourceUrls();
+      const nextSet = urls.map(sourceNameOfUrl).sort().join("|");
+      const prevSet = [...state.result.sourceNames].sort().join("|");
+      const orderOnly = prevSet !== "" && prevSet === nextSet;
+      if (orderOnly) {
+        await reprojectCatalog(); // 非强拉：缓存命中零网络（内部已入库/通知）
+        return;
+      }
+      const r = await forceRefreshCatalog();
+      state.gen++; // 新结果入库 = 代数推进，作废任何在途旧首趟的回写权
+      state.result = r;
+      notifyCatalogListeners();
+    };
+    void run().catch(() => {
+      /* 刷新失败保持旧结果——目录防御已降级 */
+    });
   });
   if (!sub) state.configWatchStarted = false; // onChange 不可用（预览环境）→ 下次 mount 再试
 }

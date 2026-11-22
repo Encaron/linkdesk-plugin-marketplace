@@ -27,6 +27,7 @@ import { markAllRead, type DiscoverReadKind } from "./discoverReads";
 import { recordLocalInstall } from "./localInstalls";
 import { publishStoreNav, type StoreNavTarget } from "./storeNav";
 import { OFFICIAL_AUTHOR_ID } from "./authors";
+import { readSourceOrder, swapAuthors, swapRepos } from "./sourceAdmin";
 import { getCatalogResult, refreshCatalogNow } from "./marketplaceShared/catalogStore";
 import { readStoreState } from "./storeRead";
 import {
@@ -373,6 +374,40 @@ export async function runSetSourcesDefaultCollapsed(
   }
 }
 
+/* ═══ 顺序面（19 §4.3）：GUI 长按拖动与命令调用**同一份 swap 函数**；产品 UI ⛔ 不显示命令名 ═══ */
+
+/** `marketplace.swapAuthors` —— 作者容器 ↔ 作者容器交换（本地组不参与；跨组/同项结构化拒绝） */
+export async function runSwapAuthors(
+  args?: unknown,
+): Promise<{ ok: true; authorOrder: string[]; repoOrder: Record<string, string[]> } | { ok: false; reason: string }> {
+  const authorIdA = stringArg(args, "authorIdA", 0);
+  const authorIdB = stringArg(args, "authorIdB", 1);
+  if (!authorIdA || !authorIdB) return { ok: false, reason: "bad-arg" };
+  const r = await swapAuthors(authorIdA, authorIdB);
+  return r.ok ? { ok: true, ...r.order } : { ok: false, reason: r.reason };
+}
+
+/** `marketplace.swapRepos` —— 同一作者内交换两个仓（官方核心仓锁第一；跨作者拒绝） */
+export async function runSwapRepos(
+  args?: unknown,
+): Promise<{ ok: true; authorOrder: string[]; repoOrder: Record<string, string[]> } | { ok: false; reason: string }> {
+  const authorId = stringArg(args, "authorId", 0);
+  const repoIdA = stringArg(args, "repoIdA", 1);
+  const repoIdB = stringArg(args, "repoIdB", 2);
+  if (!authorId || !repoIdA || !repoIdB) return { ok: false, reason: "bad-arg" };
+  const r = await swapRepos(authorId, repoIdA, repoIdB);
+  return r.ok ? { ok: true, ...r.order } : { ok: false, reason: r.reason };
+}
+
+/** `marketplace.getOrder` —— 读作者顺序与各作者组内仓库顺序（`marketplaceSources` 唯一真相源） */
+export async function runGetOrder(): Promise<{
+  ok: true;
+  authorOrder: string[];
+  repoOrder: Record<string, string[]>;
+}> {
+  return { ok: true, ...(await readSourceOrder()) };
+}
+
 /* ═══ 注册（入口模块链顶层调用——见 marketplaceShared/commands.ts 的注册时机说明） ═══ */
 
 /** 本组命令的 id → handler → title（title 必须与 plugin.json 逐字一致；其余元数据只在 manifest） */
@@ -394,6 +429,9 @@ const COMMANDS: Array<[string, (args?: unknown) => Promise<unknown>, string]> = 
   ["marketplace.markAllRead", (a) => runMarkAllRead(a), "全部标为已读"],
   ["marketplace.setViewPrefs", (a) => runSetViewPrefs(a), "设置视图偏好"],
   ["marketplace.setSourcesDefaultCollapsed", (a) => runSetSourcesDefaultCollapsed(a), "设置来源分组默认收起"],
+  ["marketplace.swapAuthors", (a) => runSwapAuthors(a), "交换作者顺序"],
+  ["marketplace.swapRepos", (a) => runSwapRepos(a), "交换仓库顺序"],
+  ["marketplace.getOrder", () => runGetOrder(), "读取市场顺序"],
 ];
 
 /**

@@ -65,7 +65,7 @@ function injectFetch(body: () => string, ok = true) {
   return fn;
 }
 
-async function boot(o: { text?: () => string; ok?: boolean } = {}) {
+async function boot(o: { text?: () => string; ok?: boolean; config?: () => unknown } = {}) {
   vi.resetModules();
   fetchCalls = [];
   unsubConfigs = { n: 0 };
@@ -73,7 +73,7 @@ async function boot(o: { text?: () => string; ok?: boolean } = {}) {
     unsubConfigs.n += 1;
   });
   (window as unknown as { linkdesk: unknown }).linkdesk = {
-    configuration: { get: async () => null, onChange: onChangeFn },
+    configuration: { get: async () => (o.config ? o.config() : null), onChange: onChangeFn },
     events: { on: () => () => {}, emit: () => {} },
   };
   const ms = await import("../services/marketSources");
@@ -193,25 +193,39 @@ describe("源配置变更 → 目录自动刷新（模块级常驻订阅，单�
     expect(onChangeFn).toHaveBeenCalledTimes(1);
   });
 
-  it("🔴 watch 触发 → 强拉全部当前源 ＋ 通知订阅方（免等 5min 缓存/免手动）", async () => {
+  it("🔴 源集合变化（加源）→ 强拉全部当前源 ＋ 通知订阅方", async () => {
     let ids = [{ id: "demo-alpha", name: "Demo Alpha" }];
-    const { store } = await boot({ text: () => catalogText(ids) });
+    let cfg: unknown[] = [];
+    const { store } = await boot({ text: () => catalogText(ids), config: () => cfg });
     const { result } = renderHook(() => store.useMarketplaceCatalog());
     await flush();
     expect(fetchCalls).toHaveLength(1);
 
-    ids = [
-      { id: "demo-alpha", name: "Demo Alpha" },
-      { id: "demo-gamma", name: "Demo Gamma" },
-    ];
+    cfg = ["https://github.com/demo/extra"]; // 源集合变化 ⇒ 强刷路径
     const cb = onChangeFn.mock.calls[0][1] as () => void;
     await act(async () => {
       cb();
-      for (let i = 0; i < 6; i += 1) await Promise.resolve();
+      for (let i = 0; i < 8; i += 1) await Promise.resolve();
     });
 
-    expect(fetchCalls).toHaveLength(2);
-    expect(result.current.entries.map((e) => e.id)).toEqual(["demo-alpha", "demo-gamma"]);
+    expect(fetchCalls.length).toBeGreaterThanOrEqual(2);
+    expect(result.current.entries.map((e) => e.id)).toEqual(["demo-alpha"]);
+  });
+
+  it("🔴 顺序变更（源集合未变，作者身份批 A）→ 命中 5min 缓存、⛔ 不重拉网络", async () => {
+    const { store } = await boot();
+    const { result } = renderHook(() => store.useMarketplaceCatalog());
+    await flush();
+    expect(fetchCalls).toHaveLength(1);
+
+    const cb = onChangeFn.mock.calls[0][1] as () => void;
+    await act(async () => {
+      cb();
+      for (let i = 0; i < 8; i += 1) await Promise.resolve();
+    });
+
+    expect(fetchCalls).toHaveLength(1);
+    expect(result.current.entries.map((e) => e.id)).toEqual(["demo-alpha"]);
   });
 
   it("预览环境无 onChange 面 → 不置守卫位（下次 mount 再试），不崩", async () => {
@@ -258,9 +272,8 @@ describe("useCatalogEntryById（已装/内置/禁用行「可更新」判定的�
       { id: "demo-alpha", name: "Demo Alpha", version: "2.0.0" },
       { id: "demo-beta", name: "Demo Beta" },
     ];
-    const cb = onChangeFn.mock.calls[0][1] as () => void;
     await act(async () => {
-      cb();
+      await store.refreshCatalogNow();
       for (let i = 0; i < 6; i += 1) await Promise.resolve();
     });
 

@@ -27,8 +27,17 @@ import {
 } from "./marketSources";
 import { fetchSidecar } from "./marketSources/fetch";
 import { removeCache } from "./marketSources/io";
-import { reprojectCatalog } from "./marketplaceShared/catalogStore";
+import { getCatalogResult, reprojectCatalog } from "./marketplaceShared/catalogStore";
 import { scheduleDataRefresh } from "./marketplaceShared/pluginsStore";
+import {
+  buildSourceOrder,
+  declaredAuthorMapOf,
+  orderSnapshot,
+  swapAuthorsRaw,
+  swapReposRaw,
+  type BuildOrderOptions,
+  type SwapDecision,
+} from "./sourceOrder";
 
 const CONFIG_KEY = "marketplace.marketplaceSources";
 
@@ -190,6 +199,46 @@ export async function refreshSource(url: string): Promise<{ ok: boolean }> {
   } catch {
     return { ok: false };
   }
+}
+
+/* ═══ 顺序面（19 §四；唯一真相源 = marketplaceSources 数组） ═══
+ * 纯决策在 `sourceOrder`；本处只负责「读原始数组 → 注入声明 authorId → 写回」。
+ * 🔴 写回只搬目标块，其余记录原样（含旧 string / {url} 形态）——⛔ 归一化重写。
+ * 目录声明映射来自当前目录投影（条目 authorId 是身份正典；GitHub owner 只是兜底）。 */
+
+function orderOptions(): BuildOrderOptions {
+  return { declaredAuthorBySource: declaredAuthorMapOf(getCatalogResult().entries) };
+}
+
+/** 读当前作者/仓顺序（`marketplace.getOrder` 的落点；不写盘） */
+export async function readSourceOrder(): Promise<{
+  authorOrder: string[];
+  repoOrder: Record<string, string[]>;
+}> {
+  const items = await readRawSourceConfig();
+  return orderSnapshot(buildSourceOrder(items, orderOptions()));
+}
+
+/** 交换两个作者容器（D4；本地组不参与） */
+export async function swapAuthors(authorIdA: string, authorIdB: string): Promise<SwapDecision> {
+  const items = await readRawSourceConfig();
+  const decision = swapAuthorsRaw(items, authorIdA, authorIdB, orderOptions());
+  if (!decision.ok) return decision;
+  await writeRawSourceConfig(decision.next);
+  return decision;
+}
+
+/** 同一作者内交换两个仓（D4；官方核心仓锁第一，跨作者拒绝） */
+export async function swapRepos(
+  authorId: string,
+  repoIdA: string,
+  repoIdB: string,
+): Promise<SwapDecision> {
+  const items = await readRawSourceConfig();
+  const decision = swapReposRaw(items, authorId, repoIdA, repoIdB, orderOptions());
+  if (!decision.ok) return decision;
+  await writeRawSourceConfig(decision.next);
+  return decision;
 }
 
 export interface SourcePreview {
