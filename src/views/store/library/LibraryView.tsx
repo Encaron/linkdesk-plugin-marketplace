@@ -232,7 +232,7 @@ export function LibraryView() {
         <Tile entry={row.entry} identity={ctx.installedIdentity} />
         <span className="marketplace-store-lib-main">
           <span className="marketplace-store-lib-name">
-            {row.entry.name}
+            {t(row.entry.name)}
             <span className="marketplace-store-lib-ver">v{row.installedVersion ?? row.entry.version}</span>
           </span>
           <span className="marketplace-store-lib-sub">
@@ -481,7 +481,7 @@ export function LibraryView() {
                 >
                   <Tile entry={entry} identity={ctx.installedIdentity} />
                   <span className="marketplace-store-lib-main">
-                    <span className="marketplace-store-lib-name">{entry.name}</span>
+                    <span className="marketplace-store-lib-name">{t(entry.name)}</span>
                     <span className="marketplace-store-lib-sub">{t("已购未安装")}</span>
                   </span>
                   <span className="marketplace-store-lib-state">

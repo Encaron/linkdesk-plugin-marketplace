@@ -62,12 +62,12 @@ export default function CatalogRow({
         <PluginIcon
           pluginId={entry.id}
           manifest={pickIdentityArt(installedIdentity, entry)}
-          alt={entry.name}
+          alt={t(entry.name)}
         />
       </div>
       <div className="marketplace-ms-item-details">
         <div className="marketplace-ms-item-header">
-          <span className="marketplace-ms-item-name" data-hint={entry.name} data-hint-delay="0">{entry.name}</span>
+          <span className="marketplace-ms-item-name" data-hint={t(entry.name)} data-hint-delay="0">{t(entry.name)}</span>
           <span className="marketplace-ms-item-version">v{entry.version}</span>
         </div>
         {entry.description && <span className="marketplace-ms-item-desc">{entry.description}</span>}

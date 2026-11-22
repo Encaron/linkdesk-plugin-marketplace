@@ -57,7 +57,7 @@ export const CardMega = memo(function CardMega({
       <Art entry={entry} identity={ctx.installedIdentity} variant="mega" />
       <div className="marketplace-store-cm-foot">
         <div className="marketplace-store-mn0">
-          <div className="marketplace-store-cm-name">{entry.name}</div>
+          <div className="marketplace-store-cm-name">{t(entry.name)}</div>
           <div className="marketplace-store-cm-cat">{tCategory(t, entry)}</div>
         </div>
         <CornerTag baseClass="marketplace-ui-corner marketplace-store-cm-free" tag={status} />

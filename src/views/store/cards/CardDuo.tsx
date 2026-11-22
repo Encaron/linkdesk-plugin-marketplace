@@ -56,7 +56,7 @@ export function CardDuo({
     >
       <div className="marketplace-store-cd-copy">
         <span className="marketplace-store-cd-tag">{tag ?? t("编辑精选")}</span>
-        <div className="marketplace-store-cd-name">{entry.name}</div>
+        <div className="marketplace-store-cd-name">{t(entry.name)}</div>
         {entry.description && <div className="marketplace-store-cd-desc">{entry.description}</div>}
         <CornerTag baseClass="marketplace-ui-corner marketplace-store-cd-corner" tag={status} />
         <div className="marketplace-store-cd-acts">

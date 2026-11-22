@@ -88,7 +88,7 @@ export function HeroCarousel({ slides }: { slides: HeroCarouselSlide[] }) {
                 >
                   <div className="marketplace-store-hero-copy">
                     <span className="marketplace-store-hero-tag">{tag ?? t("作者精选")}</span>
-                    <h2>{entry.name}</h2>
+                    <h2>{t(entry.name)}</h2>
                     {entry.description && <p>{entry.description}</p>}
                     <div className="marketplace-store-hero-meta">
                       <span>

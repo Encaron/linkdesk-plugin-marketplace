@@ -49,7 +49,7 @@ export const CardRow = memo(function CardRow({
       <Tile entry={entry} identity={ctx.installedIdentity} className="is-lg" />
       <div className="marketplace-store-cr-main">
         <div className="marketplace-store-cr-l1">
-          <span className="marketplace-store-cr-name">{entry.name}</span>
+          <span className="marketplace-store-cr-name">{t(entry.name)}</span>
           <Badge desc={sourceBadge(entry)} />
           <span className="marketplace-store-cr-cat">{tCategory(t, entry)}</span>
         </div>

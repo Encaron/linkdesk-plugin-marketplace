@@ -61,7 +61,7 @@ export const RankRow = memo(function RankRow({
       <span className="marketplace-store-rk">{index}</span>
       <Tile entry={entry} identity={ctx.installedIdentity} />
       <div className="marketplace-store-rr-mid">
-        <div className="marketplace-store-rr-name">{entry.name}</div>
+        <div className="marketplace-store-rr-name">{t(entry.name)}</div>
         <div className="marketplace-store-rr-cat">
           {tCategory(t, entry)} · {tAuthor(entry)}
         </div>

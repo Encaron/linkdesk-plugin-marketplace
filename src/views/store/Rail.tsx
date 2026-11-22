@@ -127,7 +127,7 @@ export function Rail() {
           </span>
           <span className="marketplace-store-rail-htx">
             <span className="marketplace-store-rail-ht">{t("首页")}</span>
-            <span className="marketplace-store-rail-hs">Plugin Store</span>
+            <span className="marketplace-store-rail-hs">{t("插件商店")}</span>
           </span>
         </button>
       </div>

@@ -51,7 +51,7 @@
 
 /* ── rail（三段式：品牌块 / 浏览 / 固定底栏） ── */
 .marketplace-store-rail {
-  width: 110px;
+  width: 118px;
   flex: none;
   display: flex;
   flex-direction: column;
@@ -73,9 +73,9 @@
 .marketplace-store-rail-home {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 7px;
   width: 100%;
-  padding: 9px 8px;
+  padding: 9px 7px;
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--accent) 42%, var(--border));
   background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 22%, transparent), transparent 72%);
@@ -92,8 +92,8 @@
   box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--accent) 75%, transparent);
 }
 .marketplace-store-rail-hi {
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   border-radius: var(--radius-lg);
   background: var(--accent);
   display: flex;
@@ -102,8 +102,12 @@
   flex: none;
   color: var(--text-on-accent);
 }
-.marketplace-store-rail-hi .marketplace-ui-ic { width: 17px; height: 17px; }
-.marketplace-store-rail-htx { min-width: 0; display: flex; flex-direction: column; }
+.marketplace-store-rail-hi .marketplace-ui-ic { width: 14px; height: 14px; }
+.marketplace-store-rail-htx { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; }
+/* 首页标题/副题：CJK 不许逐字换行（「首」「页」竖排），英文按词换行；装不下时省略。
+   2026-11-23 用户实机反馈：英文 Home 被裁、中文 2 字竖排——根因是文字列只有 24px。 */
+.marketplace-store-rail-ht,
+.marketplace-store-rail-hs { word-break: keep-all; overflow-wrap: break-word; }
 .marketplace-store-rail-ht { font-size: var(--font-size-sm); font-weight: 700; line-height: 1.25; }
 .marketplace-store-rail-hs { font-size: 9.5px; color: var(--text-secondary); line-height: 1.2; }
 .marketplace-store-rail-scroll {
@@ -613,7 +617,8 @@
 
 /* ── 响应式（对齐蓝图 1080/900/700 三档） ── */
 @container (max-width: 1080px) {
-  .marketplace-store-rail { width: 96px; }
+  /* 96 会让首页标题列只剩 24px——中文「首页」竖排、英文 Home 被裁（2026-11-23 实机）。108 = 文字列 ~49px。 */
+  .marketplace-store-rail { width: 108px; }
 }
 @container (max-width: 900px) {
   .marketplace-store { flex-direction: column; }
