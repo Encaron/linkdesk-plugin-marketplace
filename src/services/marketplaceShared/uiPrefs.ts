@@ -34,6 +34,9 @@ export interface UIPrefs {
   authorTipDismissed: boolean;
   /** 19 §六：作者坞底部提示已关闭（同上） */
   dockTipDismissed: boolean;
+  /** 2026-11-23 用户口径：作者页上次打开的模式（浏览/管理来源）——直接点作者时沿用；
+   *  坞的「作者页」「管理来源」按钮与命令面 openAuthors/openSources 会显式覆盖并写回。 */
+  authorMode: "browse" | "manage";
 }
 
 export const DEFAULT_UI_PREFS: UIPrefs = {
@@ -45,7 +48,10 @@ export const DEFAULT_UI_PREFS: UIPrefs = {
   catSort: "dl",
   authorTipDismissed: false,
   dockTipDismissed: false,
+  authorMode: "browse",
 };
+
+const AUTHOR_MODES = ["browse", "manage"] as const;
 
 const VIEW_MODES: readonly ViewMode[] = ["grid", "list"];
 const LIB_SORTS: readonly LibSort[] = ["name", "updated", "size", "source", "author", "repo"];
@@ -117,6 +123,7 @@ export function normalizeUIPrefs(raw: unknown): UIPrefs {
     catSort: pick(r.catSort, CAT_SORTS, DEFAULT_UI_PREFS.catSort),
     authorTipDismissed: r.authorTipDismissed === true,
     dockTipDismissed: r.dockTipDismissed === true,
+    authorMode: pick(r.authorMode, AUTHOR_MODES, DEFAULT_UI_PREFS.authorMode),
   };
 }
 

@@ -719,5 +719,9 @@
   "进入首位仓库": "Open first repository",
   "选择作者查看其仓库": "Choose an author to view their repositories",
   "来源数据有 {{count}} 处异常": "This source has {{count}} data issue(s)",
-  "搜索所有来源中的插件…": "Search plugins from all sources…"
+  "搜索所有来源中的插件…": "Search plugins from all sources…",
+  "商店行为": "Store behavior",
+  "商店的取源与点击行为——官方目录已内置，一般不用改。": "Where the store pulls from and how the icon behaves — the official catalog is built in, usually no change needed.",
+  "点图标与来源页的默认表现；改完即时生效。": "Default behavior of the sidebar icon and the sources page; changes apply immediately.",
+  "商店从哪些目录拉插件。官方目录内置且不可删；作者仓库根目录需有 marketplace.json。": "Which catalogs the store pulls plugins from. The official catalog is built in and can't be removed; author repos need a marketplace.json at their root."
 }

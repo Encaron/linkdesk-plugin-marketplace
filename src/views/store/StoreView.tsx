@@ -13,7 +13,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { getCachedUIPrefs, onUIPrefsChange, readUIPrefs, setViewPrefs } from "../../services/marketplaceShared/uiPrefs";
+import { getCachedUIPrefs, onUIPrefsChange, readUIPrefs, setViewPrefs, writeUIPrefs } from "../../services/marketplaceShared/uiPrefs";
 import type { AuthorSort, LibSort, UIPrefs } from "../../services/marketplaceShared/uiPrefs";
 import { showToast } from "../../services/hostApi";
 import {
@@ -130,6 +130,15 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
       un();
     };
   }, []);
+
+  /* 作者页模式记忆（2026-11-23 用户口径）：路由**显式**带 authorMode（坞「作者页」/「管理来源」、
+     命令面 openAuthors/openSources）⇒ 写回；直接点作者不带 ⇒ 用上次。写回走 ui.prefs，
+     ⛔ 不落插件 dataDir（详情页不会多出「数据位置」行）。 */
+  useEffect(() => {
+    if (route.page !== "authors" || !route.authorMode) return;
+    if (prefs.authorMode === route.authorMode) return;
+    void writeUIPrefs({ authorMode: route.authorMode }).catch(() => {});
+  }, [route.page, route.authorMode, prefs.authorMode]);
 
   const setCatView = useCallback((v: ViewMode) => {
     setPrefs((p) => ({ ...p, catView: v }));
@@ -476,7 +485,7 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
               {route.page === "category" && <CategoryView slug={category} />}
               {route.page === "search" && <SearchResultsView />}
               {route.page === "rank" && <RankView />}
-              {route.page === "authors" && <AuthorPageView mode={route.authorMode ?? "browse"} />}
+              {route.page === "authors" && <AuthorPageView mode={route.authorMode ?? prefs.authorMode} />}
               {route.page === "author" && (
                 <AuthorStoreView
                   /* 只按作者 key：切仓（repoId 变）不重挂载，仓库横排保留滚动位；

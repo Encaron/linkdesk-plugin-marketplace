@@ -94,7 +94,7 @@
   top: 50%;
   right: calc(100% + 10px);
   transform: translateY(-50%);
-  width: 386px;
+  width: 412px;
   max-height: min(72vh, 640px);
   display: flex;
   flex-direction: column;
@@ -128,7 +128,9 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 12px;
+  /* 2026-11-23 用户实机：hover 的卡放大/光环/多仓 fan 要长，左右留 16px 呼吸；
+     面板同步 386→412（卡宽 +26），放大与阴影不再贴到 overflow:hidden 的裁切边。 */
+  padding: 8px 16px 16px;
 }
 .marketplace-store-dock-author {
   display: flex;

@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@linkdesk/plugin-sdk/schemas/plugin.schema.json",
   "pluginId": "marketplace",
   "name": "插件市场",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "category": "productivity",
   "minAppVersion": "0.2.20",
   "icon": "resources/icon.svg",
@@ -301,27 +301,35 @@
     },
     "configuration": {
       "title": "插件市场",
+      "subtitle": "商店的取源与点击行为——官方目录已内置，一般不用改。",
+      "groupDescriptions": {
+        "商店行为": "点图标与来源页的默认表现；改完即时生效。",
+        "市场源": "商店从哪些目录拉插件。官方目录内置且不可删；作者仓库根目录需有 marketplace.json。"
+      },
       "properties": {
+        "marketplace.openTabOnIcon": {
+          "type": "boolean",
+          "title": "点击市场图标时同时打开商店",
+          "group": "商店行为",
+          "default": false,
+          "description": "关闭（默认）时，点侧栏市场图标只切换侧栏；开启后同时打开 Plugin Store 标签页。"
+        },
+        "marketplace.sourcesDefaultCollapsed": {
+          "type": "boolean",
+          "title": "来源分组默认收起",
+          "group": "商店行为",
+          "default": false,
+          "description": "打开「来源」页时，官方/作者分组默认折叠（点组头整行展开）。命令 marketplace.setSourcesDefaultCollapsed 写同一键。"
+        },
         "marketplace.marketplaceSources": {
           "type": "array",
           "title": "市场源",
+          "group": "市场源",
           "default": [
             "https://raw.githubusercontent.com/encaron/linkdesk-marketplace/main/marketplace.json"
           ],
           "description": "商店拉取哪些目录。官方目录内置；添加作者仓库 URL 即可发现该作者的插件（该仓库根目录需有 marketplace.json）。",
           "uiHint": "stringList"
-        },
-        "marketplace.sourcesDefaultCollapsed": {
-          "type": "boolean",
-          "title": "来源分组默认收起",
-          "default": false,
-          "description": "打开「来源」页时，官方/作者分组默认折叠（点组头整行展开）。命令 marketplace.setSourcesDefaultCollapsed 写同一键。"
-        },
-        "marketplace.openTabOnIcon": {
-          "type": "boolean",
-          "title": "点击市场图标时同时打开商店",
-          "default": false,
-          "description": "关闭（默认）时，点侧栏市场图标只切换侧栏；开启后同时打开 Plugin Store 标签页。"
         }
       }
     },

@@ -47,6 +47,7 @@ describe("normalizeUIPrefs —— 缺省回落", () => {
       catSort: "dl",
       authorTipDismissed: false,
       dockTipDismissed: false,
+      authorMode: "browse",
     });
   });
 
@@ -62,7 +63,13 @@ describe("normalizeUIPrefs —— 缺省回落", () => {
       catSort: "az",
       authorTipDismissed: false,
       dockTipDismissed: false,
+      authorMode: "browse",
     });
+  });
+
+  it("作者页模式：合法保留（manage），坏值回落 browse", () => {
+    expect(normalizeUIPrefs({ authorMode: "manage" }).authorMode).toBe("manage");
+    expect(normalizeUIPrefs({ authorMode: "bogus" }).authorMode).toBe("browse");
   });
 });
 
