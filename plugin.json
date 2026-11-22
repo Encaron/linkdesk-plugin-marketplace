@@ -8,7 +8,7 @@
   "icon": "resources/icon.svg",
   "marketIcon": "resources/icon-brand.svg",
   "description": "浏览、安装和管理插件",
-  "author": "官方",
+  "author": "Encaron",
   "distribution": "builtin",
   "core": true,
   "factoryRole": "marketplace",
