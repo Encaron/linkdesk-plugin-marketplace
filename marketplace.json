@@ -1,26 +1,32 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-22T20:46:34.002Z",
+  "updatedAt": "2026-11-22T21:55:05.800Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.9",
+      "version": "1.4.10",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.9/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.10/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.9/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.10/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.9/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.9/marketplace.linkdesk-plugin",
-      "size": 180625,
-      "publishedAt": "2026-11-22T20:46:34.002Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.10/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.10/marketplace.linkdesk-plugin",
+      "size": 181445,
+      "publishedAt": "2026-11-22T21:55:05.800Z",
       "versions": [
+        {
+          "version": "1.4.10",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.10/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-22T21:55:05.800Z",
+          "changelog": "- **插件名在市场里也跟着翻译**：store 各卡型原先直接渲染目录里的中文名，而侧栏走 `t(name)`——英文界面下出现「侧栏 Official Themes、市场里还是中文」。现在封面/栅格/大卡/行/排行榜/英雄轮播/库里全走 `t(entry.name)`，与侧栏同一条翻译路（字典缺项时回落原名）。\n- **左栏首页项不再挤坏**：文字列只有 24px 导致中文「首页」逐字竖排、英文 `Home` 被裁。导航栏 96→108px、图标 30→24、间距 9→7，并对标题/副题加 `word-break: keep-all`（CJK 不拆字）。副题 `Plugin Store` 硬编码改走 i18n（中文=插件商店）。\n- **图标铺满画布**：`resources/icon.svg` 内容由 9.6/16（60%）放大到 ≈84%，与官方 48 画布图标（4→44）同档，图标栏里不再比邻居小一圈。作者面补规则：schema `icon` 描述 + 中英 `06-plugin.json规范` 写明「图形要占 viewBox 80–85%，壳不替你缩放」（SDK 0.1.103 / 作者文档包 0.1.89 已发）。\n- **首页/各页吸顶栏改实底（滚动性能）**：吸顶条是全场唯一每帧都必然失效的磨砂层——它正压在移动中的内容上。移除它的 `backdrop-filter`、改用 `--bg-window-solid` 实底后，CDP 实测滚动时 GPU 进程 CPU **1.54→1.25 s/2s（约 −19%）**、渲染进程 0.88→0.59 s。\n- **英雄卡只留「放大 + 光绘」**：满幅图已经占满整张卡，背后的透明/磨砂既看不见又每帧重算——底色改实底、悬停不再挂 `backdrop-filter`，只保留放大与光晕。**其余卡片/行面/坞一律不动**。"
+        },
         {
           "version": "1.4.9",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.9/marketplace.linkdesk-plugin",
