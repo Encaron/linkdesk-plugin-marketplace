@@ -12,7 +12,7 @@ import type { AuthorDomain } from "../../../services/authors";
 import type { CatalogEntry, CatalogWarning } from "../../../services/marketCatalog";
 import { normalizeSourceUrl, sourceNameOfUrl } from "../../../services/marketCatalog";
 import type { SourceRecord } from "../../../services/marketSources";
-import { hueOf } from "../../../ui";
+import { authorHueOf } from "../authors/authorHue";
 
 export interface SourceRowView {
   record: SourceRecord;
@@ -76,7 +76,7 @@ export function groupRemoteSources(
       group = {
         authorId: id,
         name: domain?.name ?? id,
-        hue: hueOf(id),
+        hue: authorHueOf(id),
         official: domain?.official ?? false,
         rows: [],
         repoCount: 0,

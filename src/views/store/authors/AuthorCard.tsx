@@ -13,10 +13,11 @@
 
 import type { KeyboardEvent, PointerEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { hueBG, hueOf, Icon, type IconName } from "../../../ui";
+import { hueBG, Icon, type IconName } from "../../../ui";
 import { OFFICIAL_AUTHOR_ID, type AuthorDomain } from "../../../services/authors";
 import { authorDeckOf, authorDeckRestCount, authorPluginCount } from "./authorsData";
 import { useAvatarSrc } from "./useAvatarSrc";
+import { authorHueOf } from "./authorHue";
 
 function authorBadgeText(t: (k: string, o?: Record<string, unknown>) => string, domain: AuthorDomain): string {
   const base = `${domain.official ? t("官方 ✓") : t("社区源")} · ${t("{{count}} 个仓库", {
@@ -35,10 +36,10 @@ export function AuthorCard({
   className?: string;
 }) {
   const { t } = useTranslation();
-  /** 头像取源唯一口（远端 → 本地缓存 Blob → 失败回落首字母），与来源行/坞胶囊同源。 */
-  const { src: avatarSrc, onError: onAvatarError } = useAvatarSrc(domain.authorId, domain.avatar);
+  /** 头像/色/名同源：色优先取图片主色，没图时官方回落品牌橙（见 authorHue.ts）。 */
+  const { src: avatarSrc, hue: avatarHue, onError: onAvatarError } = useAvatarSrc(domain.authorId, domain.avatar);
   const showAvatar = !!avatarSrc;
-  const hue = hueOf(domain.authorId);
+  const hue = avatarHue ?? authorHueOf(domain.authorId);
   const solo = domain.repos.length === 1;
   const deckRest = authorDeckRestCount(domain.repos);
   const items = authorDeckOf(domain.repos);

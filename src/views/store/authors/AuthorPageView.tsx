@@ -16,8 +16,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { OverlayPortal } from "@linkdesk/ui";
-import { EmptyState, hueBG, hueOf, Icon } from "../../../ui";
+import { EmptyState, hueBG, Icon } from "../../../ui";
 import { useAvatarSrc } from "./useAvatarSrc";
+import { authorHueOf } from "./authorHue";
 import {
   OFFICIAL_SOURCE_URL,
   normalizeSourceUrl,
@@ -136,8 +137,8 @@ function AuthorContainer({
   children: ReactNode;
 }) {
   const { t } = useTranslation();
-  /** 头像与作者卡/坞胶囊同源（远端 → 本地缓存 → 首字母） */
-  const { src: avSrc, onError: onAvError } = useAvatarSrc(group.authorId, group.avatar);
+  /** 头像与作者卡/坞胶囊同源（远端 → 本地缓存 → 首字母）；色同理取自图片主色 */
+  const { src: avSrc, hue: avHue, onError: onAvError } = useAvatarSrc(group.authorId, group.avatar);
   const headProps = {
     role: "button" as const,
     tabIndex: 0,
@@ -159,7 +160,7 @@ function AuthorContainer({
         <span className="marketplace-store-author-grip" aria-hidden="true">
           ⋮⋮
         </span>
-        <span className="marketplace-store-author-av" style={hueBG(group.hue)}>
+        <span className="marketplace-store-author-av" style={hueBG(avHue ?? group.hue)}>
           {avSrc ? (
             <img
               className="marketplace-store-author-av-img"
@@ -235,7 +236,7 @@ export function AuthorPageView({ mode }: { mode: AuthorPageMode }) {
     const official: AuthorGroupView = {
       authorId: OFFICIAL_AUTHOR_ID,
       name: officialDomain?.name ?? "Encaron",
-      hue: hueOf(OFFICIAL_AUTHOR_ID),
+      hue: authorHueOf(OFFICIAL_AUTHOR_ID),
       avatar: officialDomain?.avatar,
       official: true,
       repos: officialRepos,

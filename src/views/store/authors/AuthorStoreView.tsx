@@ -17,7 +17,8 @@
 
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { EmptyState, hueOf } from "../../../ui";
+import { EmptyState } from "../../../ui";
+import { authorHueOf } from "./authorHue";
 import type { CatalogEntry, CollectionDecl } from "../../../services/marketCatalog";
 import { groupByPrimaryCategory, primaryCategoryOf } from "../../../services/marketCatalog";
 import type { AuthorDomain, AuthorMoreDecl, AuthorRepoView, AuthorSectionDecl } from "../../../services/authors";
@@ -159,7 +160,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
   const heroSlides = heroIndex >= 0 ? resolveSlides(sections[heroIndex], repo) : [];
   const rest = sections.filter((_, i) => i !== heroIndex);
   const storeTitle = repo.storeTitle ?? domain.storeTitle ?? t("{{name}} 的 Plugin Store", { name: domain.name });
-  const hue = hueOf(domain.authorId);
+  const hue = authorHueOf(domain.authorId);
   const categories = groupByPrimaryCategory(repo.plugins, data.catalog.railOrder);
   const catFilterEntries = authorCat
     ? repo.plugins.filter((e) => primaryCategoryOf(e) === authorCat)

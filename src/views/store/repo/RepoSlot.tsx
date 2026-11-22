@@ -13,7 +13,7 @@
 import { useCallback } from "react";
 import type { KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { hueOf } from "../../../ui";
+import { authorHueOf } from "../authors/authorHue";
 import { swapRepos } from "../../../services/sourceAdmin";
 import { orderedReposOf, useSourceOrder } from "../../../services/sourceOrderStore";
 import { showToast } from "../../../services/hostApi";
@@ -104,7 +104,7 @@ export function RepoSlot() {
                 goLabel={current ? t("当前仓库") : t("进入仓库")}
                 current={current}
                 icon={data.repo.official ? "bag" : "folder"}
-                hue={hueOf(authorId)}
+                hue={authorHueOf(authorId)}
                 onOpen={() => data.repo.setRepo({ authorId, repoId: r.id })}
                 ariaLabel={t("{{name}}——切换到该仓库", { name: r.name })}
                 drag={{

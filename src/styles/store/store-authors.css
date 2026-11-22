@@ -414,7 +414,7 @@
 .marketplace-store-author-av {
   width: 34px;
   height: 34px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;

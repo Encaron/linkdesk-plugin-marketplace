@@ -14,19 +14,20 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { hueBG, hueOf, Icon } from "../../../ui";
+import { hueBG, Icon } from "../../../ui";
 import { useAuthorDomains, type AuthorDomain } from "../../../services/authors";
 import { orderedAuthorsOf, orderedReposOf, useSourceOrder } from "../../../services/sourceOrderStore";
 import { writeUIPrefs } from "../../../services/marketplaceShared/uiPrefs";
 import { useStore } from "../StoreContext";
 import { AuthorCard } from "../authors/AuthorCard";
 import { useAvatarSrc } from "../authors/useAvatarSrc";
+import { authorHueOf } from "../authors/authorHue";
 
-/** 坞胶囊上的一枚作者头像——与作者卡/来源行同一取源口（远端 → 本地缓存 → 首字母）。 */
+/** 坞胶囊上的一枚作者头像——与作者卡/来源行同一取源口（远端 → 本地缓存 → 首字母）；色取图片主色。 */
 function DockFace({ author }: { author: AuthorDomain }) {
-  const { src, onError } = useAvatarSrc(author.authorId, author.avatar);
+  const { src, hue, onError } = useAvatarSrc(author.authorId, author.avatar);
   return (
-    <span className="marketplace-store-dock-face" style={hueBG(hueOf(author.authorId))}>
+    <span className="marketplace-store-dock-face" style={hueBG(hue ?? authorHueOf(author.authorId))}>
       {src ? (
         <img
           className="marketplace-store-dock-face-img"
