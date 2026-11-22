@@ -703,5 +703,10 @@
   "不可移除": "Cannot be removed",
   "按作者分组——点仓库卡进入该仓库；「管理来源」可添加/停用/移除来源": "Grouped by author — click a repository card to enter it; “Manage sources” adds, disables, or removes sources",
   "进入该仓库": "Enter repository",
-  "{{name}}——进入该仓库": "{{name}} — enter this repository"
+  "{{name}}——进入该仓库": "{{name}} — enter this repository",
+  "作者列表": "Author list",
+  "{{count}} 位": "{{count}}",
+  "{{name}} 的仓库": "Repositories of {{name}}",
+  "作者页": "Authors page",
+  "进入「作者页」或「管理来源」可调整顺序": "Open “Authors page” or “Manage sources” to reorder"
 }

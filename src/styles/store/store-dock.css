@@ -1,0 +1,204 @@
+/**
+ * store-dock.css — 作者坞（19 §6）：右侧竖向胶囊/浮层、作者列表、扇出、底部入口与提示；
+ * 窄容器（≤760px）降级为右下按钮 + 底部抽屉（不依赖 hover）。
+ *
+ * 全部颜色/圆角/阴影/字号走主题变量；⛔ 硬编码 hex。
+ */
+
+.marketplace-store-dock {
+  position: absolute;
+  top: 74px;
+  right: 14px;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.marketplace-store-dock-capsule {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px 5px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-pop);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--font-size-2xs);
+  transition: border-color 0.15s, transform 0.15s;
+}
+.marketplace-store-dock-capsule:hover { border-color: var(--accent); }
+.marketplace-store-dock.is-pinned .marketplace-store-dock-capsule {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
+}
+.marketplace-store-dock-faces { display: flex; align-items: center; }
+.marketplace-store-dock-face {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-on-accent);
+  font-weight: 600;
+  font-size: var(--font-size-2xs);
+  border: 1px solid var(--bg-card);
+}
+.marketplace-store-dock-face + .marketplace-store-dock-face { margin-left: -7px; }
+.marketplace-store-dock-more { color: var(--text-muted); font-size: var(--font-size-2xs); }
+.marketplace-store-dock-capsule-label { color: var(--text-secondary); }
+
+.marketplace-store-dock-panel {
+  position: absolute;
+  top: 0;
+  right: 54px;
+  width: 282px;
+  max-height: min(70vh, 560px);
+  overflow: auto;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-pop);
+}
+.marketplace-store-dock-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 2px 4px 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--font-size-sm);
+}
+.marketplace-store-dock-count { color: var(--text-muted); font-size: var(--font-size-2xs); }
+.marketplace-store-dock-list { display: flex; flex-direction: column; gap: 2px; padding: 6px 0; }
+.marketplace-store-dock-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 6px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: background 0.15s;
+}
+.marketplace-store-dock-author:hover { background: var(--tab-hover-bg); }
+.marketplace-store-dock-author.is-active { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.marketplace-store-dock-av {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-on-accent);
+  font-weight: 600;
+  font-size: var(--font-size-2xs);
+  flex: none;
+}
+.marketplace-store-dock-main { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.marketplace-store-dock-name {
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.marketplace-store-dock-sub { color: var(--text-muted); font-size: var(--font-size-2xs); }
+.marketplace-store-dock-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--accent-hover);
+  flex: none;
+}
+.marketplace-store-dock-fan {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 4px 8px;
+  border-top: 1px solid var(--border);
+}
+.marketplace-store-dock-repo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: var(--font-size-2xs);
+  color: var(--text-secondary);
+  padding: 2px 6px;
+}
+.marketplace-store-dock-repo b { font-weight: 500; }
+.marketplace-store-dock-repo i { color: var(--text-muted); font-style: normal; flex: none; }
+.marketplace-store-dock-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 4px 2px;
+  border-top: 1px solid var(--border);
+}
+.marketplace-store-dock-link {
+  border: none;
+  background: transparent;
+  color: var(--accent-hover);
+  font: inherit;
+  font-size: var(--font-size-2xs);
+  cursor: pointer;
+  padding: 2px 0;
+  white-space: nowrap;
+}
+.marketplace-store-dock-link:hover { text-decoration: underline; }
+.marketplace-store-dock-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-2xs);
+  line-height: 1.5;
+}
+.marketplace-store-dock-tip > span { flex: 1; }
+.marketplace-store-dock-tip-x,
+.marketplace-store-dock-tip-reopen {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 1px;
+  border-radius: var(--radius-sm);
+  flex: none;
+}
+.marketplace-store-dock-tip-x:hover,
+.marketplace-store-dock-tip-reopen:hover { color: var(--text-primary); background: var(--tab-hover-bg); }
+.marketplace-store-dock-tip-reopen {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  margin-left: auto;
+}
+
+/* 窄容器：胶囊 → 右下按钮；面板 → 底部抽屉（不依赖 hover） */
+@container (max-width: 760px) {
+  .marketplace-store-dock {
+    top: auto;
+    right: 12px;
+    bottom: 58px;
+  }
+  .marketplace-store-dock-capsule-label { display: none; }
+  .marketplace-store-dock-panel {
+    top: auto;
+    bottom: 54px;
+    right: 0;
+    width: min(300px, calc(100vw - 24px));
+    max-height: min(58vh, 420px);
+  }
+}

@@ -10,7 +10,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent, waitFor, within } from "@testing-library/react";
 import StoreView from "../views/store/StoreView";
 import { __setCatalogIO } from "../services/marketSources";
 import { OFFICIAL_SOURCE_URL } from "../services/marketCatalog";
@@ -223,5 +223,43 @@ describe("作者页浏览 → 仓首页（批 C：一页两模式 + D1 全链路
     // 「显示全部」全源逃生门随全源合并池一起作废
     expect(screen.queryByText("已过滤")).toBeNull();
     expect(screen.queryByText("显示全部")).toBeNull();
+  });
+
+  it("作者坞：胶囊展开 → 点作者进首位仓；提示 × 关闭并记忆、? 重开", async () => {
+    const { container } = render(<StoreView isActive />);
+    await waitFor(() => expect(screen.getAllByText("Plugin Store").length).toBeGreaterThan(0));
+
+    const capsule = container.querySelector(".marketplace-store-dock-capsule") as HTMLElement;
+    expect(capsule).toBeTruthy();
+    fireEvent.click(capsule);
+    const panel = container.querySelector(".marketplace-store-dock-panel") as HTMLElement;
+    expect(panel).toBeTruthy();
+    // 作者顺序同源：官方（Encaron）在前、第三方在后
+    const names = [...panel.querySelectorAll(".marketplace-store-dock-name")].map((n) => n.textContent);
+    expect(names[0]).toBe("Encaron");
+    expect(names).toContain("Demo Author");
+
+    // D2：点作者 → 该作者首位仓（hw）→ 回仓首页
+    const authorBtn = [...panel.querySelectorAll(".marketplace-store-dock-author")].find((b) =>
+      b.textContent?.includes("Demo Author"),
+    ) as HTMLElement;
+    fireEvent.click(authorBtn);
+    await waitFor(() => expect(screen.getAllByText("Demo Store").length).toBeGreaterThan(0));
+    expect(container.querySelector(".marketplace-store-dock-panel")).toBeNull();
+
+    // 提示：× 关闭 → 写 ui.prefs.dockTipDismissed；原位留 ?
+    fireEvent.click(capsule);
+    const panel2 = container.querySelector(".marketplace-store-dock-panel") as HTMLElement;
+    fireEvent.click(within(panel2).getByLabelText("关闭提示"));
+    await waitFor(() =>
+      expect(
+        (window.linkdesk as unknown as { pluginState: { set: { mock: { calls: unknown[][] } } } }).pluginState.set.mock.calls,
+      ).toEqual(
+        expect.arrayContaining([
+          ["marketplace", "ui.prefs", expect.objectContaining({ dockTipDismissed: true })],
+        ]),
+      ),
+    );
+    await waitFor(() => expect(within(panel2).getByLabelText("查看排序提示")).toBeTruthy());
   });
 });

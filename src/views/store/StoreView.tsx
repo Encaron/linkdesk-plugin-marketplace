@@ -59,6 +59,7 @@ import { requestLicenseDialog } from "../../services/licenseActions";
 import { AuthorPageView } from "./authors/AuthorPageView";
 import { AuthorStoreView } from "./authors/AuthorStoreView";
 import { RepoAllView } from "./repo/RepoAllView";
+import { AuthorDock } from "./dock/AuthorDock";
 import type { CatalogEntry } from "../../services/marketCatalog";
 import { Icon, type ViewMode } from "../../ui";
 
@@ -67,6 +68,7 @@ import "../../styles/store/store-shell.css";
 import "../../styles/store/store-cards.css";
 import "../../styles/store/store-home.css";
 import "../../styles/store/store-repo.css";
+import "../../styles/store/store-dock.css";
 import "../../styles/store/store-browse.css";
 import "../../styles/store/store-authors.css";
 import "../../styles/store/store-library.css";
@@ -466,6 +468,7 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
             </CatalogGate>
           </div>
         </div>
+        <AuthorDock />
         {showTop && (
           <button
             type="button"
