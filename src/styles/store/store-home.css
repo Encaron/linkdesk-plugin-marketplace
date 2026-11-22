@@ -17,16 +17,16 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--separator);
-  background: var(--bg-card);
+  /* 🔴 2026-11-23 用户拍板（仅英雄卡）：满幅图已占满整张卡 ⇒ 背后的透明/磨砂效果全部不要。
+     实底（玻璃主题取同色不透明版）——右缘渐隐落在实底色上，不再透出窗口影像。 */
+  background: var(--bg-card-solid, var(--bg-card));
   box-shadow: 0 10px 44px -10px color-mix(in srgb, var(--marketplace-hue, transparent) 45%, transparent);
   transition: transform 0.2s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.2s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
+/* 悬停只留「放大 + 光绘」两件——⛔ 不再上 backdrop-filter（满幅图下磨砂既看不见又每帧重算）。 */
 .marketplace-store-hero:hover {
   transform: translateY(var(--clearance-y, 0px)) scale(1.02);
   box-shadow: 0 14px 60px -8px color-mix(in srgb, var(--marketplace-hue, transparent) 75%, transparent), var(--shadow-pop);
-  /* 卡面语言唯一出处（store-shell）：hero 与卡/行同一套磨砂——⛔ 不再只有它没有玻璃 */
-  backdrop-filter: var(--surface-blur);
-  -webkit-backdrop-filter: var(--surface-blur);
   z-index: 30;
 }
 .marketplace-store-hero-track {
