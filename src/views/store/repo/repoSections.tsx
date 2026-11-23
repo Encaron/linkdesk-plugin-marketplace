@@ -134,7 +134,7 @@ export function RepoHero({ repo, section }: { repo: ResolvedRepo; section: Autho
   );
 }
 
-function CollectionBlock({
+function RepoCollectionBlock({
   repo,
   section,
   collection,
@@ -213,7 +213,7 @@ export function RepoSection({ repo, section }: { repo: ResolvedRepo; section: Au
     ? data.catalog.collections.find((c) => c.id === section.collection)
     : undefined;
   if (!collection) return null; // 引用不存在的合集：跳过（作者自查警告在管理面）
-  return <CollectionBlock repo={repo} section={section} collection={collection} />;
+  return <RepoCollectionBlock repo={repo} section={section} collection={collection} />;
 }
 
 /** 底部「按分类浏览」瓷片（商店标准件，作者删不掉；只列本仓有货分类）。

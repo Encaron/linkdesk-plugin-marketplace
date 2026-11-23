@@ -81,7 +81,7 @@ function resolveSlides(section: AuthorSectionDecl, repo: AuthorRepoView): HeroCa
   return out;
 }
 
-function CollectionBlock({
+function AuthorCollectionBlock({
   section,
   collection,
   repo,
@@ -224,7 +224,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
       : undefined;
     if (!collection) return null; // 引用不存在的合集：跳过（警告在来源页）
     return (
-      <CollectionBlock
+      <AuthorCollectionBlock
         key={`col:${section.collection}:${idx}`}
         section={section}
         collection={collection}
