@@ -723,5 +723,9 @@
   "商店行为": "Store behavior",
   "商店的取源与点击行为——官方目录已内置，一般不用改。": "Where the store pulls from and how the icon behaves — the official catalog is built in, usually no change needed.",
   "点图标与来源页的默认表现；改完即时生效。": "Default behavior of the sidebar icon and the sources page; changes apply immediately.",
-  "商店从哪些目录拉插件。官方目录内置且不可删；作者仓库根目录需有 marketplace.json。": "Which catalogs the store pulls plugins from. The official catalog is built in and can't be removed; author repos need a marketplace.json at their root."
+  "商店从哪些目录拉插件。官方目录内置且不可删；作者仓库根目录需有 marketplace.json。": "Which catalogs the store pulls plugins from. The official catalog is built in and can't be removed; author repos need a marketplace.json at their root.",
+  "还没有添加作者源": "No author sources yet",
+  "作者自建仓库": "Author-maintained repo",
+  "只列出「{{repo}}」里有的分类——点一下在下方展开，再点收起": "Only categories present in \"{{repo}}\" are listed — click to expand below; click again to collapse",
+  "填完整文件夹路径，例如 E:\toolsmy-plugin": "Enter the full folder path, e.g. E:\toolsmy-plugin"
 }
