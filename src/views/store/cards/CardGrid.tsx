@@ -3,7 +3,7 @@
  * 蓝图 v3.65：grid 主面全家徽标区**拆掉**——只留唯一状态角标；全量徽标在 hover 层。
  */
 
-import { memo } from "react";
+import { memo, useRef } from "react";
 import { lt } from "../../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { ActionButton, restatesState, BadgeRow, CornerTag, entryHue, MoreMenu } from "../../../ui";
@@ -37,6 +37,9 @@ export const CardGrid = memo(function CardGrid({
 }) {
   const { t } = useTranslation();
   const clearance = useStickyClearance<HTMLDivElement>();
+  // P0 防御：动作区 pointerdown 后短窗内忽略整卡 open——即使展开面因任何原因位移，
+  // 点击落到卡体也不会被当成「查看详情」。
+  const actionArmed = useRef(0);
   const open = () => handlers.onOpen(entry);
   const status = statusOfCard(entry, ctx);
   const action = actionOfCard(entry, ctx, jobLabelOf(t, ctx.job));
@@ -55,7 +58,13 @@ export const CardGrid = memo(function CardGrid({
       aria-label={t("{{name}}——查看详情", { name: lt(entry, "name") })}
       data-entry={entry.id}
       style={{ ["--marketplace-hue" as string]: entryHue(entry) }}
-      onClick={open}
+      onPointerDown={(e) => {
+        if ((e.target as Element).closest?.(".marketplace-store-x-acts")) actionArmed.current = Date.now();
+      }}
+      onClick={() => {
+        if (Date.now() - actionArmed.current < 500) return;
+        open();
+      }}
       onKeyDown={(e) => cardKeyDown(e, open)}
     >
       {/* 单面（F39）：卡体只是占位，头部/统计/新增信息都在同一个面里——面居中、高度随内容 */}

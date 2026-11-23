@@ -9,6 +9,7 @@
 
 import type { CatalogEntry } from "./marketCatalog";
 import { performMarketUpdate } from "./marketUpdateAction";
+import { confirmMarketBatch } from "./installGate";
 import { scheduleDataRefresh } from "./marketplaceShared/pluginsStore";
 
 const pm = () => window.linkdesk?.pluginManager;
@@ -43,12 +44,21 @@ export async function bulkUninstall(ids: readonly string[]): Promise<number> {
   return n;
 }
 
-/** 全部更新（逐项走同一条更新序列；回执 = 成功/取消/阻塞计数） */
+/**
+ * 全部更新——P0：**一张汇总卡确认整批**，随后逐项走同一条更新序列（skipConfirm）。
+ * ⛔ 不在市场里做来源信任/免问判定；P1 壳 policy 接管后再把 silent/ask 分组传进来。
+ * @param localVersions pluginId → 已装版本（**只用于批量卡显示 v旧→v新**；⛔ 不传给
+ *   performMarketUpdate —— P0 批量跳过单项确认，不能因此放行降级；版本方向仍由壳 stage 校验）
+ */
 export async function updateAll(
   entries: readonly CatalogEntry[],
   online: boolean,
   t: (key: string, opts?: Record<string, unknown>) => string,
+  localVersions?: Record<string, string>,
 ): Promise<{ ok: number; failed: number; cancelled: number }> {
+  if (entries.length === 0) return { ok: 0, failed: 0, cancelled: 0 };
+  const confirmed = await confirmMarketBatch(entries, localVersions);
+  if (!confirmed) return { ok: 0, failed: 0, cancelled: entries.length };
   let ok = 0;
   let failed = 0;
   let cancelled = 0;
@@ -58,6 +68,7 @@ export async function updateAll(
       entry,
       displayName: entry.name,
       ver: entry.version,
+      skipConfirm: true,
       online,
       refresh: scheduleDataRefresh,
       t,

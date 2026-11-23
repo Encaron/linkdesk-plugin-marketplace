@@ -19,8 +19,9 @@
 
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from "vitest";
 import i18n from "i18next";
-import { confirmMarketInstall, confirmMarketInstallById } from "../services/installGate";
+import { confirmMarketBatch, confirmMarketInstall, confirmMarketInstallById } from "../services/installGate";
 import { installConfirmPayload } from "../services/installConfirmPayload";
+import { batchConfirmPayload } from "../services/batchConfirmPayload";
 import { __setCatalogIO, type StorageLike } from "../services/marketSources";
 import type { CatalogEntry } from "../services/marketCatalog";
 
@@ -211,5 +212,57 @@ describe("confirmMarketInstallById（重试路径专用——入参只有 plugin
     setShell({ confirm });
     await confirmMarketInstallById("demo-alpha");
     expect(String(confirm.mock.calls[0][0])).toContain("demo-alpha");
+  });
+});
+
+describe("confirmMarketBatch（P0 批量一次确认）", () => {
+  it("dialog 面缺失 → false 且不弹（不能问就不装）", async () => {
+    setShell(undefined);
+    await expect(confirmMarketBatch([ENTRY])).resolves.toBe(false);
+  });
+
+  it("空列表 → true（没有要问的东西）", async () => {
+    setShell(undefined);
+    await expect(confirmMarketBatch([])).resolves.toBe(true);
+  });
+
+  it("confirmContent 齐备 → 一张富卡；viewId=marketplace-update-batch；payload 单一构造", async () => {
+    const confirmContent = vi.fn(async () => true);
+    const confirm = vi.fn(async () => true);
+    setShell({ confirm, confirmContent });
+    const locals = { "demo-alpha": "0.9.0" };
+
+    await expect(confirmMarketBatch([ENTRY], locals)).resolves.toBe(true);
+
+    expect(confirmContent).toHaveBeenCalledTimes(1);
+    const arg = confirmContent.mock.calls[0][0] as {
+      pluginId: string;
+      viewId: string;
+      title: string;
+      message: string;
+      payload: unknown;
+    };
+    expect(arg.pluginId).toBe("marketplace");
+    expect(arg.viewId).toBe("marketplace-update-batch");
+    expect(arg.title).toBe(i18n.t("确认批量更新"));
+    expect(arg.message).toBe(i18n.t("将依次更新 {{count}} 个插件；不会打开详情页。", { count: 1 }));
+    expect(arg.payload).toEqual(batchConfirmPayload([ENTRY], locals));
+    expect(confirm).not.toHaveBeenCalled();
+  });
+
+  it("老壳无 confirmContent → 回落纯文字 confirm，仍然要问且带数量", async () => {
+    const confirm = vi.fn(async () => true);
+    setShell({ confirm });
+    await expect(confirmMarketBatch([ENTRY])).resolves.toBe(true);
+    expect(confirm).toHaveBeenCalledTimes(1);
+    expect(String(confirm.mock.calls[0][0])).toContain("1");
+  });
+
+  it("返回值严判 === true（false/undefined 不算确认）", async () => {
+    const confirmContent = vi.fn(async () => false);
+    setShell({ confirmContent });
+    await expect(confirmMarketBatch([ENTRY])).resolves.toBe(false);
+    setShell({ confirmContent: vi.fn(async () => undefined) });
+    await expect(confirmMarketBatch([ENTRY])).resolves.toBe(false);
   });
 });

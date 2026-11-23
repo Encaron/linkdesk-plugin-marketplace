@@ -1,0 +1,91 @@
+/**
+ * MarketplaceBatchConfirm.css——P0 批量更新确认卡专用（BatchUpdateConfirm 视图）。
+ * 基础卡面/行/动作区复用 MarketplaceConfirm.css；本文件只管批量列表与计数摘要。
+ * 色/圆角/字号全走语义 token（硬约束 1），零硬编码 hex。
+ */
+
+.marketplace-mpd-batch {
+  width: min(580px, 86vw);
+}
+
+.marketplace-mpd-batch-summary {
+  margin: 0 0 8px;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.marketplace-mpd-batch-list {
+  display: flex;
+  flex-direction: column;
+  max-height: min(46vh, 360px);
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+}
+
+.marketplace-mpd-batch-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--separator);
+}
+
+.marketplace-mpd-batch-row:last-child {
+  border-bottom: 0;
+}
+
+.marketplace-mpd-batch-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.marketplace-mpd-batch-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.marketplace-mpd-batch-official {
+  flex: none;
+  font-size: var(--font-size-2xs);
+  color: var(--success);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-pill);
+  padding: 0 6px;
+  line-height: 1.5;
+}
+
+.marketplace-mpd-batch-sub {
+  margin-top: 1px;
+  font-size: var(--font-size-2xs);
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.marketplace-mpd-batch-side {
+  flex: none;
+  text-align: right;
+}
+
+.marketplace-mpd-batch-ver {
+  font-size: var(--font-size-2xs);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.marketplace-mpd-batch-size {
+  margin-top: 1px;
+  font-size: var(--font-size-2xs);
+  color: var(--text-muted);
+  white-space: nowrap;
+}

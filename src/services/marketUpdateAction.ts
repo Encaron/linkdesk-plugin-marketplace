@@ -30,6 +30,8 @@ export interface MarketUpdateOptions {
   ver?: string;
   /** 已装版本（升降判定基准；缺省 = 不判降级） */
   localVer?: string;
+  /** 跳过单项确认卡（P0 批量：调用方已经用一张汇总卡确认过整批） */
+  skipConfirm?: boolean;
   online: boolean;
   /** 成功后的收敛动作（详情 refreshPlugins / 商店 scheduleDataRefresh） */
   refresh: () => void;
@@ -61,7 +63,7 @@ export async function performMarketUpdate(o: MarketUpdateOptions): Promise<Marke
       return "blocked";
     }
   }
-  if (entry) {
+  if (entry && !o.skipConfirm) {
     const ok = await confirmMarketInstall(entry, "update", ver);
     if (!ok) return "cancelled";
   }

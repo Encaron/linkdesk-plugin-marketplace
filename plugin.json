@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@linkdesk/plugin-sdk/schemas/plugin.schema.json",
   "pluginId": "marketplace",
   "name": "插件市场",
-  "version": "1.4.24",
+  "version": "1.4.25",
   "category": "productivity",
   "minAppVersion": "0.2.60",
   "icon": "resources/icon.svg",
@@ -393,6 +393,11 @@
           "id": "marketplace-install-confirm",
           "title": "确认安装",
           "render": "src/views/confirm/ConfirmInstall.tsx"
+        },
+        {
+          "id": "marketplace-update-batch",
+          "title": "确认批量更新",
+          "render": "src/views/confirm/BatchUpdateConfirm.tsx"
         },
         {
           "id": "marketplace-license",

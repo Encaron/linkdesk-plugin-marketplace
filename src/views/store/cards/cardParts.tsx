@@ -223,6 +223,8 @@ export function Art({
 
 /** 整卡可点语义（Enter/Space 与鼠标同效；动作钮/菜单自行阻断冒泡） */
 export function cardKeyDown(ev: React.KeyboardEvent, open: () => void): void {
+  // 焦点在动作钮/菜单里时，Enter/Space 是那个控件的，不是整卡的（否则键盘也会误开详情）。
+  if ((ev.target as HTMLElement).closest?.("button")) return;
   if (ev.key === "Enter" || ev.key === " ") {
     ev.preventDefault();
     open();

@@ -31,6 +31,7 @@ import i18n from "i18next";
 import type { CatalogEntry } from "./marketCatalog";
 import { loadCatalog } from "./marketSources";
 import { installConfirmPayload, type ConfirmMode } from "./installConfirmPayload";
+import { batchConfirmPayload } from "./batchConfirmPayload";
 
 const lk = () => window.linkdesk;
 
@@ -69,6 +70,36 @@ export async function confirmMarketInstall(
     (await dlg.confirm(
       i18n.t(mode === "update" ? "确认更新「{{name}}」？" : "确认安装「{{name}}」？", { name }),
     )) === true
+  );
+}
+
+/**
+ * P0 批量确认——一次对话代替 N 张单卡。
+ *
+ * 🔴 P0 边界：仍然**每次批量都问**；⛔ 不在这里做来源信任/免问判定（P1 壳 policy 的事）。
+ * 富内容卡 → `marketplace-update-batch` 视图；缺面回落壳纯文字 confirm；问不了就不装。
+ */
+export async function confirmMarketBatch(
+  entries: readonly CatalogEntry[],
+  localVersions?: Record<string, string>,
+): Promise<boolean> {
+  if (entries.length === 0) return true;
+  const dlg = lk()?.dialog;
+  if (!dlg) return false;
+  const confirmContent = dlg.confirmContent;
+  if (confirmContent) {
+    const ok = await confirmContent({
+      title: i18n.t("确认批量更新"),
+      message: i18n.t("将依次更新 {{count}} 个插件；不会打开详情页。", { count: entries.length }),
+      pluginId: "marketplace",
+      viewId: "marketplace-update-batch",
+      payload: batchConfirmPayload(entries, localVersions),
+    });
+    return ok === true;
+  }
+  if (!dlg.confirm) return false;
+  return (
+    (await dlg.confirm(i18n.t("确认更新 {{count}} 个插件？", { count: entries.length }))) === true
   );
 }
 

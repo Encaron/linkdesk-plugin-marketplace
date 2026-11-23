@@ -159,15 +159,21 @@ export function LibraryView() {
   }, []);
 
   const onUpdateAll = async () => {
-    const entries = rows
-      .filter((r) => r.state === "update" && !r.core)
-      .map((r) => r.entry)
-      .filter((e) => !!e.downloadUrl);
+    const picked = rows.filter((r) => r.state === "update" && !r.core);
+    const entries = picked.map((r) => r.entry).filter((e) => !!e.downloadUrl);
     if (entries.length === 0) {
       showToast(t("所有插件已是最新"), { severity: "success", key: "lib-update-all" });
       return;
     }
-    const r = await updateAll(entries, data.online, t);
+    const localVersions: Record<string, string> = {};
+    for (const row of picked) {
+      if (row.installedVersion) localVersions[row.entry.id] = row.installedVersion;
+    }
+    const r = await updateAll(entries, data.online, t, localVersions);
+    if (r.ok === 0 && r.cancelled === entries.length) {
+      showToast(t("已取消批量更新"), { severity: "info", key: "lib-update-all" });
+      return;
+    }
     showToast(
       t("已更新 {{ok}} 个插件", { ok: r.ok }) +
         (r.failed ? ` · ${t("{{count}} 个失败", { count: r.failed })}` : ""),

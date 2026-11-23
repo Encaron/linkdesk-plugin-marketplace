@@ -1,5 +1,12 @@
 # 更新日志
 
+## v1.4.25（2026-11-24）
+
+- **Update all 改为一张汇总确认卡**：`libraryActions.updateAll` 先经 `confirmMarketBatch` 一次确认，再逐项 `performMarketUpdate({ skipConfirm: true })`；不再逐项弹卡。P0 过渡：仍**每次批量都问**，不做来源信任/免问判定（P1 壳 `policy` 接管）。
+- **修复顶行 hover 点 Update 误跳详情**：`useStickyClearance` 改为 hover 会话内**冻结几何**（pointerenter 按完全展开量一次，focus/blur 不重算，pointerleave 才复位）；动作区 pointerdown 后 500ms 内抑制整卡 open；键盘 focus 在动作钮上时整卡不再抢 Enter/Space。
+- **更新完成不打开详情页**：完成仍走现有轻 toast + 铃铛通知面板；批量卡明确写「不会打开详情页」。
+- **批量卡支持 20+ 条**：列表滚动 + 总数/官方源/第三方计数；不撑破弹窗。
+
 ## v1.4.24（2026-11-24）
 
 - **插件商店标签页改为正体常驻**：`openStoreTab` 显式传 `pinned:true`。此前新标签默认预览态（斜体），会被下一次预览打开顶掉——用户实机反馈「Plugins Store 极容易被替换」。壳侧 `reduceOpenOrFocus` 同步补上「已存在标签页按 `pinned:true` 补 pin」，老会话里的斜体页点一次入口即转正。

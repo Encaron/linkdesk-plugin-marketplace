@@ -3,7 +3,7 @@
  * 主面＝图标＋名＋分类＋唯一状态角标；hover 层＝动作＋简介＋全徽标＋⋯（五卡同构，08 §二·v3.65）。
  */
 
-import { memo } from "react";
+import { memo, useRef } from "react";
 import { lt } from "../../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { ActionButton, restatesState, BadgeRow, CornerTag, entryHue, MoreMenu } from "../../../ui";
@@ -35,6 +35,8 @@ export const CardSmall = memo(function CardSmall({
 }) {
   const { t } = useTranslation();
   const clearance = useStickyClearance<HTMLDivElement>();
+  // P0 防御：动作区 pointerdown 后短窗内忽略整卡 open（同 CardGrid）。
+  const actionArmed = useRef(0);
   const open = () => handlers.onOpen(entry);
   const status = statusOfCard(entry, ctx);
   const action = actionOfCard(entry, ctx, jobLabelOf(t, ctx.job));
@@ -53,7 +55,13 @@ export const CardSmall = memo(function CardSmall({
       aria-label={label}
       data-entry={entry.id}
       style={{ ["--marketplace-hue" as string]: entryHue(entry) }}
-      onClick={open}
+      onPointerDown={(e) => {
+        if ((e.target as Element).closest?.(".marketplace-store-x-acts")) actionArmed.current = Date.now();
+      }}
+      onClick={() => {
+        if (Date.now() - actionArmed.current < 500) return;
+        open();
+      }}
       onKeyDown={(e) => cardKeyDown(e, open)}
     >
       {/* 单面（F39）：卡体只是占位，头部与新增信息都在同一个面里——面居中、高度随内容 */}

@@ -414,6 +414,10 @@
 }
 .marketplace-store-card:hover .marketplace-store-x-more,
 .marketplace-store-card:focus-within .marketplace-store-x-more { grid-template-rows: 1fr; }
+/* P0 修复（2026-11-24）：测量拍强制完全展开——同一 tick 增删、不绘制，保证 pointerenter/focus
+   两拍量到同一高度；⛔ 不要把这当 hover 样式用。 */
+.marketplace-store-card.is-measuring .marketplace-store-x-more { grid-template-rows: 1fr; transition: none; }
+.marketplace-store-card.is-measuring .marketplace-store-x-more-inner { visibility: visible; transition: none; }
 .marketplace-store-card:hover .marketplace-store-x-more-inner,
 .marketplace-store-card:focus-within .marketplace-store-x-more-inner {
   visibility: visible;
