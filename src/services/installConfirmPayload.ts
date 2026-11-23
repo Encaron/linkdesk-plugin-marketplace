@@ -15,14 +15,11 @@
  */
 
 import type { CatalogEntry } from "./marketCatalog";
+import { authorLabel } from "./catalogText"; // P1 归一化：与列表/详情同一份作者显示名（原两份逐字节相同）
 
 /** 目录条目 author 兼容 {name,url} / string 两种形态——抽展示名 */
-export function authorLabel(a: CatalogEntry["author"]): string | undefined {
-  if (typeof a === "string") return a || undefined;
-  return a?.name || undefined;
-}
-
 /** 来源名（owner/repo 或 host/owner/repo）→ 仓库主页 URL——零新字段零服务器（04 §三） */
+/** 来源名 → 仓库主页 URL（本仓唯一实现；⛔ batch/确认卡各自推一遍） */
 export function repoHomeUrl(sourceName?: string): string | undefined {
   if (!sourceName) return undefined;
   const parts = sourceName.split("/");

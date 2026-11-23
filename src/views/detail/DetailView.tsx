@@ -46,7 +46,7 @@ import { useTranslation } from "react-i18next";
 import { pickIdentityArt } from "@linkdesk/ui";
 import { lt } from "../../services/i18nText";
 import { useOnlineStatus } from "../../services/marketplaceShared";
-import { authorLabel } from "../../services/installConfirmPayload";
+import { authorLabel } from "../../services/catalogText"; // P1 归一化：作者显示名唯一实现
 import { openPluginDetailTab } from "../../services/openDetailTab";
 import { useLicenseEntitlements } from "../../services/licensesView";
 import { openBuyPage } from "../../services/licenseActions";

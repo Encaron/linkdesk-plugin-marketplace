@@ -1,5 +1,12 @@
 # 更新日志
 
+## v1.4.26（2026-11-24）
+
+- **安装/更新改走壳托管确认**：新壳提供 `plugins.requestInstall` / `requestUpdateBatch` ⇒ 市场只提交结构化请求，确认卡由壳绘制、谁要确认由壳 `policy` 算、一次性令牌由壳签发、批量进度与完成汇总由壳统一出（轻 toast + 铃铛面板）。市场侧不再自绘确认卡、不再做来源信任判定。
+- **旧壳回落保留**：`installConfirmApi()` 判 `requestInstall` 不存在（老壳）才回落 `confirmMarketInstall` + `pluginManager.install/update`。新壳对**远程来源**的旧链一律拒（`no-token`），故有 `requestInstall` 时**绝不**回落。
+- **来源身份单点推导**：新增 `hostInstallConfirm.sourceIdentityOf`（official → `official`；其余用来源仓库名当 id），⛔ 各调用点不再各自拼来源字段。
+- **批量完成反馈归壳**：`updateAll` 命中壳托管线时返回 `hosted: true`，库视图不再自己弹「已更新 N 个」——一次批量只出一条汇总。
+
 ## v1.4.25（2026-11-24）
 
 - **Update all 改为一张汇总确认卡**：`libraryActions.updateAll` 先经 `confirmMarketBatch` 一次确认，再逐项 `performMarketUpdate({ skipConfirm: true })`；不再逐项弹卡。P0 过渡：仍**每次批量都问**，不做来源信任/免问判定（P1 壳 `policy` 接管）。

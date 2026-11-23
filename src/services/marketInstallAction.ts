@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { notifyError } from "./marketplaceShared/notifications";
 import { startMarketInstall } from "./marketplaceShared/installFlow";
 import { confirmMarketInstall } from "./installGate";
+import { buildInstallRequest, installConfirmApi } from "./hostInstallConfirm";
 import { minAppVerdict, readShellVersion } from "./minAppVersionGate";
 import type { CatalogEntry } from "./marketCatalog";
 
@@ -30,7 +31,9 @@ export async function runMarketInstallAction(
     notifyError(t("该插件缺少下载地址"));
     return false;
   }
-  if (!lk()?.pluginManager?.installWithProgress) {
+  // P1：新壳有 requestInstall ⇒ 只走壳托管确认（判定/令牌/队列/进度全在壳，市场不自绘确认卡）
+  const hostApi = installConfirmApi();
+  if (!hostApi && !lk()?.pluginManager?.installWithProgress) {
     notifyError(t("安装失败"));
     return false;
   }
@@ -40,7 +43,11 @@ export async function runMarketInstallAction(
     notifyError(t("需升级 LinkDesk 至 {{version}} 才能安装", { version: gate.need }));
     return false;
   }
-  // E6#71k「都问」：恒弹确认卡（官方来源不豁免）
+  if (hostApi) {
+    const res = await hostApi.requestInstall(buildInstallRequest(entry, "install", entry.downloadUrl));
+    return res?.confirmed === true;
+  }
+  // 老壳回落：市场自绘确认卡（E6#71k「都问」——官方来源不豁免）
   const confirmed = await confirmMarketInstall(entry, "install");
   if (!confirmed) return false;
   // 进度/失败/重试全走 startMarketInstall（E6#73o：带条目来源 URL 供依赖解析）

@@ -8,7 +8,9 @@
  */
 
 import type { CatalogEntry } from "./marketCatalog";
+import { versionDownloadUrl } from "./marketCatalog";
 import { performMarketUpdate } from "./marketUpdateAction";
+import { buildInstallRequest, installConfirmApi } from "./hostInstallConfirm";
 import { confirmMarketBatch } from "./installGate";
 import { scheduleDataRefresh } from "./marketplaceShared/pluginsStore";
 
@@ -50,13 +52,38 @@ export async function bulkUninstall(ids: readonly string[]): Promise<number> {
  * @param localVersions pluginId → 已装版本（**只用于批量卡显示 v旧→v新**；⛔ 不传给
  *   performMarketUpdate —— P0 批量跳过单项确认，不能因此放行降级；版本方向仍由壳 stage 校验）
  */
+export interface BulkUpdateResult {
+  ok: number;
+  failed: number;
+  cancelled: number;
+  /** true = 走的是壳托管批量（完成反馈由壳统一出：轻 toast + 铃铛面板）——调用方 ⛔ 再弹一次 */
+  hosted?: boolean;
+  /** hosted 时：整批是否被用户确认（false = 取消，0 个入队） */
+  confirmed?: boolean;
+}
+
 export async function updateAll(
   entries: readonly CatalogEntry[],
   online: boolean,
   t: (key: string, opts?: Record<string, unknown>) => string,
   localVersions?: Record<string, string>,
-): Promise<{ ok: number; failed: number; cancelled: number }> {
+): Promise<BulkUpdateResult> {
   if (entries.length === 0) return { ok: 0, failed: 0, cancelled: 0 };
+  // P1：新壳 ⇒ 一张汇总卡由壳画、计划由壳算、执行与汇总也由壳（市场只提交结构化请求）
+  const hostApi = installConfirmApi();
+  if (hostApi) {
+    const reqs = entries
+      .map((entry) => {
+        const url = versionDownloadUrl(entry, entry.version);
+        return url ? buildInstallRequest(entry, "update", url, { version: entry.version }) : null;
+      })
+      .filter((r): r is NonNullable<typeof r> => r !== null);
+    if (reqs.length === 0) return { ok: 0, failed: 0, cancelled: 0, hosted: true, confirmed: false };
+    const res = await hostApi.requestUpdateBatch(reqs);
+    return res?.confirmed
+      ? { ok: 0, failed: 0, cancelled: 0, hosted: true, confirmed: true }
+      : { ok: 0, failed: 0, cancelled: reqs.length, hosted: true, confirmed: false };
+  }
   const confirmed = await confirmMarketBatch(entries, localVersions);
   if (!confirmed) return { ok: 0, failed: 0, cancelled: entries.length };
   let ok = 0;

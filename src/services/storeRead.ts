@@ -15,6 +15,7 @@
  */
 
 import type { PluginInfoEntry, PluginListEntry } from "@linkdesk/contracts";
+import { authorLabel } from "./catalogText"; // P1 归一化：作者显示名唯一实现
 import type { CatalogEntry } from "./marketCatalog";
 import { primaryCategoryOf } from "./marketCatalog";
 import { getCatalogResult } from "./marketplaceShared/catalogStore";
@@ -121,11 +122,6 @@ export interface StoreReadState {
   };
 }
 
-function authorLabel(entry: CatalogEntry): string | undefined {
-  if (!entry.author) return undefined;
-  return typeof entry.author === "string" ? entry.author : entry.author.name;
-}
-
 function localMaps(list: PluginListEntry[], disabled: PluginInfoEntry[]) {
   const localById = new Map<string, LocalEntryInfo>();
   const disabledIds = new Set<string>();
@@ -172,7 +168,7 @@ export async function readStoreState(): Promise<StoreReadState> {
       name: entry.name,
       version: entry.version,
       description: entry.description,
-      author: authorLabel(entry),
+      author: authorLabel(entry.author),
       authorId: entry.authorId,
       category: entry.category,
       categories: entry.categories,

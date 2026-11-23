@@ -170,6 +170,11 @@ export function LibraryView() {
       if (row.installedVersion) localVersions[row.entry.id] = row.installedVersion;
     }
     const r = await updateAll(entries, data.online, t, localVersions);
+    if (r.hosted) {
+      // 完成反馈归壳（轻 toast 即时汇总 + 铃铛面板留结果/重试）——市场 ⛔ 再弹一次，否则一次批量两条同类消息
+      if (r.confirmed === false) showToast(t("已取消批量更新"), { severity: "info", key: "lib-update-all" });
+      return;
+    }
     if (r.ok === 0 && r.cancelled === entries.length) {
       showToast(t("已取消批量更新"), { severity: "info", key: "lib-update-all" });
       return;

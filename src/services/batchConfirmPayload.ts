@@ -11,7 +11,7 @@
  */
 
 import type { CatalogEntry } from "./marketCatalog";
-import { authorLabel } from "./installConfirmPayload";
+import { authorLabel } from "./catalogText"; // P1 归一化：作者显示名唯一实现（catalogText）
 
 /** 批量卡里的一行（结构克隆安全：纯原始数据，零函数零闭包） */
 export interface BatchConfirmEntry {
