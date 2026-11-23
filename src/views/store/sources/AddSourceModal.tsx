@@ -23,6 +23,9 @@ import { decideAddSource } from "../../../services/marketSourceAdd";
 import { readConfiguredAuthorSources } from "../../../services/marketSources";
 import { previewRemoteSource } from "../../../services/sourceAdmin";
 
+/** 本地目录预览的 manifest 文件名——壳暂无池侧 manifest 读取面（K10 豁免账本登记） */
+const MANIFEST_FILE = "plugin.json";
+
 export type AddSourceMode = "remote" | "local";
 
 interface Message {
@@ -126,7 +129,10 @@ export function AddSourceModal({
       path?: { join?: (...p: string[]) => string };
     } | undefined);
     const join = fs?.path?.join;
-    const manifestPath = join ? join(path, "plugin.json") : `${path.replace(/[\\/]+$/, "")}\\plugin.json`;
+    // 2026-11-24（M1）：⛔ 手拼兜底已删——路径拼接唯一源 = 壳 path.join；
+    // manifest 文件名 = 本地目录预览所需（壳暂无池侧 manifest 读取面），集中成一个常量。
+    const manifestPath = join ? join(path, MANIFEST_FILE) : null;
+    if (!manifestPath) throw new Error("no-host-path");
     try {
       const text = await fs?.filesystem?.readTextFile?.(manifestPath);
       if (!text) throw new Error("no-fs");

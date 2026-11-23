@@ -104,18 +104,50 @@ async function dominantHue(bytes: Uint8Array, mime: string): Promise<string | un
   }
 }
 
-/** 插件数据目录（不存在则创建） */
+/** 插件**缓存**目录（不存在则创建）——2026-11-24（D11/M4）：头像缓存应可清理，落 pluginCacheDir。
+ *  旧缓存曾落 pluginDataDir（永久区）——首次读时一次性迁到 cache 区（标记文件防重复）。 */
 async function dataDir(api: Ld): Promise<string | null> {
   if (!api?.env?.get || !api.filesystem || !api.path?.join) return null;
   try {
     const env = await api.env.get("marketplace");
-    const base = env?.pluginDataDir;
+    const base = env?.pluginCacheDir ?? env?.pluginDataDir;
     if (!base) return null;
     if (!(await api.filesystem.exists(base))) await api.filesystem.createDir(base);
+    await migrateLegacyAvatarCache(api, env?.pluginDataDir, base);
     return base;
   } catch {
     return null;
   }
+}
+
+/** 头像缓存子目录（迁移范围——不搬 pluginDataDir 里的其它数据） */
+const AVATAR_CACHE_SUBDIRS = ["avatars", "repo-avatars"] as const;
+
+async function copyCacheTree(api: Ld, from: string, to: string): Promise<void> {
+  if (!api.path?.join || !api.filesystem) return;
+  const list = await api.filesystem.listDir(from).catch(() => []);
+  if (!(await ensureDir(api, to))) return;
+  for (const e of list) {
+    const src = api.path.join(from, e.name);
+    const dst = api.path.join(to, e.name);
+    if (e.isDirectory) { await copyCacheTree(api, src, dst); continue; }
+    try {
+      const bytes = await api.filesystem.readBinaryFile(src);
+      await api.filesystem.writeBinaryFile(dst, bytes);
+    } catch { /* 单文件失败不阻断 */ }
+  }
+}
+
+/** D11 一次性迁移：pluginDataDir 的旧头像缓存 → pluginCacheDir（目标标记文件存在则跳过） */
+async function migrateLegacyAvatarCache(api: Ld, legacyBase: string | undefined, cacheBase: string): Promise<void> {
+  if (!legacyBase || legacyBase === cacheBase || !api.path?.join) return;
+  const marker = api.path.join(cacheBase, ".avatar-cache-migrated");
+  try { if (await api.filesystem?.exists(marker)) return; } catch { return; }
+  for (const sub of AVATAR_CACHE_SUBDIRS) {
+    try { await copyCacheTree(api, api.path.join(legacyBase, sub), api.path.join(cacheBase, sub)); } catch { /* 子目录缺省 = 无旧缓存 */ }
+  }
+  try { await api.filesystem?.writeTextFile(marker, "1"); } catch { /* 标记失败下次重试 */ }
+}
 }
 
 async function ensureDir(api: Ld, dir: string): Promise<boolean> {

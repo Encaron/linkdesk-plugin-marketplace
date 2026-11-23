@@ -16,11 +16,13 @@ const lk = () => window.linkdesk;
 export async function readInstalledPackageFile(pluginId: string, fileName: string): Promise<string | null> {
   const fs = lk()?.filesystem;
   const plugins = lk()?.plugins;
-  if (!fs?.readTextFile || !plugins?.resolvePath) return null;
+  const path = lk()?.path;
+  if (!fs?.readTextFile || !plugins?.resolvePath || !path?.join) return null;
   try {
     const root = await plugins.resolvePath(pluginId);
     if (typeof root !== "string" || !root) return null;
-    return await fs.readTextFile(`${root.replace(/[\\/]+$/, "")}/${fileName}`);
+    // 2026-11-24（M2）：路径拼接唯一源 = 壳 path.join（⛔ 不再手拼）
+    return await fs.readTextFile(path.join(root, fileName));
   } catch {
     return null;
   }

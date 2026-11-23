@@ -38,7 +38,10 @@ function pickLocalized(map: Record<string, string> | undefined, lang: string): s
 /** 包内文件的媒体基址：`linkdesk://<id>/<目录>/`；根文件 → `linkdesk://<id>/`。 */
 function localReadmeAssetBase(pluginId: string, rel: string): string {
   const dir = rel.includes("/") ? rel.slice(0, rel.lastIndexOf("/") + 1) : "";
-  return `linkdesk://${pluginId}/${dir}`;
+  const build = window.linkdesk.pluginAssets?.getUrl;
+  // 2026-11-24（M3）：URL 形状归壳（pluginAssets.getUrl）；旧壳无该面 = 兼容期兜底（K9 豁免账本登记，
+  // 到期条件：市场 minAppVersion 抬到含 pluginAssets 的壳版本后删本行）。
+  return build ? build(pluginId, dir) : `linkdesk://${pluginId}/${dir}`;
 }
 
 export function useDetailPackage(id: DetailIdentity) {
