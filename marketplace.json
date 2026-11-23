@@ -1,26 +1,32 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-23T05:30:52.323Z",
+  "updatedAt": "2026-11-23T13:48:23.579Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.15",
+      "version": "1.4.16",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.15/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.16/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.15/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.16/resources/icon-brand.svg",
       "marketIconSource": "url",
-      "minAppVersion": "0.2.20",
+      "minAppVersion": "0.2.60",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.15/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.15/marketplace.linkdesk-plugin",
-      "size": 180634,
-      "publishedAt": "2026-11-23T05:30:52.323Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.16/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.16/marketplace.linkdesk-plugin",
+      "size": 180848,
+      "publishedAt": "2026-11-23T13:48:23.579Z",
       "versions": [
+        {
+          "version": "1.4.16",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.16/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-23T13:48:23.579Z",
+          "changelog": "- **零视觉归一化（门禁 G-N1/N2）**：卡片/hero/作者卡/图标块/媒体框比例收成宿主 `--size-*` 或插件内 `--marketplace-*` 单出处（老壳自动走 fallback，视觉不变）；`CollectionBlock` 同名双实现改名 `AuthorCollectionBlock` / `RepoCollectionBlock`（行为不变）。真机 900×2800 截图像素零差。"
+        },
         {
           "version": "1.4.15",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.15/marketplace.linkdesk-plugin",
@@ -48,8 +54,7 @@
         {
           "version": "1.4.7",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.7/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-22T19:57:46.288Z",
-          "changelog": "- **侧栏「作者」的数字不再被小圆点压住**：compact 模式下数字被顶到最右，而「有新内容」的点是绝对定位在右侧 8px，正好叠在数字上；现在点改为普通 flex 项、跟在数字后面并排显示。\n- **两个点不再叠成一个**：作者项此前「有新内容」与「有源加载失败」两个点都绝对定位在同一处；现在只画一个（失败优先）。"
+          "publishedAt": "2026-11-22T19:57:46.288Z"
         },
         {
           "version": "1.4.6",
@@ -59,14 +64,12 @@
         {
           "version": "1.4.5",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.5/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-22T19:29:25.144Z",
-          "changelog": "- **「有新版本可用」不再是三行高**：更新引导按钮加 `white-space: nowrap`——此前 flex 里那段文字被挤成 5 字一行，把整条撑到 3 行（实测整条 123→87px）。\n- **作者头像三处统一**：作者卡、作者页来源行、作者坞胶囊此前各画各的（前两者只画首字母）；现在共用同一个取源口（远端 → 本地缓存 → 失败首字母），换了 GitHub 头像三处一起变。\n- **作者坞留白加大**：列表内边距改上 14 / 左右 18 / 下 18——第一张卡的上半圆角不再被面板上沿切掉，左右也不再贴着裁切边。"
+          "publishedAt": "2026-11-22T19:29:25.144Z"
         },
         {
           "version": "1.4.4",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.4/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-22T19:21:32.657Z",
-          "changelog": "- **发版后「检查更新」立刻能看到新版**：目录请求从 `cache:\"no-store\"` 改 `cache:\"reload\"`——本机实测旧写法会被 Chromium 的 HTTP 缓存挡住（同一地址反复拿回上一版），表现为「插件发了新版、软件里却一直提示已是最新」。"
+          "publishedAt": "2026-11-22T19:21:32.657Z"
         },
         {
           "version": "1.4.3",
