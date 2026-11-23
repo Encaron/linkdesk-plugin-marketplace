@@ -101,7 +101,7 @@ export interface CollectionDecl {
   /** 合集级辉光开关（08 §三·v3.57 U4：section.glow 与 collection.glow **两处都认**） */
   glow?: boolean;
   /** 合集级跳转字（09 §二：板块 more 与合集 more 两处都认） */
-  more?: { label?: string; target?: string };
+  more?: { label?: string; target?: string; locales?: Locales };
   cover?: string;
   /** 卡片原型映射：banner→hero · strip→sm 横排 · duo→lg×2 · grid→md 网格 ·
    *  mega→主题横滚 · small→小卡 · split→整行分栏 · wall→封面图墙（05 §四 / 17 §四） */

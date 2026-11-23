@@ -97,7 +97,7 @@ export function AuthorCard({
             className={`marketplace-store-ac-repo ${item.more ? "is-more" : ""}`}
             style={{ ["--i" as string]: i }}
           >
-            <b>{item.more ? t("{{count}} 个仓库", { count: deckRest }) : item.name}</b>
+            <b>{item.more ? t("{{count}} 个仓库", { count: deckRest }) : lt(item, "name")}</b>
             <i>
               {t("{{count}} 个插件", { count: item.count })}
               {solo ? ` · ${t("唯一仓库")}` : ""}

@@ -8,6 +8,7 @@
 import { useMemo } from "react";
 import type { CatalogEntry, CollectionDecl } from "../../../services/marketCatalog";
 import { CollectionRenderer } from "../CollectionRenderer";
+import { lt } from "../../../services/i18nText";
 import { useStore } from "../StoreContext";
 
 export function CollectionSection({ collection }: { collection: CollectionDecl }) {
@@ -18,7 +19,7 @@ export function CollectionSection({ collection }: { collection: CollectionDecl }
   }, [collection, data.catalog.entries]);
   // 官方合集声明的「更多」也按页主范围落页：官方店 = official 源预过滤（2026-11-22 归一化拍板）
   const more = useMemo(() => {
-    const label = collection.more?.label;
+    const label = lt(collection.more, "label");
     const target = collection.more?.target;
     if (!label || !target) return undefined;
     if (target === "rank") return { label, onClick: () => navigate({ page: "rank" }) };

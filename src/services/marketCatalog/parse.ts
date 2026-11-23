@@ -8,7 +8,7 @@
  */
 
 import { isKnownPrimaryCategory, validateEntryCategories } from "./categories";
-import { parseLocales } from "../i18nText";
+import { parseLocales, type Locales } from "../i18nText";
 import { pluginRepoUrl } from "./sourceUrl";
 import type {
   CatalogEntry,
@@ -254,12 +254,15 @@ function parseCollections(
 }
 
 /** 合集级跳转字（09 §二）——label/target 都是字符串才收；target 封闭集合在渲染期校验 */
-function normalizeMoreLink(raw: unknown): { label?: string; target?: string } | undefined {
+function normalizeMoreLink(raw: unknown): { label?: string; target?: string; locales?: Locales } | undefined {
   if (typeof raw !== "object" || raw === null) return undefined;
-  const r = raw as { label?: unknown; target?: unknown };
+  const r = raw as { label?: unknown; target?: unknown; locales?: unknown };
   const label = typeof r.label === "string" && r.label.trim() ? r.label : undefined;
   const target = typeof r.target === "string" && r.target.trim() ? r.target : undefined;
-  return label || target ? { ...(label ? { label } : {}), ...(target ? { target } : {}) } : undefined;
+  const locales = parseLocales(r.locales);
+  return label || target || locales
+    ? { ...(label ? { label } : {}), ...(target ? { target } : {}), ...(locales ? { locales } : {}) }
+    : undefined;
 }
 
 /** 根级 rail 顺序声明（06 §二·3）——形状守卫；名单校验在 railWarningsOf */

@@ -81,7 +81,7 @@ function resolveMore(
   navigate: ReturnType<typeof useStore>["navigate"],
   setRepo: (ref: { authorId: string; repoId: string }) => void,
 ): { label: string; onClick: () => void } | null {
-  const label = more?.label;
+  const label = lt(more, "label");
   const target = more?.target;
   if (!label || !target) return null;
   if (target === "rank") return { label, onClick: () => navigate({ page: "rank" }) };
@@ -91,7 +91,7 @@ function resolveMore(
     return {
       label,
       onClick: () =>
-        navigate({ page: "category", category: slug, authorId: repo.authorId, repoId: repo.id }),
+        navigate({ page: "category", category: slug, authorId: repo.authorId, repoId: repo.repoId }),
     };
   }
   if (target.startsWith("repo:")) {
@@ -120,7 +120,7 @@ function resolveSlides(section: AuthorSectionDecl, repo: ResolvedRepo): HeroCaro
       ? repo.entries.find((p) => p.id === slide.plugin)
       : repo.entries[0];
     if (!entry) continue;
-    out.push({ entry, tag: slide.tag });
+    out.push({ entry, tag: lt(section, "tag") || slide.tag });
   }
   return out;
 }

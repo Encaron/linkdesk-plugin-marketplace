@@ -8,6 +8,7 @@
 import { useMemo } from "react";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import { HeroCarousel } from "../HeroCarousel";
+import { lt } from "../../../services/i18nText";
 import { useStore } from "../StoreContext";
 
 export function Hero() {
@@ -20,7 +21,7 @@ export function Hero() {
       .map((id) => byId.get(id))
       .filter((e): e is CatalogEntry => !!e)
       .slice(0, 5)
-      .map((entry) => ({ entry, tag: banner.title }));
+      .map((entry) => ({ entry, tag: lt(banner, "title") }));
   }, [banner, data.catalog.entries]);
 
   if (slides.length === 0) return null;

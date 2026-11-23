@@ -45,7 +45,7 @@ function resolveMore(
   repoId: string,
   navigate: ReturnType<typeof useStore>["navigate"],
 ): { label: string; onClick: () => void } | null {
-  const label = more?.label;
+  const label = lt(more, "label");
   const target = more?.target;
   if (!label || !target) return null;
   if (target === "rank") return { label, onClick: () => navigate({ page: "rank" }) };
@@ -77,7 +77,7 @@ function resolveSlides(section: AuthorSectionDecl, repo: AuthorRepoView): HeroCa
       ? repo.plugins.find((p) => p.id === slide.plugin)
       : repo.plugins[0];
     if (!entry) continue;
-    out.push({ entry, tag: slide.tag });
+    out.push({ entry, tag: lt(section, "tag") || slide.tag });
   }
   return out;
 }
