@@ -1,5 +1,9 @@
 # 更新日志
 
+## v1.4.17（2026-11-23）
+
+- 目录数据多语言 locales（插件/合集/作者店/仓库/板块，按应用语言解析、base 回退）；补英文缺键；官方作者域硬编码改 locale；rail 紧凑行 nowrap/省略修「作者竖排 / 黄点超格」
+
 ## v1.4.16（2026-11-23）
 
 - **零视觉归一化（门禁 G-N1/N2）**：卡片/hero/作者卡/图标块/媒体框比例收成宿主 `--size-*` 或插件内 `--marketplace-*` 单出处（老壳自动走 fallback，视觉不变）；`CollectionBlock` 同名双实现改名 `AuthorCollectionBlock` / `RepoCollectionBlock`（行为不变）。真机 900×2800 截图像素零差。

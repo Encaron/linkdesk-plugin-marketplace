@@ -16,6 +16,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { lt } from "../../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { EmptyState } from "../../../ui";
 import { authorHueOf } from "./authorHue";
@@ -159,7 +160,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
   const heroIndex = sections.findIndex((s) => s.type === "hero");
   const heroSlides = heroIndex >= 0 ? resolveSlides(sections[heroIndex], repo) : [];
   const rest = sections.filter((_, i) => i !== heroIndex);
-  const storeTitle = repo.storeTitle ?? domain.storeTitle ?? t("{{name}} 的 Plugin Store", { name: domain.name });
+  const storeTitle = lt(repo, "storeTitle") || lt(domain, "storeTitle") || t("{{name}} 的 Plugin Store", { name: domain.name });
   const hue = authorHueOf(domain.authorId);
   const categories = groupByPrimaryCategory(repo.plugins, data.catalog.railOrder);
   const catFilterEntries = authorCat
@@ -169,14 +170,14 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
   const renderSection = (section: AuthorSectionDecl, idx: number) => {
     const noGlow = section.glow === false;
     if (section.type === "grid") {
-      const title = section.title ?? t("全部插件");
+      const title = lt(section, "title") || t("全部插件");
       if (repo.plugins.length === 0) {
         return (
           <section key={`grid:${idx}`} className={`marketplace-store-sec ${noGlow ? "is-no-glow" : ""}`.trim()}>
-            <SectionHead title={title} hint={section.hint ?? repo.intro} />
+            <SectionHead title={title} hint={lt(section, "hint") || lt(repo, "intro")} />
             <EmptyState
               icon="dots"
-              title={t("「{{name}}」暂无插件", { name: repo.name })}
+              title={t("「{{name}}」暂无插件", { name: lt(repo, "name") })}
               sub={t("作者还没往这个仓库上架插件——过阵子再来看看")}
             />
           </section>
@@ -184,7 +185,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
       }
       return (
         <section key={`grid:${idx}`} className={`marketplace-store-sec ${noGlow ? "is-no-glow" : ""}`.trim()}>
-          <SectionHead title={title} hint={section.hint ?? repo.intro} />
+          <SectionHead title={title} hint={lt(section, "hint") || lt(repo, "intro")} />
           <div className="marketplace-store-grid">
             {repo.plugins.map((entry) => (
               <CardGrid key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} />
@@ -198,7 +199,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
       if (slides.length === 0) return null;
       return (
         <section key={`hero:${idx}`} className={`marketplace-store-sec ${noGlow ? "is-no-glow" : ""}`.trim()}>
-          <SectionHead title={section.title ?? t("大屏推荐")} hint={section.hint} />
+          <SectionHead title={lt(section, "title") || t("大屏推荐")} hint={lt(section, "hint")} />
           <HeroCarousel slides={slides} />
         </section>
       );
@@ -210,7 +211,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
       const more = resolveMore(section.more, domain, repo.id, navigate);
       return (
         <section key={`rank:${idx}`} className={`marketplace-store-sec ${noGlow ? "is-no-glow" : ""}`.trim()}>
-          <SectionHead title={section.title ?? t("排行榜")} hint={section.hint} more={more ?? undefined} />
+          <SectionHead title={lt(section, "title") || t("排行榜")} hint={lt(section, "hint")} more={more ?? undefined} />
           <div>
             {rows.map((entry, i) => (
               <RankRow key={entry.id} entry={entry} index={i + 1} ctx={data.ctxOf(entry)} handlers={actions} />
@@ -280,7 +281,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
                 key={r.id}
                 title={r.name}
                 badge={officialStore ? t("内置") : t("作者自建仓库")}
-                intro={r.intro}
+                intro={lt(r, "intro")}
                 meta={t("{{count}} 个插件", { count: r.plugins.length })}
                 goLabel={current ? t("当前仓库") : t("切换到该仓库")}
                 current={current}
@@ -296,11 +297,11 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
 
       {sections.length === 0 && (
         <section className="marketplace-store-sec">
-          <SectionHead title={t("全部插件")} hint={repo.intro} />
+          <SectionHead title={t("全部插件")} hint={lt(repo, "intro")} />
           {repo.plugins.length === 0 ? (
             <EmptyState
               icon="dots"
-              title={t("「{{name}}」暂无插件", { name: repo.name })}
+              title={t("「{{name}}」暂无插件", { name: lt(repo, "name") })}
               sub={t("作者还没往这个仓库上架插件——过阵子再来看看")}
             />
           ) : (
@@ -323,7 +324,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
         {categories.length === 0 ? (
           <EmptyState
             icon="dots"
-            title={t("「{{name}}」暂无插件", { name: repo.name })}
+            title={t("「{{name}}」暂无插件", { name: lt(repo, "name") })}
             sub={t("作者还没往这个仓库上架插件——过阵子再来看看")}
           />
         ) : (

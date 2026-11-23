@@ -20,6 +20,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { urlSourceKey } from "@linkdesk/ui";
+import { parseLocales } from "./i18nText";
+import type { Locales } from "./i18nText";
 import {
   OFFICIAL_SOURCE_URL,
   catalogSiblingUrl,
@@ -54,6 +56,8 @@ export interface AuthorMoreDecl {
 
 export interface AuthorSectionDecl {
   type: AuthorSectionType;
+  /** 语言槽位（title/hint；base 字段兜底） */
+  locales?: Locales;
   title?: string;
   hint?: string;
   /** 板块辉光开关：缺省开；false = 整块回落中性阴影（⛔ 自定色） */
@@ -72,12 +76,16 @@ export interface AuthorSectionDecl {
 }
 
 export interface AuthorHomepageDecl {
+  /** 语言槽位（storeTitle；base 字段兜底） */
+  locales?: Locales;
   storeTitle?: string;
   sections: AuthorSectionDecl[];
 }
 
 export interface AuthorRepoDecl {
   id: string;
+  /** 语言槽位（name/intro/storeTitle；base 字段兜底） */
+  locales?: Locales;
   name: string;
   intro?: string;
   image?: string;
@@ -88,6 +96,8 @@ export interface AuthorRepoDecl {
 
 export interface AuthorBlock {
   authorId: string;
+  /** 语言槽位（intro/storeTitle；base 字段兜底） */
+  locales?: Locales;
   name?: string;
   avatar?: string;
   introImage?: string;
@@ -154,6 +164,7 @@ function parseSections(
       continue;
     }
     const section: AuthorSectionDecl = { type: type as AuthorSectionType };
+    section.locales = parseLocales(r.locales);
     const title = str(r.title);
     const hint = str(r.hint);
     if (title) section.title = title;
@@ -202,7 +213,7 @@ function parseHomepage(
   if (!Array.isArray(r.sections)) return undefined;
   const sections = parseSections(r.sections, repoId, warnings);
   const storeTitle = str(r.storeTitle);
-  return { ...(storeTitle ? { storeTitle } : {}), sections };
+  return { ...(parseLocales(r.locales) ? { locales: parseLocales(r.locales) } : {}), ...(storeTitle ? { storeTitle } : {}), sections };
 }
 
 function parseRepo(raw: unknown, warnings: AuthorWarning[]): AuthorRepoDecl | null {
@@ -211,7 +222,7 @@ function parseRepo(raw: unknown, warnings: AuthorWarning[]): AuthorRepoDecl | nu
   const id = str(r.id);
   const name = str(r.name);
   if (!id || !name) return null;
-  const repo: AuthorRepoDecl = { id, name };
+  const repo: AuthorRepoDecl = { id, name, locales: parseLocales(r.locales) };
   const intro = str(r.intro);
   const image = str(r.image);
   const sourceUrl = str(r.sourceUrl);
@@ -245,7 +256,7 @@ export function parseAuthorBlock(text: string): AuthorParseResult {
   if (!authorId) return { ok: false, reason: "no-author-id" };
 
   const warnings: AuthorWarning[] = [];
-  const block: AuthorBlock = { authorId, repos: [] };
+  const block: AuthorBlock = { authorId, repos: [], locales: parseLocales(r.locales) };
   const name = str(r.name);
   const avatar = str(r.avatar);
   const introImage = str(r.introImage);
@@ -283,6 +294,8 @@ export interface AuthorRepoView extends AuthorRepoDecl {
 
 export interface AuthorDomain {
   authorId: string;
+  /** 语言槽位（intro/storeTitle；base 字段兜底） */
+  locales?: Locales;
   name: string;
   avatar?: string;
   intro?: string;
@@ -448,6 +461,7 @@ export function aggregateAuthorDomain(
        自定义 id / 断网 / 被墙 ⇒ `<img onError>` 回落首字母色块（AuthorCard 侧兜）。
        ⛔ 不走 api.github.com（匿名 60 次/时、国内常被墙），只吃 github.com/<owner>.png 的 302。 */
     avatar: first.avatar ?? githubAvatarOf(authorId),
+    ...(first.locales ? { locales: first.locales } : {}),
     ...(first.intro ? { intro: first.intro } : {}),
     ...(first.introImage ? { introImage: first.introImage } : {}),
     ...(blockStoreTitle ? { storeTitle: blockStoreTitle } : {}),
@@ -533,6 +547,10 @@ export function officialDomainOf(all: readonly CatalogEntry[]): AuthorDomain | n
       id: repo,
       name: repo === OFFICIAL_CORE_REPO_ID ? "官方目录" : repo,
       intro: "官方内置与精选插件",
+      locales: {
+        zh: { name: repo === OFFICIAL_CORE_REPO_ID ? "官方目录" : repo, intro: "官方内置与精选插件" },
+        en: { name: repo === OFFICIAL_CORE_REPO_ID ? "Official catalog" : repo, intro: "Official built-ins and picks" },
+      },
       /* 2026-11-23：官方目录仓的「仓库头像」——品牌橙底 + 2×2 瓷片（插件自带资源，离线可用） */
       ...(repo === OFFICIAL_CORE_REPO_ID ? { image: "linkdesk://marketplace/resources/repo-official.svg" } : {}),
       plugins,
@@ -546,6 +564,10 @@ export function officialDomainOf(all: readonly CatalogEntry[]): AuthorDomain | n
     avatar: githubAvatarOf("Encaron"),
     intro: "官方运营的插件与主题精选",
     storeTitle: "官方 Plugin Store",
+    locales: {
+      zh: { intro: "官方运营的插件与主题精选", storeTitle: "官方 Plugin Store" },
+      en: { intro: "Official plugins and themes, curated.", storeTitle: "Official Plugin Store" },
+    },
     repos,
     warnings: [],
     official: true,

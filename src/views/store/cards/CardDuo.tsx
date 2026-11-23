@@ -5,6 +5,7 @@
  */
 
 import { useTranslation } from "react-i18next";
+import { lt } from "../../../services/i18nText";
 import { useStickyClearance } from "./useStickyClearance";
 import { ActionButton, restatesState, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
@@ -48,7 +49,7 @@ export function CardDuo({
       className={`marketplace-store-card is-duo ${split ? "is-split" : ""}`.trim()}
       role="button"
       tabIndex={0}
-      aria-label={t("{{name}}——查看详情", { name: entry.name })}
+      aria-label={t("{{name}}——查看详情", { name: lt(entry, "name") })}
       data-entry={entry.id}
       style={{ ["--marketplace-hue" as string]: entryHue(entry) }}
       onClick={open}
@@ -56,8 +57,8 @@ export function CardDuo({
     >
       <div className="marketplace-store-cd-copy">
         <span className="marketplace-store-cd-tag">{tag ?? t("编辑精选")}</span>
-        <div className="marketplace-store-cd-name">{t(entry.name)}</div>
-        {entry.description && <div className="marketplace-store-cd-desc">{entry.description}</div>}
+        <div className="marketplace-store-cd-name">{lt(entry, "name")}</div>
+        {lt(entry, "description") && <div className="marketplace-store-cd-desc">{lt(entry, "description")}</div>}
         <CornerTag baseClass="marketplace-ui-corner marketplace-store-cd-corner" tag={status} />
         <div className="marketplace-store-cd-acts">
           {!(ctx.state === "installed" && restatesState(action)) && (

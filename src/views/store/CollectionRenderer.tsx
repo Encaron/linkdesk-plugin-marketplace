@@ -12,6 +12,7 @@
  */
 
 import type { CatalogEntry, CollectionDecl } from "../../services/marketCatalog";
+import { lt } from "../../services/i18nText";
 import type { AuthorSectionDecl } from "../../services/authors";
 import { CardDuo } from "./cards/CardDuo";
 import { CardGrid } from "./cards/CardGrid";
@@ -41,20 +42,20 @@ export function CollectionRenderer({ collection, items, section, more }: Collect
   return (
     <section className={`marketplace-store-sec ${noGlow ? "is-no-glow" : ""}`.trim()} data-spec="04-6">
       <SectionHead
-        title={collection.title}
-        hint={collection.hint ?? collection.subtitle}
+        title={lt(collection, "title")}
+        hint={lt(collection, "hint") || lt(collection, "subtitle")}
         more={more ?? undefined}
       />
       {layout === "mega" ? (
-        <Strip variant="mega" ariaLabel={collection.title}>
+        <Strip variant="mega" ariaLabel={lt(collection, "title")}>
           {items.map((entry) => (
             <CardMega key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} />
           ))}
         </Strip>
       ) : layout === "duo" ? (
-        <Strip variant="duo" ariaLabel={collection.title}>
+        <Strip variant="duo" ariaLabel={lt(collection, "title")}>
           {items.slice(0, 2).map((entry) => (
-            <CardDuo key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} tag={collection.title} />
+            <CardDuo key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} tag={lt(collection, "title")} />
           ))}
         </Strip>
       ) : layout === "split" ? (
@@ -65,7 +66,7 @@ export function CollectionRenderer({ collection, items, section, more }: Collect
               entry={entry}
               ctx={data.ctxOf(entry)}
               handlers={actions}
-              tag={collection.title}
+              tag={lt(collection, "title")}
               split
             />
           ))}
@@ -83,7 +84,7 @@ export function CollectionRenderer({ collection, items, section, more }: Collect
           ))}
         </div>
       ) : (
-        <Strip variant="rows2" ariaLabel={collection.title}>
+        <Strip variant="rows2" ariaLabel={lt(collection, "title")}>
           {items.map((entry) => (
             <CardSmall key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} />
           ))}

@@ -9,6 +9,7 @@
  */
 
 import { useCallback, useMemo } from "react";
+import { lt } from "../../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { EmptyState } from "../../../ui";
 import { useAuthorDomain } from "../../../services/authors";
@@ -75,7 +76,7 @@ export function CategoryView({ slug }: { slug: string }) {
   );
   const scoped = officialOnly || !!authorId || repoOnly;
   const scopedName = repoOnly
-    ? (data.repo.repo?.name ?? data.repo.name)
+    ? (lt(data.repo.repo, "name") || data.repo.name)
     : officialOnly
       ? t("官方 Plugin Store")
       : authorDomain?.name;

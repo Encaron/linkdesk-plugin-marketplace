@@ -12,6 +12,7 @@
  */
 
 import type { KeyboardEvent, PointerEvent } from "react";
+import { lt } from "../../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { hueBG, Icon, type IconName } from "../../../ui";
 import { OFFICIAL_AUTHOR_ID, type AuthorDomain } from "../../../services/authors";
@@ -88,7 +89,7 @@ export function AuthorCard({
           <div className="marketplace-store-ac-badge">{authorBadgeText(t, domain)}</div>
         </div>
       </div>
-      {domain.intro && <div className="marketplace-store-ac-intro">{domain.intro}</div>}
+      {lt(domain, "intro") && <div className="marketplace-store-ac-intro">{lt(domain, "intro")}</div>}
       <div className="marketplace-store-ac-deck" aria-hidden="true">
         {items.map((item, i) => (
           <span

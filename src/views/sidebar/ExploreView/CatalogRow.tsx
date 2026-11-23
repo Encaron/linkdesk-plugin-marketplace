@@ -23,6 +23,7 @@
  */
 
 import { useTranslation } from "react-i18next";
+import { lt } from "../../../services/i18nText";
 import { PluginIcon, pickIdentityArt } from "@linkdesk/ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
 import CatalogRowAction from "./CatalogRowAction";
@@ -62,15 +63,15 @@ export default function CatalogRow({
         <PluginIcon
           pluginId={entry.id}
           manifest={pickIdentityArt(installedIdentity, entry)}
-          alt={t(entry.name)}
+          alt={lt(entry, "name")}
         />
       </div>
       <div className="marketplace-ms-item-details">
         <div className="marketplace-ms-item-header">
-          <span className="marketplace-ms-item-name" data-hint={t(entry.name)} data-hint-delay="0">{t(entry.name)}</span>
+          <span className="marketplace-ms-item-name" data-hint={lt(entry, "name")} data-hint-delay="0">{lt(entry, "name")}</span>
           <span className="marketplace-ms-item-version">v{entry.version}</span>
         </div>
-        {entry.description && <span className="marketplace-ms-item-desc">{entry.description}</span>}
+        {lt(entry, "description") && <span className="marketplace-ms-item-desc">{lt(entry, "description")}</span>}
         <div className="marketplace-ms-item-footer">
           {authorLabel(entry.author) && (
             <span className="marketplace-ms-item-author">{authorLabel(entry.author)}</span>

@@ -4,6 +4,7 @@
  */
 
 import { memo } from "react";
+import { lt } from "../../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { ActionButton, restatesState, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
@@ -52,7 +53,7 @@ export const RankRow = memo(function RankRow({
       className="marketplace-store-rank-row"
       role="button"
       tabIndex={0}
-      aria-label={t("{{name}}——查看详情", { name: entry.name })}
+      aria-label={t("{{name}}——查看详情", { name: lt(entry, "name") })}
       data-entry={entry.id}
       style={{ ["--marketplace-hue" as string]: entryHue(entry) }}
       onClick={open}
@@ -61,7 +62,7 @@ export const RankRow = memo(function RankRow({
       <span className="marketplace-store-rk">{index}</span>
       <Tile entry={entry} identity={ctx.installedIdentity} />
       <div className="marketplace-store-rr-mid">
-        <div className="marketplace-store-rr-name">{t(entry.name)}</div>
+        <div className="marketplace-store-rr-name">{lt(entry, "name")}</div>
         <div className="marketplace-store-rr-cat">
           {tCategory(t, entry)} · {tAuthor(entry)}
         </div>

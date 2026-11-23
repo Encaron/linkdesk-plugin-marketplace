@@ -8,6 +8,7 @@
  */
 
 import { isKnownPrimaryCategory, validateEntryCategories } from "./categories";
+import { parseLocales } from "../i18nText";
 import { pluginRepoUrl } from "./sourceUrl";
 import type {
   CatalogEntry,
@@ -66,6 +67,7 @@ function normalizeEntry(raw: unknown, warnings: CatalogWarning[]): CatalogEntry 
   const normalized: CatalogEntry = {
     id: r.id,
     name: r.name,
+    locales: parseLocales((r as { locales?: unknown }).locales),
     version: r.version,
     description: r.description,
     author: r.author,
@@ -208,6 +210,7 @@ export function parseCollectionDecl(raw: unknown): CollectionDecl | null {
   return {
     id: r.id,
     title: r.title,
+    locales: parseLocales((r as { locales?: unknown }).locales),
     subtitle: typeof r.subtitle === "string" ? r.subtitle : undefined,
     hint: typeof r.hint === "string" ? r.hint : undefined,
     // 08 §三·v3.57 U4 / 09 §二：合集级 glow 与 more 两处都认（白名单漏行 = 目录带着声明进来被静默丢）

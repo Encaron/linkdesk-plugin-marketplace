@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { lt } from "../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { useStickyClearance } from "./cards/useStickyClearance";
 import { ActionButton, entryHue, Icon } from "../../ui";
@@ -70,7 +71,7 @@ export function HeroCarousel({ slides }: { slides: HeroCarouselSlide[] }) {
               const ctx = data.ctxOf(entry);
               const action = actionOfCard(entry, ctx, jobLabelOf(t, ctx.job));
               const dl = dlText(ctx.dl);
-              const label = t("{{name}}——查看详情", { name: entry.name });
+              const label = t("{{name}}——查看详情", { name: lt(entry, "name") });
               return (
                 <div
                   key={entry.id}
@@ -88,8 +89,8 @@ export function HeroCarousel({ slides }: { slides: HeroCarouselSlide[] }) {
                 >
                   <div className="marketplace-store-hero-copy">
                     <span className="marketplace-store-hero-tag">{tag ?? t("作者精选")}</span>
-                    <h2>{t(entry.name)}</h2>
-                    {entry.description && <p>{entry.description}</p>}
+                    <h2>{lt(entry, "name")}</h2>
+                    {lt(entry, "description") && <p>{lt(entry, "description")}</p>}
                     <div className="marketplace-store-hero-meta">
                       <span>
                         {t("作者")} <b>{tAuthor(entry)}</b>

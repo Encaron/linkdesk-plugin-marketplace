@@ -176,7 +176,7 @@ export function Rail() {
           data-rail-item="library"
         >
           <Icon name="folder" size="sm" />
-          {t("库")}
+          <span className="marketplace-store-rail-text">{t("库")}</span>
           <span
             className={`marketplace-store-rail-count ${data.updateCount ? "is-warn" : ""}`}
             data-hint={
@@ -196,7 +196,7 @@ export function Rail() {
           data-rail-item="authors"
         >
           <Icon name="user" size="sm" />
-          {t("作者")}
+          <span className="marketplace-store-rail-text">{t("作者")}</span>
           <span
             className="marketplace-store-rail-count"
             data-hint={t("{{count}} 位作者", { count: data.authorCount })}

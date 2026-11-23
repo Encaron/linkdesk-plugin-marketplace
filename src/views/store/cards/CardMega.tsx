@@ -4,6 +4,7 @@
  */
 
 import { memo } from "react";
+import { lt } from "../../../services/i18nText";
 import { useStickyClearance } from "./useStickyClearance";
 import { useTranslation } from "react-i18next";
 import { ActionButton, restatesState, BadgeRow, CornerTag, entryHue, MoreMenu } from "../../../ui";
@@ -48,7 +49,7 @@ export const CardMega = memo(function CardMega({
       className="marketplace-store-card is-mega"
       role="button"
       tabIndex={0}
-      aria-label={t("{{name}}——查看详情", { name: entry.name })}
+      aria-label={t("{{name}}——查看详情", { name: lt(entry, "name") })}
       data-entry={entry.id}
       style={{ ["--marketplace-hue" as string]: entryHue(entry) }}
       onClick={open}
@@ -57,13 +58,13 @@ export const CardMega = memo(function CardMega({
       <Art entry={entry} identity={ctx.installedIdentity} variant="mega" />
       <div className="marketplace-store-cm-foot">
         <div className="marketplace-store-mn0">
-          <div className="marketplace-store-cm-name">{t(entry.name)}</div>
+          <div className="marketplace-store-cm-name">{lt(entry, "name")}</div>
           <div className="marketplace-store-cm-cat">{tCategory(t, entry)}</div>
         </div>
         <CornerTag baseClass="marketplace-ui-corner marketplace-store-cm-free" tag={status} />
       </div>
       <div className="marketplace-store-cm-band">
-        {entry.description && <div className="marketplace-store-cm-band-desc">{entry.description}</div>}
+        {lt(entry, "description") && <div className="marketplace-store-cm-band-desc">{lt(entry, "description")}</div>}
         <div className="marketplace-store-cm-band-row">
           <BadgeRow badges={badgesOfCard(entry, ctx)} />
           {!(ctx.state === "installed" && restatesState(action)) && (

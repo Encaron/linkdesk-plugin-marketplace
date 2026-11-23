@@ -4,6 +4,7 @@
  */
 
 import { memo } from "react";
+import { lt } from "../../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { ActionButton, restatesState, BadgeRow, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
@@ -38,7 +39,7 @@ export const CardSmall = memo(function CardSmall({
   const status = statusOfCard(entry, ctx);
   const action = actionOfCard(entry, ctx, jobLabelOf(t, ctx.job));
   const items = menuOfCard(entry, ctx);
-  const label = t("{{name}}——查看详情", { name: entry.name });
+  const label = t("{{name}}——查看详情", { name: lt(entry, "name") });
   return (
     <div
       ref={clearance.ref}
@@ -61,7 +62,7 @@ export const CardSmall = memo(function CardSmall({
           <Tile entry={entry} identity={ctx.installedIdentity} className="is-lg" />
           <div className="marketplace-store-fx1">
             {/* 标题独占一行（长价格不再抢宽）；角标下沉到分类行，长文案省略 */}
-            <div className="marketplace-store-cs-name">{t(entry.name)}</div>
+            <div className="marketplace-store-cs-name">{lt(entry, "name")}</div>
             <div className="marketplace-store-cs-meta">
               <span className="marketplace-store-cs-cat">{tCategory(t, entry)}</span>
               <CornerTag stacked baseClass="marketplace-ui-corner marketplace-store-cs-free" tag={status} />
@@ -71,7 +72,7 @@ export const CardSmall = memo(function CardSmall({
         {/* 展开只放新增信息（简介/徽标/动作），头部只有一份 */}
         <div className="marketplace-store-x-more">
           <div className="marketplace-store-x-more-inner">
-            {entry.description && <div className="marketplace-store-x-desc">{entry.description}</div>}
+            {lt(entry, "description") && <div className="marketplace-store-x-desc">{lt(entry, "description")}</div>}
             <div className="marketplace-store-x-foot">
               <BadgeRow badges={badgesOfCard(entry, ctx)} />
               <div className="marketplace-store-x-acts">

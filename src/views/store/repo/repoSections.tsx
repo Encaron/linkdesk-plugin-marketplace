@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
+import { lt } from "../../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { groupByPrimaryCategory } from "../../../services/marketCatalog";
 import type { CatalogEntry, CollectionDecl } from "../../../services/marketCatalog";
@@ -163,19 +164,19 @@ export function RepoSection({ repo, section }: { repo: ResolvedRepo; section: Au
     if (slides.length === 0) return null;
     return (
       <section className={cls}>
-        <SectionHead title={section.title ?? t("大屏推荐")} hint={section.hint} />
+        <SectionHead title={lt(section, "title") || t("大屏推荐")} hint={lt(section, "hint")} />
         <HeroCarousel slides={slides} />
       </section>
     );
   }
   if (section.type === "grid") {
-    const title = section.title ?? t("全部插件");
+    const title = lt(section, "title") || t("全部插件");
     if (repo.entries.length === 0) {
       return (
         <section className={cls}>
-          <SectionHead title={title} hint={section.hint ?? repo.repo?.intro} />
+          <SectionHead title={title} hint={lt(section, "hint") || lt(repo.repo, "intro")} />
           <div className="marketplace-store-state-card" role="status">
-            <b>{t("「{{name}}」暂无插件", { name: repo.name })}</b>
+            <b>{t("「{{name}}」暂无插件", { name: lt(repo, "name") })}</b>
             <span>{t("作者还没往这个仓库上架插件——过阵子再来看看")}</span>
           </div>
         </section>
@@ -183,7 +184,7 @@ export function RepoSection({ repo, section }: { repo: ResolvedRepo; section: Au
     }
     return (
       <section className={cls}>
-        <SectionHead title={title} hint={section.hint ?? repo.repo?.intro} />
+        <SectionHead title={title} hint={lt(section, "hint") || lt(repo.repo, "intro")} />
         <div className="marketplace-store-grid">
           {repo.entries.map((entry) => (
             <CardGrid key={entry.id} entry={entry} ctx={data.ctxOf(entry)} handlers={actions} />
@@ -200,7 +201,7 @@ export function RepoSection({ repo, section }: { repo: ResolvedRepo; section: Au
     const more = resolveMore(section.more, repo, navigate, data.repo.setRepo);
     return (
       <section className={cls}>
-        <SectionHead title={section.title ?? t("排行榜")} hint={section.hint} more={more ?? undefined} />
+        <SectionHead title={lt(section, "title") || t("排行榜")} hint={lt(section, "hint")} more={more ?? undefined} />
         <div>
           {rows.map((entry, i) => (
             <RankRow key={entry.id} entry={entry} index={i + 1} ctx={data.ctxOf(entry)} handlers={actions} />
@@ -234,7 +235,7 @@ export function RepoCategoryTiles({ repo }: { repo: ResolvedRepo }) {
     <section className="marketplace-store-sec" data-spec="04-7">
       <SectionHead
         title={t("按分类浏览")}
-        hint={t("只列出「{{repo}}」里有的分类——点一下在下方展开，再点收起", { repo: repo.name })}
+        hint={t("只列出「{{repo}}」里有的分类——点一下在下方展开，再点收起", { repo: lt(repo, "name") })}
       />
       <div className="marketplace-store-tiles">
         {buckets.map(({ slug, entries }) => (

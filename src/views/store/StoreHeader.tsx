@@ -6,6 +6,7 @@
  */
 
 import type { RefObject } from "react";
+import { lt } from "../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { Icon } from "../../ui";
 import { useAuthorDomain } from "../../services/authors";
@@ -25,7 +26,7 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
     data.catalog.entries.length,
   );
   // D1（19 §2.1）：首页/分类/搜索/排行的头部 = **当前仓库**的 storeTitle（官方市场可显示 Plugin Store）
-  const repoName = data.repo.repo?.name ?? data.repo.name;
+  const repoName = lt(data.repo.repo, "name") || data.repo.name;
   const authorName = data.repo.domain?.name ?? data.repo.authorId;
   const isAuthorPage = route.page === "authors";
   const title = isAuthorPage
@@ -34,7 +35,7 @@ export function StoreHeader({ searchRef }: { searchRef: RefObject<HTMLInputEleme
       ? (domain?.storeTitle ?? (domain ? t("{{name}} 的 Plugin Store", { name: domain.name }) : t("作者主页")))
       : data.repo.core
         ? "Plugin Store"
-        : (data.repo.storeTitle ?? repoName);
+        : (lt(data.repo.repo, "storeTitle") || repoName);
   const sub = isAuthorPage
     ? t("按作者分组——点仓库卡进入该仓库；「管理来源」可添加/停用/移除来源")
     : route.page === "author"

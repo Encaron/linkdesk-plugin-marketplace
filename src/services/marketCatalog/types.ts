@@ -3,9 +3,13 @@
  * E6#86（第 3.6.3 轮）feature-folder 拆分：自 `marketCatalog.ts` 原样搬出，零行为变更。
  */
 
+import type { Locales } from "../i18nText";
+
 /** 市场目录单条目——marketplace.json plugins[] 元素（作者侧声明，sourceId 为合并时注入） */
 export interface CatalogEntry {
   id: string;
+  /** 目录数据的语言槽位（name/description；base 字段兜底）。解析 = ../i18nText */
+  locales?: Locales;
   name: string;
   version: string;
   description?: string;
@@ -83,9 +87,11 @@ export interface SourceLink {
   addedAt: string;
 }
 
-/** 合集声明（06 §二·3；作者数据直显不走 t()） */
+/** 合集声明（06 §二·3；作者数据直显不走 t()；locales 提供多语言覆盖） */
 export interface CollectionDecl {
   id: string;
+  /** 语言槽位（title/subtitle/hint；base 字段兜底） */
+  locales?: Locales;
   title: string;
   subtitle?: string;
   /** 板块副题说明字——不声明不渲染（09 §五） */

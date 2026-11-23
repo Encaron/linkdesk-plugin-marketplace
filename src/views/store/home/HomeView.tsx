@@ -12,6 +12,7 @@
  */
 
 import { useTranslation } from "react-i18next";
+import { lt } from "../../../services/i18nText";
 import { EmptyState } from "../../../ui";
 import { useStore } from "../StoreContext";
 import { RepoSlot } from "../repo/RepoSlot";
@@ -33,14 +34,14 @@ export function HomeView() {
         <section className="marketplace-store-sec">
           <EmptyState
             icon="dots"
-            title={t("「{{name}}」暂无插件", { name: data.repo.name })}
+            title={t("「{{name}}」暂无插件", { name: lt(data.repo.repo, "name") || data.repo.name })}
             sub={t("作者还没往这个仓库上架插件——过阵子再来看看，或换一个仓库")}
           />
         </section>
       ) : (
         rest.map((section, i) => (
           <RepoSection
-            key={`${section.type}:${section.collection ?? section.title ?? ""}:${i}`}
+            key={`${section.type}:${section.collection ?? (lt(section, "title") || "")}:${i}`}
             repo={data.repo}
             section={section}
           />

@@ -4,6 +4,7 @@
  */
 
 import { memo } from "react";
+import { lt } from "../../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { ActionButton, restatesState, BadgeRow, CornerTag, entryHue, MoreMenu } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
@@ -51,7 +52,7 @@ export const CardGrid = memo(function CardGrid({
       className="marketplace-store-card is-grid"
       role="button"
       tabIndex={0}
-      aria-label={t("{{name}}——查看详情", { name: entry.name })}
+      aria-label={t("{{name}}——查看详情", { name: lt(entry, "name") })}
       data-entry={entry.id}
       style={{ ["--marketplace-hue" as string]: entryHue(entry) }}
       onClick={open}
@@ -63,7 +64,7 @@ export const CardGrid = memo(function CardGrid({
           <Tile entry={entry} identity={ctx.installedIdentity} />
           <div className="marketplace-store-fx1">
             {/* 标题独占一行；角标下沉到作者行，长文案省略 */}
-            <div className="marketplace-store-cg-name">{t(entry.name)}</div>
+            <div className="marketplace-store-cg-name">{lt(entry, "name")}</div>
             <div className="marketplace-store-cg-meta">
               <span className="marketplace-store-cg-author">{tAuthor(entry)}</span>
               <CornerTag baseClass="marketplace-ui-corner marketplace-store-cg-corner" tag={status} />
@@ -80,7 +81,7 @@ export const CardGrid = memo(function CardGrid({
         {/* 展开只放新增信息（简介/徽标/动作），头部只有一份 */}
         <div className="marketplace-store-x-more">
           <div className="marketplace-store-x-more-inner">
-            {entry.description && <div className="marketplace-store-x-desc">{entry.description}</div>}
+            {lt(entry, "description") && <div className="marketplace-store-x-desc">{lt(entry, "description")}</div>}
             <div className="marketplace-store-x-foot">
               <BadgeRow badges={badgesOfCard(entry, ctx)} />
               <div className="marketplace-store-x-acts">

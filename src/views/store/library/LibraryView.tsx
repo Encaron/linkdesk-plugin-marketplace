@@ -12,6 +12,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { lt } from "../../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import {
   ActionButton,
@@ -211,7 +212,7 @@ export function LibraryView() {
         className={`marketplace-store-lib-row ${row.state === "disabled" ? "is-disabled" : ""} ${editing ? "is-editing" : ""}`.trim()}
         role="button"
         tabIndex={0}
-        aria-label={t("{{name}}——查看详情", { name: row.entry.name })}
+        aria-label={t("{{name}}——查看详情", { name: lt(row.entry, "name") })}
         data-entry={row.entry.id}
         onClick={() => (editing ? toggleSelect(row.entry.id) : actions.onOpen(row.entry))}
         onKeyDown={(e) =>
@@ -223,7 +224,7 @@ export function LibraryView() {
             type="checkbox"
             className="marketplace-store-lib-check"
             checked={selected.has(row.entry.id)}
-            aria-label={t("选择 {{name}}", { name: row.entry.name })}
+            aria-label={t("选择 {{name}}", { name: lt(row.entry, "name") })}
             onChange={() => toggleSelect(row.entry.id)}
             onClick={(e) => e.stopPropagation()}
           />
@@ -232,7 +233,7 @@ export function LibraryView() {
         <Tile entry={row.entry} identity={ctx.installedIdentity} />
         <span className="marketplace-store-lib-main">
           <span className="marketplace-store-lib-name">
-            {t(row.entry.name)}
+            {lt(row.entry, "name")}
             <span className="marketplace-store-lib-ver">v{row.installedVersion ?? row.entry.version}</span>
           </span>
           <span className="marketplace-store-lib-sub">
@@ -475,13 +476,13 @@ export function LibraryView() {
                   className="marketplace-store-lib-row"
                   role="button"
                   tabIndex={0}
-                  aria-label={t("{{name}}——查看详情", { name: entry.name })}
+                  aria-label={t("{{name}}——查看详情", { name: lt(entry, "name") })}
                   onClick={() => actions.onOpen(entry)}
                   onKeyDown={(e) => cardKeyDown(e, () => actions.onOpen(entry))}
                 >
                   <Tile entry={entry} identity={ctx.installedIdentity} />
                   <span className="marketplace-store-lib-main">
-                    <span className="marketplace-store-lib-name">{t(entry.name)}</span>
+                    <span className="marketplace-store-lib-name">{lt(entry, "name")}</span>
                     <span className="marketplace-store-lib-sub">{t("已购未安装")}</span>
                   </span>
                   <span className="marketplace-store-lib-state">

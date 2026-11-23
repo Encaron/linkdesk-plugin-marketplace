@@ -7,6 +7,7 @@
  */
 
 import { useTranslation } from "react-i18next";
+import { lt } from "../../../services/i18nText";
 import { EmptyState, Icon } from "../../../ui";
 import { CardGrid } from "../cards/CardGrid";
 import { SectionHead } from "../home/SectionHead";
@@ -24,7 +25,7 @@ export function RepoAllView() {
       <div className="marketplace-store-crumb marketplace-store-repo-all-crumb">
         <button type="button" className="marketplace-store-back" onClick={() => navigate({ page: "home" })}>
           <Icon name="chevron-left" size="sm" />
-          {t("返回「{{repo}}」首页", { repo: repo.name })}
+          {t("返回「{{repo}}」首页", { repo: lt(repo, "name") })}
         </button>
         <span className="marketplace-store-repo-all-count">
           {t("{{count}} 个插件", { count: repo.entries.length })}
@@ -32,11 +33,11 @@ export function RepoAllView() {
       </div>
       <RepoSlot />
       <section className="marketplace-store-sec" data-spec="04-7-repo-all">
-        <SectionHead title={t("全部插件")} hint={t("「{{repo}}」里的全部插件", { repo: repo.name })} />
+        <SectionHead title={t("全部插件")} hint={t("「{{repo}}」里的全部插件", { repo: lt(repo, "name") })} />
         {repo.entries.length === 0 ? (
           <EmptyState
             icon="dots"
-            title={t("「{{name}}」暂无插件", { name: repo.name })}
+            title={t("「{{name}}」暂无插件", { name: lt(repo, "name") })}
             sub={t("作者还没往这个仓库上架插件——过阵子再来看看")}
           />
         ) : (

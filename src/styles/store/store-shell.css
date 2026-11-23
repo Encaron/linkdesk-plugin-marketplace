@@ -165,8 +165,11 @@
 .marketplace-store-rail-item.is-empty { opacity: 0.5; }
 .marketplace-store-rail-item.is-compact {
   flex-direction: row;
+  flex-wrap: nowrap;
   justify-content: flex-start;
   gap: 9px;
+  white-space: nowrap;
+  text-align: left;
   padding: 10px 9px;
   border-radius: var(--radius-lg);
   font-size: var(--font-size-xs);
@@ -180,7 +183,14 @@
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
-.marketplace-store-rail-item.is-compact .marketplace-store-rail-count { margin-left: auto; font-size: 11px; }
+.marketplace-store-rail-item.is-compact .marketplace-store-rail-count { margin-left: auto; flex: none; font-size: 11px; }
+.marketplace-store-rail-item.is-compact .marketplace-store-rail-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .marketplace-store-rail-count.is-warn { color: var(--warning); font-weight: 600; }
 .marketplace-store-rail-gap { height: 12px; }
 .marketplace-store-rail-dot {

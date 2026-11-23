@@ -7,6 +7,7 @@
  */
 
 import { memo } from "react";
+import { lt } from "../../../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { ActionButton, restatesState, CornerTag, entryHue, MoreMenu } from "../../../../ui";
 import type { CatalogEntry } from "../../../../services/marketCatalog";
@@ -45,7 +46,7 @@ export const CardWall = memo(function CardWall({
       className="marketplace-store-card is-wall"
       role="button"
       tabIndex={0}
-      aria-label={t("{{name}}——查看详情", { name: entry.name })}
+      aria-label={t("{{name}}——查看详情", { name: lt(entry, "name") })}
       data-entry={entry.id}
       style={{ ["--marketplace-hue" as string]: entryHue(entry) }}
       onClick={open}
@@ -56,7 +57,7 @@ export const CardWall = memo(function CardWall({
       </div>
       <div className="marketplace-store-cw-foot">
         <div className="marketplace-store-mn0">
-          <div className="marketplace-store-cw-name">{t(entry.name)}</div>
+          <div className="marketplace-store-cw-name">{lt(entry, "name")}</div>
           <div className="marketplace-store-cw-sub">
             {tCategory(t, entry)}
             {dl ? ` · ▾ ${dl}` : ""}
@@ -67,7 +68,7 @@ export const CardWall = memo(function CardWall({
       {/* hover 快捷层：与其它卡同一套动作/角标/菜单——整卡进详情不是唯一路径 */}
       <div className="marketplace-store-cw-hover">
         <div className="marketplace-store-cw-h-top">
-          <span className="marketplace-store-cw-h-name">{t(entry.name)}</span>
+          <span className="marketplace-store-cw-h-name">{lt(entry, "name")}</span>
           <CornerTag baseClass="marketplace-ui-corner marketplace-store-cw-corner" tag={status} />
           <MoreMenu
             pluginId={entry.id}

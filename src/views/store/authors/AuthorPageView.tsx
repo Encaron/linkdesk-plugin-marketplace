@@ -13,6 +13,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lt } from "../../../services/i18nText";
 import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { OverlayPortal } from "@linkdesk/ui";
@@ -732,7 +733,7 @@ export function AuthorPageView({ mode }: { mode: AuthorPageMode }) {
                         key={r.id}
                         title={r.name}
                         badge={`${group.name} · ${group.official ? t("官方 ✓") : t("社区源")}`}
-                        intro={r.intro}
+                        intro={lt(r, "intro")}
                         meta={t("{{count}} 个插件", { count: r.plugins.length })}
                         goLabel={r.id === data.repo.repoId && isCurrent ? t("当前仓库") : t("进入仓库")}
                         current={r.id === data.repo.repoId && isCurrent}

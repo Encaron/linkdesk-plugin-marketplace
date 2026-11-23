@@ -4,6 +4,7 @@
  */
 
 import { memo } from "react";
+import { lt } from "../../../services/i18nText";
 import { useTranslation } from "react-i18next";
 import { ActionButton, restatesState, Badge, entryHue, MoreMenu, sourceBadge } from "../../../ui";
 import type { CatalogEntry } from "../../../services/marketCatalog";
@@ -40,7 +41,7 @@ export const CardRow = memo(function CardRow({
       className="marketplace-store-card is-row"
       role="button"
       tabIndex={0}
-      aria-label={t("{{name}}——查看详情", { name: entry.name })}
+      aria-label={t("{{name}}——查看详情", { name: lt(entry, "name") })}
       data-entry={entry.id}
       style={{ ["--marketplace-hue" as string]: entryHue(entry) }}
       onClick={open}
@@ -49,11 +50,11 @@ export const CardRow = memo(function CardRow({
       <Tile entry={entry} identity={ctx.installedIdentity} className="is-lg" />
       <div className="marketplace-store-cr-main">
         <div className="marketplace-store-cr-l1">
-          <span className="marketplace-store-cr-name">{t(entry.name)}</span>
+          <span className="marketplace-store-cr-name">{lt(entry, "name")}</span>
           <Badge desc={sourceBadge(entry)} />
           <span className="marketplace-store-cr-cat">{tCategory(t, entry)}</span>
         </div>
-        {entry.description && <div className="marketplace-store-cr-desc">{entry.description}</div>}
+        {lt(entry, "description") && <div className="marketplace-store-cr-desc">{lt(entry, "description")}</div>}
       </div>
       {dl && (
         <span className="marketplace-store-cr-dl" data-hint={t("下载量")}>
