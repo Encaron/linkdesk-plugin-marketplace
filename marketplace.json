@@ -1,30 +1,36 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-23T17:28:23.857Z",
+  "updatedAt": "2026-11-23T17:32:01.522Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.20",
+      "version": "1.4.21",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.20/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.21/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.20/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.21/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.60",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.20/README.md",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.21/README.md",
       "readmeLocales": {
-        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.20/README.md",
-        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.20/docs/readme/en.md"
+        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.21/README.md",
+        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.21/docs/readme/en.md"
       },
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.20/marketplace.linkdesk-plugin",
-      "size": 195165,
-      "publishedAt": "2026-11-23T17:28:23.857Z",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.21/marketplace.linkdesk-plugin",
+      "size": 195054,
+      "publishedAt": "2026-11-23T17:32:01.522Z",
       "versions": [
+        {
+          "version": "1.4.21",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.21/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-23T17:32:01.522Z",
+          "changelog": "- **rail 紧凑行不再省略**：112px + gap 6 / padding 7 / 计数 10px / 点 margin 4；英文 Library、Author 与中文「我的库 / 作者」完整显示（2026-11-24 实机「Lib… / A..」）。"
+        },
         {
           "version": "1.4.20",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.20/marketplace.linkdesk-plugin",
@@ -52,8 +58,7 @@
         {
           "version": "1.4.16",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.16/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-23T13:48:23.579Z",
-          "changelog": "- **零视觉归一化（门禁 G-N1/N2）**：卡片/hero/作者卡/图标块/媒体框比例收成宿主 `--size-*` 或插件内 `--marketplace-*` 单出处（老壳自动走 fallback，视觉不变）；`CollectionBlock` 同名双实现改名 `AuthorCollectionBlock` / `RepoCollectionBlock`（行为不变）。真机 900×2800 截图像素零差。"
+          "publishedAt": "2026-11-23T13:48:23.579Z"
         },
         {
           "version": "1.4.15",
