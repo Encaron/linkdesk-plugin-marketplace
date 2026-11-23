@@ -338,7 +338,7 @@
   pointer-events: none;
   /* 小卡/网格卡的整面不是「文字条」：保持主题玻璃，只在文字侧压局部 scrim，⛔ 不整面深色。 */
   background: var(--bg-card);
-  color: var(--text-primary);
+  color: var(--surface-ink, var(--text-primary));
   text-shadow: 0 1px 2px color-mix(in srgb, var(--surface-media-scrim) 80%, transparent);
   backdrop-filter: var(--surface-blur);
   -webkit-backdrop-filter: var(--surface-blur);
@@ -419,7 +419,7 @@
   bottom: 60px;
   height: 108px;
   background: var(--surface-reading-strong);
-  color: var(--text-primary);
+  color: var(--surface-ink, var(--text-primary));
   text-shadow: 0 1px 2px color-mix(in srgb, var(--surface-media-scrim) 80%, transparent);
   /* D5：hover 条是压在封面上的玻璃——必须模糊它**下面的图**；用的仍是卡面同一 token
      `--surface-blur`（⛔ 新 blur 数值）。卡面的 backdrop-filter 只采样卡外背景，管不到卡内媒体。 */
@@ -551,7 +551,7 @@
     var(--surface-media-scrim) 0%,
     color-mix(in srgb, var(--surface-media-scrim) 78%, transparent) 70%,
     transparent 100%);
-  color: var(--surface-ink, var(--text-primary));
+  color: var(--surface-media-ink, var(--surface-ink, var(--text-primary)));
   opacity: 0;
   transform: translateY(6px);
   pointer-events: none;

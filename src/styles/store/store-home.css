@@ -85,7 +85,7 @@
   justify-content: center;
   min-width: 0;
   /* 压图文字走「媒体墨色」——浅色主题的 text-primary 是深色，直接继承会在暗遮罩上消失 */
-  color: var(--surface-ink, var(--text-primary));
+  color: var(--surface-media-ink, var(--surface-ink, var(--text-primary)));
   text-shadow: 0 1px 2px color-mix(in srgb, var(--surface-media-scrim) 80%, transparent);
 }
 .marketplace-store-hero-tag {
@@ -109,7 +109,7 @@
   overflow: hidden;
 }
 .marketplace-store-hero-copy p {
-  color: color-mix(in srgb, var(--surface-ink, var(--text-primary)) 80%, transparent);
+  color: color-mix(in srgb, var(--surface-media-ink, var(--surface-ink, var(--text-primary))) 80%, transparent);
   font-size: var(--font-size-sm);
   line-height: 1.6;
   margin: 0 0 14px;
@@ -122,14 +122,14 @@
 .marketplace-store-hero-meta {
   display: flex;
   gap: 14px;
-  color: color-mix(in srgb, var(--surface-ink, var(--text-primary)) 72%, transparent);
+  color: color-mix(in srgb, var(--surface-media-ink, var(--surface-ink, var(--text-primary))) 72%, transparent);
   font-size: var(--font-size-xs);
   margin-bottom: 18px;
   align-items: center;
   font-variant-numeric: tabular-nums;
   flex-wrap: wrap;
 }
-.marketplace-store-hero-meta b { color: var(--surface-ink, var(--text-primary)); font-weight: 600; }
+.marketplace-store-hero-meta b { color: var(--surface-media-ink, var(--surface-ink, var(--text-primary))); font-weight: 600; }
 .marketplace-store-hero-cta { display: flex; gap: 10px; }
 .marketplace-store-art.is-hero { min-height: 0; }
 
