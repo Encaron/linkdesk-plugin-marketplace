@@ -1,26 +1,32 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-22T21:55:05.800Z",
+  "updatedAt": "2026-11-23T05:30:52.323Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.10",
+      "version": "1.4.15",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.10/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.15/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.10/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.15/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.20",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.10/README.md",
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.10/marketplace.linkdesk-plugin",
-      "size": 181445,
-      "publishedAt": "2026-11-22T21:55:05.800Z",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.15/README.md",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.15/marketplace.linkdesk-plugin",
+      "size": 180634,
+      "publishedAt": "2026-11-23T05:30:52.323Z",
       "versions": [
+        {
+          "version": "1.4.15",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.15/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-23T05:30:52.323Z",
+          "changelog": "- **装机必备小卡 / 网格卡：常态不再磨砂**：这两种卡的可见面就是一层半透底（`.marketplace-store-x-over`），与 duo、热门下载行同一处境、同一「普通玻璃」语言；磨砂改到 hover/键盘聚焦时才上（面长大、压到邻居那一拍）。滚动实测 ≈ −0.2 s/2s（~15%）。作者坞、作者卡叠层（半透卡压半透卡）保持常态磨砂——那是遮挡需求。"
+        },
         {
           "version": "1.4.10",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.10/marketplace.linkdesk-plugin",
