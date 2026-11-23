@@ -1,5 +1,10 @@
 # 更新日志
 
+## v1.4.11（2026-11-23）
+
+- **Hero 压图文字改走媒体墨色（浅色主题实机）**：`.marketplace-store-hero-copy` 及其标题／描述／作者行不再继承 `--text-primary` / `--text-secondary` / `--text-muted`，改用 `--surface-ink` 与其 alpha 派生，并加遮罩色文字阴影。玫瑰窗这类**浅色主题**在深色 Hero 上的文字不再消失；深色主题观感不变。
+- 与主题侧 `surface-ink`／`surface-media-scrim` 成对修正（玫瑰窗 1.0.4）。
+
 ## v1.4.10（2026-11-23）
 
 - **插件名在市场里也跟着翻译**：store 各卡型原先直接渲染目录里的中文名，而侧栏走 `t(name)`——英文界面下出现「侧栏 Official Themes、市场里还是中文」。现在封面/栅格/大卡/行/排行榜/英雄轮播/库里全走 `t(entry.name)`，与侧栏同一条翻译路（字典缺项时回落原名）。
