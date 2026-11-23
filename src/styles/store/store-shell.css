@@ -477,6 +477,9 @@
 .marketplace-store-sbtn:hover { background: var(--tab-hover-bg); color: var(--text-primary); }
 
 /* ── 板块节奏 ── */
+/* 2026-11-23 试验记录（已撤回）：给各 section 加 `content-visibility:auto`（配 48px padding 防 hover 光晕被
+   paint containment 裁掉）——真机 A/B 六轮：GPU/4s 基线 2.02/2.05/2.07 vs 注入后 2.16/2.11/1.98，
+   **无可测收益**（页面只有 5–6 个板块、总高 ~2–3 屏，离屏跳过省下来的量在噪声里）。故不保留。 */
 .marketplace-store-sec { margin-bottom: 36px; }
 .marketplace-store-sec-head {
   display: flex;
