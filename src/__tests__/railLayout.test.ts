@@ -24,11 +24,16 @@ describe("rack rail compact 布局契约", () => {
     expect(b).toContain("white-space: nowrap");
   });
 
-  it("标签槽可收缩 + 省略号（英文 Author 不被点挤出）", () => {
+  it("标签槽不依赖省略号（英文 Author 完整显示）", () => {
     const b = block(".marketplace-store-rail-item.is-compact .marketplace-store-rail-text");
     expect(b).toContain("min-width: 0");
-    expect(b).toContain("text-overflow: ellipsis");
+    expect(b).toContain("text-overflow: clip");
+    expect(b).not.toContain("text-overflow: ellipsis");
     expect(b).toContain("white-space: nowrap");
+  });
+
+  it("窄容器 rail 宽度足够（128px）——Library/Author + 计数 + 点全部放得下", () => {
+    expect(CSS).toMatch(/@container \(max-width: 1080px\)[\s\S]*?\.marketplace-store-rail\s*\{\s*width:\s*128px/);
   });
 
   it("数字与点不参与收缩（点始终在胶囊内）", () => {

@@ -188,7 +188,7 @@
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
 }
 .marketplace-store-rail-count.is-warn { color: var(--warning); font-weight: 600; }
@@ -633,9 +633,9 @@
 
 /* ── 响应式（对齐蓝图 1080/900/700 三档） ── */
 @container (max-width: 1080px) {
-  /* 108 时英文 Library 仍会被省略号截成 Lib…（2026-11-24 实机）。112 + 紧凑 gap/padding
-     让「图标 + Library + 计数 + 点」全部放得下；中文「我的库 / 作者」同样不竖排。 */
-  .marketplace-store-rail { width: 112px; }
+  /* 112 时 Author + 计数 + 黄点仍会挤成 Aut…（2026-11-24 实机）。128 = 图标/文字/计数/点
+     全部放得下，标签槽不再依赖省略号；中文「我的库 / 作者」同样不竖排。 */
+  .marketplace-store-rail { width: 128px; }
 }
 @container (max-width: 900px) {
   .marketplace-store { flex-direction: column; }
