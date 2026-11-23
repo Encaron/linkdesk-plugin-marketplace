@@ -14,6 +14,7 @@
 
 import { useCallback, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { lt } from "../../services/i18nText";
 import type { CatalogEntry } from "../../services/marketCatalog";
 import { retryMarketInstall } from "../../services/marketplaceShared/installFlow";
 import { scheduleDataRefresh } from "../../services/marketplaceShared/pluginsStore";
@@ -41,7 +42,7 @@ export function useStoreActions(
   const onOpen = useCallback((entry: CatalogEntry) => {
     // 08 v3.51：每插件一标签、pinned:true 固定新开；未装插件壳无 manifest，必须传 label。
     // 唯一入口 = services/openDetailTab（R4-3.16）——⛔ 视图里不再各自写 tabs.create。
-    void openPluginDetailTab(entry.id, entry.name);
+    void openPluginDetailTab(entry.id, lt(entry, "name"));
   }, []);
 
   const onAct = useCallback(
@@ -54,7 +55,7 @@ export function useStoreActions(
         case "retry":
           if (id === "retry") {
             if (!entry.downloadUrl) return;
-            void retryMarketInstall(entry.id, entry.downloadUrl, entry.name);
+            void retryMarketInstall(entry.id, entry.downloadUrl, lt(entry, "name"));
             return;
           }
           void runMarketInstallAction(entry, online, t);
@@ -63,7 +64,7 @@ export function useStoreActions(
           void performMarketUpdate({
             pluginId: entry.id,
             entry,
-            displayName: entry.name,
+            displayName: lt(entry, "name"),
             ver: entry.version,
             online,
             refresh: scheduleDataRefresh,
@@ -77,7 +78,7 @@ export function useStoreActions(
               await pm()?.enable(entry.id);
               scheduleDataRefresh();
             } catch (e) {
-              notifyError(t("启用「{{name}}」失败：{{detail}}", { name: entry.name, detail: e instanceof Error ? e.message : String(e) }));
+              notifyError(t("启用「{{name}}」失败：{{detail}}", { name: lt(entry, "name"), detail: e instanceof Error ? e.message : String(e) }));
             }
           })();
           return;
@@ -87,7 +88,7 @@ export function useStoreActions(
               await pm()?.disable(entry.id);
               scheduleDataRefresh();
             } catch (e) {
-              notifyError(t("禁用「{{name}}」失败：{{detail}}", { name: entry.name, detail: e instanceof Error ? e.message : String(e) }));
+              notifyError(t("禁用「{{name}}」失败：{{detail}}", { name: lt(entry, "name"), detail: e instanceof Error ? e.message : String(e) }));
             }
           })();
           return;
@@ -101,7 +102,7 @@ export function useStoreActions(
                 await pm()?.uninstall(entry.id);
                 scheduleDataRefresh();
               } catch (e) {
-                notifyError(t("卸载「{{name}}」失败：{{detail}}", { name: entry.name, detail: e instanceof Error ? e.message : String(e) }));
+                notifyError(t("卸载「{{name}}」失败：{{detail}}", { name: lt(entry, "name"), detail: e instanceof Error ? e.message : String(e) }));
               }
             })();
             return;

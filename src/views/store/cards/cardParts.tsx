@@ -16,6 +16,7 @@ import type { LocalIdentity, PackageState } from "../../../services/catalogStatu
 import type { InstallJob } from "../../../services/installJobs";
 import { installJobLabel } from "../../../services/installJobs";
 import { authorLabel } from "../../../services/catalogText";
+import { lt } from "../../../services/i18nText";
 import {
   allBadges,
   entryHue,
@@ -180,7 +181,7 @@ export function Art({
     >
       {/* 生成式底纹（同一件，不是第二套）：有图时被盖住；图 404/未加载时自动露出 */}
       <div className="marketplace-store-art-gen" aria-hidden="true">
-        <span className="marketplace-store-art-watermark">{t(entry.name)}</span>
+        <span className="marketplace-store-art-watermark">{lt(entry, "name")}</span>
         <span className="marketplace-store-art-genico">
           <PluginIcon pluginId={entry.id} manifest={pickIdentityArt(identity, entry)} alt="" />
         </span>
@@ -194,7 +195,7 @@ export function Art({
           controls
           preload="metadata"
           onClick={(e) => e.stopPropagation()}
-          aria-label={t("{{name}} 介绍视频——作者直链，点击播放（不自动播放）", { name: entry.name })}
+          aria-label={t("{{name}} 介绍视频——作者直链，点击播放（不自动播放）", { name: lt(entry, "name") })}
         />
       )}
       {frames.map((src, i) => (

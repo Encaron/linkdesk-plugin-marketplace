@@ -45,7 +45,7 @@ export function syntheticOfficialSections(
   if (banner) {
     sections.push({
       type: "hero",
-      slides: banner.items.slice(0, 5).map((plugin) => ({ plugin, tag: banner.title })),
+      slides: banner.items.slice(0, 5).map((plugin) => ({ plugin, tag: lt(banner, "title") })),
     });
   }
   for (const c of [...official]

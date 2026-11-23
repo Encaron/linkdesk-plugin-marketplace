@@ -12,6 +12,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { lt } from "../../services/i18nText";
 
 import { getCachedUIPrefs, onUIPrefsChange, readUIPrefs, setViewPrefs, writeUIPrefs } from "../../services/marketplaceShared/uiPrefs";
 import type { AuthorSort, LibSort, UIPrefs } from "../../services/marketplaceShared/uiPrefs";
@@ -82,7 +83,7 @@ export default function StoreView({ isActive = true }: { isActive?: boolean }) {
      壳面不可用（旧壳/预览/测试）才落本地 OverlayPortal 版 */
   const openLicense = useCallback(
     (entry: CatalogEntry) => {
-      void requestLicenseDialog({ pluginName: entry.name, authorId: entry.authorId }).then((r) => {
+      void requestLicenseDialog({ pluginName: lt(entry, "name"), authorId: entry.authorId }).then((r) => {
         if (r === "unsupported") setLicenseEntry(entry);
         else if (r === "ok") data.refreshLicenses();
       });

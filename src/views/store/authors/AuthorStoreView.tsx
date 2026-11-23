@@ -279,7 +279,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
             return (
               <AuthorSwitchCard
                 key={r.id}
-                title={r.name}
+                title={lt(r, "name")}
                 badge={officialStore ? t("内置") : t("作者自建仓库")}
                 intro={lt(r, "intro")}
                 meta={t("{{count}} 个插件", { count: r.plugins.length })}
@@ -288,7 +288,7 @@ export function AuthorStoreView({ authorId, repoId }: { authorId: string; repoId
                 icon={officialStore ? "bag" : r.image ? "folder" : "user"}
                 hue={r.image ? hue : undefined}
                 onOpen={() => navigate({ page: "author", authorId: domain.authorId, repoId: r.id })}
-                ariaLabel={t("{{name}}——切换到该仓库", { name: r.name })}
+                ariaLabel={t("{{name}}——切换到该仓库", { name: lt(r, "name") })}
               />
             );
           })}

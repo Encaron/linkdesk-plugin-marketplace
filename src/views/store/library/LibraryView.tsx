@@ -389,7 +389,7 @@ export function LibraryView() {
                       type="checkbox"
                       className="marketplace-store-lib-check is-corner"
                       checked={selected.has(node.row.entry.id)}
-                      aria-label={t("选择 {{name}}", { name: node.row.entry.name })}
+                      aria-label={t("选择 {{name}}", { name: lt(node.row.entry, "name") })}
                       onChange={() => toggleSelect(node.row.entry.id)}
                       onClick={(e) => e.stopPropagation()}
                     />

@@ -731,7 +731,7 @@ export function AuthorPageView({ mode }: { mode: AuthorPageMode }) {
                     return (
                       <AuthorSwitchCard
                         key={r.id}
-                        title={r.name}
+                        title={lt(r, "name")}
                         badge={`${group.name} · ${group.official ? t("官方 ✓") : t("社区源")}`}
                         intro={lt(r, "intro")}
                         meta={t("{{count}} 个插件", { count: r.plugins.length })}
@@ -740,7 +740,7 @@ export function AuthorPageView({ mode }: { mode: AuthorPageMode }) {
                         icon={group.official ? "bag" : "folder"}
                         hue={group.hue}
                         onOpen={() => openRepo(group.authorId, r.id)}
-                        ariaLabel={t("{{name}}——进入该仓库", { name: r.name })}
+                        ariaLabel={t("{{name}}——进入该仓库", { name: lt(r, "name") })}
                         drag={{
                           attrs: {
                             "data-swap-kind": "repo",

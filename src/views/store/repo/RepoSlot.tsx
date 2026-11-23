@@ -14,6 +14,7 @@ import { useCallback } from "react";
 import type { KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { authorHueOf } from "../authors/authorHue";
+import { lt } from "../../../services/i18nText";
 import { swapRepos } from "../../../services/sourceAdmin";
 import { orderedReposOf, useSourceOrder } from "../../../services/sourceOrderStore";
 import { showToast } from "../../../services/hostApi";
@@ -97,9 +98,9 @@ export function RepoSlot() {
             return (
               <AuthorSwitchCard
                 key={r.id}
-                title={r.name}
+                title={lt(r, "name")}
                 badge={`${authorName} · ${data.repo.official ? t("官方 ✓") : t("社区源")}`}
-                intro={r.intro}
+                intro={lt(r, "intro")}
                 meta={t("{{count}} 个插件", { count: r.plugins.length })}
                 goLabel={current ? t("当前仓库") : t("进入仓库")}
                 current={current}
@@ -109,7 +110,7 @@ export function RepoSlot() {
                 image={r.image ?? (core ? "linkdesk://marketplace/resources/repo-official.svg" : undefined)}
                 hue={authorHueOf(authorId)}
                 onOpen={() => data.repo.setRepo({ authorId, repoId: r.id })}
-                ariaLabel={t("{{name}}——切换到该仓库", { name: r.name })}
+                ariaLabel={t("{{name}}——切换到该仓库", { name: lt(r, "name") })}
                 drag={{
                   attrs: {
                     "data-swap-kind": "repo",

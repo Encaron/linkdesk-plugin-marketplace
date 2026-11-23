@@ -1,5 +1,11 @@
 # 更新日志
 
+## v1.4.22（2026-11-24）
+
+- **作者/仓库卡名走目录 locales**：`AuthorSwitchCard` / 仓卡标题此前裸读 `r.name`（intro 已本地化、name 没走 lt），英文界面仍显示「官方目录」；作者仓卡/仓库页/来源管理三处统一 `lt(r,"name")`。
+- **防复发**：新增 `catalogTextResolution.test.ts`，扫视图里的 `title={r.name}` / `tag: banner.title` / `more.label` 裸读，命中即红。
+
+
 ## v1.4.21（2026-11-24）
 
 - **rail 紧凑行不再省略**：112px + gap 6 / padding 7 / 计数 10px / 点 margin 4；英文 Library、Author 与中文「我的库 / 作者」完整显示（2026-11-24 实机「Lib… / A..」）。

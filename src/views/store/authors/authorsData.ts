@@ -11,6 +11,8 @@ import type { AuthorSort } from "../../../services/marketplaceShared/uiPrefs";
 /** 仓卡扇出项（蓝图 authorDeck：1 仓满宽「唯一仓库」；4+ 前 2＋「+N 个仓库」汇总） */
 export interface AuthorDeckItem {
   name: string;
+  /** 仓名语言槽位——卡面按应用语言解析（与 domain/repo 同一套 locales） */
+  locales?: AuthorRepoView["locales"];
   count: number;
   /** 汇总卡（+N）——文案由视图出（作者数据里没有这个名字） */
   more?: boolean;
@@ -23,7 +25,7 @@ export interface AuthorDeckItem {
  *   - 4+：前 2 ＋ 汇总卡（⛔ 溢出卡片）。
  */
 export function authorDeckOf(repos: readonly AuthorRepoView[]): AuthorDeckItem[] {
-  const items = repos.map((r) => ({ name: r.name, count: r.plugins.length, id: r.id }));
+  const items = repos.map((r) => ({ name: r.name, locales: r.locales, count: r.plugins.length, id: r.id }));
   if (items.length > 3) {
     const rest = items.slice(2);
     return [
@@ -31,7 +33,7 @@ export function authorDeckOf(repos: readonly AuthorRepoView[]): AuthorDeckItem[]
       { name: "", count: rest.reduce((n, r) => n + r.count, 0), more: true },
     ];
   }
-  return items.map(({ name, count }) => ({ name, count }));
+  return items.map(({ name, locales, count }) => ({ name, locales, count }));
 }
 
 /** 汇总卡的实际仓数（+N 的 N） */
