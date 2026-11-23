@@ -141,13 +141,16 @@ function waitTabActivated(
  *  🔴 R4-V.2 真机缺陷修正（2026-11-21 隔离实例实机复现）：主区视图 tab 不带 `{pluginId}` 时，
  *  壳按 `opts.pluginId ?? resolveLegacyPluginId(type) ?? type` 把裸 type 当插件 id ⇒
  *  面板画「插件 "marketplace-store" 不可用」；带上 pluginId 后池按插件入口装载（入口别名渲染同一 StoreView）。
- *  label 用词典既有键（en.json "插件商店"）——否则 tab 标签回落裸 type 串。 */
+ *  label 用词典既有键（en.json "插件商店"）——否则 tab 标签回落裸 type 串。
+ *  pinned:true = 正体常驻：pinned=false 是预览态（斜体），会被下一次预览打开顶掉（用户
+ *  2026-11-24 实机反馈「Plugins Store 极容易被替换」）。壳侧 openOrFocus 对已开的预览页也会
+ *  补 pin（reduceCreateTab Step 1），老会话里的斜体页点一次入口即转正。 */
 async function openStoreTab(): Promise<OpenTabResult> {
   const tabs = lk()?.tabs;
   if (!tabs?.openOrFocus) return { ok: false, tabId: "" };
   const waiter = waitTabActivated();
   try {
-    await tabs.openOrFocus(STORE_TAB_TYPE, { pluginId: OWNER, label: i18n.t("插件商店") });
+    await tabs.openOrFocus(STORE_TAB_TYPE, { pluginId: OWNER, label: i18n.t("插件商店"), pinned: true });
   } catch {
     waiter.cancel();
     return { ok: false, tabId: "" };

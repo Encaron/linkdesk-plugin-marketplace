@@ -1,5 +1,9 @@
 # 更新日志
 
+## v1.4.24（2026-11-24）
+
+- **插件商店标签页改为正体常驻**：`openStoreTab` 显式传 `pinned:true`。此前新标签默认预览态（斜体），会被下一次预览打开顶掉——用户实机反馈「Plugins Store 极容易被替换」。壳侧 `reduceOpenOrFocus` 同步补上「已存在标签页按 `pinned:true` 补 pin」，老会话里的斜体页点一次入口即转正。
+
 ## v1.4.23（2026-11-24）
 
 - **rail 标签不再省略**：128px + `text-overflow: clip`；此前 112px 仍会把 Author + 计数 + 黄点挤成 Aut…。门禁/测试也改为要求 128px + clip，不再把省略号当不变量。
