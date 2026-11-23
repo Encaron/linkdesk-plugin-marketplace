@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@linkdesk/plugin-sdk/schemas/plugin.schema.json",
   "pluginId": "marketplace",
   "name": "插件市场",
-  "version": "1.4.17",
+  "version": "1.4.18",
   "category": "productivity",
   "minAppVersion": "0.2.60",
   "icon": "resources/icon.svg",
@@ -405,6 +405,13 @@
           "render": "src/views/store/StoreView.tsx"
         }
       ]
+    }
+  },
+  "readme": {
+    "default": "README.md",
+    "locales": {
+      "zh": "README.md",
+      "en": "docs/readme/en.md"
     }
   }
 }

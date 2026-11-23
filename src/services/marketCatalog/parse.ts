@@ -91,6 +91,9 @@ function normalizeEntry(raw: unknown, warnings: CatalogWarning[]): CatalogEntry 
     minAppVersion: r.minAppVersion,
     versions: Array.isArray(r.versions) ? r.versions : undefined,
     readmeUrl: r.readmeUrl,
+    readmeLocales: r.readmeLocales && typeof r.readmeLocales === "object" && !Array.isArray(r.readmeLocales)
+      ? Object.fromEntries(Object.entries(r.readmeLocales).filter(([, v]) => typeof v === "string" && v))
+      : undefined,
     screenshots: normalizeScreenshots(r.screenshots, r.id, warnings),
     cover: normalizeMediaUrl(r.cover, "cover", r.id, warnings),
     license: r.license,

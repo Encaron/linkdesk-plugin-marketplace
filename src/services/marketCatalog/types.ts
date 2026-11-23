@@ -38,6 +38,8 @@ export interface CatalogEntry {
   /** 版本历史（最新在前）——版本下拉数据源（E6#29c） */
   versions?: Array<{ version: string; downloadUrl?: string; publishedAt?: string; changelog?: string }>;
   readmeUrl?: string;
+  /** 多语言 README（语言码 → tag 下 raw URL）；缺省 = 单语言 readmeUrl。 */
+  readmeLocales?: Record<string, string>;
   /** R4-0.2（06 §二·2 媒体契约向后兼容扩宽）：string = 图片 URL（旧数据原样可读）；
    *  视频项 {type:"video",url,poster?} 至多 1 段且必须排第一（封面视频）——多段/越位的解析期丢弃并
    *  在来源页记声明提示（⛔ 不静默降级成图）；播放语义照 README 视频（controls 强制/preload=metadata/

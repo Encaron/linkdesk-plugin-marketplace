@@ -44,6 +44,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { pickIdentityArt } from "@linkdesk/ui";
+import { lt } from "../../services/i18nText";
 import { useOnlineStatus } from "../../services/marketplaceShared";
 import { authorLabel } from "../../services/installConfirmPayload";
 import { openPluginDetailTab } from "../../services/openDetailTab";
@@ -146,13 +147,14 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
   //    零 dangerouslySetInnerHTML）。 ──
   const m = info?.manifest ?? {};
   const isCore = !!m.core;
-  const nameText = info ? t(m.name ?? pluginId ?? "") : entry?.name ?? pluginId ?? "";
+  const nameText = info ? t(m.name ?? pluginId ?? "") : lt(entry, "name") || pluginId || "";
   const versionText = info ? m.version : entry?.version;
   /* #63c B3：作者行/header 副标题两源归并（禁用态连带坑 2026-09-09——getDisabled 子集无 author/icon：
    *  已装 manifest author 为准 → 缺失回退目录 entry.author（禁用/已装都可经目录补齐副标题 + 侧栏作者行）；
    *  目录也没有 = undefined → header 副标题藏、侧栏作者行 Dash 诚实占位（结构固定不缩行）。 */
   const authorText = (info ? m.author : undefined) || (entry ? authorLabel(entry.author) : undefined);
-  const descText = info ? m.description ?? "" : entry?.description ?? "";
+  // 已装/禁用：宿主 list()/getDisabled() 已解析成当前语言；未装：目录 locales（数据层解析）。
+  const descText = info ? m.description ?? "" : lt(entry, "description");
   const showDesc = descText.length > 0;
   /* E6#69c/#69f（14 档案批次三）：展示位 = marketIcon ?? icon ?? 默认彩色块——pickIdentityArt 恒返有效
    *  descriptor（零分支，顶替旧 codicon-symbol-misc 兜底 + #66 640 场景默认）。candidates 顺序 =
