@@ -40,8 +40,8 @@
   position: relative;
   display: block;
   /* 2026-11-22 用户实机：hero 从上到下太长；压高度上限，不让 2:1 比例把它撑回 460。 */
-  min-height: 240px;
-  max-height: 300px;
+  min-height: var(--marketplace-hero-min-h);
+  max-height: var(--marketplace-hero-max-h);
   aspect-ratio: var(--media-hero);
   cursor: pointer;
 }
@@ -145,7 +145,7 @@
   .marketplace-store-hero-copy { width: min(64%, 620px); padding: 28px 32px; }
 }
 @container (max-width: 620px) {
-  .marketplace-store-hero-slide { aspect-ratio: var(--media-card); min-height: 210px; max-height: 280px; }
+  .marketplace-store-hero-slide { aspect-ratio: var(--media-card); min-height: var(--marketplace-hero-min-h-md); max-height: var(--marketplace-hero-max-h-md); }
   .marketplace-store-hero-copy { width: 100%; padding: 22px; justify-content: flex-end; }
   .marketplace-store-hero-slide::after {
     background: linear-gradient(0deg,
@@ -156,7 +156,7 @@
   .marketplace-store-hero-copy p { -webkit-line-clamp: 2; }
 }
 @container (max-width: 420px) {
-  .marketplace-store-hero-slide { min-height: 220px; }
+  .marketplace-store-hero-slide { min-height: var(--marketplace-hero-min-h-sm); }
   .marketplace-store-hero-copy { padding: 16px; }
   .marketplace-store-hero-copy h2 { font-size: 21px; }
   .marketplace-store-hero-meta { gap: 8px; margin-bottom: 12px; }
@@ -175,14 +175,14 @@
     max-width: 100%;
   }
   .marketplace-store-hero-copy h2 { font-size: 19px; }
-  .marketplace-store-hero-slide { min-height: 190px; max-height: 240px; }
+  .marketplace-store-hero-slide { min-height: var(--marketplace-hero-min-h-xs); max-height: var(--marketplace-hero-max-h-xs); }
 }
 .marketplace-store-hero-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
+  width: var(--marketplace-hero-arrow);
+  height: var(--marketplace-hero-arrow);
   border-radius: var(--radius-full);
   background: color-mix(in srgb, var(--bg-input) 80%, transparent);
   color: var(--text-secondary);
@@ -209,8 +209,8 @@
   margin-bottom: 18px;
 }
 .marketplace-store-hero-dot {
-  width: 7px;
-  height: 7px;
+  width: var(--marketplace-hero-dot);
+  height: var(--marketplace-hero-dot);
   border-radius: var(--radius-full);
   background: var(--separator);
   padding: 0;
@@ -270,8 +270,8 @@
   --surface-glow: 0 12px 44px -8px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 .marketplace-store-ct-icon {
-  width: 40px;
-  height: 40px;
+  width: var(--size-glyph-md, 40px);
+  height: var(--size-glyph-md, 40px);
   border-radius: var(--radius-lg);
   flex: none;
   display: flex;

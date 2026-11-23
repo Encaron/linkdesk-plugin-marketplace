@@ -6,13 +6,13 @@
 
 /* ── 作者卡（首页作者栏 ＋ 作者页平铺共用） ── */
 .marketplace-store-author-card {
-  width: 264px;
+  width: var(--marketplace-author-card-w);
   flex: none;
   padding: 16px;
   cursor: pointer;
 }
 .marketplace-store-author-card.has-deck {
-  width: 340px;
+  width: var(--marketplace-author-card-deck-w);
   overflow: hidden;
   position: relative;
 }
@@ -99,7 +99,7 @@
 }
 
 /* ── 仓卡扇出：静止＝一沓叠错（只露边），hover＝同一拍扇开成横排 ── */
-.marketplace-store-ac-deck { position: relative; height: 40px; margin: 2px 0 10px; }
+.marketplace-store-ac-deck { position: relative; height: var(--marketplace-ac-deck-h); margin: 2px 0 10px; }
 .marketplace-store-ac-repo {
   position: absolute;
   top: 0;
@@ -157,7 +157,7 @@
   -webkit-backdrop-filter: var(--surface-blur);
 }
 /* 边界 ① 单仓：一张满宽卡＋「唯一仓库」，不假装扇出 */
-.marketplace-store-author-card.is-solo .marketplace-store-ac-deck { height: 38px; }
+.marketplace-store-author-card.is-solo .marketplace-store-ac-deck { height: var(--marketplace-ac-deck-solo-h); }
 .marketplace-store-author-card.is-solo .marketplace-store-ac-repo {
   width: 100%;
   flex-direction: row;
@@ -215,7 +215,7 @@
 }
 
 /* ── 作者店内：门店切换卡（作者卡同款；官方第一/当前仓 ring；⛔ 第四方） ── */
-.marketplace-store-author-card.is-switch { width: 264px; }
+.marketplace-store-author-card.is-switch { width: var(--marketplace-author-card-w); }
 /* 门店切换卡抬升 = store-shell 声明表（--surface-scale: 1.06）——⛔ 这里不再写 transform */
 .marketplace-store-author-card.is-switch.is-on {
   box-shadow: inset 0 0 0 1.5px var(--accent),
@@ -319,7 +319,7 @@
 @container (max-width: 700px) {
   .marketplace-store-author-grid { grid-template-columns: 1fr; }
   .marketplace-store-author-card.has-deck,
-  .marketplace-store-author-card.is-switch { width: 300px; }
+  .marketplace-store-author-card.is-switch { width: var(--marketplace-author-card-narrow-w); }
 }
 
 /* ═══ 作者页（一页两模式，19 §3）——作者容器卡继承基础 card；浏览/管理同一外壳 ═══ */

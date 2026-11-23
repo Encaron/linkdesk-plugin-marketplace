@@ -88,7 +88,7 @@
   text-align: center;
   min-width: 0;
 }
-.marketplace-ui-empty-icon { width: 36px; height: 36px; stroke-width: 1.1; }
+.marketplace-ui-empty-icon { width: var(--marketplace-empty-icon); height: var(--marketplace-empty-icon); stroke-width: 1.1; }
 .marketplace-ui-empty-title { font-size: var(--font-size-sm); color: var(--text-secondary); }
 .marketplace-ui-empty-sub {
   font-size: var(--font-size-2xs);
@@ -213,7 +213,7 @@
   padding: 5px 13px;
   font-size: var(--font-size-xs);
   font-weight: 600;
-  min-height: 27px;
+  min-height: var(--marketplace-btn-min-h);
   white-space: nowrap;
   flex: none;
   max-width: 100%;
@@ -257,8 +257,8 @@
 
 /* ── 小图标钮（⋯ / 工具行） ── */
 .marketplace-ui-icon-btn {
-  width: 28px;
-  height: 28px;
+  width: var(--size-control-md, 28px);
+  height: var(--size-control-md, 28px);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: transparent;

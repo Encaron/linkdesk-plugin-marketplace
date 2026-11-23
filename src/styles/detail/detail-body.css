@@ -162,7 +162,7 @@
 }
 .marketplace-mpd-gallery.is-empty .marketplace-store-art {
   aspect-ratio: var(--media-card);
-  max-width: 560px;
+  max-width: var(--marketplace-gallery-max-w);
   border: 1px solid var(--separator);
   border-radius: var(--radius-md);
 }

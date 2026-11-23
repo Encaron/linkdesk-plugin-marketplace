@@ -465,7 +465,7 @@
 .marketplace-store-content-bar .marketplace-ui-ic { color: var(--accent-hover); flex: none; }
 .marketplace-store-content-bar-text { flex: 1; min-width: 0; }
 .marketplace-store-sbtn {
-  height: 28px;
+  height: var(--size-control-md, 28px);
   padding: 0 10px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);

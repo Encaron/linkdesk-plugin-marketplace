@@ -18,8 +18,8 @@
   position: relative;
   /* E6#66/67（2026-09-09 拍板）：展示位 52 → 96 方框；E6#69c 再放大档 96 → 128——Type-2 身份图框
    *（marketIcon/icon/默认彩色块同在此框显形，内图按型接管，见下；#69c 档位已点头） */
-  width: 128px;
-  height: 128px;
+  width: var(--marketplace-mpd-icon);
+  height: var(--marketplace-mpd-icon);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -39,13 +39,13 @@
 }
 
 .marketplace-mpd-icon .plugin-icon--lucide {
-  width: 56px;
-  height: 56px;
+  width: var(--marketplace-mpd-icon-lucide);
+  height: var(--marketplace-mpd-icon-lucide);
 }
 
 .marketplace-mpd-icon .plugin-icon--img {
-  width: 120px;
-  height: 120px;
+  width: var(--marketplace-mpd-icon-img);
+  height: var(--marketplace-mpd-icon-img);
   object-fit: contain;
 }
 
@@ -54,9 +54,9 @@
   position: absolute;
   right: -3px;
   bottom: -3px;
-  width: 20px;
-  height: 20px;
-  line-height: 20px;
+  width: var(--size-icon-md, 20px);
+  height: var(--size-icon-md, 20px);
+  line-height: var(--size-icon-md, 20px);
   border-radius: var(--radius-2xl);
   background: var(--accent);
   color: var(--badge-text);

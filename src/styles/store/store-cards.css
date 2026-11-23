@@ -11,8 +11,43 @@
 /* 媒体 token 的作用域＝两个视图根：商店（卡片/hero）＋详情（无图生成式 stage）。
    ⛔ :root（插件不得定义文档级变量）；两处共用同一份定义。 */
 :is(.marketplace-store, .marketplace-mpd-detail) {
-  --media-hero: 2 / 1;   /* 首屏 hero 媒体框（用户口径 3:2 或 2:1，取 2:1） */
-  --media-card: 3 / 2;   /* 主题图墙 / mega / duo / 详情默认媒体框 */
+  --media-hero: var(--size-ratio-hero, 2 / 1);   /* 2 / 1 —— 宿主尺寸域（第七域；scripts/ui-size-spec.json） */
+  --media-card: var(--size-ratio-card, 3 / 2);   /* 3 / 2 —— 同上 */
+  /* ── 市场独家卡几何（⛔ 不进宿主：市场自己的表现语言；规格表 declaredGeometry 登记）──
+     改一个卡型只改这里；门禁 = scripts/check-size-tokens.mjs。 */
+  --marketplace-card-mega-w: 312px;
+  --marketplace-card-mega-w-narrow: 262px;
+  --marketplace-card-mega-art-h: 200px;
+  --marketplace-card-duo-min-h: 192px;
+  --marketplace-card-duo-split-min-h: 270px;
+  --marketplace-art-split-min-h: 246px;
+  --marketplace-art-duo-min-h: 140px;
+  --marketplace-art-split-narrow-min-h: 180px;
+  --marketplace-card-small-w: 236px;
+  --marketplace-card-small-h: 84px;
+  --marketplace-card-grid-min-h: 108px;
+  --marketplace-tile-icon: 22px;
+  --marketplace-tile-icon-lg: 28px;
+  --marketplace-hero-min-h: 240px;
+  --marketplace-hero-max-h: 300px;
+  --marketplace-hero-min-h-md: 210px;
+  --marketplace-hero-max-h-md: 280px;
+  --marketplace-hero-min-h-sm: 220px;
+  --marketplace-hero-min-h-xs: 190px;
+  --marketplace-hero-max-h-xs: 240px;
+  --marketplace-hero-arrow: 30px;
+  --marketplace-hero-dot: 7px;
+  --marketplace-author-card-w: 264px;
+  --marketplace-author-card-deck-w: 340px;
+  --marketplace-author-card-narrow-w: 300px;
+  --marketplace-ac-deck-h: 40px;
+  --marketplace-ac-deck-solo-h: 38px;
+  --marketplace-mpd-icon: 128px;
+  --marketplace-mpd-icon-lucide: 56px;
+  --marketplace-mpd-icon-img: 120px;
+  --marketplace-gallery-max-w: 560px;
+  --marketplace-empty-icon: 36px;
+  --marketplace-btn-min-h: 27px;
   --media-fade: 0.45s;   /* 卡内轮播帧间淡入 */
   --media-cycle: 12s;    /* 卡内 hover 轮播一轮 */
 }
@@ -34,8 +69,8 @@
 
 /* ── 图标块 / 媒体舞台（唯一媒体入口 = cardParts.Art；17 §3.3） ── */
 .marketplace-store-tile {
-  width: 40px;
-  height: 40px;
+  width: var(--size-glyph-md, 40px);
+  height: var(--size-glyph-md, 40px);
   border-radius: var(--radius-lg);
   flex: none;
   display: flex;
@@ -44,9 +79,9 @@
   color: var(--text-on-accent);
   overflow: hidden;
 }
-.marketplace-store-tile.is-lg { width: 48px; height: 48px; border-radius: var(--radius-lg); }
-.marketplace-store-tile .plugin-icon { width: 22px; height: 22px; }
-.marketplace-store-tile.is-lg .plugin-icon { width: 28px; height: 28px; }
+.marketplace-store-tile.is-lg { width: var(--size-glyph-lg, 48px); height: var(--size-glyph-lg, 48px); border-radius: var(--radius-lg); }
+.marketplace-store-tile .plugin-icon { width: var(--marketplace-tile-icon); height: var(--marketplace-tile-icon); }
+.marketplace-store-tile.is-lg .plugin-icon { width: var(--marketplace-tile-icon-lg); height: var(--marketplace-tile-icon-lg); }
 .marketplace-store-tile .plugin-icon--img {
   width: 100%;
   height: 100%;
@@ -246,8 +281,8 @@
 /* ── small（装机必备：236×84 · 10:3.6） ──
    🔴 卡体只是**占位**：面（背景/边框/磨砂）与内容全部由 `.x-over` 一处拥有（F39 单面）。 */
 .marketplace-store-card.is-small {
-  width: 236px;
-  height: 84px;
+  width: var(--marketplace-card-small-w);
+  height: var(--marketplace-card-small-h);
   flex: none;
   padding: 0;
   cursor: pointer;
@@ -278,7 +313,7 @@
 .marketplace-store-card.is-grid {
   padding: 0;
   cursor: pointer;
-  min-height: 108px;
+  min-height: var(--marketplace-card-grid-min-h);
   background: transparent;
   border-color: transparent;
 }
@@ -398,11 +433,11 @@
 
 /* ── mega（主题专区：312 宽 / 封面 200 / 脚区 60 / 灰条上延） ── */
 .marketplace-store-card.is-mega {
-  width: 312px;
+  width: var(--marketplace-card-mega-w);
   flex: none;
   cursor: pointer;
   overflow: hidden;
-}.marketplace-store-art.is-mega { height: 200px; }
+}.marketplace-store-art.is-mega { height: var(--marketplace-card-mega-art-h); }
 .marketplace-store-cm-foot {
   height: 60px;
   padding: 0 16px;
@@ -458,7 +493,7 @@
   display: grid;
   /* 同 hero：fr 的 min-content 对 CJK = 1 字 ⇒ 显式地板，窄则整列下沉 */
   grid-template-columns: minmax(220px, 1.05fr) minmax(0, 0.95fr);
-  min-height: 192px;
+  min-height: var(--marketplace-card-duo-min-h);
   cursor: pointer;
   overflow: hidden;
 }
@@ -492,12 +527,12 @@
 /* ── split（分栏大卡：整行 270、1fr/1fr、媒体内嵌、无满幅/无 scrim） ── */
 .marketplace-store-card.is-duo.is-split {
   grid-template-columns: 1fr 1fr;
-  min-height: 270px;
+  min-height: var(--marketplace-card-duo-split-min-h);
   padding: 12px;
   gap: 12px;
 }
 .marketplace-store-card.is-duo.is-split .marketplace-store-cd-copy { padding: 12px 10px 12px 18px; }
-.marketplace-store-art.is-split { min-height: 246px; border-radius: var(--radius-lg); }
+.marketplace-store-art.is-split { min-height: var(--marketplace-art-split-min-h); border-radius: var(--radius-lg); }
 .marketplace-store-split-list { display: flex; flex-direction: column; gap: 16px; }
 
 /* ── wall（主题图墙：封面在上 3:2 / 信息在下 / hover 快捷层） ── */
@@ -702,8 +737,8 @@
   padding-bottom: 48px;
   display: grid;
   grid-auto-flow: column;
-  grid-template-rows: repeat(2, 84px);
-  grid-auto-columns: 236px;
+  grid-template-rows: repeat(2, var(--marketplace-card-small-h));
+  grid-auto-columns: var(--marketplace-card-small-w);
   gap: 12px 14px;
   justify-content: start;
   align-items: stretch;
@@ -718,8 +753,8 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 28px;
-  height: 28px;
+  width: var(--size-control-md, 28px);
+  height: var(--size-control-md, 28px);
   border-radius: var(--radius-full);
   background: var(--bg-input);
   color: var(--text-secondary);
@@ -742,7 +777,7 @@
 /* 窄屏：页边距只剩 16px，装不下外置钮 ⇒ 轨道自身左右缩进 42px，钮回到缩进区（仍不压内容、左右对称） */
 @container (max-width: 900px) {
   .marketplace-store-strip-row.is-duo .marketplace-store-card.is-duo { flex-basis: 100%; }
-  .marketplace-store-card.is-mega { width: 262px; }
+  .marketplace-store-card.is-mega { width: var(--marketplace-card-mega-w-narrow); }
   .marketplace-store-strip { padding: 0 42px; }
   .marketplace-store-strip-row { padding-left: 40px; padding-right: 40px; }
   .marketplace-store-strip-arrow.is-l { left: 6px; }
@@ -750,9 +785,9 @@
 }
 @container (max-width: 700px) {
   .marketplace-store-card.is-duo { grid-template-columns: 1fr; }
-  .marketplace-store-art.is-duo { min-height: 140px; }
+  .marketplace-store-art.is-duo { min-height: var(--marketplace-art-duo-min-h); }
   .marketplace-store-card.is-duo.is-split { min-height: 0; }
-  .marketplace-store-art.is-split { min-height: 180px; }
+  .marketplace-store-art.is-split { min-height: var(--marketplace-art-split-narrow-min-h); }
 }
 
 @media (prefers-reduced-motion: reduce) {
