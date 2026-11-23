@@ -10,6 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from "react";
+import i18n from "i18next";
 // E5.7#98：数据源是 pluginManager.list()（IPC 序列化子集）——消费 PluginListEntry，
 // 非 ViewPluginEntry（后者带 component 字段，IPC 不可达）
 // E5.8#20-c：契约化——插件列表类型走 @linkdesk/contracts（零 @src/core）
@@ -36,6 +37,8 @@ interface PluginsState {
   listeners: Set<() => void>;
   /** 生命周期刷新节流（30.5c 实机回归）——一次装卸可能连发多条广播（实机 4 条），microtask 合并为一次 IPC 重拉 */
   refreshQueued: boolean;
+  /** 语言切换重拉只绑一次（本插件多表面各有一份模块副本，槽里一份判据防重复监听） */
+  languageListenerBound: boolean;
 }
 
 const state = realmSlot<PluginsState>("pluginsStore/v1", () => ({
@@ -44,7 +47,15 @@ const state = realmSlot<PluginsState>("pluginsStore/v1", () => ({
   disabledPlugins: [],
   listeners: new Set<() => void>(),
   refreshQueued: false,
+  languageListenerBound: false,
 }));
+
+/* 语言切换：宿主 list() 是**按当前语言解析**的显示视图——不重拉就会一直停在启动时那门语言。
+ * 目录 locales 的渲染本身随 react-i18next 重渲染；已装列表必须显式重拉。 */
+if (!state.languageListenerBound) {
+  state.languageListenerBound = true;
+  i18n.on("languageChanged", () => scheduleDataRefresh());
+}
 
 function notifyDataListeners(): void {
   state.listeners.forEach((fn) => fn());
