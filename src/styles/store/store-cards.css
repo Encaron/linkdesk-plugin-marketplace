@@ -340,8 +340,9 @@
   background: var(--bg-card);
   color: var(--surface-ink, var(--text-primary));
   text-shadow: 0 1px 2px color-mix(in srgb, var(--surface-media-scrim) 80%, transparent);
-  backdrop-filter: var(--surface-blur);
-  -webkit-backdrop-filter: var(--surface-blur);
+  /* 🔴 2026-11-23 用户拍板：**常态不再挂 backdrop-filter**——与 duo / 排行行同一条「普通玻璃」语言
+     （它们同样半透、同样写字压在窗口图上，实机观感无碍）。磨砂只在 hover/键盘聚焦时上，
+     也就是「面长大、压到邻居」的那一拍（下方 hover 规则保留）。滚动成本实测：关掉这一层 ≈ −0.2 s/2s（~15%）。 */
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   transition: left 0.18s cubic-bezier(0.2, 0.7, 0.3, 1), right 0.18s cubic-bezier(0.2, 0.7, 0.3, 1),
