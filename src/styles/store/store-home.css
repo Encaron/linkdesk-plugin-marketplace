@@ -131,6 +131,13 @@
 }
 .marketplace-store-hero-meta b { color: var(--surface-media-ink, var(--surface-ink, var(--text-primary))); font-weight: 600; }
 .marketplace-store-hero-cta { display: flex; gap: 10px; }
+/* 2026-11-23：Hero 里的次级按钮（如「已安装」禁用态）也在媒体面上——
+   is-secondary 的 text-secondary/opacity 在浅色主题下是深字压深遮罩，等于隐身。 */
+.marketplace-store-hero-cta .marketplace-ui-btn.is-secondary {
+  border-color: color-mix(in srgb, var(--surface-media-ink, var(--surface-ink, var(--text-primary))) 45%, transparent);
+  color: color-mix(in srgb, var(--surface-media-ink, var(--surface-ink, var(--text-primary))) 88%, transparent);
+}
+.marketplace-store-hero-cta .marketplace-ui-btn:disabled { opacity: 0.72; }
 .marketplace-store-art.is-hero { min-height: 0; }
 
 /* 窄容器降档：文案改为整宽压底、scrim 改自下而上；媒体比例退到 3:2 */
