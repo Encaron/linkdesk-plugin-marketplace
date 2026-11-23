@@ -1,5 +1,10 @@
 # 更新日志
 
+## v1.4.21（2026-11-24）
+
+- **rail 紧凑行不再省略**：112px + gap 6 / padding 7 / 计数 10px / 点 margin 4；英文 Library、Author 与中文「我的库 / 作者」完整显示（2026-11-24 实机「Lib… / A..」）。
+
+
 ## v1.4.20（2026-11-24）
 
 - **修复首页宣传图消失**：官方目录合并改为 `{...existing,...entry}`，保留只在目录侧维护的 `cover`/`screenshots`（实体在 linkdesk-marketplace/media/），不再被插件仓条目整条替换。

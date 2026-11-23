@@ -167,10 +167,10 @@
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: flex-start;
-  gap: 9px;
+  gap: 6px;
   white-space: nowrap;
   text-align: left;
-  padding: 10px 9px;
+  padding: 10px 7px;
   border-radius: var(--radius-lg);
   font-size: var(--font-size-xs);
   min-height: 38px;
@@ -183,7 +183,7 @@
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
-.marketplace-store-rail-item.is-compact .marketplace-store-rail-count { margin-left: auto; flex: none; font-size: 11px; }
+.marketplace-store-rail-item.is-compact .marketplace-store-rail-count { margin-left: auto; flex: none; font-size: 10px; }
 .marketplace-store-rail-item.is-compact .marketplace-store-rail-text {
   flex: 1 1 auto;
   min-width: 0;
@@ -211,7 +211,7 @@
      改成普通 flex 项跟在数字后面——点与数字并排，永不重叠。 */
   position: static;
   transform: none;
-  margin-left: 6px;
+  margin-left: 4px;
   flex: none;
 }
 
@@ -633,8 +633,9 @@
 
 /* ── 响应式（对齐蓝图 1080/900/700 三档） ── */
 @container (max-width: 1080px) {
-  /* 96 会让首页标题列只剩 24px——中文「首页」竖排、英文 Home 被裁（2026-11-23 实机）。108 = 文字列 ~49px。 */
-  .marketplace-store-rail { width: 108px; }
+  /* 108 时英文 Library 仍会被省略号截成 Lib…（2026-11-24 实机）。112 + 紧凑 gap/padding
+     让「图标 + Library + 计数 + 点」全部放得下；中文「我的库 / 作者」同样不竖排。 */
+  .marketplace-store-rail { width: 112px; }
 }
 @container (max-width: 900px) {
   .marketplace-store { flex-direction: column; }

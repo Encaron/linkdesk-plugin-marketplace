@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@linkdesk/plugin-sdk/schemas/plugin.schema.json",
   "pluginId": "marketplace",
   "name": "插件市场",
-  "version": "1.4.20",
+  "version": "1.4.21",
   "category": "productivity",
   "minAppVersion": "0.2.60",
   "icon": "resources/icon.svg",
