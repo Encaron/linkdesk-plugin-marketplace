@@ -249,15 +249,18 @@
 
 /* ── 粘性条（唯一实现 = views/store/StickyBar.tsx）──────────────────────
    页头、分类/搜索/库/作者的工具栏、来源添加入口共用这一层机制：
-   位置/层级/底色/页头高度接续只写在这里，各页只塞内容。⛔ 页面里不再写 position:sticky。
+   位置/层级/页头高度接续只写在这里，各页只塞内容。⛔ 页面里不再写 position:sticky。
    面画在 ::before 上并向左右外扩 bleed——hover 放大的卡面比内容列宽，边界必须盖住它；
    ⛔ 不给本体加横向 padding（否则标题/工具行与下方卡片错位）。
-   🔴 2026-11-23 用户拍板：**实底、不挂 backdrop-filter**。吸顶条是全场唯一每帧都必然失效的模糊层
-   （它正压在移动中的内容上）——CDP 实测滚动时 GPU 进程 CPU 1.49→1.62s/2s（最大化解），
-   卸掉背景大图或全关磨砂各降约三分之一；吸顶条这一层收益最低、代价最高，改 `-solid` 实底。
-   其余卡片磨砂不动（用户明确要玻璃观感）。 */
+
+   🔴 2026-11-23 用户拍板（第二次）：**这一块必须保留磨砂**。页头与工具组滚动时会合并成一条连续玻璃，
+   它盖在移动中的内容上——纯透明/实底都会让后面的卡片「顶出来」。所以恢复 `backdrop-filter`，
+   但用**折中参数**把成本压下来：blur 16→8px、底色用 `-solid` 基色 62% 叠半透（视觉仍是磨砂、
+   压得住内容），比原参数便宜。用户口径：先这样，不够再一点点加。
+   （历史数据：原参数 16px 单项 ≈ GPU 1.54→1.25 s/2s，−19%；英雄卡那笔实底收益不受影响。） */
 .marketplace-store-sticky {
   --marketplace-sticky-bleed: 28px;
+  --marketplace-sticky-blur: blur(8px) saturate(1.15);
   position: sticky;
   top: var(--marketplace-sticky-head, 0px);
   z-index: 66;
@@ -267,9 +270,9 @@
   position: absolute;
   inset: 0 calc(-1 * var(--marketplace-sticky-bleed));
   z-index: -1;
-  /* 实底：玻璃主题下 `--bg-window` 是 alpha 0.46 的色，`-solid` 是同一基色的不透明版；
-     无玻璃/无该派生键时回落 `--bg-window`（普通主题本就是实色）。 */
-  background: var(--bg-window-solid, var(--bg-window));
+  background: color-mix(in srgb, var(--bg-window-solid, var(--bg-window)) 62%, transparent);
+  -webkit-backdrop-filter: var(--marketplace-sticky-blur);
+  backdrop-filter: var(--marketplace-sticky-blur);
   border-radius: var(--radius-lg);
   box-shadow: 0 1px 0 color-mix(in srgb, var(--border) 65%, transparent);
 }
