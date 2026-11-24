@@ -40,10 +40,15 @@ export interface HostInstallRequest {
   };
   allowOlder?: boolean;
   catalogUrl?: string;
+  /** 目录条目声明的最低壳版本（壳会自己再判一次，不满足直接拦） */
+  minAppVersion?: string;
 }
 
 interface ConfirmResult {
   confirmed?: boolean;
+  /** 执行结果（confirmed 只表示「用户同意了」）——false = 没装成 */
+  ok?: boolean;
+  error?: string;
   cancelled?: boolean;
   reason?: string;
 }
@@ -140,6 +145,10 @@ export function buildInstallRequest(
       size: entry.size,
     },
     allowOlder: opts?.allowOlder,
+    // 🔴 依赖自动安装要用目录源（壳在同一 job 内按它解析 requires）——旧链一直传，切新链时漏了 = 依赖装不上
+    catalogUrl: entry.sourceUrl,
+    // 最低壳版本照抄目录条目——壳会自己再判一次（不满足直接拦，不弹卡）
+    minAppVersion: entry.minAppVersion,
   };
 }
 

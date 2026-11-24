@@ -45,6 +45,11 @@ export async function runMarketInstallAction(
   }
   if (hostApi) {
     const res = await hostApi.requestInstall(buildInstallRequest(entry, "install", entry.downloadUrl));
+    if (res?.confirmed && res?.ok === false) {
+      // 用户点了确认但没装成（下载/校验/落盘失败）——如实报，⛔ 不假装启动成功
+      notifyError(res.error || t("安装失败"));
+      return false;
+    }
     return res?.confirmed === true;
   }
   // 老壳回落：市场自绘确认卡（E6#71k「都问」——官方来源不豁免）

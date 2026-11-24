@@ -148,7 +148,6 @@ async function migrateLegacyAvatarCache(api: Ld, legacyBase: string | undefined,
   }
   try { await api.filesystem?.writeTextFile(marker, "1"); } catch { /* 标记失败下次重试 */ }
 }
-}
 
 async function ensureDir(api: Ld, dir: string): Promise<boolean> {
   try {

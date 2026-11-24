@@ -71,6 +71,11 @@ export async function performMarketUpdate(o: MarketUpdateOptions): Promise<Marke
     const res = await hostApi.requestInstall(
       buildInstallRequest(entry, "update", url, { version: ver, allowOlder: isDowngrade || undefined }),
     );
+    if (res?.confirmed && res?.ok === false) {
+      // 已确认但执行失败（下载/校验/落盘）——交回失败分支，⛔ 不报「已更新」
+      settleUpdateFailure(pluginId, displayName, url, res.error ?? "");
+      return "blocked";
+    }
     if (res?.confirmed) {
       const pin = ver ? pinnedAfterApply(entry, ver) : undefined;
       if (pin !== undefined) void setPinnedVersion(pluginId, pin);
