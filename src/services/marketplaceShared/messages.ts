@@ -97,6 +97,21 @@ export function updateFailLabelKey(reason: InstallFailReason): string {
  *  安装域五个类目词对更新域状态/策略错不成立，硬塞会让「不在用户安装区」显示成「插件包损坏」）；
  *  原文为空 → 兜底通用重试语。
  *  `labelKeyFn` 由域决定（安装域 `installFailLabelKey` / 更新域 `updateFailLabelKey`）——**不得再落第二份同构拷贝**。 */
+/** 剥掉 Electron IPC 的管道前缀——`Error invoking remote method 'plugins:download': Error: xxx` → `xxx`。
+ *  用户不该看到通道名与内部措辞（2026-11-24 实机：完整性校验失败被原样甩到界面）。 */
+export function stripIpcPrefix(raw?: string): string {
+  let s = (raw ?? "").trim();
+  for (let i = 0; i < 3; i++) {
+    const next = s
+      .replace(/^Error invoking remote method '[^']*':\s*/i, "")
+      .replace(/^\w*Error:\s*/i, "")
+      .trim();
+    if (next === s) break;
+    s = next;
+  }
+  return s;
+}
+
 export function failText(
   t: (key: string) => string,
   labelKeyFn: (reason: InstallFailReason) => string,
@@ -104,7 +119,7 @@ export function failText(
   raw?: string,
 ): string {
   if (reason !== "unknown") return t(labelKeyFn(reason));
-  const s = (raw ?? "").trim();
+  const s = stripIpcPrefix(raw);
   return s ? s : t(labelKeyFn("unknown"));
 }
 

@@ -11,7 +11,7 @@
 
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { notifyError } from "./marketplaceShared/notifications";
+import { notifyError, settleInstallFailure } from "./marketplaceShared/notifications";
 import { startMarketInstall } from "./marketplaceShared/installFlow";
 import { buildInstallRequest, installConfirmApi } from "./hostInstallConfirm";
 import { minAppVerdict, readShellVersion } from "./minAppVersionGate";
@@ -45,8 +45,11 @@ export async function runMarketInstallAction(
   }
   const res = await hostApi.requestInstall(buildInstallRequest(entry, "install", entry.downloadUrl));
   if (res?.confirmed && res?.ok === false) {
-    // 用户点了确认但没装成（下载/校验/落盘失败）——如实报，⛔ 不假装启动成功
-    notifyError(res.error || t("安装失败"));
+    /* 用户点了确认但没装成（下载/校验/落盘失败）——走**归因**通道：
+     * 「安装失败：文件校验未通过」这种人话 + [重试]，原文只作兜底。
+     * 🔴 此前这里直 `notifyError(res.error)` ⇒ 用户看到 `Error invoking remote method 'plugins:download': …`
+     *    这种纯开发者文本（2026-11-24 实机）。 */
+    await settleInstallFailure(entry.id, entry.downloadUrl, res.error);
     return false;
   }
   return res?.confirmed === true;
