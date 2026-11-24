@@ -1,30 +1,36 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-24T15:40:24.316Z",
+  "updatedAt": "2026-11-24T15:44:38.078Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.29",
+      "version": "1.4.30",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.29/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.30/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.29/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.30/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.60",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.29/README.md",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.30/README.md",
       "readmeLocales": {
-        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.29/README.md",
-        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.29/docs/readme/en.md"
+        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.30/README.md",
+        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.30/docs/readme/en.md"
       },
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.29/marketplace.linkdesk-plugin",
-      "size": 197472,
-      "publishedAt": "2026-11-24T15:40:24.316Z",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.30/marketplace.linkdesk-plugin",
+      "size": 197132,
+      "publishedAt": "2026-11-24T15:44:38.078Z",
       "versions": [
+        {
+          "version": "1.4.30",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.30/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-24T15:44:38.078Z",
+          "changelog": "- 安装/更新失败**同时**给轻 toast（立刻看得见）＋ 铃铛面板（常驻+重试）——此前只有面板，用户点完安装看不到任何即时反馈。"
+        },
         {
           "version": "1.4.29",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.29/marketplace.linkdesk-plugin",
@@ -52,8 +58,7 @@
         {
           "version": "1.4.25",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.25/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-23T20:30:31.417Z",
-          "changelog": "- **Update all 改为一张汇总确认卡**：`libraryActions.updateAll` 先经 `confirmMarketBatch` 一次确认，再逐项 `performMarketUpdate({ skipConfirm: true })`；不再逐项弹卡。P0 过渡：仍**每次批量都问**，不做来源信任/免问判定（P1 壳 `policy` 接管）。\n- **修复顶行 hover 点 Update 误跳详情**：`useStickyClearance` 改为 hover 会话内**冻结几何**（pointerenter 按完全展开量一次，focus/blur 不重算，pointerleave 才复位）；动作区 pointerdown 后 500ms 内抑制整卡 open；键盘 focus 在动作钮上时整卡不再抢 Enter/Space。\n- **更新完成不打开详情页**：完成仍走现有轻 toast + 铃铛通知面板；批量卡明确写「不会打开详情页」。\n- **批量卡支持 20+ 条**：列表滚动 + 总数/官方源/第三方计数；不撑破弹窗。"
+          "publishedAt": "2026-11-23T20:30:31.417Z"
         },
         {
           "version": "1.4.24",
