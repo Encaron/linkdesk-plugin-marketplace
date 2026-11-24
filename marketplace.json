@@ -1,30 +1,36 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-24T15:44:38.078Z",
+  "updatedAt": "2026-11-24T15:56:46.936Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.30",
+      "version": "1.4.31",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.30/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.31/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.30/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.31/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.60",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.30/README.md",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.31/README.md",
       "readmeLocales": {
-        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.30/README.md",
-        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.30/docs/readme/en.md"
+        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.31/README.md",
+        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.31/docs/readme/en.md"
       },
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.30/marketplace.linkdesk-plugin",
-      "size": 197132,
-      "publishedAt": "2026-11-24T15:44:38.078Z",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.31/marketplace.linkdesk-plugin",
+      "size": 196889,
+      "publishedAt": "2026-11-24T15:56:46.936Z",
       "versions": [
+        {
+          "version": "1.4.31",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.31/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-24T15:56:46.936Z",
+          "changelog": "- 安装失败改走**归因**通道（「文件校验未通过」人话 + [重试]）；兜底原文统一剥掉 `Error invoking remote method ...` 这类 IPC 管道前缀——用户不该看到通道名与开发者措辞。"
+        },
         {
           "version": "1.4.30",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.30/marketplace.linkdesk-plugin",
@@ -52,8 +58,7 @@
         {
           "version": "1.4.26",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.26/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-23T22:09:12.935Z",
-          "changelog": "- **安装/更新改走壳托管确认**：新壳提供 `plugins.requestInstall` / `requestUpdateBatch` ⇒ 市场只提交结构化请求，确认卡由壳绘制、谁要确认由壳 `policy` 算、一次性令牌由壳签发、批量进度与完成汇总由壳统一出（轻 toast + 铃铛面板）。市场侧不再自绘确认卡、不再做来源信任判定。\n- **旧壳回落保留**：`installConfirmApi()` 判 `requestInstall` 不存在（老壳）才回落 `confirmMarketInstall` + `pluginManager.install/update`。新壳对**远程来源**的旧链一律拒（`no-token`），故有 `requestInstall` 时**绝不**回落。\n- **来源身份单点推导**：新增 `hostInstallConfirm.sourceIdentityOf`（official → `official`；其余用来源仓库名当 id），⛔ 各调用点不再各自拼来源字段。\n- **批量完成反馈归壳**：`updateAll` 命中壳托管线时返回 `hosted: true`，库视图不再自己弹「已更新 N 个」——一次批量只出一条汇总。"
+          "publishedAt": "2026-11-23T22:09:12.935Z"
         },
         {
           "version": "1.4.25",
