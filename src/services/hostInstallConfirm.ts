@@ -15,6 +15,7 @@
 
 import { urlSourceKey } from "@linkdesk/ui";
 import type { CatalogEntry } from "./marketCatalog";
+import type { PluginConfirmViewPayload } from "@linkdesk/contracts";
 
 /** 壳侧 `PluginSourceIdentity`（contracts 0.1.53 同形；本仓类型面未跟进，故收窄一份） */
 export interface HostSourceIdentity {
@@ -59,35 +60,110 @@ interface BatchResult {
   cancelled?: boolean;
 }
 
+/** 市场自绘卡的视图 id —— 与 `plugin.json` 的 `contributes.views.main` 同值（唯一登记处） */
+export const MARKET_CONFIRM_VIEWS = {
+  install: "marketplace-install-confirm",
+  batch: "marketplace-update-batch",
+} as const;
+
+/** 两步确认第一跳的回执（壳 `prepareInstall` / `prepareUpdateBatch`） */
+interface HostPrepared {
+  planId: string;
+  plan: { ask: unknown[] };
+  view: PluginConfirmViewPayload;
+}
+
+/** 壳的两步确认面（D1′）——缺任何一个 ⇒ 走 `requestInstall` 快捷路径（契约保留的兜底） */
+interface HostTwoStep {
+  prepareInstall?(req: HostInstallRequest): Promise<HostPrepared>;
+  prepareUpdateBatch?(reqs: HostInstallRequest[]): Promise<HostPrepared>;
+  commitInstall?(planId: string): Promise<ConfirmResult>;
+  discardInstall?(planId: string): Promise<void>;
+}
+
 /** 壳托管确认面（P1 新壳才有） */
 export interface HostInstallConfirmApi {
   requestInstall(req: HostInstallRequest): Promise<ConfirmResult>;
   requestUpdateBatch(reqs: HostInstallRequest[]): Promise<BatchResult>;
 }
 
+/** 内容弹窗面（`dialog.confirmContent`）——没有它就没法自绘（壳面缺失 ⇒ 取消，安全方向） */
+function confirmContentApi(): ((o: { pluginId: string; viewId: string; payload: unknown }) => Promise<boolean>) | null {
+  const dlg = (window.linkdesk as unknown as { dialog?: { confirmContent?: unknown } } | undefined)?.dialog;
+  return typeof dlg?.confirmContent === "function"
+    ? (dlg.confirmContent as (o: { pluginId: string; viewId: string; payload: unknown }) => Promise<boolean>)
+    : null;
+}
+
+/**
+ * 弹**市场自绘卡**（壳提供对话框外壳：遮罩/居中/Esc/焦点锁；内容与按钮归市场）。
+ * 返回 true = 用户确认；false = 取消/关闭/无法弹。
+ */
+async function showMarketCard(view: PluginConfirmViewPayload): Promise<boolean> {
+  const confirmContent = confirmContentApi();
+  if (!confirmContent) return false;
+  try {
+    return await confirmContent({ pluginId: "marketplace", viewId: MARKET_CONFIRM_VIEWS[view.kind], payload: view });
+  } catch {
+    return false; // 内容槽解析失败 → 当取消（⛔ 当成功是灾难）
+  }
+}
+
 /**
  * 取壳托管确认面——**形状守卫必须核对象**：dev 宿主的契约 Proxy 对树外路径返回 call-stub 函数
  * （不是对象），只判 `!== undefined` 会让 null 检查通过、当场抛（照 hostApi.ts 的同款教训）。
+ *
+ * 🔴 2026-11-25（D8′）：`requestInstall`/`requestUpdateBatch` 现在是**编排**——
+ *   有 `prepare*`/`commit*` ⇒ 先要计划，**需要确认时弹市场自绘卡**（VIEW = 共享件），再 `commit`；
+ *   没有两步面 ⇒ 走壳的 `requestInstall` 快捷路径（壳画默认卡）。
+ *   判定/令牌/执行仍在壳；市场只决定「怎么画」。调用方一行都不用改（单一入口）。
  */
 export function installConfirmApi(): HostInstallConfirmApi | null {
   const lk = window.linkdesk as unknown as { plugins?: unknown } | undefined;
   const plugins = lk?.plugins;
   if (!plugins || typeof plugins !== "object") return null;
-  const candidate = plugins as Partial<HostInstallConfirmApi>;
+  const candidate = plugins as Partial<HostInstallConfirmApi> & HostTwoStep;
   if (typeof candidate.requestInstall !== "function") return null;
-  // 批量面缺失时用单项面兜底（逐条问 = 老行为，⛔ 不静默放弃）
+
+  // 两步面按**kind 分别**判定：单项要 prepareInstall，批量要 prepareUpdateBatch（缺哪个就只回落那一条）
+  const hasCommit = typeof candidate.commitInstall === "function";
+  const canPrepare = hasCommit && typeof candidate.prepareInstall === "function";
+  const canPrepareBatch = hasCommit && typeof candidate.prepareUpdateBatch === "function";
+
   return {
-    requestInstall: candidate.requestInstall.bind(plugins),
-    requestUpdateBatch:
-      typeof candidate.requestUpdateBatch === "function"
-        ? candidate.requestUpdateBatch.bind(plugins)
-        : async (reqs) => {
-            for (const req of reqs) {
-              const r = await candidate.requestInstall!(req);
-              if (!r?.confirmed) return { confirmed: false, cancelled: r?.cancelled };
-            }
-            return { confirmed: true };
-          },
+    requestInstall: async (req) => {
+      if (!canPrepare) return candidate.requestInstall!(req); // 壳无两步面 ⇒ 快捷路径（壳画卡）
+      const prepared = await candidate.prepareInstall!(req);
+      if (prepared.plan.ask.length > 0) {
+        const ok = await showMarketCard(prepared.view);
+        if (!ok) {
+          await candidate.discardInstall?.(prepared.planId);
+          return { confirmed: false, cancelled: true };
+        }
+      }
+      return candidate.commitInstall!(prepared.planId);
+    },
+    requestUpdateBatch: async (reqs) => {
+      if (canPrepareBatch) {
+        const prepared = await candidate.prepareUpdateBatch!(reqs);
+        if (prepared.plan.ask.length > 0) {
+          const ok = await showMarketCard(prepared.view);
+          if (!ok) {
+            await candidate.discardInstall?.(prepared.planId);
+            return { confirmed: false, cancelled: true };
+          }
+        }
+        const r = await candidate.commitInstall!(prepared.planId);
+        return { confirmed: r.confirmed, cancelled: r.cancelled };
+      }
+      // 批量面缺失 ⇒ 逐条走单项面（逐条问 = 老行为，⛔ 不静默放弃）
+      if (typeof candidate.requestUpdateBatch === "function") return candidate.requestUpdateBatch.bind(plugins)(reqs);
+      for (const req of reqs) {
+        const r = await candidate.requestInstall!(req);
+        if (!r?.confirmed) return { confirmed: false, cancelled: r?.cancelled };
+      }
+      return { confirmed: true };
+    },
   };
 }
 

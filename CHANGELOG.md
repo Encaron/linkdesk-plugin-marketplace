@@ -1,5 +1,13 @@
 # 更新日志
 
+## v1.4.33（2026-11-25）
+
+- **确认卡由市场自绘**（D8′）：安装/更新/批量更新改走两步 API——`prepareInstall`/`prepareUpdateBatch` 拿壳算的 `plan`，需要确认时用 `dialog.confirmContent` 弹出**市场自己的视图**（`marketplace-install-confirm` / `marketplace-update-batch`，内容用 `@linkdesk/ui` 共享件），用户确认后 `commitInstall(planId)`；取消 ⇒ `discardInstall`。
+  - 判定/令牌/执行仍在壳；⛔ 市场不拼来源/版本/哈希（只吃壳的 `view.plan`）。
+  - 全免问（ask 为空）不弹卡；壳无两步面 ⇒ 回落 `requestInstall` 快捷路径（壳画默认卡）。
+- 清理：删掉自造确认载荷（`installConfirmPayload()`）与旧 `ConfirmInstall` 版式，改为壳数据 + 共享件。
+- 翻译：补 5 条英文（发起方 / AI 与三条错误提示，随 lang-defaults 1.0.82）。
+
 ## v1.4.32（2026-11-25）
 
 - 内务：批量更新回执类型去掉壳从不返回的 `jobIds`（壳不建 job 表，改了契约）；行为零变化。
