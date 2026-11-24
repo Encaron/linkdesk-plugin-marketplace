@@ -223,28 +223,16 @@ describe("runInstall（安装执行单一入口）", () => {
   });
 });
 
-describe("handleInstallClick（确认门恒弹——本次安装一次确认只对这一次有效）", () => {
-  it("🔴 用户点确认 ⇒ 才发起（顺序：先弹卡，再落动作）", async () => {
-    h.confirmMarketInstall.mockResolvedValue(true);
+describe("handleInstallClick（确认归壳——市场不再自己弹卡）", () => {
+  it("🔴 点安装 ⇒ 直接发起（壳的 requestInstall 内部弹卡，市场这层不再问）", async () => {
     const { result } = renderHook(() => useInstallAction(identity(), opts()));
     await act(async () => {
       await result.current.handleInstallClick();
     });
 
-    expect(h.confirmMarketInstall).toHaveBeenCalledWith(ENTRY, "install", "1.0.0");
+    // 否定断言：市场自己的确认门已删（否则详情页会问两遍）
+    expect(h.confirmMarketInstall).not.toHaveBeenCalled();
     expect(h.startMarketInstall).toHaveBeenCalledTimes(1);
-  });
-
-  it("🔴🔴 用户取消 ⇒ **确认前不落任何安装动作**（本层最值钱的一条否定断言）", async () => {
-    h.confirmMarketInstall.mockResolvedValue(false);
-    const { result } = renderHook(() => useInstallAction(identity(), opts()));
-    await act(async () => {
-      await result.current.handleInstallClick();
-    });
-
-    expect(h.confirmMarketInstall).toHaveBeenCalledTimes(1); // 真弹了
-    expect(h.startMarketInstall).not.toHaveBeenCalled(); // 但一个动作都没落
-    expect(h.setPinnedVersion).not.toHaveBeenCalled();
   });
 
   it("🔴 门禁不过 ⇒ 连确认卡都不弹（静默拦在弹卡之前）", async () => {

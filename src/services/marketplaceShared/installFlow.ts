@@ -8,7 +8,7 @@
 
 // E6#71k「都问」：重试也要过确认门——门位在本模块 retryMarketInstall（三入口单点），"不 import 门" 无从豁免
 import i18n from "i18next";
-import { confirmMarketInstallById } from "../installGate";
+
 import { buildInstallRequest, installConfirmApi } from "../hostInstallConfirm";
 import { getCatalogResult } from "./catalogStore";
 import { pluginDisplayNameOf } from "./catalogStore";
@@ -23,7 +23,6 @@ const pm = () => window.linkdesk?.pluginManager;
 /* E6#73o：catalogUrl 随行安装——本仓 @linkdesk/contracts（0.1.15）类型面尚未含该字段（棒 12 统一升），
  * 照 hostApi / installFromDirectory 的既有处置**只收窄本仓要用到的面**：运行时壳已消费它
  * （同一安装 job 内自动装 requires 缺失依赖）；⛔ 不改依赖、不改运行时形状。 */
-type InstallRequestOpts = { pluginId: string; displayName: string; origin: "user"; catalogUrl?: string };
 
 /* ═══ E6#73c 第 2 步（18 档 §五 I.7）：并发闸交给壳，本模块只剩「发起 + 终局回执」 ═══
  *
@@ -35,14 +34,14 @@ type InstallRequestOpts = { pluginId: string; displayName: string; origin: "user
  *   的 job 行表达，见 `installJobs.ts`）。
  *
  * 本模块对安装还剩两件事：
- *   a. **发起**——`startMarketInstall` 直呼 `installWithProgress`（壳侧 `installPlugin` 全队列唯一入口）；
+ *   a. **发起**——`startMarketInstall` → 壳托管的 `requestInstall`（判定/令牌/队列全在壳；⛔ 不再直呼旧链）；
  *   b. **终局回执**——失败时推一条带 [重试] 的 toast（成功由 lifecycle 消费端唯一发声，见 73h D2）。
  *
  * ⚠️ 本模块**不画进度**（73d 起 job 行是进度的唯一出处）——同一面板里再挂一条自己的进度条
  * = 同一次安装两行，用户看到的是「装了两遍」。故也不需要 NotificationHandle 句柄管理。 ═══ */
 
 /**
- * 单次安装——**直呼** `installWithProgress(downloadUrl, 身份)`，本模块不排队、不限流、不去重。
+ * 单次安装——**直呼** 壳托管的 `requestInstall`，本模块不排队、不限流、不去重。
  *
  * 并发上限（N=3）、FIFO 顺序、同插件去重、排队回执、槽级看门狗全在壳侧 `installPlugin`
  * （全队列唯一入口，两条腿——包源/目录源——同一条队列）。池侧读到的进度/排队态经
@@ -59,10 +58,10 @@ async function runMarketInstall(pluginId: string, name: string, downloadUrl: str
    * 🔴 2026-11-24 根治：此前本函数直呼 `installWithProgress` ⇒ 新壳把它按「远程来源无 token」拒掉，
    *   用户看到的是「重试永远是 no-token」。现在**只有**这一条路，旧链退到「老壳回落」。 */
   const host = installConfirmApi();
-  if (host) {
+  if (!host) return settleInstallFailure(pluginId, downloadUrl, i18n.t("当前 LinkDesk 版本过旧，请更新后再安装插件"));
+  {
     const entry = getCatalogResult().entries.find((e) => e.id === pluginId);
     if (!entry) {
-      // 目录里没有它（离线/已下架）⇒ 构造不出合规请求。如实报，⛔ 不退回旧链（会被 no-token 拒）
       return settleInstallFailure(pluginId, downloadUrl, i18n.t("目录里没有这个插件的信息，请刷新目录后重试"));
     }
     const res = await host.requestInstall(buildInstallRequest(entry, "install", downloadUrl));
@@ -70,27 +69,6 @@ async function runMarketInstall(pluginId: string, name: string, downloadUrl: str
     if (res.ok === false) return settleInstallFailure(pluginId, downloadUrl, res.error ?? "");
     scheduleDataRefresh();
     return true;
-  }
-  /* ── ② 老壳回落（无 requestInstall 的旧版本）：原样走旧链 ── */
-  const inst = lk()?.pluginManager?.installWithProgress;
-  if (!inst) return false;
-  try {
-    // E6#73c 第 1 步：请求侧身份随行——壳侧 job 表按 pluginId 去重、job 行取显示名，而两者只有池侧知道
-    // （第三个参数见 types.ts PluginInstallRequestOpts；jobId 不在此——它是壳侧 job 表的产物）。
-    // E6#73o：catalogUrl 随行——壳在同一安装 job 内自动装 requires 缺失依赖（解析半径 = 本条目来源目录）。
-    const r = await (inst as (path: string, opts?: InstallRequestOpts) => Promise<{ cancelled?: boolean; success?: boolean; error?: string }>)(
-      downloadUrl,
-      { pluginId, displayName: name, origin: "user", catalogUrl },
-    );
-    // E6#73d：用户点「取消安装」——**不是失败**。壳侧已把那条 job 整条撤掉（不留红行），本模块也绝不走
-    // settleInstallFailure（那会推一条带 [重试] 的错误 toast：用户刚亲口说不要，再问一遍要不要重试
-    // = 拿他的决定去烦他）。
-    if (r?.cancelled) return false;
-    if (r && !r.success) return settleInstallFailure(pluginId, downloadUrl, r.error ?? "");
-    scheduleDataRefresh();
-    return true;
-  } catch (e) {
-    return settleInstallFailure(pluginId, downloadUrl, e instanceof Error ? e.message : String(e));
   }
 }
 
@@ -145,7 +123,6 @@ export async function retryMarketInstall(
 ): Promise<boolean> {
   if (!pluginId || !downloadUrl) return false;
   // 新壳：确认由壳负责（requestInstall 内部弹卡）；再走一次市场确认门 = 同一件事问两遍
-  if (!installConfirmApi() && !(await confirmMarketInstallById(pluginId, displayName))) return false;
   return startMarketInstall(pluginId, downloadUrl, displayName);
 }
 
@@ -178,15 +155,5 @@ export async function retryMarketUpdate(
     scheduleDataRefresh();
     return true;
   }
-  if (!(await confirmMarketInstallById(pluginId, displayName))) return false;
-  const upd = pm()?.update;
-  if (!upd) return false;
-  try {
-    const r = await upd(pluginId, { url: downloadUrl });
-    if (!r?.success) return false;
-    scheduleDataRefresh();
-    return true;
-  } catch {
-    return false;
-  }
+  return settleInstallFailure(pluginId, downloadUrl, i18n.t("当前 LinkDesk 版本过旧，请更新后再更新插件"));
 }

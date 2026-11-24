@@ -160,6 +160,15 @@ function stubLinkdesk(o: {
     plugins: {
       getCompatibility: vi.fn(async () => undefined),
       resolvePath: vi.fn(async () => "C:/plugins/demo"),
+      // P1（2026-11-24 根治）：安装/更新的唯一入口 = 壳托管的 requestInstall（⛔ 老链已删）
+      requestInstall: vi.fn(async () => ({ confirmed: true, ok: true })),
+      requestUpdateBatch: vi.fn(async () => ({ confirmed: true, ok: true, jobIds: [] })),
+      getUpdatePolicy: vi.fn(async () => ({ silentOfficial: true, silentTrustedSources: false })),
+      setUpdatePolicy: vi.fn(async () => ({ silentOfficial: true, silentTrustedSources: false })),
+      listSourceTrust: vi.fn(async () => []),
+      trustSource: vi.fn(async () => []),
+      untrustSource: vi.fn(async () => []),
+      previewUpdatePlan: vi.fn(async () => ({ ask: [], silent: [], groups: [], rejected: [], totals: { total: 0, ask: 0, silent: 0 } })),
     },
     filesystem: {
       readTextFile: vi.fn(async () => {
@@ -310,18 +319,18 @@ describe("R4-3.18 右栏四类字段", () => {
 });
 
 describe("§8.1 #11 动作委托：逐按钮落同一条入口", () => {
-  it("未装：安装 → 确认门 → installWithProgress（单一下载入口）", async () => {
+  it("未装：安装 → 壳托管 requestInstall（唯一入口，⛔ 不再直呼旧链）", async () => {
     api = stubLinkdesk();
     render(<DetailView pluginId="demo-net" isActive />);
     await syncPlugins();
     fireEvent.click(screen.getByText("安装"));
-    await waitFor(() => expect(api.dialog.confirm).toHaveBeenCalled());
     await waitFor(() =>
-      expect(api.pluginManager.installWithProgress).toHaveBeenCalledWith(
-        VERSIONS[0].downloadUrl,
-        expect.anything(),
+      expect(api.plugins.requestInstall).toHaveBeenCalledWith(
+        expect.objectContaining({ mode: "install", pluginId: "demo-net" }),
       ),
     );
+    // 否定断言：旧链一次都不许被调（那正是「重试永远 no-token」的根源）
+    expect(api.pluginManager.installWithProgress).not.toHaveBeenCalled();
   });
 
   it("已装：更新 → pm.update；禁用 → pm.disable；卸载 → 确认 → pm.uninstall", async () => {
@@ -334,11 +343,11 @@ describe("§8.1 #11 动作委托：逐按钮落同一条入口", () => {
 
     fireEvent.click(screen.getByText("更新到 v1.7.0"));
     await waitFor(() =>
-      expect(api.pluginManager.update).toHaveBeenCalledWith(
-        "demo-net",
-        expect.objectContaining({ url: VERSIONS[0].downloadUrl }),
+      expect(api.plugins.requestInstall).toHaveBeenCalledWith(
+        expect.objectContaining({ mode: "update", pluginId: "demo-net" }),
       ),
     );
+    expect(api.pluginManager.update).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByText("禁用"));
     await waitFor(() => expect(api.pluginManager.disable).toHaveBeenCalledWith("demo-net"));

@@ -9,9 +9,8 @@
 
 import type { CatalogEntry } from "./marketCatalog";
 import { versionDownloadUrl } from "./marketCatalog";
-import { performMarketUpdate } from "./marketUpdateAction";
+import { notifyError } from "./marketplaceShared/notifications";
 import { buildInstallRequest, installConfirmApi } from "./hostInstallConfirm";
-import { confirmMarketBatch } from "./installGate";
 import { scheduleDataRefresh } from "./marketplaceShared/pluginsStore";
 
 const pm = () => window.linkdesk?.pluginManager;
@@ -84,27 +83,8 @@ export async function updateAll(
       ? { ok: 0, failed: 0, cancelled: 0, hosted: true, confirmed: true }
       : { ok: 0, failed: 0, cancelled: reqs.length, hosted: true, confirmed: false };
   }
-  const confirmed = await confirmMarketBatch(entries, localVersions);
-  if (!confirmed) return { ok: 0, failed: 0, cancelled: entries.length };
-  let ok = 0;
-  let failed = 0;
-  let cancelled = 0;
-  for (const entry of entries) {
-    const outcome = await performMarketUpdate({
-      pluginId: entry.id,
-      entry,
-      displayName: entry.name,
-      ver: entry.version,
-      skipConfirm: true,
-      online,
-      refresh: scheduleDataRefresh,
-      t,
-    });
-    if (outcome === "ok") ok++;
-    else if (outcome === "cancelled") cancelled++;
-    else failed++;
-  }
-  return { ok, failed, cancelled };
+  notifyError(t("当前 LinkDesk 版本过旧，请更新后再批量更新插件"));
+  return { ok: 0, failed: entries.length, cancelled: 0 };
 }
 
 /** 全部已读（发现型）——命令面唯一入口；返回 cleared */

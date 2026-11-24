@@ -7,12 +7,12 @@
 import { describe, it, expect } from "vitest";
 import type { CatalogEntry } from "../services/marketCatalog";
 import {
-  authorLabel,
   repoHomeUrl,
   fmtSize,
   installConfirmPayload,
   isHttpSourceUrl,
 } from "../services/installConfirmPayload";
+import { authorLabel } from "../services/catalogText"; // P1 归一化：唯一实现
 
 /** 最小目录条目 fixture——字段只填被测面需要，其余按类型缺省（结构可选）。虚构值恒明显非真实。 */
 function entryFixture(overrides: Partial<CatalogEntry> = {}): CatalogEntry {

@@ -13,7 +13,6 @@ import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { notifyError } from "./marketplaceShared/notifications";
 import { startMarketInstall } from "./marketplaceShared/installFlow";
-import { confirmMarketInstall } from "./installGate";
 import { buildInstallRequest, installConfirmApi } from "./hostInstallConfirm";
 import { minAppVerdict, readShellVersion } from "./minAppVersionGate";
 import type { CatalogEntry } from "./marketCatalog";
@@ -31,10 +30,11 @@ export async function runMarketInstallAction(
     notifyError(t("该插件缺少下载地址"));
     return false;
   }
-  // P1：新壳有 requestInstall ⇒ 只走壳托管确认（判定/令牌/队列/进度全在壳，市场不自绘确认卡）
+  /* 🔴 2026-11-24 用户拍板：**不再为老壳做任何适配**（本软件只有作者本人使用，没有旧版本用户）。
+   * 市场只走壳托管的 requestInstall；拿不到这个面 = 壳太旧，直接如实报错，⛔ 不写回落分支。 */
   const hostApi = installConfirmApi();
-  if (!hostApi && !lk()?.pluginManager?.installWithProgress) {
-    notifyError(t("安装失败"));
+  if (!hostApi) {
+    notifyError(t("当前 LinkDesk 版本过旧，请更新后再安装插件"));
     return false;
   }
   // 2026-11-05 拍板②：minAppVersion 门（行内/商店/详情同一道）
@@ -43,20 +43,13 @@ export async function runMarketInstallAction(
     notifyError(t("需升级 LinkDesk 至 {{version}} 才能安装", { version: gate.need }));
     return false;
   }
-  if (hostApi) {
-    const res = await hostApi.requestInstall(buildInstallRequest(entry, "install", entry.downloadUrl));
-    if (res?.confirmed && res?.ok === false) {
-      // 用户点了确认但没装成（下载/校验/落盘失败）——如实报，⛔ 不假装启动成功
-      notifyError(res.error || t("安装失败"));
-      return false;
-    }
-    return res?.confirmed === true;
+  const res = await hostApi.requestInstall(buildInstallRequest(entry, "install", entry.downloadUrl));
+  if (res?.confirmed && res?.ok === false) {
+    // 用户点了确认但没装成（下载/校验/落盘失败）——如实报，⛔ 不假装启动成功
+    notifyError(res.error || t("安装失败"));
+    return false;
   }
-  // 老壳回落：市场自绘确认卡（E6#71k「都问」——官方来源不豁免）
-  const confirmed = await confirmMarketInstall(entry, "install");
-  if (!confirmed) return false;
-  // 进度/失败/重试全走 startMarketInstall（E6#73o：带条目来源 URL 供依赖解析）
-  return startMarketInstall(entry.id, entry.downloadUrl, entry.name, entry.sourceUrl);
+  return res?.confirmed === true;
 }
 
 export function useMarketInstallAction(online: boolean) {

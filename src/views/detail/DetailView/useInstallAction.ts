@@ -12,7 +12,6 @@ import { pinnedAfterApply } from "../../../services/marketCatalog";
 import { minAppVerdict } from "../../../services/minAppVersionGate";
 import { notifyError, startMarketInstall, retryMarketInstall } from "../../../services/marketplaceShared";
 import { installConfirmApi } from "../../../services/hostInstallConfirm";
-import { confirmMarketInstall } from "../../../services/installGate";
 import { installJobLabel, useInstallJob } from "../../../services/installJobs";
 import { setPinnedVersion } from "../../../services/installedUpdateMeta";
 import type { DetailIdentity } from "./useDetailIdentity";
@@ -107,12 +106,7 @@ export function useInstallAction(
     if (!pluginId || busy || installingHere) return;
     if (installGateError()) return;
     if (!entry) return;
-    // 🔴 新壳：确认归壳（requestInstall 内部弹卡）；市场这层门只服务老壳回落，
-    //    否则详情页会出现「问两次」（市场卡 → 壳卡）——2026-11-24 实机。
-    if (!installConfirmApi()) {
-      const ok = await confirmMarketInstall(entry, "install", installVer);
-      if (!ok) return;
-    }
+    // 🔴 确认归壳（requestInstall 内部弹卡）——市场这层门已删（用户 2026-11-24：不做老壳适配）
     await runInstall();
   }, [pluginId, busy, installingHere, installGateError, entry, installVer, runInstall]);
 

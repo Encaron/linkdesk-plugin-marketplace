@@ -14,7 +14,6 @@ import type { CatalogEntry } from "./marketCatalog";
 import { compareVersions, pinnedAfterApply, versionDownloadUrl } from "./marketCatalog";
 import { minAppVerdict, readShellVersion } from "./minAppVersionGate";
 import { notifyError, settleUpdateFailure } from "./marketplaceShared/notifications";
-import { confirmMarketInstall } from "./installGate";
 import { buildInstallRequest, installConfirmApi } from "./hostInstallConfirm";
 import { setPinnedVersion } from "./installedUpdateMeta";
 
@@ -50,11 +49,10 @@ export async function performMarketUpdate(o: MarketUpdateOptions): Promise<Marke
     notifyError(t("该插件缺少下载地址"));
     return "blocked";
   }
-  // P1：新壳有 requestInstall ⇒ 只走壳托管确认；⛔ 不回落旧 update（新壳对远程来源旧链一律拒）
+  // 🔴 不再有为老壳的回落（用户 2026-11-24 拍板）；拿不到新面 = 壳太旧，如实报错
   const hostApi = installConfirmApi();
-  const upd = pm()?.update;
-  if (!hostApi && !upd) {
-    notifyError(t("更新失败"));
+  if (!hostApi) {
+    notifyError(t("当前 LinkDesk 版本过旧，请更新后再更新插件"));
     return "blocked";
   }
   const isDowngrade = !!o.localVer && !!ver && compareVersions(ver, o.localVer) < 0;
@@ -66,7 +64,7 @@ export async function performMarketUpdate(o: MarketUpdateOptions): Promise<Marke
       return "blocked";
     }
   }
-  if (hostApi && entry) {
+  if (entry) {
     // 降级要显式放行（壳 policy 出 downgrade 确认卡）；确认/取消语义由壳统一给
     const res = await hostApi.requestInstall(
       buildInstallRequest(entry, "update", url, { version: ver, allowOlder: isDowngrade || undefined }),
@@ -84,25 +82,6 @@ export async function performMarketUpdate(o: MarketUpdateOptions): Promise<Marke
     }
     return res?.cancelled ? "cancelled" : "blocked";
   }
-  if (entry && !o.skipConfirm) {
-    const ok = await confirmMarketInstall(entry, "update", ver);
-    if (!ok) return "cancelled";
-  }
-  // 到这里 hostApi 必为 null（上面已分流）⇒ upd 必在；收窄给 tsc
-  if (!upd) return "blocked";
-  try {
-    const r = await upd(pluginId, { url, allowOlder: isDowngrade ? true : undefined });
-    if (r && r.success) {
-      const pin = entry && ver ? pinnedAfterApply(entry, ver) : undefined;
-      if (pin !== undefined) void setPinnedVersion(pluginId, pin);
-      refresh();
-      return "ok";
-    }
-    if (!r?.cancelled) settleUpdateFailure(pluginId, displayName, url, r?.error ?? "");
-    return r?.cancelled ? "cancelled" : "blocked";
-  } catch (e) {
-    const raw = e instanceof Error ? e.message : String(e);
-    settleUpdateFailure(pluginId, displayName, url, raw);
-    return "blocked";
-  }
+  notifyError(t("该插件缺少目录条目，无法发起更新"));
+  return "blocked";
 }
