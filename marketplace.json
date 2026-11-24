@@ -1,30 +1,37 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-24T17:52:15.447Z",
+  "updatedAt": "2026-11-24T19:34:31.814Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.34",
+      "version": "1.4.35",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.34/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.35/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.34/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.35/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.63",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.34/README.md",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.35/README.md",
       "readmeLocales": {
-        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.34/README.md",
-        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.34/docs/readme/en.md"
+        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.35/README.md",
+        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.35/docs/readme/en.md"
       },
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.34/marketplace.linkdesk-plugin",
-      "size": 197196,
-      "publishedAt": "2026-11-24T17:52:15.447Z",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.35/marketplace.linkdesk-plugin",
+      "size": 197335,
+      "publishedAt": "2026-11-24T19:34:31.814Z",
       "versions": [
+        {
+          "version": "1.4.35",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.35/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-24T19:34:31.814Z",
+          "changelog": "- **风险分档**：壳在 `prepare*` 回执里给出 `cardOwner`——首装 / 来源变更 / 降级 / 未信任来源 = `host`（壳画，用户看到的内容有壳背书）；官方同源、已信任来源只是开关关着 = `market`（市场自绘）。市场收到 `host` 时丢弃计划、改走 `requestInstall`/`requestUpdateBatch`，不硬画。",
+          "sha256": "1ae1912cd3315fab7db681bc9e9c56ee8c5f2e8f53181a9b3be9489a3f58a165"
+        },
         {
           "version": "1.4.34",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.34/marketplace.linkdesk-plugin",
@@ -54,8 +61,7 @@
         {
           "version": "1.4.30",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.30/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-24T15:44:38.078Z",
-          "changelog": "- 安装/更新失败**同时**给轻 toast（立刻看得见）＋ 铃铛面板（常驻+重试）——此前只有面板，用户点完安装看不到任何即时反馈。"
+          "publishedAt": "2026-11-24T15:44:38.078Z"
         },
         {
           "version": "1.4.29",
