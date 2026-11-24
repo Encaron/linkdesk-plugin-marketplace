@@ -10,6 +10,13 @@
  */
 
 import { afterEach, describe, expect, it, vi } from "vitest";
+vi.mock("i18next", () => ({ default: { t: (k: string) => k } }));
+
+const notified: string[] = [];
+vi.mock("../services/marketplaceShared/notifications", () => ({
+  notifyError: (m: string) => notified.push(m),
+}));
+
 import { installConfirmApi, MARKET_CONFIRM_VIEWS } from "../services/hostInstallConfirm";
 
 const VIEW = {
@@ -199,5 +206,24 @@ describe("风险分档：cardOwner = host（首装/来源变更/降级/未信任
     expect(requestUpdateBatch).toHaveBeenCalledWith([REQ]);
     expect(confirmContent).not.toHaveBeenCalled();
     expect(r.confirmed).toBe(true);
+  });
+});
+describe("计划过期（壳回 unknown-plan）", () => {
+  it("不再静默当取消——说一句「确认已过期」", async () => {
+    notified.length = 0;
+    const commitInstall = vi.fn(async () => ({ confirmed: false, reason: "unknown-plan" }));
+    stub(
+      {
+        requestInstall: vi.fn(),
+        prepareInstall: vi.fn(async () => ({ planId: "p1", plan: (VIEW as { plan: unknown }).plan, view: VIEW })),
+        commitInstall,
+        discardInstall: vi.fn(),
+      },
+      { confirmContent: vi.fn(async (_o: { pluginId: string; viewId: string; payload: unknown }) => true) },
+    );
+
+    const r = await installConfirmApi()!.requestInstall(REQ);
+    expect(r).toMatchObject({ confirmed: false });
+    expect(notified.some((m) => m.includes("确认已过期"))).toBe(true);
   });
 });

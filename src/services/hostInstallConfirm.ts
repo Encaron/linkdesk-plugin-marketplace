@@ -14,8 +14,10 @@
  */
 
 import { urlSourceKey } from "@linkdesk/ui";
+import i18n from "i18next";
 import type { CatalogEntry } from "./marketCatalog";
 import type { PluginConfirmViewPayload } from "@linkdesk/contracts";
+import { notifyError } from "./marketplaceShared/notifications";
 
 /** 壳侧 `PluginSourceIdentity`（contracts 0.1.53 同形；本仓类型面未跟进，故收窄一份） */
 export interface HostSourceIdentity {
@@ -58,6 +60,14 @@ interface ConfirmResult {
 interface BatchResult {
   confirmed?: boolean;
   cancelled?: boolean;
+}
+
+/**
+ * 计划过期提示（2026-11-25 用户拍板）：确认计划的句柄只活 5 分钟——用户把卡晾在那儿再点确认时，
+ * 壳回 `unknown-plan`。此前被当成"取消"静默吞掉，用户会以为按钮坏了。这里统一说一句人话。
+ */
+function notifyPlanExpired(): void {
+  void notifyError(i18n.t("确认已过期，请重新发起"));
 }
 
 /** 市场自绘卡的视图 id —— 与 `plugin.json` 的 `contributes.views.main` 同值（唯一登记处） */
@@ -148,7 +158,9 @@ export function installConfirmApi(): HostInstallConfirmApi | null {
           return { confirmed: false, cancelled: true };
         }
       }
-      return candidate.commitInstall!(prepared.planId);
+      const done = await candidate.commitInstall!(prepared.planId);
+      if (done?.reason === "unknown-plan") notifyPlanExpired();
+      return done;
     },
     requestUpdateBatch: async (reqs) => {
       if (canPrepareBatch) {
@@ -167,6 +179,7 @@ export function installConfirmApi(): HostInstallConfirmApi | null {
           }
         }
         const r = await candidate.commitInstall!(prepared.planId);
+        if (r?.reason === "unknown-plan") notifyPlanExpired();
         return { confirmed: r.confirmed, cancelled: r.cancelled };
       }
       // 批量面缺失 ⇒ 逐条走单项面（逐条问 = 老行为，⛔ 不静默放弃）
