@@ -14,6 +14,7 @@
 import i18n from "i18next";
 import { classifyInstallError, failText, installFailLabelKey, updateFailText } from "./messages";
 import { pluginDisplayNameOf } from "./catalogStore";
+import { showToast } from "../hostApi";
 
 const lk = () => window.linkdesk;
 
@@ -70,6 +71,15 @@ export async function settleInstallFailure(pluginId: string, downloadUrl: string
           args: [{ pluginId, downloadUrl }],
         },
       ],
+    });
+    /**
+     * 🔴 再加一条**轻 toast**（2026-11-24 用户实机）：「失败只进了铃铛面板，点安装后右下角什么都没有」。
+     * 面板是结果/重试的常驻落点，轻 toast 是"立刻看得见"的即时反馈——同一通知 store 的双呈现，
+     * 不是第三个面（壳 `toasts.show` 的 severity 仅 info/success/warning ⇒ 这里给 warning）。
+     */
+    showToast(i18n.t("{{name}}：{{reason}}", { name: failName, reason: failReasonText }), {
+      severity: "warning",
+      key: `install-fail-${pluginId}`,
     });
   }
   return false;
