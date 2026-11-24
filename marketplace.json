@@ -1,30 +1,37 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-24T19:34:31.814Z",
+  "updatedAt": "2026-11-24T19:44:16.819Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.35",
+      "version": "1.4.36",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.35/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.36/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.35/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.36/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.63",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.35/README.md",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.36/README.md",
       "readmeLocales": {
-        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.35/README.md",
-        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.35/docs/readme/en.md"
+        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.36/README.md",
+        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.36/docs/readme/en.md"
       },
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.35/marketplace.linkdesk-plugin",
-      "size": 197335,
-      "publishedAt": "2026-11-24T19:34:31.814Z",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.36/marketplace.linkdesk-plugin",
+      "size": 197404,
+      "publishedAt": "2026-11-24T19:44:16.819Z",
       "versions": [
+        {
+          "version": "1.4.36",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.36/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-24T19:44:16.819Z",
+          "changelog": "- 确认计划过期（卡摆了超过 5 分钟才点确认）不再静默当取消：提示「确认已过期，请重新发起」。",
+          "sha256": "efd069b02b316659dd12a50d1b960f78ede1af6e1d0ce51fff26984d14de61b0"
+        },
         {
           "version": "1.4.35",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.35/marketplace.linkdesk-plugin",
@@ -55,8 +62,7 @@
         {
           "version": "1.4.31",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.31/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-24T15:56:46.936Z",
-          "changelog": "- 安装失败改走**归因**通道（「文件校验未通过」人话 + [重试]）；兜底原文统一剥掉 `Error invoking remote method ...` 这类 IPC 管道前缀——用户不该看到通道名与开发者措辞。"
+          "publishedAt": "2026-11-24T15:56:46.936Z"
         },
         {
           "version": "1.4.30",
