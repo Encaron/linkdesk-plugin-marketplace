@@ -13,6 +13,7 @@
  * 归一化：来源身份只在这里推导一次（`sourceIdentityOf`），⛔ 各调用点各拼一遍。
  */
 
+import { urlSourceKey } from "@linkdesk/ui";
 import type { CatalogEntry } from "./marketCatalog";
 
 /** 壳侧 `PluginSourceIdentity`（contracts 0.1.53 同形；本仓类型面未跟进，故收窄一份） */
@@ -109,8 +110,13 @@ export function sourceIdentityOf(entry: CatalogEntry): HostSourceIdentity {
   if (entry.official) {
     return { id: "official", url, repo: entry.sourceName, publisher: publisherOf(entry) };
   }
+  /**
+   * 🔴 来源 id **必须**与「设置里那本信任清单」同一个词（2026-11-24 实机：信任了 A 却按 B 判定 ⇒ 开关永远无效）。
+   * 统一用 `urlSourceKey`（`owner/repo`，小写）——它是市场加源去重、设置 StringListEditor 去重共用的那把钥匙；
+   * 拿 `sourceName`（只有仓库名、没有 owner）或自造短名都会造出第二套词。
+   */
   return {
-    id: entry.sourceName || entry.sourceUrl || "unknown",
+    id: urlSourceKey(url) ?? entry.sourceName ?? url ?? "unknown",
     url,
     repo: entry.sourceName,
     publisher: publisherOf(entry),

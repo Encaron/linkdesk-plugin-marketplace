@@ -7,7 +7,10 @@
  */
 
 // E6#71k「都问」：重试也要过确认门——门位在本模块 retryMarketInstall（三入口单点），"不 import 门" 无从豁免
+import i18n from "i18next";
 import { confirmMarketInstallById } from "../installGate";
+import { buildInstallRequest, installConfirmApi } from "../hostInstallConfirm";
+import { getCatalogResult } from "./catalogStore";
 import { pluginDisplayNameOf } from "./catalogStore";
 import { scheduleDataRefresh } from "./pluginsStore";
 import { settleInstallFailure } from "./notifications";
@@ -52,6 +55,23 @@ type InstallRequestOpts = { pluginId: string; displayName: string; origin: "user
  * 仍留 catch：极端下壳面 reject 也要有终局，不能让调用方的按钮永远转圈。
  */
 async function runMarketInstall(pluginId: string, name: string, downloadUrl: string, catalogUrl?: string): Promise<boolean> {
+  /* ── ① 新壳：唯一合法远程安装入口 = 壳托管的 requestInstall（判定/令牌/队列/提示全在壳） ──
+   * 🔴 2026-11-24 根治：此前本函数直呼 `installWithProgress` ⇒ 新壳把它按「远程来源无 token」拒掉，
+   *   用户看到的是「重试永远是 no-token」。现在**只有**这一条路，旧链退到「老壳回落」。 */
+  const host = installConfirmApi();
+  if (host) {
+    const entry = getCatalogResult().entries.find((e) => e.id === pluginId);
+    if (!entry) {
+      // 目录里没有它（离线/已下架）⇒ 构造不出合规请求。如实报，⛔ 不退回旧链（会被 no-token 拒）
+      return settleInstallFailure(pluginId, downloadUrl, i18n.t("目录里没有这个插件的信息，请刷新目录后重试"));
+    }
+    const res = await host.requestInstall(buildInstallRequest(entry, "install", downloadUrl));
+    if (res?.cancelled || !res?.confirmed) return false;
+    if (res.ok === false) return settleInstallFailure(pluginId, downloadUrl, res.error ?? "");
+    scheduleDataRefresh();
+    return true;
+  }
+  /* ── ② 老壳回落（无 requestInstall 的旧版本）：原样走旧链 ── */
   const inst = lk()?.pluginManager?.installWithProgress;
   if (!inst) return false;
   try {
@@ -99,7 +119,7 @@ export function startMarketInstall(
   displayName?: string,
   catalogUrl?: string,
 ): Promise<boolean> {
-  if (!lk()?.pluginManager?.installWithProgress) return Promise.resolve(false);
+  if (!installConfirmApi() && !lk()?.pluginManager?.installWithProgress) return Promise.resolve(false);
   const open = openInstalls.get(pluginId);
   if (open) return open;
   const p = runMarketInstall(pluginId, displayName ?? pluginDisplayNameOf(pluginId), downloadUrl, catalogUrl).finally(() => {
@@ -124,7 +144,8 @@ export async function retryMarketInstall(
   displayName?: string,
 ): Promise<boolean> {
   if (!pluginId || !downloadUrl) return false;
-  if (!(await confirmMarketInstallById(pluginId, displayName))) return false;
+  // 新壳：确认由壳负责（requestInstall 内部弹卡）；再走一次市场确认门 = 同一件事问两遍
+  if (!installConfirmApi() && !(await confirmMarketInstallById(pluginId, displayName))) return false;
   return startMarketInstall(pluginId, downloadUrl, displayName);
 }
 
@@ -146,6 +167,17 @@ export async function retryMarketUpdate(
   displayName?: string,
 ): Promise<boolean> {
   if (!pluginId || !downloadUrl) return false;
+  // 新壳：同重试安装——确认归壳，走 requestInstall；⛔ 不再直呼 pluginManager.update（会被 no-token 拒）
+  const host = installConfirmApi();
+  if (host) {
+    const entry = getCatalogResult().entries.find((e) => e.id === pluginId);
+    if (!entry) return settleInstallFailure(pluginId, downloadUrl, i18n.t("目录里没有这个插件的信息，请刷新目录后重试"));
+    const res = await host.requestInstall(buildInstallRequest(entry, "update", downloadUrl));
+    if (res?.cancelled || !res?.confirmed) return false;
+    if (res.ok === false) return settleInstallFailure(pluginId, downloadUrl, res.error ?? "");
+    scheduleDataRefresh();
+    return true;
+  }
   if (!(await confirmMarketInstallById(pluginId, displayName))) return false;
   const upd = pm()?.update;
   if (!upd) return false;
