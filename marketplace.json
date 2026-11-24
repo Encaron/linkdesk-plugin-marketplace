@@ -1,30 +1,36 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-23T22:09:12.935Z",
+  "updatedAt": "2026-11-24T13:53:48.109Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.26",
+      "version": "1.4.27",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.26/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.27/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.26/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.27/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.60",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.26/README.md",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.27/README.md",
       "readmeLocales": {
-        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.26/README.md",
-        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.26/docs/readme/en.md"
+        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.27/README.md",
+        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.27/docs/readme/en.md"
       },
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.26/marketplace.linkdesk-plugin",
-      "size": 199562,
-      "publishedAt": "2026-11-23T22:09:12.935Z",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.27/marketplace.linkdesk-plugin",
+      "size": 200235,
+      "publishedAt": "2026-11-24T13:53:48.109Z",
       "versions": [
+        {
+          "version": "1.4.27",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.27/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-24T13:53:48.109Z",
+          "changelog": "- **把 sha256 传给壳**：请求里的校验和现在按**目标版本**从版本历史里取（此前恒 undefined，导致确认卡上永远写「未提供校验值」，壳的下载后校验形同虚设）。实机发现。\n- 目录条目类型补 `versions[].sha256`（与 marketplace-kit 0.1.8 的 schema 对齐）。"
+        },
         {
           "version": "1.4.26",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.26/marketplace.linkdesk-plugin",
@@ -52,8 +58,7 @@
         {
           "version": "1.4.22",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.22/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-23T17:42:16.152Z",
-          "changelog": "- **作者/仓库卡名走目录 locales**：`AuthorSwitchCard` / 仓卡标题此前裸读 `r.name`（intro 已本地化、name 没走 lt），英文界面仍显示「官方目录」；作者仓卡/仓库页/来源管理三处统一 `lt(r,\"name\")`。\n- **防复发**：新增 `catalogTextResolution.test.ts`，扫视图里的 `title={r.name}` / `tag: banner.title` / `more.label` 裸读，命中即红。"
+          "publishedAt": "2026-11-23T17:42:16.152Z"
         },
         {
           "version": "1.4.21",
