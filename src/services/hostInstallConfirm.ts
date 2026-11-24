@@ -57,7 +57,6 @@ interface ConfirmResult {
 interface BatchResult {
   confirmed?: boolean;
   cancelled?: boolean;
-  jobIds?: string[];
 }
 
 /** 壳托管确认面（P1 新壳才有） */
@@ -85,9 +84,9 @@ export function installConfirmApi(): HostInstallConfirmApi | null {
         : async (reqs) => {
             for (const req of reqs) {
               const r = await candidate.requestInstall!(req);
-              if (!r?.confirmed) return { confirmed: false, cancelled: r?.cancelled, jobIds: [] };
+              if (!r?.confirmed) return { confirmed: false, cancelled: r?.cancelled };
             }
-            return { confirmed: true, jobIds: [] };
+            return { confirmed: true };
           },
   };
 }

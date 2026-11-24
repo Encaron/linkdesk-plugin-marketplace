@@ -103,7 +103,7 @@ describe("installConfirmApi —— 形状守卫", () => {
 
 describe("updateAll —— 壳托管线", () => {
   it("确认后返回 hosted:true + confirmed:true（完成反馈归壳）", async () => {
-    const requestUpdateBatch = vi.fn(async () => ({ confirmed: true, jobIds: [] }));
+    const requestUpdateBatch = vi.fn(async () => ({ confirmed: true }));
     vi.stubGlobal("window", { linkdesk: { plugins: { requestInstall: async () => ({ confirmed: true }), requestUpdateBatch } } });
     const r = await updateAll([entry()], true, (k: string) => k);
     expect(r.hosted).toBe(true);

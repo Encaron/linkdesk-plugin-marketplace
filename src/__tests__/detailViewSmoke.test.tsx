@@ -162,7 +162,7 @@ function stubLinkdesk(o: {
       resolvePath: vi.fn(async () => "C:/plugins/demo"),
       // P1（2026-11-24 根治）：安装/更新的唯一入口 = 壳托管的 requestInstall（⛔ 老链已删）
       requestInstall: vi.fn(async () => ({ confirmed: true, ok: true })),
-      requestUpdateBatch: vi.fn(async () => ({ confirmed: true, ok: true, jobIds: [] })),
+      requestUpdateBatch: vi.fn(async () => ({ confirmed: true, ok: true })),
       getUpdatePolicy: vi.fn(async () => ({ silentOfficial: true, silentTrustedSources: false })),
       setUpdatePolicy: vi.fn(async () => ({ silentOfficial: true, silentTrustedSources: false })),
       listSourceTrust: vi.fn(async () => []),
