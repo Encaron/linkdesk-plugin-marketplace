@@ -1,30 +1,36 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-24T13:53:48.109Z",
+  "updatedAt": "2026-11-24T15:16:26.769Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.27",
+      "version": "1.4.28",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.27/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.28/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.27/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.28/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.60",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.27/README.md",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.28/README.md",
       "readmeLocales": {
-        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.27/README.md",
-        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.27/docs/readme/en.md"
+        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.28/README.md",
+        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.28/docs/readme/en.md"
       },
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.27/marketplace.linkdesk-plugin",
-      "size": 200235,
-      "publishedAt": "2026-11-24T13:53:48.109Z",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.28/marketplace.linkdesk-plugin",
+      "size": 200386,
+      "publishedAt": "2026-11-24T15:16:26.769Z",
       "versions": [
+        {
+          "version": "1.4.28",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.28/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-24T15:16:26.769Z",
+          "changelog": "- **安装/更新的单入口收口**（根治）：详情页安装、全部「重试」、`startMarketInstall` 一律先走壳 `requestInstall`，旧链只在**老壳**回落——此前直呼 `installWithProgress`/`update` 会被新壳按 `no-token` 拒，「重试」永远失败。\n- **来源 id 统一为 `owner/repo`**（`urlSourceKey`）：与设置里信任清单同一个词，修「信任了来源、开关也开了，更新仍旧弹卡」。\n- **详情页不再双重确认**：新壳只由壳问一次（原先市场卡 + 壳卡问两遍）。\n- 请求补齐 `catalogUrl`（依赖自动安装）与 `minAppVersion`（壳侧再判一次）。"
+        },
         {
           "version": "1.4.27",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.27/marketplace.linkdesk-plugin",
@@ -52,8 +58,7 @@
         {
           "version": "1.4.23",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.23/marketplace.linkdesk-plugin",
-          "publishedAt": "2026-11-23T18:05:00.547Z",
-          "changelog": "- **rail 标签不再省略**：128px + `text-overflow: clip`；此前 112px 仍会把 Author + 计数 + 黄点挤成 Aut…。门禁/测试也改为要求 128px + clip，不再把省略号当不变量。"
+          "publishedAt": "2026-11-23T18:05:00.547Z"
         },
         {
           "version": "1.4.22",
