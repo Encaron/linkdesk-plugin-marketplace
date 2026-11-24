@@ -146,3 +146,58 @@ describe("requestUpdateBatch —— 市场自绘", () => {
     expect(r.confirmed).toBe(true);
   });
 });
+describe("风险分档：cardOwner = host（首装/来源变更/降级/未信任来源）", () => {
+  it("单项：壳说这单要壳画 ⇒ 丢弃计划、改走 requestInstall（⛔ 不弹市场卡）", async () => {
+    const confirmContent = vi.fn(async (_o: { pluginId: string; viewId: string; payload: unknown }) => true);
+    const discardInstall = vi.fn(async () => undefined);
+    const requestInstall = vi.fn(async () => ({ confirmed: true }));
+    const commitInstall = vi.fn(async () => ({ confirmed: true }));
+    stub(
+      {
+        requestInstall,
+        prepareInstall: vi.fn(async () => ({
+          planId: "p-host",
+          plan: (VIEW as { plan: unknown }).plan,
+          view: VIEW,
+          cardOwner: "host",
+        })),
+        commitInstall,
+        discardInstall,
+      },
+      { confirmContent },
+    );
+
+    const r = await installConfirmApi()!.requestInstall(REQ);
+
+    expect(discardInstall).toHaveBeenCalledWith("p-host");
+    expect(requestInstall).toHaveBeenCalledWith(REQ); // 壳默认卡
+    expect(confirmContent).not.toHaveBeenCalled();
+    expect(commitInstall).not.toHaveBeenCalled();
+    expect(r.confirmed).toBe(true);
+  });
+
+  it("批量：壳说整批要壳画 ⇒ 改走 requestUpdateBatch", async () => {
+    const confirmContent = vi.fn(async (_o: { pluginId: string; viewId: string; payload: unknown }) => true);
+    const requestUpdateBatch = vi.fn(async () => ({ confirmed: true }));
+    stub(
+      {
+        requestInstall: vi.fn(),
+        prepareUpdateBatch: vi.fn(async () => ({
+          planId: "b-host",
+          plan: (BATCH_VIEW as { plan: unknown }).plan,
+          view: BATCH_VIEW,
+          cardOwner: "host",
+        })),
+        commitInstall: vi.fn(async () => ({ confirmed: true })),
+        discardInstall: vi.fn(async () => undefined),
+        requestUpdateBatch,
+      },
+      { confirmContent },
+    );
+
+    const r = await installConfirmApi()!.requestUpdateBatch!([REQ]);
+    expect(requestUpdateBatch).toHaveBeenCalledWith([REQ]);
+    expect(confirmContent).not.toHaveBeenCalled();
+    expect(r.confirmed).toBe(true);
+  });
+});

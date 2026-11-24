@@ -71,6 +71,8 @@ interface HostPrepared {
   planId: string;
   plan: { ask: unknown[] };
   view: PluginConfirmViewPayload;
+  /** 壳指定这张卡该谁画（风险分档，2026-11-25 拍板）：host = 首装/来源变更/降级/未信任来源 */
+  cardOwner?: "host" | "market";
 }
 
 /** 壳的两步确认面（D1′）——缺任何一个 ⇒ 走 `requestInstall` 快捷路径（契约保留的兜底） */
@@ -134,6 +136,11 @@ export function installConfirmApi(): HostInstallConfirmApi | null {
     requestInstall: async (req) => {
       if (!canPrepare) return candidate.requestInstall!(req); // 壳无两步面 ⇒ 快捷路径（壳画卡）
       const prepared = await candidate.prepareInstall!(req);
+      /* 高风险 ⇒ 壳画（壳的默认卡才能保证用户看到的内容有壳背书）。市场在这里让路，⛔ 不硬画。 */
+      if (prepared.cardOwner === "host") {
+        await candidate.discardInstall?.(prepared.planId);
+        return candidate.requestInstall!(req);
+      }
       if (prepared.plan.ask.length > 0) {
         const ok = await showMarketCard(prepared.view);
         if (!ok) {
@@ -146,6 +153,12 @@ export function installConfirmApi(): HostInstallConfirmApi | null {
     requestUpdateBatch: async (reqs) => {
       if (canPrepareBatch) {
         const prepared = await candidate.prepareUpdateBatch!(reqs);
+        if (prepared.cardOwner === "host") {
+          await candidate.discardInstall?.(prepared.planId);
+          return typeof candidate.requestUpdateBatch === "function"
+            ? candidate.requestUpdateBatch.bind(plugins)(reqs)
+            : { confirmed: false, cancelled: true };
+        }
         if (prepared.plan.ask.length > 0) {
           const ok = await showMarketCard(prepared.view);
           if (!ok) {
