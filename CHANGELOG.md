@@ -1,5 +1,9 @@
 # 更新日志
 
+## v1.4.34（2026-11-25）
+
+- 补 5 条插件字典英文（版本过旧 ×3 / 目录无此插件 / 缺目录条目）——`check-i18n-surface` 转绿。
+
 ## v1.4.33（2026-11-25）
 
 - **确认卡由市场自绘**（D8′）：安装/更新/批量更新改走两步 API——`prepareInstall`/`prepareUpdateBatch` 拿壳算的 `plan`，需要确认时用 `dialog.confirmContent` 弹出**市场自己的视图**（`marketplace-install-confirm` / `marketplace-update-batch`，内容用 `@linkdesk/ui` 共享件），用户确认后 `commitInstall(planId)`；取消 ⇒ `discardInstall`。

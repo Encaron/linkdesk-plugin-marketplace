@@ -774,5 +774,10 @@
   "作者聚合键（两个仓必须属于该作者）": "作者聚合键（两个仓必须属于该作者）",
   "仓库 id（作者声明 repos[].id / 源记录的 repoId）": "仓库 id（作者声明 repos[].id / 源记录的 repoId）",
   "另一个仓库 id（同一作者内）": "另一个仓库 id（同一作者内）",
-  "读取作者容器顺序与各作者组内仓库顺序（唯一真相源 marketplace.marketplaceSources 数组序；官方核心仓恒在官方组第一；本地组不参与）。回执 {ok:true, authorOrder, repoOrder}": "读取作者容器顺序与各作者组内仓库顺序（唯一真相源 marketplace.marketplaceSources 数组序；官方核心仓恒在官方组第一；本地组不参与）。回执 {ok:true, authorOrder, repoOrder}"
+  "读取作者容器顺序与各作者组内仓库顺序（唯一真相源 marketplace.marketplaceSources 数组序；官方核心仓恒在官方组第一；本地组不参与）。回执 {ok:true, authorOrder, repoOrder}": "读取作者容器顺序与各作者组内仓库顺序（唯一真相源 marketplace.marketplaceSources 数组序；官方核心仓恒在官方组第一；本地组不参与）。回执 {ok:true, authorOrder, repoOrder}",
+  "当前 LinkDesk 版本过旧，请更新后再安装插件": "当前 LinkDesk 版本过旧，请更新后再安装插件",
+  "当前 LinkDesk 版本过旧，请更新后再更新插件": "当前 LinkDesk 版本过旧，请更新后再更新插件",
+  "当前 LinkDesk 版本过旧，请更新后再批量更新插件": "当前 LinkDesk 版本过旧，请更新后再批量更新插件",
+  "目录里没有这个插件的信息，请刷新目录后重试": "目录里没有这个插件的信息，请刷新目录后重试",
+  "该插件缺少目录条目，无法发起更新": "该插件缺少目录条目，无法发起更新"
 }

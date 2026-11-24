@@ -774,5 +774,10 @@
   "作者聚合键（两个仓必须属于该作者）": "Author key (both repositories must belong to this author).",
   "仓库 id（作者声明 repos[].id / 源记录的 repoId）": "Repository id (the author's repos[].id / the source record's repoId).",
   "另一个仓库 id（同一作者内）": "Another repository id (within the same author).",
-  "{ page:\"lib\"|\"author\"|\"cat\", view?: \"grid\"|\"list\", sort?: string }": "{ page:\"lib\"|\"author\"|\"cat\", view?: \"grid\"|\"list\", sort?: string }"
+  "{ page:\"lib\"|\"author\"|\"cat\", view?: \"grid\"|\"list\", sort?: string }": "{ page:\"lib\"|\"author\"|\"cat\", view?: \"grid\"|\"list\", sort?: string }",
+  "当前 LinkDesk 版本过旧，请更新后再安装插件": "This LinkDesk version is too old — update LinkDesk before installing plugins",
+  "当前 LinkDesk 版本过旧，请更新后再更新插件": "This LinkDesk version is too old — update LinkDesk before updating plugins",
+  "当前 LinkDesk 版本过旧，请更新后再批量更新插件": "This LinkDesk version is too old — update LinkDesk before batch-updating plugins",
+  "目录里没有这个插件的信息，请刷新目录后重试": "This plugin is not in the catalog — refresh the catalog and try again",
+  "该插件缺少目录条目，无法发起更新": "This plugin has no catalog entry — cannot start the update"
 }
