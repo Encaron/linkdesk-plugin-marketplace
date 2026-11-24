@@ -780,5 +780,13 @@
   "当前 LinkDesk 版本过旧，请更新后再批量更新插件": "This LinkDesk version is too old — update LinkDesk before batch-updating plugins",
   "目录里没有这个插件的信息，请刷新目录后重试": "This plugin is not in the catalog — refresh the catalog and try again",
   "该插件缺少目录条目，无法发起更新": "This plugin has no catalog entry — cannot start the update",
-  "确认已过期，请重新发起": "This confirmation has expired — please start again"
+  "确认已过期，请重新发起": "This confirmation has expired — please start again",
+  "启用一个已安装但被禁用的插件（按 pluginId）。只改插件启用状态，不动磁盘代码。": "Enables an installed but disabled plugin (by pluginId). Changes the enabled state only; never touches code on disk.",
+  "禁用一个已安装插件（按 pluginId）。只改启用状态，不删磁盘代码。": "Disables an installed plugin (by pluginId). Changes the enabled state only; keeps code on disk.",
+  "卸载一个已安装插件（按 pluginId）：删除安装代码，插件数据可能一并丢失，重装不等于恢复。": "Uninstalls an installed plugin (by pluginId): deletes its installed code; plugin data may be lost too, and reinstalling does not restore it.",
+  "安装失败 toast 的「重试」落点：按 pluginId + downloadUrl 重试安装（仍过确认门）。": "Retry entry point from the install-failure toast: retries installing by pluginId + downloadUrl (still goes through the confirmation gate).",
+  "更新失败 toast 的「重试」落点：按 pluginId + downloadUrl（可选 displayName）重试更新（仍过确认门）。": "Retry entry point from the update-failure toast: retries updating by pluginId + downloadUrl (optional displayName; still goes through the confirmation gate).",
+  "插件 id": "Plugin id",
+  "安装包下载地址（失败 toast 构造时自带）": "Package download URL (supplied by the failure toast)",
+  "插件显示名（可选，用于提示文案）": "Plugin display name (optional; used in messages)"
 }
