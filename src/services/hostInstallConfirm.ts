@@ -127,8 +127,9 @@ export function buildInstallRequest(
     pluginId: entry.id,
     version: opts?.version ?? entry.version,
     downloadUrl,
-    // P1 过渡期：目录条目还没有 sha256（kit 0.1.8 起 publish 才写），缺省 = 壳标「未校验」不阻断
-    sha256: undefined,
+    // P1（spec §七）：校验和按**目标版本**从版本历史里取——壳在下载落盘后立刻校验，
+    // 不符即删包拒装。旧条目没有该字段 ⇒ 传 undefined（壳标「未提供校验值」，过渡期不阻断）。
+    sha256: versionSha256Of(entry, opts?.version ?? entry.version),
     source: sourceIdentityOf(entry),
     display: {
       name: entry.name,
@@ -140,4 +141,10 @@ export function buildInstallRequest(
     },
     allowOlder: opts?.allowOlder,
   };
+}
+
+/** 目标版本的 sha256——查版本历史；查不到返回 undefined（⛔ 不拿别的版本的哈希凑数） */
+export function versionSha256Of(entry: CatalogEntry, version: string): string | undefined {
+  const hit = entry.versions?.find((v) => v.version === version);
+  return hit?.sha256;
 }

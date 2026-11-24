@@ -36,7 +36,9 @@ export interface CatalogEntry {
   publishedAt?: string;
   minAppVersion?: string;
   /** 版本历史（最新在前）——版本下拉数据源（E6#29c） */
-  versions?: Array<{ version: string; downloadUrl?: string; publishedAt?: string; changelog?: string }>;
+  /** 版本历史（最新在前）。`sha256` = 该版本分发件的校验和（kit 0.1.8 起 publish 自动写；
+   *  旧条目没有 ⇒ 壳标「未提供校验值」不阻断）——**必须原样传给壳**，否则壳无法在下载后校验。 */
+  versions?: Array<{ version: string; downloadUrl?: string; publishedAt?: string; changelog?: string; sha256?: string }>;
   readmeUrl?: string;
   /** 多语言 README（语言码 → tag 下 raw URL）；缺省 = 单语言 readmeUrl。 */
   readmeLocales?: Record<string, string>;
