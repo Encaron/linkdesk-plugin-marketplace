@@ -56,6 +56,7 @@ npm run lint       # SDK 规则腿（硬编码颜色 / 字号 / 4px 网格 / 自
 npm run publish    # 发版到本仓自己的 GitHub Release（**上架两步里的第一步**）
 npm run verify     # 🔴 **交付前严格腿** = 本仓 CI 跑的那条（lint 判红 + 跨插件 import + 字典完整性 + 声明自洽）
 npm run test       # 单元测试（vitest）
+npm run verify:selftest# （见 package.json）
 ```
 
 ## 6. 发布与版本纪律
