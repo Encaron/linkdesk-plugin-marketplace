@@ -317,6 +317,7 @@
   "检查更新失败": "Failed to check for updates",
   "检查完成 · 发现 {{count}} 个可用更新": "Check complete · {{count}} updates available",
   "所有插件已是最新": "All plugins are up to date",
+  "{{n}} 个更新缺少下载地址，暂时无法更新": "{{n}} update(s) have no download URL and can't be updated right now",
   "更新": "Update",
   "卸载…": "Uninstall…",
   "查看详情": "View details",

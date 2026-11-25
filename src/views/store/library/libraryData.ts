@@ -12,7 +12,7 @@
 
 import type { PluginInfoEntry, PluginListEntry } from "@linkdesk/contracts";
 import type { CatalogEntry } from "../../../services/marketCatalog";
-import { updateTargetFor } from "../../../services/marketCatalog";
+import { updateTargetFor, versionDownloadUrl } from "../../../services/marketCatalog";
 import type { PackageState } from "../../../services/catalogStatus";
 import type { LocalInstallRecord } from "../../../services/localInstalls";
 import type { LibSort } from "../../../services/marketplaceShared/uiPrefs";
@@ -242,6 +242,33 @@ export function libraryStats(rows: readonly LibraryRow[]): {
     updatable: rows.filter((r) => r.state === "update").length,
     disabled: rows.filter((r) => r.state === "disabled").length,
   };
+}
+
+/** 「全部更新」的目标集——**唯一选择判据**（视图 ⛔ 自己再 filter 一遍）。
+ *
+ *  🔴 `core` **不参与选择**：`core: true` 唯一语义 = UI 不给卸载按钮（E6 §二·三 /
+ *     `docs/02-Electron架构/插件生态与发布/03-插件市场/05-更新与版本.md` §147「core:true 的插件同规则
+ *     可更新/降级——无内置排除」），不定义任何更新/版本行为。
+ *     此前的 `!r.core` 恰好把「待更新全是随包件（editor/file-tree/settings）」这种常态排空 ⇒
+ *     按钮亮着「3 个可更新」、点下去却弹「所有插件已是最新」——统计头（含 core）与动作集（排 core）自相矛盾。
+ *     能不能真更新由住所闸 `updatable` 定（随包只读根的 state 压根不是 update），⛔ 不拿 core 二次判。
+ *
+ *  `missingDownload` 单独回：有更新但目录条目/releases 缺可下载地址 ⇒ 是「发不了包」，⛔ 不是「已是最新」。 */
+export interface UpdateAllSelection {
+  /** 批量更新入参（能解析出下载地址的目录条目） */
+  entries: CatalogEntry[];
+  /** state=update 的行数（含缺地址的）——判断「真没有」 */
+  total: number;
+  /** 有更新但解析不出下载地址的件数——视图据此如实说话 */
+  missingDownload: number;
+}
+
+export function selectUpdateAllTargets(rows: readonly LibraryRow[]): UpdateAllSelection {
+  const picked = rows.filter((r) => r.state === "update");
+  const entries = picked
+    .map((r) => r.entry)
+    .filter((e) => !!versionDownloadUrl(e, e.version)); // 与 updateAll 取址同一处，⛔ 另写判据
+  return { entries, total: picked.length, missingDownload: picked.length - entries.length };
 }
 
 /** 「已购未安装」分区（棒 10 变实；本棒渲染预留区＋空态）——已验许可、未装包 */

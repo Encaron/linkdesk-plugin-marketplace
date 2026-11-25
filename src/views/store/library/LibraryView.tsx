@@ -52,6 +52,7 @@ import {
   libraryStats,
   orderLibraryRows,
   purchasedNotInstalled,
+  selectUpdateAllTargets,
   type LibFilters,
   type LibraryRow,
 } from "./libraryData";
@@ -159,15 +160,23 @@ export function LibraryView() {
   }, []);
 
   const onUpdateAll = async () => {
-    const picked = rows.filter((r) => r.state === "update" && !r.core);
-    const entries = picked.map((r) => r.entry).filter((e) => !!e.downloadUrl);
-    if (entries.length === 0) {
+    // 选择判据唯一出处 = libraryData.selectUpdateAllTargets（core 不排除——core 只定义「不可卸载」）
+    const { entries, total, missingDownload } = selectUpdateAllTargets(rows);
+    if (total === 0) {
       showToast(t("所有插件已是最新"), { severity: "success", key: "lib-update-all" });
       return;
     }
+    if (entries.length === 0) {
+      // 有更新但目录缺可下载地址（发不了包）——如实说，⛔ 不冒充「已是最新」
+      showToast(t("{{n}} 个更新缺少下载地址，暂时无法更新", { n: missingDownload }), {
+        severity: "warning",
+        key: "lib-update-all",
+      });
+      return;
+    }
     const localVersions: Record<string, string> = {};
-    for (const row of picked) {
-      if (row.installedVersion) localVersions[row.entry.id] = row.installedVersion;
+    for (const row of rows) {
+      if (row.state === "update" && row.installedVersion) localVersions[row.entry.id] = row.installedVersion;
     }
     const r = await updateAll(entries, data.online, t, localVersions);
     if (r.hosted) {

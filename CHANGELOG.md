@@ -1,5 +1,13 @@
 # 更新日志
 
+## v1.4.39（2026-11-26）
+
+- **修「全部更新」撒谎（用户实机报障）**：库里亮着「N 个可更新」，点「全部更新」却弹「所有插件已是最新」。
+  - 根因：`LibraryView.onUpdateAll` 的选择式 `state === "update" && !r.core` 把 `core:true` 整批排掉——而待更新恰好全是随包件（editor / file-tree / settings）时，统计头（含 core）与动作集（排 core）自相矛盾，随后落进「0 条 ⇒ 已是最新」分支。
+  - `core: true` 唯一语义 = UI 不给卸载按钮，**不定义更新/版本行为**；能否真更新由住所闸 `updatable` 决定。选择判据收敛到唯一出口 `libraryData.selectUpdateAllTargets`（⛔ 视图自己再 filter）。
+  - 顺修同族谎话：有更新但目录缺可下载地址 ⇒ 如实报「N 个更新缺少下载地址，暂时无法更新」，⛔ 不冒充「已是最新」。
+  - 回归：`libraryUpdateAll` 走真实数据链断言 core 行入批 + 零「已是最新」toast；`libraryData` 三条纯函数断言（旧实现下两处必红）。
+
 ## v1.4.38（2026-11-25）
 
 - **状态命令试点（跨领域 · Block 2）**：

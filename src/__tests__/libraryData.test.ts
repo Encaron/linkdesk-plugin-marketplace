@@ -12,6 +12,7 @@ import {
   libraryStats,
   orderLibraryRows,
   purchasedNotInstalled,
+  selectUpdateAllTargets,
 } from "../views/store/library/libraryData";
 
 const CATALOG: CatalogEntry[] = [
@@ -145,5 +146,41 @@ describe("已购未安装", () => {
     expect(
       purchasedNotInstalled(paidCatalog, new Map([["p1", { exp: 1 }], ["p2", { exp: 1 }]]), rows).map((e) => e.id),
     ).toEqual(["p1", "p2"]);
+  });
+});
+
+describe("全部更新目标集（selectUpdateAllTargets）", () => {
+  const coreInstalled: PluginListEntry[] = [
+    { pluginId: "core-demo", manifest: { name: "Core Demo", version: "1.0.0", core: true }, updatable: true },
+  ];
+  const coreCatalog: CatalogEntry[] = [
+    { id: "core-demo", name: "Core Demo", version: "1.1.0", downloadUrl: "https://x/core-demo.zip" },
+  ];
+  const coreRows = buildLibraryRows({
+    catalog: coreCatalog,
+    installed: coreInstalled,
+    disabled: [],
+    localInstalls: [],
+    licenses: new Map(),
+  });
+
+  it("🔴 core:true 的待更新行**照常入选**（core 只定义不可卸载，不定义更新/版本行为）", () => {
+    const sel = selectUpdateAllTargets(coreRows);
+    expect(sel.total).toBe(1);
+    expect(sel.missingDownload).toBe(0);
+    expect(sel.entries.map((e) => e.id)).toEqual(["core-demo"]);
+  });
+
+  it("有更新但缺可下载地址 ⇒ 只计 missingDownload，⛔ 不是「已是最新」", () => {
+    // 现成 rows 里 demo-one 可更新（2.0.0 > 1.0.0）但目录条目无 downloadUrl
+    const sel = selectUpdateAllTargets(rows);
+    expect(sel.total).toBe(1);
+    expect(sel.entries).toEqual([]);
+    expect(sel.missingDownload).toBe(1);
+  });
+
+  it("真没有可更新 ⇒ total 0（视图才允许说「已是最新」）", () => {
+    const sel = selectUpdateAllTargets([]);
+    expect(sel).toEqual({ entries: [], total: 0, missingDownload: 0 });
   });
 });
