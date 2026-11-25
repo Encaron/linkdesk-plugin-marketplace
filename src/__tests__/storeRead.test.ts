@@ -104,7 +104,7 @@ beforeEach(() => {
   const pluginManager = {
     list: vi.fn(async () => [
       { pluginId: "demo-installed", manifest: { version: "1.0.0" }, updatable: true },
-      { pluginId: "demo-core", manifest: { version: "1.0.0", core: true } },
+      { pluginId: "demo-core", manifest: { version: "1.0.0", essential: true } },
     ]),
     getDisabled: vi.fn(async () => [{ pluginId: "demo-disabled", version: "0.9.0", updatable: false }]),
   };
@@ -149,7 +149,7 @@ describe("readStoreState —— AI 读取面", () => {
     expect(bundle.license).toEqual({ exp: undefined });
   });
 
-  it("本地状态四态 + 能力：已装可停用/卸载，停用可启用，core 不可卸载", async () => {
+  it("本地状态四态 + 能力：已装可停用/卸载，停用可启用，essential 不可卸载", async () => {
     const s = await readStoreState();
     const installed = s.entries.find((e) => e.id === "demo-installed")!;
     expect(installed.state).toBe("installed"); // updatable 但目录无更高版本
@@ -157,9 +157,9 @@ describe("readStoreState —— AI 读取面", () => {
     const disabled = s.entries.find((e) => e.id === "demo-disabled")!;
     expect(disabled.state).toBe("disabled");
     expect(disabled.capabilities).toMatchObject({ enable: true, install: false });
-    const core = s.entries.find((e) => e.id === "demo-core")!;
-    expect(core.core).toBe(true);
-    expect(core.capabilities.uninstall).toBe(false);
+    const essentialEntry = s.entries.find((e) => e.id === "demo-core")!;
+    expect(essentialEntry.essential).toBe(true);
+    expect(essentialEntry.capabilities.uninstall).toBe(false);
   });
 
   it("合集/作者仓库/来源/计数全量可读", async () => {

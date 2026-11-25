@@ -59,7 +59,7 @@ export function ExtensionItem({ plugin, onClick, onDoubleClick, updateTo }: Exte
        *  （marketIcon 现为 Type-2 身份图，列表/详情同一张；无图落默认彩色块顶 📄/640 场景默认） */}
       <div className="marketplace-ms-item-icon">
         <PluginIcon pluginId={plugin.pluginId} manifest={pickIdentityArt(plugin.manifest)} />
-        {m.core && <span className="marketplace-ms-item-badge codicon codicon-star-full" />}
+        {m.essential && <span className="marketplace-ms-item-badge codicon codicon-star-full" />}
       </div>
 
       {/* VS Code: .details */}
@@ -87,8 +87,8 @@ export function ExtensionItem({ plugin, onClick, onDoubleClick, updateTo }: Exte
         </div>
       </div>
 
-      {/* ⚙ 齿轮——core 插件无齿轮菜单 */}
-      {!m.core && (
+      {/* ⚙ 齿轮——essential（重要型）插件无齿轮菜单 */}
+      {!m.essential && (
         <div className="marketplace-ms-item-gear-wrapper">
           <button ref={gearBtnRef} className="marketplace-ms-item-gear-btn" onClick={handleGear} data-hint={t("管理")} aria-label={t("管理")}>
             <span className="codicon codicon-gear" />

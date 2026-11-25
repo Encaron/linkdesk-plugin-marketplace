@@ -26,7 +26,7 @@ export interface StoreData {
   online: boolean;
   statusOf: (entry: CatalogEntry) => PackageState;
   identityOf: (pluginId: string) => LocalIdentity | undefined;
-  coreOf: (pluginId: string) => boolean;
+  essentialOf: (pluginId: string) => boolean;
   localLoading: boolean;
   installedCount: number;
   updateCount: number;
@@ -54,7 +54,7 @@ export function useStoreData(): StoreData {
   // 订阅一次 job 表（壳广播全量快照）——卡片内用纯函数 pickInstallJob 现查，⛔ 每卡一个订阅
   useInstallJobsSubscription();
   const online = useOnlineStatus();
-  const { statusOf, identityOf, coreOf, localLoading } = useCatalogStatus();
+  const { statusOf, identityOf, essentialOf, localLoading } = useCatalogStatus();
   const { all } = useMarketplacePlugins();
   const { map: licenses, refresh: refreshLicenses } = useLicenseEntitlements();
   const urls = catalog.entries.map((e) => e.downloadUrl).filter((u): u is string => !!u);
@@ -79,14 +79,14 @@ export function useStoreData(): StoreData {
   const ctxOf = useCallback(
     (entry: CatalogEntry): StoreCardContext => ({
       state: statusOf(entry),
-      core: coreOf(entry.id),
+      essential: essentialOf(entry.id),
       license: licenses.get(entry.id) ?? null,
       job: pickInstallJob(entry.id),
       online,
       dl: entry.downloadUrl ? counts.get(entry.downloadUrl) : undefined,
       installedIdentity: identityOf(entry.id),
     }),
-    [statusOf, coreOf, licenses, online, counts, identityOf],
+    [statusOf, essentialOf, licenses, online, counts, identityOf],
   );
 
   return {
@@ -94,7 +94,7 @@ export function useStoreData(): StoreData {
     online,
     statusOf,
     identityOf,
-    coreOf,
+    essentialOf,
     localLoading,
     installedCount: all.length,
     updateCount,

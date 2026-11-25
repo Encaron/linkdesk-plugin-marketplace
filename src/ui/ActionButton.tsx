@@ -45,7 +45,7 @@ export interface ResolvedAction {
 export interface ActionContext {
   state: PackageState;
   online: boolean;
-  core?: boolean;
+  essential?: boolean;
   license?: LicenseView | null;
   /** 本插件当前 job（进度的唯一出处 = 壳 job 表） */
   job?: Pick<InstallJob, "state" | "terminal" | "stage" | "percent"> | null;
@@ -162,20 +162,20 @@ export interface MoreItem {
 }
 
 /** 菜单项推导（纯函数；蓝图 `moreMenu(e)` 同构）——卸载 ⛔ 卡面主位，只在菜单里 */
-export function moreMenuItems(entry: CatalogEntry, ctx: Pick<ActionContext, "state" | "core">): MoreItem[] {
+export function moreMenuItems(entry: CatalogEntry, ctx: Pick<ActionContext, "state" | "essential">): MoreItem[] {
   const items: MoreItem[] = [{ id: "open", labelKey: "查看详情" }];
   if (ctx.state === "disabled") items.push({ id: "enable", labelKey: "启用" });
   else if (ctx.state === "installed" || ctx.state === "update") items.push({ id: "disable", labelKey: "禁用" });
 
   const installed = ctx.state === "installed" || ctx.state === "update" || ctx.state === "disabled";
-  const uninstallDisabled = !installed || !!ctx.core;
+  const uninstallDisabled = !installed || !!ctx.essential;
   items.push({
     id: "uninstall",
     labelKey: "卸载…",
     danger: true,
     sepBefore: true,
     disabled: uninstallDisabled,
-    titleKey: ctx.core ? "内置插件不提供卸载按钮" : !installed ? "未安装，无可卸载内容" : undefined,
+    titleKey: ctx.essential ? "内置插件不提供卸载按钮" : !installed ? "未安装，无可卸载内容" : undefined,
   });
   return items;
 }

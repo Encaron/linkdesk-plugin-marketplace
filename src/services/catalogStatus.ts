@@ -34,11 +34,11 @@ export interface LocalIdentity {
   marketIconSource?: "codicon" | "svg" | "url" | "lucide";
 }
 
-/** 本地已装投影（每 pluginId 一条）——版本/住所以及 core 旗标 */
+/** 本地已装投影（每 pluginId 一条）——版本/住所以及 essential（重要型）旗标 */
 export interface LocalEntryInfo {
   version: string;
   updatable?: boolean;
-  core?: boolean;
+  essential?: boolean;
 }
 
 /**
@@ -67,10 +67,10 @@ export function useCatalogStatus() {
   const localById = useMemo(() => {
     const m = new Map<string, LocalEntryInfo>();
     for (const p of disabledRaw) {
-      m.set(p.pluginId, { version: p.version ?? "", updatable: p.updatable, core: p.core });
+      m.set(p.pluginId, { version: p.version ?? "", updatable: p.updatable, essential: p.essential });
     }
     for (const p of all) {
-      m.set(p.pluginId, { version: p.manifest.version ?? "", updatable: p.updatable, core: p.manifest.core });
+      m.set(p.pluginId, { version: p.manifest.version ?? "", updatable: p.updatable, essential: p.manifest.essential });
     }
     return m;
   }, [all, disabledRaw]);
@@ -110,7 +110,7 @@ export function useCatalogStatus() {
     [localById, disabledIds],
   );
 
-  const coreOf = useCallback((pluginId: string): boolean => localById.get(pluginId)?.core === true, [localById]);
+  const essentialOf = useCallback((pluginId: string): boolean => localById.get(pluginId)?.essential === true, [localById]);
 
-  return { statusOf, identityOf, coreOf, localLoading };
+  return { statusOf, identityOf, essentialOf, localLoading };
 }

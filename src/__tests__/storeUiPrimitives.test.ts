@@ -5,7 +5,7 @@
  *   ① `statusTag` 九级优先级逐条短路（已停用＞许可过期＞有更新＞订阅临期＞剩 N 天＞已安装＞已购＞
  *      订阅价＞买断价＞免费）——主面永远只显一个词；
  *   ② `resolveAction` 的动作分支（离线置灰 / 安装中 / 排队 / 失败重试 / 已装 / 更新 / 付费域）；
- *   ③ `moreMenuItems` 随装态动态（未装不出现禁用；core 卸载置灰带原因）。
+ *   ③ `moreMenuItems` 随装态动态（未装不出现禁用；essential 卸载置灰带原因）。
  */
 
 import { describe, it, expect } from "vitest";
@@ -133,7 +133,7 @@ describe("sourceBadge —— 发布者身份（⛔ 按名猜）", () => {
 describe("allBadges —— 全量徽标行顺序", () => {
   it("已安装 → 有更新 → 内置 → 许可 → 来源", () => {
     const e = entry({ pricing: { model: "paid", price: 30 }, official: true });
-    const badges = allBadges(e, { state: "update", core: true, license: expIn(10), now: NOW });
+    const badges = allBadges(e, { state: "update", essential: true, license: expIn(10), now: NOW });
     expect(badges.map((b) => b.kind)).toEqual(["update", "core", "price", "soon", "official"]);
   });
 });
@@ -217,10 +217,10 @@ describe("moreMenuItems —— 随装态动态", () => {
     expect(items.find((i) => i.id === "uninstall")?.disabled).toBe(false);
   });
 
-  it("已停用：启用 + 卸载；core：卸载置灰带原因", () => {
+  it("已停用：启用 + 卸载；essential：卸载置灰带原因", () => {
     expect(moreMenuItems(entry(), { state: "disabled" }).map((i) => i.id)).toEqual(["open", "enable", "uninstall"]);
-    const core = moreMenuItems(entry(), { state: "installed", core: true });
-    const un = core.find((i) => i.id === "uninstall");
+    const essentialItems = moreMenuItems(entry(), { state: "installed", essential: true });
+    const un = essentialItems.find((i) => i.id === "uninstall");
     expect(un?.disabled).toBe(true);
     expect(un?.titleKey).toBe("内置插件不提供卸载按钮");
   });

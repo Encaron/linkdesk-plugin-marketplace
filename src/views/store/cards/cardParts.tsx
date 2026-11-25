@@ -63,7 +63,7 @@ export function cardPropsEqual(
   if (a.entry !== b.entry || a.handlers !== b.handlers) return false;
   return (
     a.ctx.state === b.ctx.state &&
-    a.ctx.core === b.ctx.core &&
+    a.ctx.essential === b.ctx.essential &&
     a.ctx.license === b.ctx.license &&
     a.ctx.job === b.ctx.job &&
     a.ctx.online === b.ctx.online &&
@@ -96,7 +96,7 @@ export function statusOfCard(entry: CatalogEntry, ctx: StoreCardContext): Status
 const STATUS_BADGE_KINDS = new Set(["price", "soon", "expired", "owned", "installed", "update", "muted"]);
 
 export function badgesOfCard(entry: CatalogEntry, ctx: StoreCardContext): BadgeDesc[] {
-  return allBadges(entry, { state: ctx.state, core: ctx.core, license: ctx.license }).filter(
+  return allBadges(entry, { state: ctx.state, essential: ctx.essential, license: ctx.license }).filter(
     (b) => !STATUS_BADGE_KINDS.has(b.kind),
   );
 }
@@ -109,7 +109,7 @@ export function actionOfCard(
   return resolveAction(entry, {
     state: ctx.state,
     online: ctx.online,
-    core: ctx.core,
+    essential: ctx.essential,
     license: ctx.license,
     job: ctx.job,
     jobLabel,
@@ -117,7 +117,7 @@ export function actionOfCard(
 }
 
 export function menuOfCard(entry: CatalogEntry, ctx: StoreCardContext): MoreItem[] {
-  return moreMenuItems(entry, { state: ctx.state, core: ctx.core });
+  return moreMenuItems(entry, { state: ctx.state, essential: ctx.essential });
 }
 
 /** 卡片里的安装阶段短句（唯一出处 = installJobs 的 label 派生） */

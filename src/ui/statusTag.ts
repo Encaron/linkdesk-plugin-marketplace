@@ -204,7 +204,7 @@ export function allBadges(
   if (ctx.state === "installed") out.push({ kind: "installed", key: "已安装" });
   if (ctx.state === "disabled") out.push({ kind: "muted", key: "已禁用" });
   if (ctx.state === "update") out.push({ kind: "update", key: "有更新" });
-  if (ctx.core) out.push({ kind: "core", key: "内置" });
+  if (ctx.essential) out.push({ kind: "core", key: "内置" });
   out.push(...licenseBadges(entry, ctx.license, ctx.now));
   out.push(sourceBadge(entry));
   return out;

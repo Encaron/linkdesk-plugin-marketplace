@@ -24,7 +24,7 @@
  *     prerelease（§一·三/§二·四——beta 默认忽略，只看稳定版）
  *   - 唯一判定 = semver.gt(remote, local)；多源冲突已由 marketCatalog.mergeCatalogs 取高（§二·二，源变化回退
  *     按现目录比，不制造额外提示）
- *   - 无内置排除——core:true 不定义更新行为，覆盖全部已装插件（§二·三）
+ *   - 无内置排除——essential 不定义更新行为，覆盖全部已装插件（§二·三）
  *   - 有更新 → 通知中心铃铛推一条（每版本一次：lastNotifiedVersion === remote 不重推）+ 记 lastNotifiedVersion
  *   - 自愈清提醒：lastNotifiedVersion ≤ 本地 → 已追上（外部路径更新/重装的兜底），清标记（§二·一「更新成功清」）
  *   - 目录 offline/corrupt（entries 空）→ 本趟不铃不写，且**返回 null（判不了）由调度器换时间重试**（E6#82；

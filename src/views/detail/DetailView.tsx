@@ -146,7 +146,7 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
   //    未装 = 目录作者数据原样（catalog 作者数据绝不 t()）。30.5d：目录字段走 JSX 文本渲染（React 默认转义，
   //    零 dangerouslySetInnerHTML）。 ──
   const m = info?.manifest ?? {};
-  const isCore = !!m.core;
+  const isEssential = !!m.essential;
   const nameText = info ? t(m.name ?? pluginId ?? "") : lt(entry, "name") || pluginId || "";
   const versionText = info ? m.version : entry?.version;
   /* #63c B3：作者行/header 副标题两源归并（禁用态连带坑 2026-09-09——getDisabled 子集无 author/icon：
@@ -209,7 +209,7 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
         authorText={authorText}
         showDesc={showDesc}
         descText={descText}
-        isCore={isCore}
+        isEssential={isEssential}
         source={source}
         licBadges={licBadges}
         actions={
@@ -218,7 +218,7 @@ export default function DetailView({ pluginId }: DetailContributedProps) {
             pending={pending}
             pendingReason={enabledEntry?.pendingReason}
             hasInfo={!!info}
-            isCore={isCore}
+            isEssential={isEssential}
             online={online}
             belowMinApp={ver.appBelowMin}
             minAppVersion={entry?.minAppVersion}

@@ -80,7 +80,7 @@ export function useDetailIdentity(pluginId?: string) {
           version: enabledEntry.manifest.version,
           author: enabledEntry.manifest.author,
           description: enabledEntry.manifest.description,
-          core: enabledEntry.manifest.core,
+          essential: enabledEntry.manifest.essential,
           // E6#65c：图标回退链第二环——已装 manifest.icon/iconSource 透传（list() 子集已带，E6#65a）
           icon: enabledEntry.manifest.icon,
           iconSource: enabledEntry.manifest.iconSource,
@@ -98,7 +98,7 @@ export function useDetailIdentity(pluginId?: string) {
             name: disabledHit.name,
             version: disabledHit.version,
             description: disabledHit.description,
-            core: disabledHit.core,
+            essential: disabledHit.essential,
           },
         }
       : null;

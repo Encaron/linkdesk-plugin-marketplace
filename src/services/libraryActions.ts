@@ -15,7 +15,7 @@ import { scheduleDataRefresh } from "./marketplaceShared/pluginsStore";
 
 const pm = () => window.linkdesk?.pluginManager;
 
-/** 批量停用（core 由调用方过滤；返回成功数） */
+/** 批量停用（重要型/essential 由调用方过滤；返回成功数） */
 export async function bulkDisable(ids: readonly string[]): Promise<number> {
   let n = 0;
   for (const id of ids) {
@@ -30,7 +30,7 @@ export async function bulkDisable(ids: readonly string[]): Promise<number> {
   return n;
 }
 
-/** 批量卸载（core 由调用方过滤；返回成功数） */
+/** 批量卸载（重要型/essential 由调用方过滤；返回成功数） */
 export async function bulkUninstall(ids: readonly string[]): Promise<number> {
   let n = 0;
   for (const id of ids) {

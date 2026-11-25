@@ -19,7 +19,7 @@ export default function DetailHeader({
   authorText,
   showDesc,
   descText,
-  isCore,
+  isEssential,
   source,
   licBadges,
   actions,
@@ -31,7 +31,7 @@ export default function DetailHeader({
   authorText?: string;
   showDesc: boolean;
   descText: string;
-  isCore: boolean;
+  isEssential: boolean;
   /** R4-3.16：来源派生徽标（官方 ✓/官方/社区/本地）——判定链在 `ui/statusTag.sourceBadge`，本件只出画 */
   source?: BadgeDesc;
   /** R4-3.20：许可徽标（价格/临期/过期/已购）——详情页 = 徽标分层「最全」档（08 v3.64d） */
@@ -44,7 +44,7 @@ export default function DetailHeader({
         {/* E6#69c/#69f：iconManifest 恒有值（pickIdentityArt 默认彩色块兜底）——无条件渲染 PluginIcon，
          *  codicon-symbol-misc 占位分支已删；96px 展示框内 img 型显 Type-2 身份图、codicon/lucide 型显图标 */}
         <PluginIcon pluginId={pluginId ?? ""} manifest={iconManifest} alt={nameText} />
-        {isCore && <span className="marketplace-mpd-icon-badge codicon codicon-star-full" />}
+        {isEssential && <span className="marketplace-mpd-icon-badge codicon codicon-star-full" />}
       </div>
       <div className="marketplace-mpd-header-details">
         <div className="marketplace-mpd-title-row">
@@ -52,7 +52,7 @@ export default function DetailHeader({
           {versionText && <span className="marketplace-mpd-version">v{versionText}</span>}
           {/* R4-3.16：详情徽标收编 `ui/Badge`（棒 6 交办「棒 9 统一时再收」）——与商店卡同源 descriptor；
            *  来源徽标派生（entry.official/vendorId ⇒ 官方/社区），⛔ 不读作者自声明、⛔ 按作者名猜。 */}
-          {isCore && <Badge desc={{ kind: "core", key: "内置" }} />}
+          {isEssential && <Badge desc={{ kind: "core", key: "内置" }} />}
           {source && <Badge desc={source} />}
           {licBadges && licBadges.length > 0 && <BadgeRow badges={licBadges} />}
         </div>

@@ -45,7 +45,7 @@ export interface StoreReadEntry {
   pricing?: CatalogEntry["pricing"];
   /** 本地状态（唯一推导：install / installed / update / disabled） */
   state: PackageState;
-  core: boolean;
+  essential: boolean;
   /** 壳权益投影（exp 缺省 = 永久） */
   license: { exp?: number } | null;
   /** 可执行能力——对应壳 pluginManager API（install/uninstall/disable/enable/update） */
@@ -127,13 +127,13 @@ function localMaps(list: PluginListEntry[], disabled: PluginInfoEntry[]) {
   const disabledIds = new Set<string>();
   for (const p of disabled) {
     disabledIds.add(p.pluginId);
-    localById.set(p.pluginId, { version: p.version ?? "", updatable: p.updatable, core: p.core });
+    localById.set(p.pluginId, { version: p.version ?? "", updatable: p.updatable, essential: p.essential });
   }
   for (const p of list) {
     localById.set(p.pluginId, {
       version: p.manifest.version ?? "",
       updatable: p.updatable,
-      core: p.manifest.core,
+      essential: p.manifest.essential,
     });
   }
   return { localById, disabledIds };
@@ -161,7 +161,7 @@ export async function readStoreState(): Promise<StoreReadState> {
 
   const entries: StoreReadEntry[] = catalog.entries.map((entry) => {
     const state = derivePackageState(entry, localById, disabledIds);
-    const core = localById.get(entry.id)?.core === true;
+    const essential = localById.get(entry.id)?.essential === true;
     const license = licenseById.get(entry.id) ?? null;
     return {
       id: entry.id,
@@ -177,12 +177,12 @@ export async function readStoreState(): Promise<StoreReadState> {
       downloadUrl: entry.downloadUrl,
       pricing: entry.pricing,
       state,
-      core,
+      essential,
       license,
       capabilities: {
         install: state === "install" && !!entry.downloadUrl,
         update: state === "update",
-        uninstall: localById.has(entry.id) && !core,
+        uninstall: localById.has(entry.id) && !essential,
         disable: state === "installed",
         enable: state === "disabled",
       },

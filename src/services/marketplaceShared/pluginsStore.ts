@@ -29,7 +29,7 @@ interface PluginsState {
    *  _loadingPromise 模式，#59c Bug 1 教训）；也兼作「loading = 从未拉过」的判据 */
   loadingPromise: Promise<void> | null;
   allPlugins: PluginListEntry[];
-  /** E6#106：改用契约类型 `PluginInfoEntry`（此前是**本地手抄的一份形状**——`core`/`updatable`/图标四字段
+  /** E6#106：改用契约类型 `PluginInfoEntry`（此前是**本地手抄的一份形状**——`essential`/`updatable`/图标四字段
    * 每加一次就要在这里补一遍，漏补的表现就是「壳侧字段已经到了、市场侧 TS 报不存在」）。同一个形状抄两份
    * = 必然漂移，故收成契约单一来源；契约的 `icon/iconSource/marketIcon/marketIconSource` 即禁用行的
    * 展示图通道（照 E6#65a 给 list() 补图标通道的先例）。 */
@@ -99,8 +99,8 @@ function updateAllBadges(): void {
   const emit = lk()?.events?.emit;
   if (!emit) return;
   const self = { pluginId: "marketplace", containerId: "marketplace" };
-  emit("marketplace:updateBadge", { ...self, viewId: "installed", count: state.allPlugins.filter((p) => !p.manifest.core).length });
-  emit("marketplace:updateBadge", { ...self, viewId: "builtin", count: state.allPlugins.filter((p) => p.manifest.core).length });
+  emit("marketplace:updateBadge", { ...self, viewId: "installed", count: state.allPlugins.filter((p) => !p.manifest.essential).length });
+  emit("marketplace:updateBadge", { ...self, viewId: "builtin", count: state.allPlugins.filter((p) => p.manifest.essential).length });
   emit("marketplace:updateBadge", { ...self, viewId: "disabled", count: state.disabledPlugins.length });
   // E6#30d：viewId "explore"（探索插件）无 badge——目录浏览是橱窗不是计数列表，语义同 VS Code 无徽标
 }
@@ -178,10 +178,10 @@ export function useMarketplacePlugins() {
   };
 
   const installed = state.allPlugins.filter(
-    (p) => !p.manifest.core && matchSearch(p.manifest.name, p.pluginId, p.manifest.description),
+    (p) => !p.manifest.essential && matchSearch(p.manifest.name, p.pluginId, p.manifest.description),
   );
   const builtin = state.allPlugins.filter(
-    (p) => p.manifest.core && matchSearch(p.manifest.name, p.pluginId, p.manifest.description),
+    (p) => p.manifest.essential && matchSearch(p.manifest.name, p.pluginId, p.manifest.description),
   );
   const disabled = state.disabledPlugins.filter((p) => matchSearch(p.name, p.pluginId, p.description));
 

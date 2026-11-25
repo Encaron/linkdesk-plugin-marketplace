@@ -75,7 +75,7 @@ function badgeOfRow(row: LibraryRow): BadgeDesc {
   // 单徽标位唯一出口：过期 > 临期 > 已购 > 价格（⛔ 不拿多徽标行的第一项当单状态）
   const lic = licenseBadgeOf(row.entry, row.license);
   if (lic) return lic;
-  if (row.core) return { kind: "core", key: "内置" };
+  if (row.essential) return { kind: "core", key: "内置" };
   if (row.state === "disabled") return { kind: "muted", key: "已停用" };
   if (row.state === "update") return { kind: "update", key: "可更新" };
   return { kind: "installed", key: "已安装" };
@@ -101,7 +101,7 @@ function rowAction(
   return resolveAction(row.entry, {
     state: row.state,
     online: ctx.online,
-    core: row.core,
+    essential: row.essential,
     license: row.license ?? ctx.license,
     job: ctx.job,
     jobLabel: ctx.job ? installJobLabel(t, ctx.job) : "",
@@ -205,7 +205,7 @@ export function LibraryView() {
   const bulk = async (kind: "disable" | "uninstall") => {
     const ids = [...selected].filter((id) => {
       const row = rows.find((r) => r.entry.id === id);
-      if (!row || row.core) return false;
+      if (!row || row.essential) return false;
       // 批量停用不重复作用于已停用行（批量卸载不限）
       return kind === "uninstall" || row.state !== "disabled";
     });
@@ -273,7 +273,7 @@ export function LibraryView() {
           <MoreMenu
             pluginId={row.entry.id}
             disabled={row.state === "disabled"}
-            items={moreMenuItems(row.entry, { state: row.state, core: row.core })}
+            items={moreMenuItems(row.entry, { state: row.state, essential: row.essential })}
             onSelect={(id) => (id === "open" ? actions.onOpen(row.entry) : actions.onAct(row.entry, id))}
           />
         </span>

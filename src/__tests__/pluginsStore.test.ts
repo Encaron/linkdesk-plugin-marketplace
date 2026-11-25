@@ -12,7 +12,7 @@
  *
  * 钉住的四件事：
  *   ① 首趟加载盾——多个视图同时 mount 只发一趟 IPC（对标 loader 的 #59c Bug 1 教训）；
- *   ② 分组口径——installed = 非 core、builtin = core、disabled 来自 getDisabled（list 排除禁用）；
+ *   ② 分组口径——installed = 非 essential、builtin = essential、disabled 来自 getDisabled（list 排除禁用）；
  *   ③ badge 广播——三个 viewId 各一条，`explore` **不发**（橱窗不是计数列表）；
  *   ④ 生命周期三通道订阅 ＋ 卸载全撤（铁律 19）＋ burst 合并（一次装卸连发多条只重拉一次）
  *      ——🔴 E6#152 修：修前三条订阅注册在 async `init()` 内、「卸载全撤」只对 viewContainer 那条成立，
@@ -35,13 +35,13 @@ let unsubs: { n: number };
 let emitted: Emitted[];
 
 /** 已装（启用）清单条目——契约形状 */
-function enabled(pluginId: string, core: boolean): PluginListEntry {
-  return { pluginId, manifest: { name: `Demo ${pluginId}`, description: `Demo ${pluginId} desc`, version: "1.0.0", core } };
+function enabled(pluginId: string, essential: boolean): PluginListEntry {
+  return { pluginId, manifest: { name: `Demo ${pluginId}`, description: `Demo ${pluginId} desc`, version: "1.0.0", essential } };
 }
 
-/** 禁用清单条目——契约形状（getDisabled 子集，带 core 旗标） */
-function disabled(pluginId: string, core = false): PluginInfoEntry {
-  return { pluginId, name: `Demo ${pluginId}`, description: `Demo ${pluginId} desc`, version: "1.0.0", core };
+/** 禁用清单条目——契约形状（getDisabled 子集，带 essential 旗标） */
+function disabled(pluginId: string, essential = false): PluginInfoEntry {
+  return { pluginId, name: `Demo ${pluginId}`, description: `Demo ${pluginId} desc`, version: "1.0.0", essential };
 }
 
 /** 每个用例一份全新模块实例 + 全新壳面 */
@@ -88,7 +88,7 @@ afterEach(() => {
 });
 
 describe("装载与分组（installed / builtin / disabled 三组口径）", () => {
-  it("一次装载：核心旗标分组——installed = 非 core、builtin = core；all 为未过滤全量", async () => {
+  it("一次装载：重要旗标分组——installed = 非 essential、builtin = essential；all 为未过滤全量", async () => {
     const { store } = await boot({
       plugins: [enabled("demo-alpha", false), enabled("demo-core-one", true)],
       disabledList: [disabled("demo-beta")],

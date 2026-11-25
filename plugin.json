@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@linkdesk/plugin-sdk/schemas/plugin.schema.json",
   "pluginId": "marketplace",
   "name": "插件市场",
-  "version": "1.4.39",
+  "version": "1.4.40",
   "category": "productivity",
   "minAppVersion": "0.2.63",
   "icon": "resources/icon.svg",
@@ -10,7 +10,6 @@
   "description": "浏览、安装和管理插件",
   "author": "Encaron",
   "distribution": "builtin",
-  "core": true,
   "factoryRole": "marketplace",
   "entry": "src/index.tsx",
   "appearsIn": {
@@ -1097,5 +1096,6 @@
       "zh": "README.md",
       "en": "docs/readme/en.md"
     }
-  }
+  },
+  "essential": true
 }

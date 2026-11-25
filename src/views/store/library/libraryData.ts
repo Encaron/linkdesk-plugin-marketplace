@@ -24,7 +24,7 @@ export type LibSourceFilter = "all" | "official" | "third" | "local";
 export interface LibraryRow {
   entry: CatalogEntry;
   state: PackageState;
-  core: boolean;
+  essential: boolean;
   /** 已装版本（manifest/禁用表；目录条目版本可能更新） */
   installedVersion?: string;
   source: Exclude<LibSourceFilter, "all">;
@@ -74,15 +74,16 @@ export function buildLibraryRows(input: LibraryBuildInput): LibraryRow[] {
   const localById = new Map(input.localInstalls.map((r) => [r.pluginId, r]));
   const rows = new Map<string, LibraryRow>();
 
-  const push = (
-    id: string,
-    name: string | undefined,
-    version: string | undefined,
-    core: boolean | undefined,
-    updatable: boolean | undefined,
-    disabled: boolean,
-    manifest?: PluginListEntry["manifest"] | PluginInfoEntry,
-  ) => {
+  const push = (row: {
+    id: string;
+    name: string | undefined;
+    version: string | undefined;
+    essential: boolean | undefined;
+    updatable: boolean | undefined;
+    disabled: boolean;
+    manifest?: PluginListEntry["manifest"] | PluginInfoEntry;
+  }) => {
+    const { id, name, version, essential, updatable, disabled, manifest } = row;
     if (!id || rows.has(id)) return;
     const catalog = byId.get(id);
     const local = localById.get(id);
@@ -100,7 +101,7 @@ export function buildLibraryRows(input: LibraryBuildInput): LibraryRow[] {
           : catalog.sourceName === "local" || catalog.author === "本地"
             ? "local"
             : "third"
-        : core
+        : essential
           ? "official"
           : "third";
     const catAuthor = catalog
@@ -111,7 +112,7 @@ export function buildLibraryRows(input: LibraryBuildInput): LibraryRow[] {
     rows.set(id, {
       entry,
       state,
-      core: !!core,
+      essential: !!essential,
       ...(version ? { installedVersion: version } : {}),
       source,
       author: source === "local" ? "" : catAuthor,
@@ -123,18 +124,26 @@ export function buildLibraryRows(input: LibraryBuildInput): LibraryRow[] {
   };
 
   for (const p of input.disabled) {
-    push(p.pluginId, p.name, p.version, p.core, p.updatable, true, p);
+    push({
+      id: p.pluginId,
+      name: p.name,
+      version: p.version,
+      essential: p.essential,
+      updatable: p.updatable,
+      disabled: true,
+      manifest: p,
+    });
   }
   for (const p of input.installed) {
-    push(
-      p.pluginId,
-      p.manifest.name,
-      p.manifest.version,
-      p.manifest.core,
-      p.updatable,
-      false,
-      p.manifest,
-    );
+    push({
+      id: p.pluginId,
+      name: p.manifest.name,
+      version: p.manifest.version,
+      essential: p.manifest.essential,
+      updatable: p.updatable,
+      disabled: false,
+      manifest: p.manifest,
+    });
   }
   return [...rows.values()];
 }
@@ -156,7 +165,7 @@ export function filterLibraryRows(rows: readonly LibraryRow[], f: LibFilters, se
     if (q && !`${row.entry.name}${row.entry.id}${row.author}`.toLowerCase().includes(q)) return false;
     if (f.status === "upd" && row.state !== "update") return false;
     if (f.status === "off" && row.state !== "disabled") return false;
-    if (f.status === "core" && !row.core) return false;
+    if (f.status === "core" && !row.essential) return false;
     if (f.source !== "all" && row.source !== f.source) return false;
     if (f.author !== "all" && (row.author || "") !== f.author) return false;
     if (f.repo !== "all" && (row.repo || "") !== f.repo) return false;
@@ -246,12 +255,12 @@ export function libraryStats(rows: readonly LibraryRow[]): {
 
 /** 「全部更新」的目标集——**唯一选择判据**（视图 ⛔ 自己再 filter 一遍）。
  *
- *  🔴 `core` **不参与选择**：`core: true` 唯一语义 = UI 不给卸载按钮（E6 §二·三 /
- *     `docs/02-Electron架构/插件生态与发布/03-插件市场/05-更新与版本.md` §147「core:true 的插件同规则
+ *  🔴 `essential`（旧名 core）**不参与选择**：唯一语义 = UI 不给卸载按钮（E6 §二·三 /
+ *     `docs/02-Electron架构/插件生态与发布/03-插件市场/05-更新与版本.md` §147「该旗标的插件同规则
  *     可更新/降级——无内置排除」），不定义任何更新/版本行为。
- *     此前的 `!r.core` 恰好把「待更新全是随包件（editor/file-tree/settings）」这种常态排空 ⇒
- *     按钮亮着「3 个可更新」、点下去却弹「所有插件已是最新」——统计头（含 core）与动作集（排 core）自相矛盾。
- *     能不能真更新由住所闸 `updatable` 定（随包只读根的 state 压根不是 update），⛔ 不拿 core 二次判。
+ *     此前的 `!r.core`（1.4.39 已删）恰好把「待更新全是随包件（editor/file-tree/settings）」这种常态排空 ⇒
+ *     按钮亮着「3 个可更新」、点下去却弹「所有插件已是最新」——统计头（含该旗标）与动作集（排该旗标）自相矛盾。
+ *     能不能真更新由住所闸 `updatable` 定（随包只读根的 state 压根不是 update），⛔ 不拿该旗标二次判。
  *
  *  `missingDownload` 单独回：有更新但目录条目/releases 缺可下载地址 ⇒ 是「发不了包」，⛔ 不是「已是最新」。 */
 export interface UpdateAllSelection {

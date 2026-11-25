@@ -19,7 +19,7 @@ export default function DetailActionBar({
   pending,
   pendingReason,
   hasInfo,
-  isCore,
+  isEssential,
   online,
   belowMinApp,
   minAppVersion,
@@ -54,7 +54,7 @@ export default function DetailActionBar({
   pendingReason?: string;
   /** 已装且非挂起分支（= 调用方的 `info` 为真） */
   hasInfo: boolean;
-  isCore: boolean;
+  isEssential: boolean;
   online: boolean;
   /** R4-3.18「不够」：当前壳 < 条目要求的 minAppVersion——行保留标黄，安装/重试钮置灰并给出原因（05 §02/§07 D3） */
   belowMinApp?: boolean;
@@ -128,7 +128,7 @@ export default function DetailActionBar({
               <span className="codicon codicon-play" /> {t("启用")}
             </Button>
             {/* E6#18a：core:true 藏卸载钮——含禁用态（core 经 getDisabled 透传） */}
-            {!isCore && (
+            {!isEssential && (
               <Button variant="danger" onClick={onUninstall} disabled={frozen}>
                 <span className="codicon codicon-trash" /> {uninstallingHere ? t("卸载中...") : t("卸载")}
               </Button>
@@ -160,7 +160,7 @@ export default function DetailActionBar({
             <Button variant="ghost" onClick={onDisable} disabled={frozen}>
               <span className="codicon codicon-circle-slash" /> {t("禁用")}
             </Button>
-            {!isCore && (
+            {!isEssential && (
               <Button variant="danger" onClick={onUninstall} disabled={frozen}>
                 <span className="codicon codicon-trash" /> {uninstallingHere ? t("卸载中...") : t("卸载")}
               </Button>
