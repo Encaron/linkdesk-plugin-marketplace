@@ -788,5 +788,13 @@
   "更新失败 toast 的「重试」落点：按 pluginId + downloadUrl（可选 displayName）重试更新（仍过确认门）。": "Retry entry point from the update-failure toast: retries updating by pluginId + downloadUrl (optional displayName; still goes through the confirmation gate).",
   "插件 id": "Plugin id",
   "安装包下载地址（失败 toast 构造时自带）": "Package download URL (supplied by the failure toast)",
-  "插件显示名（可选，用于提示文案）": "Plugin display name (optional; used in messages)"
+  "插件显示名（可选，用于提示文案）": "Plugin display name (optional; used in messages)",
+  "启用插件。传 pluginId；成功后回读真实启停态（enabled）。同一 idempotencyKey 重试由宿主回放（收敛写，⛔ 重复启用）。": "Enable a plugin. Pass pluginId; after success returns the real post-state (enabled). Retrying with the same idempotencyKey is replayed by the host (convergent write — never enables twice).",
+  "要启用的插件 id": "Plugin id to enable",
+  "重试键：同一键第二次调用回放首次结果（replayed:true），⛔ 再启用一次": "Retry key: the same key replays the first result (replayed:true) instead of enabling again",
+  "禁用插件。传 pluginId；成功后回读真实启停态（enabled:false）。同一 idempotencyKey 重试由宿主回放（收敛写，⛔ 重复禁用）。": "Disable a plugin. Pass pluginId; after success returns the real post-state (enabled:false). Retrying with the same idempotencyKey is replayed by the host (convergent write — never disables twice).",
+  "要禁用的插件 id": "Plugin id to disable",
+  "重试键：同一键第二次调用回放首次结果（replayed:true），⛔ 再禁用一次": "Retry key: the same key replays the first result (replayed:true) instead of disabling again",
+  "卸载插件（R3，不可逆）。传 pluginId；成功后回读 installed:false。⛔ 不声明幂等键（破坏性写，重放不应被缓存为成功）。": "Uninstall a plugin (R3, irreversible). Pass pluginId; after success returns installed:false. No idempotencyKey is declared (destructive write — replay must not be cached as success).",
+  "要卸载的插件 id": "Plugin id to uninstall"
 }

@@ -16,6 +16,33 @@ const lk = () => window.linkdesk;
 
 const pm = () => window.linkdesk?.pluginManager;
 
+/** 命令入参两形等价：逐位 pluginId 或具名对象 `{ pluginId }`（壳 expandNamedArgs 同契约） */
+function targetPluginId(args: unknown[]): string | undefined {
+  const a0 = args[0];
+  if (typeof a0 === "string" && a0) return a0;
+  if (a0 && typeof a0 === "object") {
+    const id = (a0 as { pluginId?: unknown }).pluginId;
+    if (typeof id === "string" && id) return id;
+  }
+  return undefined;
+}
+
+/**
+ * 后置状态快照——enable/disable/uninstall 成功后回读插件的真实装/启状态。
+ * `pluginManager.list()` = 已装（启用）真相源，`getDisabled()` = 禁用表；读不到 ⇒ null（⛔ 猜）。
+ */
+async function pluginPostState(pluginId: string): Promise<{ installed: boolean | null; enabled: boolean | null }> {
+  try {
+    const list = await pm()?.list?.() ?? [];
+    const installed = Array.isArray(list) && list.some((p) => (p as { id?: unknown })?.id === pluginId);
+    const disabled = await pm()?.getDisabled?.() ?? [];
+    const isDisabled = Array.isArray(disabled) && disabled.some((d) => d === pluginId || (d as { id?: unknown })?.id === pluginId);
+    return { installed, enabled: installed ? !isDisabled : false };
+  } catch {
+    return { installed: null, enabled: null };
+  }
+}
+
 /* ═══ E6#71g marketplace 命令组注册（模块级——原 index.tsx 迁入，注册随任一市场视图激活） ═══
  * 背景：marketplace.enable/disable/uninstall/retryInstall + gear 菜单原只在 index.tsx 模块顶注册
  * （市场落地页标签打开才执行）。但安装/卸载失败 toast 在 DetailView/ExploreView 触发（import 本模块，
@@ -49,8 +76,11 @@ function ensureMarketplaceCommands(): void {
   reg(
     "marketplace.enable",
     async (...args: unknown[]) => {
-      const ctx = args[0] as { pluginId?: string } | undefined;
-      if (ctx?.pluginId) await pm().enable(ctx.pluginId);
+      const pluginId = targetPluginId(args);
+      if (!pluginId) return { ok: false, pluginId: null, enabled: null, reason: "missing-pluginId" };
+      await pm().enable(pluginId);
+      const state = await pluginPostState(pluginId);
+      return { ok: true, pluginId, enabled: state.enabled };
     },
     { title: "启用" },
   );
@@ -58,8 +88,11 @@ function ensureMarketplaceCommands(): void {
   reg(
     "marketplace.disable",
     async (...args: unknown[]) => {
-      const ctx = args[0] as { pluginId?: string } | undefined;
-      if (ctx?.pluginId) await pm().disable(ctx.pluginId);
+      const pluginId = targetPluginId(args);
+      if (!pluginId) return { ok: false, pluginId: null, enabled: null, reason: "missing-pluginId" };
+      await pm().disable(pluginId);
+      const state = await pluginPostState(pluginId);
+      return { ok: true, pluginId, enabled: state.enabled };
     },
     { title: "禁用" },
   );
@@ -67,8 +100,11 @@ function ensureMarketplaceCommands(): void {
   reg(
     "marketplace.uninstall",
     async (...args: unknown[]) => {
-      const ctx = args[0] as { pluginId?: string } | undefined;
-      if (ctx?.pluginId) await pm().uninstall(ctx.pluginId);
+      const pluginId = targetPluginId(args);
+      if (!pluginId) return { ok: false, pluginId: null, installed: null, reason: "missing-pluginId" };
+      await pm().uninstall(pluginId);
+      const state = await pluginPostState(pluginId);
+      return { ok: true, pluginId, installed: state.installed };
     },
     { title: "卸载" },
   );

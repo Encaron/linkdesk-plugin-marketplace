@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@linkdesk/plugin-sdk/schemas/plugin.schema.json",
   "pluginId": "marketplace",
   "name": "插件市场",
-  "version": "1.4.37",
+  "version": "1.4.38",
   "category": "productivity",
   "minAppVersion": "0.2.63",
   "icon": "resources/icon.svg",
@@ -782,19 +782,46 @@
         "id": "marketplace.enable",
         "risk": "R2",
         "activation": "entry",
-        "returns": [],
+        "returns": [
+          {
+            "name": "ok",
+            "type": "boolean",
+            "description": "True when the command completed"
+          },
+          {
+            "name": "pluginId",
+            "type": "string|null",
+            "description": "Target plugin id"
+          },
+          {
+            "name": "enabled",
+            "type": "boolean|null",
+            "description": "Post-state: whether the plugin is enabled (null when unreadable)"
+          },
+          {
+            "name": "reason",
+            "type": "string",
+            "optional": true,
+            "description": "Why nothing was done: missing-pluginId"
+          }
+        ],
         "example": {
-          "pluginId": "serial-monitor"
+          "pluginId": "demo-plugin"
         },
         "title": "启用",
         "category": "插件市场",
-        "description": "启用一个已安装但被禁用的插件（按 pluginId）。只改插件启用状态，不动磁盘代码。",
+        "description": "启用插件。传 pluginId；成功后回读真实启停态（enabled）。同一 idempotencyKey 重试由宿主回放（收敛写，⛔ 重复启用）。",
         "params": [
           {
+            "name": "pluginId",
             "type": "string",
             "required": true,
-            "name": "pluginId",
-            "description": "插件 id"
+            "description": "要启用的插件 id"
+          },
+          {
+            "name": "idempotencyKey",
+            "type": "string",
+            "description": "重试键：同一键第二次调用回放首次结果（replayed:true），⛔ 再启用一次"
           }
         ]
       },
@@ -802,19 +829,46 @@
         "id": "marketplace.disable",
         "risk": "R2",
         "activation": "entry",
-        "returns": [],
+        "returns": [
+          {
+            "name": "ok",
+            "type": "boolean",
+            "description": "True when the command completed"
+          },
+          {
+            "name": "pluginId",
+            "type": "string|null",
+            "description": "Target plugin id"
+          },
+          {
+            "name": "enabled",
+            "type": "boolean|null",
+            "description": "Post-state: whether the plugin is enabled (null when unreadable)"
+          },
+          {
+            "name": "reason",
+            "type": "string",
+            "optional": true,
+            "description": "Why nothing was done: missing-pluginId"
+          }
+        ],
         "example": {
-          "pluginId": "serial-monitor"
+          "pluginId": "demo-plugin"
         },
         "title": "禁用",
         "category": "插件市场",
-        "description": "禁用一个已安装插件（按 pluginId）。只改启用状态，不删磁盘代码。",
+        "description": "禁用插件。传 pluginId；成功后回读真实启停态（enabled:false）。同一 idempotencyKey 重试由宿主回放（收敛写，⛔ 重复禁用）。",
         "params": [
           {
+            "name": "pluginId",
             "type": "string",
             "required": true,
-            "name": "pluginId",
-            "description": "插件 id"
+            "description": "要禁用的插件 id"
+          },
+          {
+            "name": "idempotencyKey",
+            "type": "string",
+            "description": "重试键：同一键第二次调用回放首次结果（replayed:true），⛔ 再禁用一次"
           }
         ]
       },
@@ -822,19 +876,41 @@
         "id": "marketplace.uninstall",
         "risk": "R3",
         "activation": "entry",
-        "returns": [],
+        "returns": [
+          {
+            "name": "ok",
+            "type": "boolean",
+            "description": "True when the command completed"
+          },
+          {
+            "name": "pluginId",
+            "type": "string|null",
+            "description": "Target plugin id"
+          },
+          {
+            "name": "installed",
+            "type": "boolean|null",
+            "description": "Post-state: whether the plugin is still installed (null when unreadable)"
+          },
+          {
+            "name": "reason",
+            "type": "string",
+            "optional": true,
+            "description": "Why nothing was done: missing-pluginId"
+          }
+        ],
         "example": {
-          "pluginId": "serial-monitor"
+          "pluginId": "demo-plugin"
         },
         "title": "卸载",
         "category": "插件市场",
-        "description": "卸载一个已安装插件（按 pluginId）：删除安装代码，插件数据可能一并丢失，重装不等于恢复。",
+        "description": "卸载插件（R3，不可逆）。传 pluginId；成功后回读 installed:false。⛔ 不声明幂等键（破坏性写，重放不应被缓存为成功）。",
         "params": [
           {
+            "name": "pluginId",
             "type": "string",
             "required": true,
-            "name": "pluginId",
-            "description": "插件 id"
+            "description": "要卸载的插件 id"
           }
         ]
       },

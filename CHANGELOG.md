@@ -1,5 +1,13 @@
 # 更新日志
 
+## v1.4.38（2026-11-25）
+
+- **状态命令试点（跨领域 · Block 2）**：
+  - `marketplace.enable` / `disable`：参数化 `pluginId`（逐位/具名两形等价）＋ **`idempotencyKey`**（收敛写：置为启用/禁用同一终态，同键重试由宿主回放，⛔ 重复执行）；成功回后置状态 `{ok,pluginId,enabled}`（回读 `pluginManager.list()/getDisabled()` 真值，读不到 ⇒ null）。
+  - `marketplace.uninstall`（R3）：参数化 `pluginId`；成功回 `{ok,pluginId,installed:false}`；**不声明**幂等键（破坏性写，重放不应被缓存为成功）。
+  - 缺 `pluginId` ⇒ `{ok:false,pluginId:null,reason:"missing-pluginId"}`（可判读，⛔ 静默 undefined）。
+  - 顺带清理 lint：`useInstallAction` 的 `installVer` 无用依赖；补 `fmtSize` 单测（覆盖度腿此前黄灯）。
+
 ## v1.4.37（2026-11-25）
 
 - AI 门外契约补齐：命令声明补 `risk`/`activation`/`returns`/`example`。

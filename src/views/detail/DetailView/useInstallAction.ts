@@ -108,7 +108,7 @@ export function useInstallAction(
     if (!entry) return;
     // 🔴 确认归壳（requestInstall 内部弹卡）——市场这层门已删（用户 2026-11-24：不做老壳适配）
     await runInstall();
-  }, [pluginId, busy, installingHere, installGateError, entry, installVer, runInstall]);
+  }, [pluginId, busy, installingHere, installGateError, entry, runInstall]);
 
   /** #64 A3（mockup 02 帧 3）：同一失败只留一处重试口——安装钮原位变红「↻ 重试安装」
    *  （toast [重试] 同 retryMarketInstall、同目录 downloadUrl = 双口零漂移）；
