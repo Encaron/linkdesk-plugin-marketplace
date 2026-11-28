@@ -1,5 +1,12 @@
 # 更新日志
 
+## v1.4.41（2026-11-28）
+
+- **修「官方目录仓」仓库头像 404（实机 protocol-debug.log：`404 NOT FOUND — marketplace/resources/repo-official.svg`）**：该图只被代码按字符串 URL 引用，不在 plugin.json 声明面也不被 README 引用 ⇒ SDK build 随包白名单够不着它 ⇒ 发布 zip 里根本没有这个文件，每台安装版都裂图。
+  - 修法 = 构建期内联：`?raw` 把 `resources/repo-official.svg` 编进 bundle 出 data URL（资产真源仍是那一份文件，改图只改它）；消费链 `resolveRepoAvatar` 对非 http(s) src 原样直通，零网络零缓存副作用。⛔ 不为单图开 SDK 白名单口子（E6#93b 判据原样）。
+- **补完 1.4.40 的 essential 改名残留**：`core-forbidden` → `essential-forbidden`（加源弹窗分支 + 字典双键）、`StoreCardContext` / `allBadges` ctx / `DetailInfo` 三处类型声明换名、库行构造与注释面、「已购未安装」行构造。类型面现与 1.4.40 的运行时一致。
+- 顺修（同笔小账）：`libraryData.test.ts` 夹具 `core: true` → `essential: true`（tsconfig 无 tsc 门，测试运行时不挑——但名字必须诚实）。
+
 ## v1.4.40（2026-11-26）
 
 - **`core` → `essential` 硬切（无兼容别名）**：随包 / 重要 / 可更新 三事实分家——随包＝lock `seed`（构建期事实）；`essential` 只表示「UI 不显示卸载入口」，仅随包件可声明；可否更新只看住所 `updatable`。

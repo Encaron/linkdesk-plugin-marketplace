@@ -198,7 +198,7 @@ export function licenseBadges(
 /** 全量徽标行（顺序照蓝图 badges()：已安装 → 已禁用 → 有更新 → 内置 → 许可 → 来源） */
 export function allBadges(
   entry: Pick<CatalogEntry, "pricing" | "official" | "vendorId">,
-  ctx: { state: PackageState; core?: boolean; license?: LicenseView | null; now?: number },
+  ctx: { state: PackageState; essential?: boolean; license?: LicenseView | null; now?: number },
 ): BadgeDesc[] {
   const out: BadgeDesc[] = [];
   if (ctx.state === "installed") out.push({ kind: "installed", key: "已安装" });

@@ -15,7 +15,7 @@ export type DetailContributedProps = {
  *  E6#65c：manifest 再挑 icon/iconSource（图标回退链第二环——已装 manifest 无目录条目时详情页头图）
  *  E6#67：manifest 再挑 marketIcon/marketIconSource——已装插件详情展示位读它（list() 投影已带，双图标模型） */
 export type DetailInfo = {
-  manifest: { name?: string; version?: string; author?: string; description?: string; core?: boolean; icon?: string; iconSource?: "codicon" | "svg" | "url" | "lucide"; marketIcon?: string; marketIconSource?: "codicon" | "svg" | "url" | "lucide" };
+  manifest: { name?: string; version?: string; author?: string; description?: string; essential?: boolean; icon?: string; iconSource?: "codicon" | "svg" | "url" | "lucide"; marketIcon?: string; marketIconSource?: "codicon" | "svg" | "url" | "lucide" };
   pendingReason?: string;
 };
 

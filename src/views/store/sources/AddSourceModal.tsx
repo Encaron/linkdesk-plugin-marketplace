@@ -214,8 +214,8 @@ export function AddSourceModal({
           text:
             r?.reason === "exists"
               ? t("同 id 插件已安装——先卸载或换一个文件夹")
-              : r?.reason === "core-forbidden"
-                ? t("本地插件不得声明 core:true")
+              : r?.reason === "essential-forbidden"
+                ? t("本地插件不得声明 essential:true")
                 : t("本地安装失败（{{reason}}）", { reason: r?.reason ?? "io" }),
         });
         setStage("check");

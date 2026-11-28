@@ -484,7 +484,7 @@ export function LibraryView() {
               const row: LibraryRow = {
                 entry,
                 state: "install",
-                core: false,
+                essential: false,
                 source: "third",
                 author: "",
                 repo: "",

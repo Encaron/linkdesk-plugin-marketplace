@@ -151,7 +151,7 @@ describe("已购未安装", () => {
 
 describe("全部更新目标集（selectUpdateAllTargets）", () => {
   const coreInstalled: PluginListEntry[] = [
-    { pluginId: "core-demo", manifest: { name: "Core Demo", version: "1.0.0", core: true }, updatable: true },
+    { pluginId: "core-demo", manifest: { name: "Core Demo", version: "1.0.0", essential: true }, updatable: true },
   ];
   const coreCatalog: CatalogEntry[] = [
     { id: "core-demo", name: "Core Demo", version: "1.1.0", downloadUrl: "https://x/core-demo.zip" },
@@ -164,7 +164,7 @@ describe("全部更新目标集（selectUpdateAllTargets）", () => {
     licenses: new Map(),
   });
 
-  it("🔴 core:true 的待更新行**照常入选**（core 只定义不可卸载，不定义更新/版本行为）", () => {
+  it("🔴 essential 的待更新行**照常入选**（essential 只定义不可卸载，不定义更新/版本行为）", () => {
     const sel = selectUpdateAllTargets(coreRows);
     expect(sel.total).toBe(1);
     expect(sel.missingDownload).toBe(0);

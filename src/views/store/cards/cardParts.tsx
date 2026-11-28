@@ -36,7 +36,7 @@ import { mediaOf } from "./mediaModel";
 /** 卡片渲染上下文（由商店数据层一次性算好，逐卡传入——⛔ 卡内再订阅 store） */
 export interface StoreCardContext {
   state: PackageState;
-  core?: boolean;
+  essential?: boolean;
   license?: LicenseView | null;
   job?: InstallJob | null;
   online: boolean;

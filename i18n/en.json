@@ -557,7 +557,7 @@
   "目录获取成功——确认后写入市场源（与设置页同一配置项）": "Catalog fetched — on confirm it is saved to the sources config (the same key as Settings)",
   "已添加本地插件 · {{name}}": "Local plugin added · {{name}}",
   "同 id 插件已安装——先卸载或换一个文件夹": "A plugin with the same id is already installed — uninstall it first or pick another folder",
-  "本地插件不得声明 core:true": "Local plugins must not declare core:true",
+  "本地插件不得声明 essential:true": "Local plugins must not declare essential:true",
   "本地安装失败（{{reason}}）": "Local install failed ({{reason}})",
   "已添加来源 · {{url}}": "Source added · {{url}}",
   "添加失败（{{reason}}）": "Failed to add ({{reason}})",

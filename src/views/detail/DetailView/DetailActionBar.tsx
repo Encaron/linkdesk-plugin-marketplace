@@ -127,7 +127,7 @@ export default function DetailActionBar({
             <Button variant="success" onClick={onEnable} disabled={frozen}>
               <span className="codicon codicon-play" /> {t("启用")}
             </Button>
-            {/* E6#18a：core:true 藏卸载钮——含禁用态（core 经 getDisabled 透传） */}
+            {/* E6#18a：essential 藏卸载钮——含禁用态（旗标经 getDisabled 透传） */}
             {!isEssential && (
               <Button variant="danger" onClick={onUninstall} disabled={frozen}>
                 <span className="codicon codicon-trash" /> {uninstallingHere ? t("卸载中...") : t("卸载")}

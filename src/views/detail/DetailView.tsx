@@ -33,7 +33,7 @@
  *   禁用 = getDisabled 子集（name/description/version/core）。未装 = catalog 目录数据。
  *
  * 动作（30.11d + 30.5b）：enable/disable/uninstall 走 window.linkdesk.pluginManager.*；卸载二次确认走
- *   linkdesk.dialog.confirm。core:true 只藏卸载钮（E6#18a——UI 防误删旗标，命令/接口层可卸，含禁用态）。
+ *   linkdesk.dialog.confirm。essential 只藏卸载钮（E6#18a——UI 防误删旗标，命令/接口层可卸，含禁用态）。
  *   执行后本地不翻转状态——lifecycle 事件驱动 useMarketplacePlugins 自动 refreshData，视图随刷新收敛到真值。
  *
  * 30.6 富展示诚实边界（04 §三）：评分/评论/下载数/Star **不做**（无服务器不伪造，下载数 E6#30.8b 域）；

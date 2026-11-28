@@ -34,6 +34,7 @@ import { fetchSidecar } from "./marketSources/fetch";
 import { readSourceRecords, type SourceRecord } from "./marketSources";
 import { getCatalogResult } from "./marketplaceShared/catalogStore";
 import { OFFICIAL_AUTHOR_ID, OFFICIAL_CORE_REPO_ID } from "./officialRepo";
+import { repoOfficialImage } from "./repoOfficialImage";
 import { realmSlot } from "./realmSlot";
 
 /** 官方作者域（合成身份）：官方目录条目没有 authorId，但官方也按「一个作者多个仓库」展示 */
@@ -551,8 +552,8 @@ export function officialDomainOf(all: readonly CatalogEntry[]): AuthorDomain | n
         zh: { name: repo === OFFICIAL_CORE_REPO_ID ? "官方目录" : repo, intro: "官方内置与精选插件" },
         en: { name: repo === OFFICIAL_CORE_REPO_ID ? "Official catalog" : repo, intro: "Official built-ins and picks" },
       },
-      /* 2026-11-23：官方目录仓的「仓库头像」——品牌橙底 + 2×2 瓷片（插件自带资源，离线可用） */
-      ...(repo === OFFICIAL_CORE_REPO_ID ? { image: "linkdesk://marketplace/resources/repo-official.svg" } : {}),
+      /* 2026-11-23：官方目录仓的「仓库头像」——品牌橙底 + 2×2 瓷片（构建期内联，离线可用；出处 = services/repoOfficialImage.ts） */
+      ...(repo === OFFICIAL_CORE_REPO_ID ? { image: repoOfficialImage } : {}),
       plugins,
     };
   });

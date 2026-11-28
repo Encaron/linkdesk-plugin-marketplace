@@ -3,7 +3,7 @@
  *
  * 🔴 报障现象：库里明明亮着「N 个可更新」，点「全部更新」却弹「所有插件已是最新」。
  *    根因：`onUpdateAll` 里 `state === "update" && !r.core` 把 core 插件整批排掉——而当时待更新的
- *    恰好全是随包件（editor / file-tree / settings，全声明 core:true）。`core: true` 唯一语义是
+ *    恰好全是随包件（editor / file-tree / settings，全声明 essential）。`essential` 唯一语义是
  *    「UI 不给卸载按钮」，**不定义更新/版本行为**（05-更新与版本 §147）；能不能真更新由住所闸
  *    `updatable` 决定（随包只读根压根不是 update 态）。
  *
@@ -61,9 +61,9 @@ function stubLinkdesk() {
     pluginState: { get: vi.fn(async () => undefined), set: vi.fn(async () => undefined), onChange: vi.fn(() => unsub) },
     events: { on: vi.fn(() => unsub), emit: vi.fn() },
     pluginManager: {
-      // core:true + userData 住所（updatable）——本仓常态：随包件的可更新行
+      // essential + userData 住所（updatable）——本仓常态：随包件的可更新行
       list: vi.fn(async () => [
-        { pluginId: "editor", manifest: { name: "Editor", version: "1.0.31", core: true }, updatable: true },
+        { pluginId: "editor", manifest: { name: "Editor", version: "1.0.31", essential: true }, updatable: true },
       ]),
       getDisabled: vi.fn(async () => []),
       installWithProgress: vi.fn(async () => ({ success: true })),
@@ -110,7 +110,7 @@ afterEach(() => {
 });
 
 describe("我的库 · 全部更新", () => {
-  it("🔴 core:true 的待更新行照常入批——⛔ 不许弹「所有插件已是最新」", async () => {
+  it("🔴 essential 的待更新行照常入批——⛔ 不许弹「所有插件已是最新」", async () => {
     const { container } = render(<StoreView isActive />);
     await waitFor(() => expect(container.querySelector('[data-rail-item="library"]')).toBeTruthy());
     fireEvent.click(container.querySelector('[data-rail-item="library"]') as HTMLElement);

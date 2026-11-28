@@ -20,6 +20,7 @@ import { orderedReposOf, useSourceOrder } from "../../../services/sourceOrderSto
 import { showToast } from "../../../services/hostApi";
 import type { AuthorRepoView } from "../../../services/authors";
 import { isOfficialCoreRepo } from "../../../services/officialRepo";
+import { repoOfficialImage } from "../../../services/repoOfficialImage";
 import { AuthorSwitchCard } from "../authors/AuthorCard";
 import { Strip } from "../Strip";
 import { useStore } from "../StoreContext";
@@ -107,7 +108,7 @@ export function RepoSlot() {
                 icon={data.repo.official ? "bag" : "folder"}
                 authorId={authorId}
                 repoId={r.id}
-                image={r.image ?? (core ? "linkdesk://marketplace/resources/repo-official.svg" : undefined)}
+                image={r.image ?? (core ? repoOfficialImage : undefined)}
                 hue={authorHueOf(authorId)}
                 onOpen={() => data.repo.setRepo({ authorId, repoId: r.id })}
                 ariaLabel={t("{{name}}——切换到该仓库", { name: lt(r, "name") })}

@@ -83,7 +83,7 @@ export function useDetailActions(id: DetailIdentity, o: { localVer?: string }) {
   }, [pluginId, busy, t, displayName]);
 
   /* 卸载 = 二次确认（dialog.confirm——真实原语，mockup 帧 4「复用现有 confirm」）→ 执行。
-   *   core:true 藏钮（#18），但命令层可卸；不确认不卸。 */
+   *   essential 藏钮（#18），但命令层可卸；不确认不卸。 */
   const handleUninstall = useCallback(async () => {
     if (!pluginId || busy) return;
     const confirmApi = lk()?.dialog?.confirm;
