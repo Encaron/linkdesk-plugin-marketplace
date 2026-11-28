@@ -1,30 +1,37 @@
 {
   "version": "1",
-  "updatedAt": "2026-11-25T17:56:42.854Z",
+  "updatedAt": "2026-11-28T07:26:27.644Z",
   "plugins": [
     {
       "id": "marketplace",
       "name": "插件市场",
-      "version": "1.4.40",
+      "version": "1.4.41",
       "description": "浏览、安装和管理插件",
       "author": {
         "name": "Encaron"
       },
-      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.40/resources/icon.svg",
+      "icon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.41/resources/icon.svg",
       "iconSource": "url",
-      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.40/resources/icon-brand.svg",
+      "marketIcon": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.41/resources/icon-brand.svg",
       "marketIconSource": "url",
       "minAppVersion": "0.2.63",
       "category": "productivity",
-      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.40/README.md",
+      "readmeUrl": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.41/README.md",
       "readmeLocales": {
-        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.40/README.md",
-        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.40/docs/readme/en.md"
+        "zh": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.41/README.md",
+        "en": "https://raw.githubusercontent.com/Encaron/linkdesk-plugin-marketplace/v1.4.41/docs/readme/en.md"
       },
-      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.40/marketplace.linkdesk-plugin",
-      "size": 201810,
-      "publishedAt": "2026-11-25T17:56:42.854Z",
+      "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.41/marketplace.linkdesk-plugin",
+      "size": 202910,
+      "publishedAt": "2026-11-28T07:26:27.644Z",
       "versions": [
+        {
+          "version": "1.4.41",
+          "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.41/marketplace.linkdesk-plugin",
+          "publishedAt": "2026-11-28T07:26:27.644Z",
+          "changelog": "- **修「官方目录仓」仓库头像 404（实机 protocol-debug.log：`404 NOT FOUND — marketplace/resources/repo-official.svg`）**：该图只被代码按字符串 URL 引用，不在 plugin.json 声明面也不被 README 引用 ⇒ SDK build 随包白名单够不着它 ⇒ 发布 zip 里根本没有这个文件，每台安装版都裂图。\n  - 修法 = 构建期内联：`?raw` 把 `resources/repo-official.svg` 编进 bundle 出 data URL（资产真源仍是那一份文件，改图只改它）；消费链 `resolveRepoAvatar` 对非 http(s) src 原样直通，零网络零缓存副作用。⛔ 不为单图开 SDK 白名单口子（E6#93b 判据原样）。\n- **补完 1.4.40 的 essential 改名残留**：`core-forbidden` → `essential-forbidden`（加源弹窗分支 + 字典双键）、`StoreCardContext` / `allBadges` ctx / `DetailInfo` 三处类型声明换名、库行构造与注释面、「已购未安装」行构造。类型面现与 1.4.40 的运行时一致。\n- 顺修（同笔小账）：`libraryData.test.ts` 夹具 `core: true` → `essential: true`（tsconfig 无 tsc 门，测试运行时不挑——但名字必须诚实）。",
+          "sha256": "264265e65ce0afc27bcda1c929d2f652a8e21a8ac22768c333911c1e8ac4cabb"
+        },
         {
           "version": "1.4.40",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.40/marketplace.linkdesk-plugin",
@@ -57,7 +64,6 @@
           "version": "1.4.36",
           "downloadUrl": "https://github.com/Encaron/linkdesk-plugin-marketplace/releases/download/v1.4.36/marketplace.linkdesk-plugin",
           "publishedAt": "2026-11-24T19:44:16.819Z",
-          "changelog": "- 确认计划过期（卡摆了超过 5 分钟才点确认）不再静默当取消：提示「确认已过期，请重新发起」。",
           "sha256": "efd069b02b316659dd12a50d1b960f78ede1af6e1d0ce51fff26984d14de61b0"
         },
         {
